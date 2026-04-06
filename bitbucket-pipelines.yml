@@ -1,0 +1,67 @@
+image: composer:2
+
+pipelines:
+  branches:
+    main:
+      - step:
+          name: "🧰 Build & Deploy Laravel"
+          caches:
+            - composer
+          script:
+            # 1️⃣ Install rsync + SSH client
+            - |
+              echo "📦 Installing rsync & SSH client..."
+              apk add --no-cache rsync openssh
+
+            # 2️⃣ Composer install
+            - |
+              echo "📦 Installing Composer dependencies..."
+              composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+            # 3️⃣ Ensure Laravel directories exist
+            - |
+              echo "🛠️ Ensuring Laravel directories exist..."
+              mkdir -p bootstrap/cache
+              mkdir -p storage/framework/views
+              mkdir -p storage/framework/cache
+              mkdir -p storage/logs
+              mkdir -p resources/views
+
+            # 4️⃣ Laravel optimization
+            - |
+              echo "⚙️ Optimizing Laravel..."
+              php artisan config:cache || true
+              php artisan route:cache || true
+
+            # 5️⃣ SSH setup
+            - |
+              echo "🔑 Setting up SSH..."
+              mkdir -p ~/.ssh
+              chmod 700 ~/.ssh
+              ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+
+            # 6️⃣ Test SSH connection
+            - |
+              echo "🔍 Testing SSH connection..."
+              ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "echo '✅ SSH connection successful to $SSH_HOST'"
+
+            # 7️⃣ Deploy with rsync
+            - |
+              echo "🚀 Deploying to production..."
+              rsync -avzP --delete \
+                --exclude=".git/" \
+                --exclude=".github/" \
+                --exclude="node_modules/" \
+                --exclude="storage/logs/" \
+                --exclude="tests/" \
+                --exclude=".env" \
+                ./ $SSH_USER@$SSH_HOST:$DEPLOY_PATH
+
+            # 8️⃣ Fix permissions and optimize on server
+            - |
+              echo "🧹 Fixing permissions & optimizing Laravel on server..."
+              ssh $SSH_USER@$SSH_HOST "cd $DEPLOY_PATH && chmod -R 755 storage bootstrap/cache"
+            - |
+              echo "⚡ Clearing Laravel config on server..."
+              ssh $SSH_USER@$SSH_HOST "cd $DEPLOY_PATH && php artisan config:clear && php artisan optimize:clear"
+
