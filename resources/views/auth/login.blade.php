@@ -1,4 +1,5 @@
 @extends('auth.layout.auth')
+@section('title', 'Aspire Learners - Login')
 <!-- BEGIN: Body-->
 @section('content')
 
@@ -7,8 +8,8 @@
                         <div class="card bg-authentication rounded-0 mb-0">
                             <div class="row m-0">
                                 <div class="col-lg-6 d-lg-block d-none text-center align-self-center px-1 py-0">
-                                    <img src="{{ asset('theme/app-assets/images/logo/branding-logo.png') }}"
-                                        alt="branding logo" width="50%">
+                                    <img src="{{ asset('theme/app-assets/images/logo/Logosample.png') }}"
+                                        alt="branding logo" width="100%">
                                 </div>
                                 <div class="col-lg-6 col-12 p-0">
                                     <div class="card rounded-0 mb-0 px-2">
@@ -85,12 +86,13 @@
                                         </div>
                                         <div class="login-footer">
                                             <div class="divider">
-                                                <div class="divider-text">Manage Data Using</div>
+                                                <div class="divider-text">Login Using</div>
                                             </div>
                                             <div class="footer-btn d-inline">
-                                                <h4>
-                                                    <center>Backup Recovery Tool</center>
-                                                </h4>
+                                                <a href="#" class="btn btn-facebook waves-effect waves-light"><span class="fa fa-facebook"></span></a>
+                                                <a href="#" class="btn btn-twitter white waves-effect waves-light"><span class="fa fa-twitter"></span></a>
+                                                <a href="#" class="btn btn-google waves-effect waves-light"><span class="fa fa-google"></span></a>
+                                                <a href="#" class="btn btn-github waves-effect waves-light"><span class="fa fa-github-alt"></span></a>
                                             </div>
                                         </div>
                                     </div>

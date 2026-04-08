@@ -6,6 +6,14 @@ use App\Http\Controllers\LogsController;
 use App\Http\Controllers\ManualBackupManagerController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\EditProfileController;
+
+use App\Http\Controllers\Student\HomeController as StudentHomeController;
+use App\Http\Controllers\Student\LessonsController as StudentLessonsController;
+use App\Http\Controllers\Student\AnalyticsController as StudentAnalyticsController;
+use App\Http\Controllers\Student\AssessmentController as StudentAssessmentsController;
+use App\Http\Controllers\Student\FocusAreasController as StudentFocusAreasController;
+use App\Http\Controllers\Student\AnnouncementsController as StudentAnnouncementsController;
+use App\Http\Controllers\Student\CentreTestScoreController as StudentCentreTestScoreController;
 use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Route;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
@@ -70,9 +78,18 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
 
 // Student
 Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
-    Route::get('/student/dashboard', function () {
-        return view('student.dashboard');
-    })->name('student.dashboard');
+     Route::get('/student/dashboard', [StudentHomeController::class, 'index'])->name('student.dashboard');
+
+     Route::get('/student/video-lessons-categories', [StudentLessonsController::class, 'index'])->name('student.videolessonscategories');
+     Route::get('/student/video-lessons-list', [StudentLessonsController::class, 'lessionlist'])->name('student.videolessonslist');
+
+     Route::get('/student/analytics', [StudentAnalyticsController::class, 'index'])->name('student.analytics');
+
+     Route::get('/student/assessments', [StudentAssessmentsController::class, 'index'])->name('student.assessments');
+     Route::get('/student/focus-areas', [StudentFocusAreasController::class, 'index'])->name('student.focusareas');
+     Route::get('/student/announcements', [StudentAnnouncementsController::class, 'index'])->name('student.announcements');
+     Route::get('/student/centretestscores', [StudentCentreTestScoreController::class, 'index'])->name('student.centretestscores');
+   
 });
 
 // Parent

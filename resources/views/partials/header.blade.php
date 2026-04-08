@@ -39,6 +39,9 @@
                             <a class="dropdown-item" href="{{ route('edit-profile') }}"><i
                                     class="feather icon-settings"></i>
                                 Settings</a>
+                            <a class="dropdown-item" href="javascript:void(0);" id="themeToggleBtn"><i
+                                    class="feather icon-{{ $theme === 'dark' ? 'sun' : 'moon' }}"></i>
+                                Enable {{ $theme === 'dark' ? 'Light' : 'Dark' }} Mode</a>
                             <div class="dropdown-divider"></div>
                             <!-- Logout Form -->
                             <form method="POST" action="{{ route('logout') }}">
