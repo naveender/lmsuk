@@ -98,3 +98,5 @@ Route::middleware(['auth', 'verified', 'role:parent'])->group(function () {
         return view('parent.dashboard');
     })->name('parent.dashboard');
 });
+
+Route::get('/change-theme', [HomeController::class, 'toggleTheme'])->name('change.theme');

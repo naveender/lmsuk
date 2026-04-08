@@ -14,17 +14,13 @@ class HomeController extends Controller
         return view('dashboard',compact('stats'));
     }
 
-     public function toggle(Request $request)
+     public function toggleTheme(Request $request)
     {
         $currentTheme = session('theme', 'dark'); // default dark
         $newTheme = $currentTheme === 'dark' ? 'light' : 'dark';
 
         session(['theme' => $newTheme]);
 
-        return response()->json([
-            'success' => true,
-            'theme' => $newTheme,
-            'layoutClass' => $newTheme . '-layout'
-        ]);
+         return redirect()->back();
     }
 }

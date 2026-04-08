@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Aspire Learners')</title>
-    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     @stack('styles')
     @include('partials.includetop')
 </head>
@@ -18,7 +17,7 @@
 <body
     class="{{ $isAdmin 
         ? 'vertical-layout vertical-menu-modern ' . $themeLayoutClass . ' 2-columns navbar-floating footer-static' 
-        : 'horizontal-layout horizontal-menu dark-layout 2-columns navbar-floating footer-static' }}"
+        : 'horizontal-layout horizontal-menu ' . $themeLayoutClass . ' 2-columns navbar-floating footer-static' }}"
     data-open="{{ $isAdmin ? 'click' : 'hover' }}"
     data-menu="{{ $isAdmin ? 'vertical-menu-modern' : 'horizontal-menu' }}"
     data-col="2-columns"
@@ -44,7 +43,6 @@
     @include('partials.includebottom')
 
 
-    <script src="{{ asset('assets/js/main.js') }}"></script>
     @stack('scripts')
 </body>
 

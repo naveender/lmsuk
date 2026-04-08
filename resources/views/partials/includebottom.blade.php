@@ -28,4 +28,6 @@
 <!-- END: Theme JS-->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+<script src="{{ asset('theme/app-assets/js/script.js') }}"></script>
+
 
