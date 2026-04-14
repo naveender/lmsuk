@@ -11,15 +11,15 @@
                      <div class="row breadcrumbs-top">
                          <div class="col-12">
                              <h2 class="content-header-title float-left mb-0 font-weight-bold">
-                                 Backup Inventory
+                                 Categories Management
                              </h2>
                              <div class="breadcrumb-wrapper col-12">
                                  <ol class="breadcrumb">
                                      <li class="breadcrumb-item">
                                          <a href="index.html">Home</a>
                                      </li>
-                                     <li class="breadcrumb-item"><a href="#">Backup</a></li>
-                                     <li class="breadcrumb-item">Backup Inventory</li>
+                                     <li class="breadcrumb-item"><a href="#">Categories</a></li>
+                                     <li class="breadcrumb-item">Categories List</li>
                                  </ol>
                              </div>
                          </div>
@@ -29,7 +29,7 @@
              <div class="content-body">
                  <div class="row">
                      <div class="col-12">
-                         <p>Manage and monitor your backup files</p>
+                         <p>Manage Categories</p>
                      </div>
                  </div>
                  <!-- Data list view starts -->

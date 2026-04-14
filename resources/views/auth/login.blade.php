@@ -84,7 +84,7 @@
                                                 </form>
                                             </div>
                                         </div>
-                                        <div class="login-footer">
+                                        {{-- <div class="login-footer">
                                             <div class="divider">
                                                 <div class="divider-text">Login Using</div>
                                             </div>
@@ -94,7 +94,7 @@
                                                 <a href="#" class="btn btn-google waves-effect waves-light"><span class="fa fa-google"></span></a>
                                                 <a href="#" class="btn btn-github waves-effect waves-light"><span class="fa fa-github-alt"></span></a>
                                             </div>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                 </div>
                             </div>
