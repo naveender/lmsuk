@@ -4,11 +4,10 @@
             <ul class="nav navbar-nav flex-row">
                 <li class="nav-item mr-auto">
                     <a class="navbar-brand" href="../html/backup-dashboard.html">
-                        <!-- <div class="brand-logo"></div> -->
-                        <div>
-                            <i class="feather icon-upload-cloud"></i>
-                        </div>
-                        <h2 class="brand-text mb-0">Aspire Learners</h2>
+                        <div class="brand-logo">
+                             <img src="{{asset('theme/app-assets/images/logo/Aspire-Learner-Horizontal-Full-Logo.png')}}" alt="">
+                        </div> 
+                       
                     </a>
                 </li>
                 <li class="nav-item nav-toggle"><a class="nav-link modern-nav-toggle pr-0" data-toggle="collapse"><i
@@ -24,25 +23,42 @@
                     <a href="{{ route('dashboard') }}"><i class="feather icon-home"></i><span class="menu-title"
                             data-i18n="Email">Dashboard</span></a>
                 </li>
-                <li class="{{ request()->routeIs('inventory') ? 'active' : '' }} nav-item">
-                    <a href="{{ route('inventory') }}"><i class="feather icon-server"></i><span class="menu-title"
-                            data-i18n="Email">Users</span></a>
+                <li class=" nav-item"><a href="#"><i class="feather icon-user"></i><span class="menu-title" data-i18n="User">User</span></a>
+                    <ul class="menu-content">
+                        
+                        <li><a href="app-user-list.html"><i class="feather icon-circle"></i><span class="menu-item" data-i18n="Add New User">Add New User</span></a>
+                        </li>
+                        <li><a href="app-user-list.html"><i class="feather icon-circle"></i><span class="menu-item" data-i18n="All Users">All Users</span></a>
+                        </li>
+                        <li><a href="app-user-view.html"><i class="feather icon-circle"></i><span class="menu-item" data-i18n="Manage Students">Manage Students</span></a>
+                        </li>
+                        <li><a href="app-user-edit.html"><i class="feather icon-circle"></i><span class="menu-item" data-i18n="Manage Parents">Manage Parents</span></a>
+                        </li>
+                    </ul>
                 </li>
-                <li class="{{ request()->routeIs('manual-backup-manager') ? 'active' : '' }} nav-item">
-                    <a href="{{ route('manual-backup-manager') }}"><i class="feather icon-upload"></i><span class="menu-title"
-                            data-i18n="Email">Categories</span></a>
+                <li class="nav-item">
+                    <a href="#"><i class="feather icon-settings"></i><span class="menu-title"
+                            data-i18n="Upload Files">Upload Files</span></a>
                 </li>
-                <li class="{{ request()->routeIs('logs') ? 'active' : '' }} nav-item">
-                    <a href="{{ route('logs') }}"><i class="feather icon-file-text"></i><span class="menu-title"
-                            data-i18n="Email">Tests</span></a>
+                <li class="nav-item">
+                    <a href="#"><i class="feather icon-settings"></i><span class="menu-title"
+                            data-i18n="Manage Announcement">Manage Announcement</span></a>
                 </li>
-                <li class="{{ request()->routeIs('settings.index') ? 'active' : '' }} nav-item">
-                    <a href="{{ route('settings.index') }}"><i class="feather icon-settings"></i><span class="menu-title"
-                            data-i18n="Email">Settings</span></a>
+                <li class="nav-item">
+                    <a href="#"><i class="feather icon-settings"></i><span class="menu-title"
+                            data-i18n="Create a Report">Create a Report</span></a>
                 </li>
-                <li class="{{ request()->routeIs('logs') ? 'active' : '' }} nav-item">
-                    <a href="{{ route('logs') }}"><i class="feather icon-file-text"></i><span class="menu-title"
-                            data-i18n="Email">Logs</span></a>
+                <li class="nav-item">
+                    <a href="#"><i class="feather icon-settings"></i><span class="menu-title"
+                            data-i18n="Manage Files">Manage Files</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="#"><i class="feather icon-settings"></i><span class="menu-title"
+                            data-i18n="Invoice Creater">Invoice Creater</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="#"><i class="feather icon-settings"></i><span class="menu-title"
+                            data-i18n="Cohort Report"> Cohort Report</span></a>
                 </li>
             </ul>
         </div>

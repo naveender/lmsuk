@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('backup_settings', function (Blueprint $table) {
+        Schema::create('aspire_settings', function (Blueprint $table) {
            $table->id();
             $table->string('key')->unique();
             $table->longText('value')->nullable();
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('backup_settings');
+        Schema::dropIfExists('aspire_settings');
     }
 };

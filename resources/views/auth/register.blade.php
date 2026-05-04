@@ -9,7 +9,7 @@
             <div class="card bg-authentication rounded-0 mb-0">
                 <div class="row m-0">
                     <div class="col-lg-6 d-lg-block d-none text-center align-self-center pl-0 pr-3 py-0">
-                        <img src="{{ asset('theme/app-assets/images/logo/Logosample.png') }}" alt="branding logo"
+                        <img src="{{ asset('theme/app-assets/images/logo/Aspire-Learner-Full-Logo.png') }}" width="50%" alt="branding logo"
                             width="100%">
                     </div>
                     <div class="col-lg-6 col-12 p-0">

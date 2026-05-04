@@ -16,7 +16,7 @@ class SettingsSeeder extends Seeder
             // -------------------------
             [
                 'key'   => 'storage_default_path',
-                'value' => '/var/backups/production',
+                'value' => 'videos/lessons',
                 'group' => 'storage',
             ],
             [
@@ -59,7 +59,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key'   => 'system_version',
-                'value' => 'BackupManager v1.0',
+                'value' => 'Aspire Learner v1.0',
                 'group' => 'system',
             ],
             [
