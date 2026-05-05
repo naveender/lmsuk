@@ -86,13 +86,13 @@
                                         </div>
                                         {{-- <div class="login-footer">
                                             <div class="divider">
-                                                <div class="divider-text">Login Using</div>
+                                                <div class="divider-text">Aspire Learner</div>
                                             </div>
                                             <div class="footer-btn d-inline">
-                                                <a href="#" class="btn btn-facebook waves-effect waves-light"><span class="fa fa-facebook"></span></a>
-                                                <a href="#" class="btn btn-twitter white waves-effect waves-light"><span class="fa fa-twitter"></span></a>
-                                                <a href="#" class="btn btn-google waves-effect waves-light"><span class="fa fa-google"></span></a>
-                                                <a href="#" class="btn btn-github waves-effect waves-light"><span class="fa fa-github-alt"></span></a>
+                                                <center>
+                                                    <p>Best Learning Experience</p>
+                                                    <p> With Aspire Learner</p>
+                                                </center>
                                             </div>
                                         </div> --}}
                                     </div>

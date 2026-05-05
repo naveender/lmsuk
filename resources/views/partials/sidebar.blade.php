@@ -37,28 +37,41 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="#"><i class="feather icon-settings"></i><span class="menu-title"
+                    <a href="#"><i class="feather icon-upload"></i><span class="menu-title"
                             data-i18n="Upload Files">Upload Files</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="#"><i class="feather icon-settings"></i><span class="menu-title"
+                    <a href="#"><i class="feather icon-message-square"></i><span class="menu-title"
                             data-i18n="Manage Announcement">Manage Announcement</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="#"><i class="feather icon-settings"></i><span class="menu-title"
+                    <a href="#"><i class="feather icon-bar-chart-2"></i><span class="menu-title"
                             data-i18n="Create a Report">Create a Report</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="#"><i class="feather icon-settings"></i><span class="menu-title"
+                    <a href="#"><i class="feather icon-file"></i><span class="menu-title"
                             data-i18n="Manage Files">Manage Files</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="#"><i class="feather icon-settings"></i><span class="menu-title"
+                    <a href="#"><i class="feather icon-file-text"></i><span class="menu-title"
                             data-i18n="Invoice Creater">Invoice Creater</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="#"><i class="feather icon-settings"></i><span class="menu-title"
+                    <a href="#"><i class="feather icon-pie-chart"></i><span class="menu-title"
                             data-i18n="Cohort Report"> Cohort Report</span></a>
+                </li>
+                 <li class=" nav-item"><a href="#"><i class="feather icon-list"></i><span class="menu-title" data-i18n="User">Content Manager</span></a>
+                    <ul class="menu-content">
+                        
+                        <li><a href="app-user-list.html"><i class="feather icon-circle"></i><span class="menu-item" data-i18n="Add New User">Class</span></a>
+                        </li>
+                        <li><a href="app-user-list.html"><i class="feather icon-circle"></i><span class="menu-item" data-i18n="All Users">Year Groups</span></a>
+                        </li>
+                        <li><a href="app-user-view.html"><i class="feather icon-circle"></i><span class="menu-item" data-i18n="Manage Students">Topics</span></a>
+                        </li>
+                        <li><a href="app-user-edit.html"><i class="feather icon-circle"></i><span class="menu-item" data-i18n="Manage Parents">Sub Topics</span></a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </div>
