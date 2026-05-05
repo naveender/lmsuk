@@ -27,75 +27,143 @@
                 </div>
             </div>
             <div class="content-body">
-                <div class="row">
-                    <div class="col-12">
+                <div class="row mb-2">
+                    <div class="col-9">
                         <p>Manage Topics</p>
                     </div>
-                    <a href="{{ route('add.topic') }}" class="btn btn-primary">Add Topic</a>
+                    <div class="col-3">
+                        <a href="{{ route('add.topic') }}" class="btn btn-primary float-right">Add Topic</a>
+                    </div>
                 </div>
+                <!--  filter start -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Filters</h4>
+                        <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
+                        <div class="heading-elements">
+                            <ul class="list-inline mb-0">
+                                <li><a data-action="collapse"><i class="feather icon-chevron-down"></i></a></li>
+                                <li><a data-action=""><i class="feather icon-rotate-cw users-data-filter"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-content collapse show">
+                        <div class="card-body">
+                            <div class="users-list-filter">
+                                <form method="GET" action="{{ route('topics') }}" class="row mb-4 g-2 align-items-end">
+                                    <div class="col-md-3">
+                                        <label for="filter_by" class="form-label">Filter By</label>
+                                        <select name="filter_by" id="filter_by" class="form-control">
+                                            <option value="topic" {{ request('filter_by') == 'topic' ? 'selected' : '' }}>
+                                                Topic</option>
+                                            <option value="subtopic"
+                                                {{ request('filter_by') == 'subtopic' ? 'selected' : '' }}>Subtopic</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="search" class="form-label">Search Keyword</label>
+                                        <input type="text" name="search" id="search" value="{{ request('search') }}"
+                                            class="form-control" placeholder="Type here...">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="date" class="form-label">Filter by Date</label>
+                                        <input type="date" name="date" id="date" value="{{ request('date') }}"
+                                            class="form-control">
+                                    </div>
+
+                                    <div class="col-md-3 d-flex justify-content-between">
+                                        <button type="submit" class="btn btn-primary flex-fill mr-1">Apply Filters</button>
+                                        <a href="{{ route('topics') }}"
+                                            class="btn btn-secondary flex-fill text-center">Reset</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!--  filter end -->
                 <!-- Data list view starts -->
                 <section id="data-list-view" class="data-list-view-header">
                     <div class="card">
                         <div class="card-content">
                             <div class="card-body card-dashboard">
-                                <!-- 🔍 Filter Form -->
-                                <form method="GET" action="{{ route('topics') }}" class="row mb-4 g-2 align-items-end">
-                                    <div class="col-md-4">
-                                        <label for="search" class="form-label">Search Topic Name</label>
-                                        <input type="text" name="search" id="search" value=""
-                                            class="form-control" placeholder="e.g. Topic Name">
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label for="date" class="form-label">Filter by Date</label>
-                                        <input type="date" name="date" id="date" value=""
-                                            class="form-control">
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <a href="{{ route('topics') }}" class="btn btn-secondary w-100">Reset</a>
-                                    </div>
-                                </form>
                                 <!-- DataTable starts -->
                                 <div class="table-responsive">
-                                    <table class="table">
+                                    <table class="table table-hover-animation">
                                         <thead>
                                             <tr>
-                                                <th></th>
+                                                <th>#</th>
                                                 <th>Name</th>
                                                 <th>Slug</th>
-                                                <th>Parent</th>
+                                                <th>Sub Topics</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @forelse($topics as $index => $topic)
                                                 <tr>
-                                                    <td>{{ $index + 1 }}</td>
+                                                    <td>{{ $topics->firstItem() + $index }}</td>
                                                     <td>{{ $topic->name }}</td>
                                                     <td>{{ $topic->slug }}</td>
-                                                    <td>{{ $topic->parent }}</td>
-
+                                                    <td>
+                                                        <div class="d-flex flex-column align-items-start">
+                                                            @foreach ($topic->subtopics as $subtopic)
+                                                                <div
+                                                                    class="d-flex align-items-center border p-1 rounded mb-1">
+                                                                    <span
+                                                                        class="badge badge-primary mr-1">{{ $subtopic->name }}</span>
+                                                                    <a href="{{ route('topics.edit', $subtopic->id) }}"
+                                                                        class="btn btn-sm btn-icon btn-outline-primary mr-1"
+                                                                        title="Edit">
+                                                                        <i class="feather icon-edit"></i>
+                                                                    </a>
+                                                                    <form
+                                                                        action="{{ route('topics.destroy', $subtopic->id) }}"
+                                                                        method="POST" class="m-0"
+                                                                        onsubmit="return confirm('Are you sure you want to delete this subtopic?');">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                        <button type="submit"
+                                                                            class="btn btn-sm btn-icon btn-outline-danger"
+                                                                            title="Delete">
+                                                                            <i class="feather icon-trash"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </td>
                                                     <td>
                                                         <a href="{{ route('topics.edit', $topic->id) }}"
-                                                            class="btn btn-sm btn-primary download-btn">
+                                                            class="btn btn-sm btn-primary mb-1">
                                                             <i class="feather icon-edit"></i> Edit
                                                         </a>
+                                                        <form action="{{ route('topics.destroy', $topic->id) }}"
+                                                            method="POST" class="d-inline"
+                                                            onsubmit="return confirm('Are you sure you want to delete this topic?');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-sm btn-danger mb-1">
+                                                                <i class="feather icon-trash"></i> Delete
+                                                            </button>
+                                                        </form>
                                                     </td>
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="7" class="text-center">No backups found.</td>
+                                                    <td colspan="5" class="text-center">No topics found.</td>
                                                 </tr>
                                             @endforelse
                                         </tbody>
                                     </table>
 
-
+                                    <!-- 📄 Pagination -->
+                                    <nav aria-label="Page navigation">
+                                        {{ $topics->links('pagination::bootstrap-5') }}
+                                    </nav>
 
                                 </div>
 

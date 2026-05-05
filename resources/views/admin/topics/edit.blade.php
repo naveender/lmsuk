@@ -41,23 +41,27 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-body">
-                                        <form class="form form-vertical">
+                                        <form class="form form-vertical" action="{{ route('topics.update', $topic->id) }}" method="POST" enctype="multipart/form-data">
+                                            @csrf
+                                            @method('PUT')
                                             <div class="form-body">
                                                 <div class="row">
                                                     <div class="col-12">
                                                         <div class="form-group">
-                                                            <label for="first-name-vertical">Category code</label>
+                                                            <label for="first-name-vertical">Topic code</label>
                                                             <input type="text" id="first-name-vertical"
-                                                                class="form-control" name="fname"
-                                                                placeholder="Category code">
+                                                                class="form-control" name="topic_code"
+                                                                placeholder="Topic code" value="{{ old('topic_code', $topic->code) }}">
+                                                            @error('topic_code') <span class="text-danger">{{ $message }}</span> @enderror
                                                         </div>
                                                     </div>
                                                     <div class="col-12">
                                                         <div class="form-group">
                                                             <label for="email-id-vertical">Topic name</label>
-                                                            <input type="email" id="email-id-vertical"
-                                                                class="form-control" name="email-id"
-                                                                placeholder="Topic name">
+                                                            <input type="text" id="email-id-vertical"
+                                                                class="form-control" name="name"
+                                                                placeholder="Topic name" value="{{ old('name', $topic->name) }}">
+                                                            @error('name') <span class="text-danger">{{ $message }}</span> @enderror
                                                         </div>
                                                     </div>
                                                     <div class="col-12">
@@ -66,10 +70,11 @@
                                                             <select name="parent_id" id="parent_id" class="form-control">
                                                                 <option value="0">None</option>
                                                                 @foreach ($categories as $category)
-                                                                    <option value="{{ $category->id }}">
+                                                                    <option value="{{ $category->id }}" {{ old('parent_id', $topic->parent) == $category->id ? 'selected' : '' }}>
                                                                         {{ $category->name }}</option>
                                                                 @endforeach
                                                             </select>
+                                                            @error('parent_id') <span class="text-danger">{{ $message }}</span> @enderror
                                                         </div>
                                                     </div>
                                                     <div class="col-12">
@@ -78,13 +83,18 @@
                                                             <input type="file" id="password-vertical"
                                                                 class="form-control" name="thumbnail"
                                                                 placeholder="Thumbnail">
+                                                            @if($topic->thumbnail)
+                                                                <div class="mt-1">
+                                                                    <img src="{{ asset('storage/' . $topic->thumbnail) }}" alt="Thumbnail" width="100">
+                                                                </div>
+                                                            @endif
+                                                            @error('thumbnail') <span class="text-danger">{{ $message }}</span> @enderror
                                                         </div>
                                                     </div>
                                                     <div class="col-12">
                                                         <button type="submit"
                                                             class="btn btn-primary mr-1 mb-1">Update</button>
-                                                        <button type="reset"
-                                                            class="btn btn-outline-warning mr-1 mb-1">Cancel</button>
+                                                        <a href="{{ route('topics') }}" class="btn btn-outline-warning mr-1 mb-1">Cancel</a>
                                                     </div>
                                                 </div>
                                             </div>

@@ -26,6 +26,15 @@ class Topic extends Model
         return $this->hasMany(Topic::class, 'parent');
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($topic) {
+            $topic->subTopics()->delete();
+        });
+    }
+
 
     // Get all topics
     // $topics = Category::whereNull('parent')->get();

@@ -37,7 +37,8 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-body">
-                                        <form class="form form-vertical">
+                                        <form class="form form-vertical" action="{{ route('topics.store') }}" method="POST" enctype="multipart/form-data">
+                                            @csrf
                                             <div class="form-body">
                                                 <div class="row">
                                                     <div class="col-12">
@@ -45,7 +46,8 @@
                                                             <label for="first-name-vertical">Topic code</label>
                                                             <input type="text" id="first-name-vertical"
                                                                 class="form-control" name="topic_code"
-                                                                placeholder="Topic code">
+                                                                placeholder="Topic code" value="{{ old('topic_code') }}">
+                                                            @error('topic_code') <span class="text-danger">{{ $message }}</span> @enderror
                                                         </div>
                                                     </div>
                                                     <div class="col-12">
@@ -53,7 +55,8 @@
                                                             <label for="email-id-vertical">Topic name</label>
                                                             <input type="text" id="email-id-vertical"
                                                                 class="form-control" name="name"
-                                                                placeholder="Topic name">
+                                                                placeholder="Topic name" value="{{ old('name') }}">
+                                                            @error('name') <span class="text-danger">{{ $message }}</span> @enderror
                                                         </div>
                                                     </div>
                                                     <div class="col-12">
@@ -62,10 +65,11 @@
                                                             <select name="parent_id" id="parent_id" class="form-control">
                                                                 <option value="0">None</option>
                                                                 @foreach ($topics as $topic)
-                                                                    <option value="{{ $topic->id }}">
+                                                                    <option value="{{ $topic->id }}" {{ old('parent_id') == $topic->id ? 'selected' : '' }}>
                                                                         {{ $topic->name }}</option>
                                                                 @endforeach
                                                             </select>
+                                                            @error('parent_id') <span class="text-danger">{{ $message }}</span> @enderror
                                                         </div>
                                                     </div>
                                                     <div class="col-12">
@@ -73,6 +77,7 @@
                                                             <label for="thumbnail">Thumbnail</label>
                                                             <input type="file" id="thumbnail" class="form-control"
                                                                 name="thumbnail" placeholder="Thumbnail">
+                                                            @error('thumbnail') <span class="text-danger">{{ $message }}</span> @enderror
                                                         </div>
                                                     </div>
                                                     <div class="col-12">

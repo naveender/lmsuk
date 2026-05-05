@@ -56,6 +56,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminHomeController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/topics', [TopicController::class, 'index'])->name('topics');
     Route::get('/admin/add-topic', [TopicController::class, 'add'])->name('add.topic');
+    Route::post('/admin/topics', [TopicController::class, 'store'])->name('topics.store');
+    Route::get('/admin/topics/{topic}/edit', [TopicController::class, 'edit'])->name('topics.edit');
+    Route::put('/admin/topics/{topic}', [TopicController::class, 'update'])->name('topics.update');
+    Route::delete('/admin/topics/{topic}', [TopicController::class, 'destroy'])->name('topics.destroy');
 });
 
 // Student
