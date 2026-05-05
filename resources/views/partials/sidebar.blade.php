@@ -67,9 +67,7 @@
                         </li>
                         <li><a href="app-user-list.html"><i class="feather icon-circle"></i><span class="menu-item" data-i18n="All Users">Year Groups</span></a>
                         </li>
-                        <li><a href="app-user-view.html"><i class="feather icon-circle"></i><span class="menu-item" data-i18n="Manage Students">Topics</span></a>
-                        </li>
-                        <li><a href="app-user-edit.html"><i class="feather icon-circle"></i><span class="menu-item" data-i18n="Manage Parents">Sub Topics</span></a>
+                        <li class="{{ request()->routeIs('topics') ? 'active' : '' }}"><a href="{{ route('topics') }}"><i class="feather icon-circle"></i><span class="menu-item" data-i18n="Manage Students">Topics/Sub Topics</span></a>
                         </li>
                     </ul>
                 </li>
