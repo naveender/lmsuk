@@ -60,6 +60,16 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('/admin/topics/{topic}/edit', [TopicController::class, 'edit'])->name('topics.edit');
     Route::put('/admin/topics/{topic}', [TopicController::class, 'update'])->name('topics.update');
     Route::delete('/admin/topics/{topic}', [TopicController::class, 'destroy'])->name('topics.destroy');
+    
+    // Announcements
+    Route::resource('admin/announcements', \App\Http\Controllers\Admin\AnnouncementController::class)->names([
+        'index' => 'admin.announcements.index',
+        'create' => 'admin.announcements.create',
+        'store' => 'admin.announcements.store',
+        'edit' => 'admin.announcements.edit',
+        'update' => 'admin.announcements.update',
+        'destroy' => 'admin.announcements.destroy',
+    ]);
 });
 
 // Student

@@ -80,8 +80,8 @@
                 </ul>
             </li>
             <li class="nav-item">
-                <a href="#"><i class="feather icon-message-square"></i><span class="menu-title"
-                        data-i18n="Manage Announcement">Manage Announcement</span></a>
+                <a href="{{ route('admin.announcements.index') }}"><i class="feather icon-message-square"></i><span
+                        class="menu-title" data-i18n="Manage Announcement">Manage Announcement</span></a>
             </li>
         </ul>
     </div>
