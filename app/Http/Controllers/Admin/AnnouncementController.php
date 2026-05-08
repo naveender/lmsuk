@@ -26,7 +26,7 @@ class AnnouncementController extends Controller
         }
 
         if ($request->filled('date')) {
-            $query->whereDate('created_at', $request->date);
+            $query->whereDate('created_at', $request->date); 
         }
 
         $announcements = $query->latest()->paginate(10)->appends($request->all());
