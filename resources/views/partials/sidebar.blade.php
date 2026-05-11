@@ -45,10 +45,26 @@
                     </li>
                 </ul>
             </li>
-            <li class="nav-item">
-                <a href="#"><i class="feather icon-upload"></i><span class="menu-title"
-                        data-i18n="Upload Files">Upload Files</span></a>
+            <li class=" nav-item"><a href="#"><i class="feather icon-help-circle"></i><span class="menu-title"
+                        data-i18n="Question Bank">Question Bank</span></a>
+                <ul class="menu-content">
+
+                    <li><a href=""><i class="feather icon-circle"></i><span class="menu-item"
+                                data-i18n="Add New Question">Add New Question</span></a>
+                    </li>
+                    <li><a href=""><i class="feather icon-circle"></i><span class="menu-item"
+                                data-i18n="Questions Directory">Questions Directory</span></a>
+                    </li>
+                    <li class="{{ request()->routeIs('topics') ? 'active' : '' }}"><a href="{{ route('topics') }}"><i
+                                class="feather icon-circle"></i><span class="menu-item"
+                                data-i18n="Import Questions">Import Questions</span></a>
+                    </li>
+                </ul>
             </li>
+            {{-- <li class="nav-item">
+                <a href="#"><i class="feather icon-upload"></i><span class="menu-title"
+                        data-i18n="Questions Manager">Questions Manager</span></a>
+            </li> --}}
 
             <li class="nav-item">
                 <a href="#"><i class="feather icon-bar-chart-2"></i><span class="menu-title"
@@ -76,8 +92,8 @@
                     <li><a href="app-user-list.html"><i class="feather icon-circle"></i><span class="menu-item"
                                 data-i18n="All Users">Year Groups</span></a>
                     </li>
-                    <li class="{{ request()->routeIs('topics') ? 'active' : '' }}"><a href="{{ route('topics') }}"><i
-                                class="feather icon-circle"></i><span class="menu-item"
+                    <li class="{{ request()->routeIs('topics') ? 'active' : '' }}"><a
+                            href="{{ route('topics') }}"><i class="feather icon-circle"></i><span class="menu-item"
                                 data-i18n="Manage Students">Topics/Sub Topics</span></a>
                     </li>
                 </ul>
