@@ -3,12 +3,9 @@
     <div class="navbar-header">
         <ul class="nav navbar-nav flex-row">
             <li class="nav-item mr-auto">
-                <a class="navbar-brand" href="../html/backup-dashboard.html">
-                    <div class="brand-logo">
-                        <img src="{{ asset('theme/app-assets/images/logo/Aspire-Learner-Horizontal-Full-Logo.png') }}"
-                            alt="">
-                    </div>
-
+                <a class="navbar-brand" href="{{ route('dashboard') }}" style="margin-top: 10px;">
+                    <img src="{{ asset('theme/app-assets/images/logo/Aspire-Learner-Horizontal-Full-Logo.png') }}"
+                        alt="Aspire Learner Logo" style="max-width: 180px; height: auto; object-fit: contain;">
                 </a>
             </li>
             <li class="nav-item nav-toggle"><a class="nav-link modern-nav-toggle pr-0" data-toggle="collapse"><i

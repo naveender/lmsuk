@@ -6,8 +6,8 @@
 <nav class="header-navbar navbar-expand-lg navbar navbar-with-menu {{ !$isAdmin ? 'navbar-fixed navbar-brand-center' : 'floating-nav navbar-dark navbar-shadow' }}">
     <div class="navbar-header d-xl-block d-none">
         <ul class="nav navbar-nav flex-row">
-            <li class="nav-item"><a class="navbar-brand" href="/">
-                    <div class="brand-logo"></div>
+            <li class="nav-item"><a class="navbar-brand" href="/" style="padding: 15px 0;">
+                    <img src="{{ asset('theme/app-assets/images/logo/Aspire-Learner-Horizontal-Full-Logo.png') }}" alt="Aspire Learner Logo" style="max-width: 160px; height: auto; object-fit: contain;">
                 </a></li>
         </ul>
     </div>
