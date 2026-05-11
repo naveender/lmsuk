@@ -42,9 +42,13 @@ class StudentController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'date_of_birth' => 'nullable|date',
-            'grade' => 'nullable|string|max:255',
-            'school' => 'nullable|string|max:255',
+            'date_of_birth' => 'required|date',
+            'group_year' => 'required|string|max:255',
+            'academic_year' => 'required|string|max:255',
+            'region' => 'required|string|max:255',
+            'student_phone' => 'nullable|string|max:255',
+            'student_email' => 'nullable|string|email|max:255',
+            'gender' => 'required|string|in:male,female,other',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -57,6 +61,12 @@ class StudentController extends Controller
 
             $user->studentDetail()->create([
                 'date_of_birth' => $request->date_of_birth,
+                'group_year' => $request->group_year,
+                'academic_year' => $request->academic_year,
+                'region' => $request->region,
+                'student_phone' => $request->student_phone,
+                'student_email' => $request->student_email,
+                'gender' => $request->gender,
             ]);
         });
 
@@ -80,9 +90,13 @@ class StudentController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$student->id,
-            'date_of_birth' => 'nullable|date',
-            'grade' => 'nullable|string|max:255',
-            'school' => 'nullable|string|max:255',
+            'date_of_birth' => 'required|date',
+            'group_year' => 'required|string|max:255',
+            'academic_year' => 'required|string|max:255',
+            'region' => 'required|string|max:255',
+            'student_phone' => 'nullable|string|max:255',
+            'student_email' => 'nullable|string|email|max:255',
+            'gender' => 'required|string|in:male,female,other',
         ]);
 
         DB::transaction(function () use ($request, $student) {
@@ -100,10 +114,22 @@ class StudentController extends Controller
             if ($student->studentDetail) {
                 $student->studentDetail->update([
                     'date_of_birth' => $request->date_of_birth,
+                    'group_year' => $request->group_year,
+                    'academic_year' => $request->academic_year,
+                    'region' => $request->region,
+                    'student_phone' => $request->student_phone,
+                    'student_email' => $request->student_email,
+                    'gender' => $request->gender,
                 ]);
             } else {
                 $student->studentDetail()->create([
                     'date_of_birth' => $request->date_of_birth,
+                    'group_year' => $request->group_year,
+                    'academic_year' => $request->academic_year,
+                    'region' => $request->region,
+                    'student_phone' => $request->student_phone,
+                    'student_email' => $request->student_email,
+                    'gender' => $request->gender,
                 ]);
             }
         });

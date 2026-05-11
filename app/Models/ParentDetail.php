@@ -14,6 +14,9 @@ class ParentDetail extends Model
         'user_id',
         'phone',
         'address',
+        'relation',
+        'alternate_phone',
+        'emergency_contact',
     ];
 
     public function user()

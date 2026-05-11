@@ -17,8 +17,8 @@
     <div class="shadow-bottom"></div>
     <div class="main-menu-content">
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
-            <li class="{{ request()->routeIs('dashboard') ? 'active' : '' }} nav-item">
-                <a href="{{ route('dashboard') }}"><i class="feather icon-home"></i><span class="menu-title"
+            <li class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }} nav-item">
+                <a href="{{ route('admin.dashboard') }}"><i class="feather icon-home"></i><span class="menu-title"
                         data-i18n="Email">Dashboard</span></a>
             </li>
             <li
@@ -58,6 +58,9 @@
                     <li class="{{ request()->routeIs('topics') ? 'active' : '' }}"><a href="{{ route('topics') }}"><i
                                 class="feather icon-circle"></i><span class="menu-item"
                                 data-i18n="Import Questions">Import Questions</span></a>
+                    </li>
+                    <li><a href=""><i class="feather icon-circle"></i><span class="menu-item"
+                                data-i18n="Import Using AI">Import Using AI</span></a>
                     </li>
                 </ul>
             </li>

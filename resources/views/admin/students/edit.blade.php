@@ -42,39 +42,121 @@
                                             @method('PUT')
                                             <div class="form-body">
                                                 <div class="row">
-                                                    <div class="col-12">
-                                                        <div class="form-group row">
-                                                            <div class="col-md-2"><span>Name</span></div>
-                                                            <div class="col-md-10">
-                                                                <input type="text" id="name" class="form-control" name="name" value="{{ old('name', $student->name) }}" required>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Fullname</label>
+                                                                <input type="text" id="name" class="form-control" name="name" value="{{ old('name', $student->name) }}" placeholder="Enter Your Fullname" required>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-12">
-                                                        <div class="form-group row">
-                                                            <div class="col-md-2"><span>Email</span></div>
-                                                            <div class="col-md-10">
-                                                                <input type="email" id="email" class="form-control" name="email" value="{{ old('email', $student->email) }}" required>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Email</label>
+                                                                <input type="email" id="email" class="form-control" name="email" value="{{ old('email', $student->email) }}" placeholder="Enter Your Email" required>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-12">
-                                                        <div class="form-group row">
-                                                            <div class="col-md-2"><span>Password (Leave blank to keep current)</span></div>
-                                                            <div class="col-md-10">
-                                                                <input type="password" id="password" class="form-control" name="password">
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Password</label>
+                                                                <input type="password" id="password" class="form-control" name="password" placeholder="Leave blank to keep current">
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-12">
-                                                        <div class="form-group row">
-                                                            <div class="col-md-2"><span>Date of Birth</span></div>
-                                                            <div class="col-md-10">
-                                                                <input type="date" id="date_of_birth" class="form-control" name="date_of_birth" value="{{ old('date_of_birth', optional($student->studentDetail)->date_of_birth) }}">
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Date of Birth (DOB)</label>
+                                                                <input type="text" class="form-control birthdate-picker" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', optional($student->studentDetail)->date_of_birth) }}" required placeholder="Date of Birth (DOB)">
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-10 offset-md-2">
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <label>Group Year</label>
+                                                            <select class="form-control" name="group_year" required>
+                                                                <option value="">--Select Group Year--</option>
+                                                                <option value="1" {{ old('group_year', optional($student->studentDetail)->group_year) == '1' ? 'selected' : '' }}>1st year</option>
+                                                                <option value="2" {{ old('group_year', optional($student->studentDetail)->group_year) == '2' ? 'selected' : '' }}>2nd year</option>
+                                                                <option value="3" {{ old('group_year', optional($student->studentDetail)->group_year) == '3' ? 'selected' : '' }}>3rd year</option>
+                                                                <option value="4" {{ old('group_year', optional($student->studentDetail)->group_year) == '4' ? 'selected' : '' }}>4th year</option>
+                                                                <option value="5" {{ old('group_year', optional($student->studentDetail)->group_year) == '5' ? 'selected' : '' }}>5th year</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <label>Academic Year</label>
+                                                            <select class="form-control" name="academic_year" required>
+                                                                <option value="">--Select Academic Year--</option>
+                                                                <option value="1" {{ old('academic_year', optional($student->studentDetail)->academic_year) == '1' ? 'selected' : '' }}>2024-2025</option>
+                                                                <option value="2" {{ old('academic_year', optional($student->studentDetail)->academic_year) == '2' ? 'selected' : '' }}>2025-2026</option>
+                                                                <option value="3" {{ old('academic_year', optional($student->studentDetail)->academic_year) == '3' ? 'selected' : '' }}>2026-2027</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Region</label>
+                                                                <input type="text" class="form-control" name="region" value="{{ old('region', optional($student->studentDetail)->region) }}" required placeholder="Geographic region or campus the student belongs to...">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Student Phone Number</label>
+                                                                <input type="text" class="form-control" name="student_phone" value="{{ old('student_phone', optional($student->studentDetail)->student_phone) }}" placeholder="Direct contact number of the student, if available...(optional)">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Student Email</label>
+                                                                <input type="email" class="form-control" name="student_email" value="{{ old('student_email', optional($student->studentDetail)->student_email) }}" placeholder="Direct email address of the student, if available.(optional)">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <label>Gender</label>
+                                                            <ul class="list-unstyled mb-0">
+                                                                <li class="d-inline-block mr-2">
+                                                                    <fieldset>
+                                                                        <div class="vs-radio-con">
+                                                                            <input type="radio" name="gender" {{ old('gender', optional($student->studentDetail)->gender) == 'male' ? 'checked' : '' }} value="male">
+                                                                            <span class="vs-radio"><span class="vs-radio--border"></span><span class="vs-radio--circle"></span></span>
+                                                                            Male
+                                                                        </div>
+                                                                    </fieldset>
+                                                                </li>
+                                                                <li class="d-inline-block mr-2">
+                                                                    <fieldset>
+                                                                        <div class="vs-radio-con">
+                                                                            <input type="radio" name="gender" {{ old('gender', optional($student->studentDetail)->gender) == 'female' ? 'checked' : '' }} value="female">
+                                                                            <span class="vs-radio"><span class="vs-radio--border"></span><span class="vs-radio--circle"></span></span>
+                                                                            Female
+                                                                        </div>
+                                                                    </fieldset>
+                                                                </li>
+                                                                <li class="d-inline-block mr-2">
+                                                                    <fieldset>
+                                                                        <div class="vs-radio-con">
+                                                                            <input type="radio" name="gender" {{ old('gender', optional($student->studentDetail)->gender) == 'other' ? 'checked' : '' }} value="other">
+                                                                            <span class="vs-radio"><span class="vs-radio--border"></span><span class="vs-radio--circle"></span></span>
+                                                                            Other
+                                                                        </div>
+                                                                    </fieldset>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
                                                         <button type="submit" class="btn btn-primary mr-1 mb-1">Update</button>
                                                         <a href="{{ route('admin.students.index') }}" class="btn btn-outline-warning mb-1">Cancel</a>
                                                     </div>

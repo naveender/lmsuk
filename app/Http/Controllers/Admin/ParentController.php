@@ -45,7 +45,10 @@ class ParentController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'phone' => 'nullable|string|max:255',
+            'phone' => 'required|string|max:255',
+            'relation' => 'required|string|max:255',
+            'alternate_phone' => 'nullable|string|max:255',
+            'emergency_contact' => 'nullable|string|max:255',
             'address' => 'nullable|string',
         ]);
 
@@ -59,6 +62,9 @@ class ParentController extends Controller
 
             $user->parentDetail()->create([
                 'phone' => $request->phone,
+                'relation' => $request->relation,
+                'alternate_phone' => $request->alternate_phone,
+                'emergency_contact' => $request->emergency_contact,
                 'address' => $request->address,
             ]);
         });
@@ -83,7 +89,10 @@ class ParentController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$parent->id,
-            'phone' => 'nullable|string|max:255',
+            'phone' => 'required|string|max:255',
+            'relation' => 'required|string|max:255',
+            'alternate_phone' => 'nullable|string|max:255',
+            'emergency_contact' => 'nullable|string|max:255',
             'address' => 'nullable|string',
         ]);
 
@@ -102,11 +111,17 @@ class ParentController extends Controller
             if ($parent->parentDetail) {
                 $parent->parentDetail->update([
                     'phone' => $request->phone,
+                    'relation' => $request->relation,
+                    'alternate_phone' => $request->alternate_phone,
+                    'emergency_contact' => $request->emergency_contact,
                     'address' => $request->address,
                 ]);
             } else {
                 $parent->parentDetail()->create([
                     'phone' => $request->phone,
+                    'relation' => $request->relation,
+                    'alternate_phone' => $request->alternate_phone,
+                    'emergency_contact' => $request->emergency_contact,
                     'address' => $request->address,
                 ]);
             }

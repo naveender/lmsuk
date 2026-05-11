@@ -42,47 +42,67 @@
                                             @method('PUT')
                                             <div class="form-body">
                                                 <div class="row">
-                                                    <div class="col-12">
-                                                        <div class="form-group row">
-                                                            <div class="col-md-2"><span>Name</span></div>
-                                                            <div class="col-md-10">
-                                                                <input type="text" id="name" class="form-control" name="name" value="{{ old('name', $parent->name) }}" required>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Parent Name</label>
+                                                                <input type="text" class="form-control" name="name" value="{{ old('name', $parent->name) }}" required placeholder="Full name of the parent or guardian.">
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-12">
-                                                        <div class="form-group row">
-                                                            <div class="col-md-2"><span>Email</span></div>
-                                                            <div class="col-md-10">
-                                                                <input type="email" id="email" class="form-control" name="email" value="{{ old('email', $parent->email) }}" required>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Relation to the Student</label>
+                                                                <select class="form-control" name="relation" required>
+                                                                    <option value="Father" {{ old('relation', optional($parent->parentDetail)->relation) == 'Father' ? 'selected' : '' }}>Father</option>
+                                                                    <option value="Mother" {{ old('relation', optional($parent->parentDetail)->relation) == 'Mother' ? 'selected' : '' }}>Mother</option>
+                                                                    <option value="Guardian" {{ old('relation', optional($parent->parentDetail)->relation) == 'Guardian' ? 'selected' : '' }}>Guardian</option>
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-12">
-                                                        <div class="form-group row">
-                                                            <div class="col-md-2"><span>Password (Leave blank to keep current)</span></div>
-                                                            <div class="col-md-10">
-                                                                <input type="password" id="password" class="form-control" name="password">
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Parent Email</label>
+                                                                <input type="email" class="form-control" name="email" value="{{ old('email', $parent->email) }}" required placeholder="Primary email address of the parent/guardian for communication.">
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-12">
-                                                        <div class="form-group row">
-                                                            <div class="col-md-2"><span>Phone Number</span></div>
-                                                            <div class="col-md-10">
-                                                                <input type="text" id="phone" class="form-control" name="phone" value="{{ old('phone', optional($parent->parentDetail)->phone) }}">
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Password</label>
+                                                                <input type="password" class="form-control" name="password" placeholder="Leave blank to keep current">
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-12">
-                                                        <div class="form-group row">
-                                                            <div class="col-md-2"><span>Address</span></div>
-                                                            <div class="col-md-10">
-                                                                <textarea id="address" class="form-control" name="address" rows="3">{{ old('address', optional($parent->parentDetail)->address) }}</textarea>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Parent Phone</label>
+                                                                <input type="text" class="form-control" name="phone" value="{{ old('phone', optional($parent->parentDetail)->phone) }}" required placeholder="Primary contact number of the parent/guardian.">
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-10 offset-md-2">
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Parent Phone (Alternate)</label>
+                                                                <input type="text" class="form-control" name="alternate_phone" value="{{ old('alternate_phone', optional($parent->parentDetail)->alternate_phone) }}" placeholder="Secondary contact number, in case the primary is unreachable">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Emergency Contact Number</label>
+                                                                <input type="text" class="form-control" name="emergency_contact" value="{{ old('emergency_contact', optional($parent->parentDetail)->emergency_contact) }}" placeholder="A contact number to be reached in case of emergencies.">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
                                                         <button type="submit" class="btn btn-primary mr-1 mb-1">Update</button>
                                                         <a href="{{ route('admin.parents.index') }}" class="btn btn-outline-warning mb-1">Cancel</a>
                                                     </div>

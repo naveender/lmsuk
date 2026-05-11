@@ -37,7 +37,8 @@
                                             </div>
                                         @endif
 
-                                        <form class="form form-horizontal" action="{{ route('admin.users.store') }}" method="POST">
+                                        <form class="form form-horizontal" action="{{ route('admin.users.store') }}"
+                                            method="POST">
                                             @csrf
                                             <div class="form-body">
                                                 <div class="row">
@@ -45,7 +46,8 @@
                                                         <div class="form-group row">
                                                             <div class="col-md-2"><span>Name</span></div>
                                                             <div class="col-md-10">
-                                                                <input type="text" id="name" class="form-control" name="name" value="{{ old('name') }}" required>
+                                                                <input type="text" id="name" class="form-control"
+                                                                    name="name" value="{{ old('name') }}" required>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -53,7 +55,8 @@
                                                         <div class="form-group row">
                                                             <div class="col-md-2"><span>Email</span></div>
                                                             <div class="col-md-10">
-                                                                <input type="email" id="email" class="form-control" name="email" value="{{ old('email') }}" required>
+                                                                <input type="email" id="email" class="form-control"
+                                                                    name="email" value="{{ old('email') }}" required>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -61,7 +64,8 @@
                                                         <div class="form-group row">
                                                             <div class="col-md-2"><span>Password</span></div>
                                                             <div class="col-md-10">
-                                                                <input type="password" id="password" class="form-control" name="password" required>
+                                                                <input type="password" id="password" class="form-control"
+                                                                    name="password" required>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -69,17 +73,26 @@
                                                         <div class="form-group row">
                                                             <div class="col-md-2"><span>Role</span></div>
                                                             <div class="col-md-10">
-                                                                <select name="role" id="role" class="form-control" required>
-                                                                    <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student</option>
-                                                                    <option value="parent" {{ old('role') == 'parent' ? 'selected' : '' }}>Parent</option>
-                                                                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                                                                <select name="role" id="role" class="form-control"
+                                                                    required>
+                                                                    <option value="student"
+                                                                        {{ old('role') == 'student' ? 'selected' : '' }}>
+                                                                        Student</option>
+                                                                    <option value="parent"
+                                                                        {{ old('role') == 'parent' ? 'selected' : '' }}>
+                                                                        Parent</option>
+                                                                    <option value="admin"
+                                                                        {{ old('role') == 'admin' ? 'selected' : '' }}>Admin
+                                                                    </option>
                                                                 </select>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-10 offset-md-2">
-                                                        <button type="submit" class="btn btn-primary mr-1 mb-1">Submit</button>
-                                                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-warning mb-1">Cancel</a>
+                                                        <button type="submit"
+                                                            class="btn btn-primary mr-1 mb-1">Submit</button>
+                                                        <a href="{{ route('admin.users.index') }}"
+                                                            class="btn btn-outline-warning mb-1">Cancel</a>
                                                     </div>
                                                 </div>
                                             </div>

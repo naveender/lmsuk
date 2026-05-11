@@ -13,6 +13,12 @@ class StudentDetail extends Model
     protected $fillable = [
         'user_id',
         'date_of_birth',
+        'group_year',
+        'academic_year',
+        'region',
+        'student_phone',
+        'student_email',
+        'gender',
     ];
 
     public function user()
