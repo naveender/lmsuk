@@ -43,6 +43,7 @@ class ParentController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'phone' => 'required|string|max:255',
@@ -55,6 +56,7 @@ class ParentController extends Controller
         DB::transaction(function () use ($request) {
             $user = User::create([
                 'name' => $request->name,
+                'username' => $request->username,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => 'parent',
@@ -88,6 +90,7 @@ class ParentController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,'.$parent->id,
             'email' => 'required|string|email|max:255|unique:users,email,'.$parent->id,
             'phone' => 'required|string|max:255',
             'relation' => 'required|string|max:255',
@@ -99,6 +102,7 @@ class ParentController extends Controller
         DB::transaction(function () use ($request, $parent) {
             $parent->update([
                 'name' => $request->name,
+                'username' => $request->username,
                 'email' => $request->email,
             ]);
 

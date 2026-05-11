@@ -52,6 +52,14 @@
                                                     </div>
                                                     <div class="col-12">
                                                         <div class="form-group row">
+                                                            <div class="col-md-2"><span>Username</span></div>
+                                                            <div class="col-md-10">
+                                                                <input type="text" id="username" class="form-control" name="username" value="{{ old('username', $user->username) }}" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <div class="form-group row">
                                                             <div class="col-md-2"><span>Email</span></div>
                                                             <div class="col-md-10">
                                                                 <input type="email" id="email" class="form-control" name="email" value="{{ old('email', $user->email) }}" required>

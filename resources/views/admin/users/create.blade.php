@@ -53,6 +53,16 @@
                                                     </div>
                                                     <div class="col-12">
                                                         <div class="form-group row">
+                                                            <div class="col-md-2"><span>Username</span></div>
+                                                            <div class="col-md-10">
+                                                                <input type="text" id="username" class="form-control"
+                                                                    name="username" value="{{ old('username') }}" required>
+                                                                <small class="text-muted">Username must be unique. Suggested: <a href="javascript:void(0)" id="suggest_username"></a></small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <div class="form-group row">
                                                             <div class="col-md-2"><span>Email</span></div>
                                                             <div class="col-md-10">
                                                                 <input type="email" id="email" class="form-control"
@@ -106,4 +116,32 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const nameInput = document.getElementById('name');
+            const usernameInput = document.getElementById('username');
+            const suggestBtn = document.getElementById('suggest_username');
+
+            nameInput.addEventListener('input', function() {
+                if (nameInput.value) {
+                    let baseName = nameInput.value.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    if (baseName.length > 0) {
+                        let suggested = baseName + Math.floor(Math.random() * 1000);
+                        suggestBtn.textContent = suggested;
+                    } else {
+                        suggestBtn.textContent = '';
+                    }
+                } else {
+                    suggestBtn.textContent = '';
+                }
+            });
+
+            suggestBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (suggestBtn.textContent) {
+                    usernameInput.value = suggestBtn.textContent;
+                }
+            });
+        });
+    </script>
 @endsection

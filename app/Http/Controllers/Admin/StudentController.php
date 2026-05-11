@@ -40,6 +40,7 @@ class StudentController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'date_of_birth' => 'required|date',
@@ -54,6 +55,7 @@ class StudentController extends Controller
         DB::transaction(function () use ($request) {
             $user = User::create([
                 'name' => $request->name,
+                'username' => $request->username,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => 'student',
@@ -89,6 +91,7 @@ class StudentController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,'.$student->id,
             'email' => 'required|string|email|max:255|unique:users,email,'.$student->id,
             'date_of_birth' => 'required|date',
             'group_year' => 'required|string|max:255',
@@ -102,6 +105,7 @@ class StudentController extends Controller
         DB::transaction(function () use ($request, $student) {
             $student->update([
                 'name' => $request->name,
+                'username' => $request->username,
                 'email' => $request->email,
             ]);
 

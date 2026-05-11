@@ -53,6 +53,14 @@
                                                     <div class="col-12 col-sm-6">
                                                         <div class="form-group">
                                                             <div class="controls">
+                                                                <label>Username</label>
+                                                                <input type="text" id="username" class="form-control" name="username" value="{{ old('username', $student->username) }}" placeholder="Enter Username" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
                                                                 <label>Email</label>
                                                                 <input type="email" id="email" class="form-control" name="email" value="{{ old('email', $student->email) }}" placeholder="Enter Your Email" required>
                                                             </div>

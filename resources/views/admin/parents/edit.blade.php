@@ -53,6 +53,14 @@
                                                     <div class="col-12 col-sm-6">
                                                         <div class="form-group">
                                                             <div class="controls">
+                                                                <label>Username</label>
+                                                                <input type="text" id="username" class="form-control" name="username" value="{{ old('username', $parent->username) }}" placeholder="Enter Username" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
                                                                 <label>Relation to the Student</label>
                                                                 <select class="form-control" name="relation" required>
                                                                     <option value="Father" {{ old('relation', optional($parent->parentDetail)->relation) == 'Father' ? 'selected' : '' }}>Father</option>
