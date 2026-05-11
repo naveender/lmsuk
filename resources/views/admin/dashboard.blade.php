@@ -19,7 +19,7 @@
                              <div class="card text-white bg-gradient-primary text-center">
                                  <div class="card-content">
                                      <div class="card-body">
-                                        <div class="d-block mb-1">
+                                         <div class="d-block mb-1">
                                              <img src="{{ asset('theme/app-assets/images/lmsicon/more/community.png') }}"
                                                  alt="element 01" width="150" class="mb-1">
                                          </div>
@@ -33,7 +33,7 @@
                              <div class="card text-white bg-gradient-primary text-center">
                                  <div class="card-content">
                                      <div class="card-body">
-                                        <div class="d-block mb-1">
+                                         <div class="d-block mb-1">
                                              <img src="{{ asset('theme/app-assets/images/lmsicon/more/training.png') }}"
                                                  alt="element 01" width="150" class="mb-1">
                                          </div>
@@ -47,12 +47,12 @@
                              <div class="card text-white bg-gradient-primary text-center">
                                  <div class="card-content">
                                      <div class="card-body">
-                                        <div class="d-block mb-1">
+                                         <div class="d-block mb-1">
                                              <img src="{{ asset('theme/app-assets/images/lmsicon/more/cloud-upload.png') }}"
                                                  alt="element 01" width="150" class="mb-1">
                                          </div>
-                                         <a href="{{ route('student.videolessonscategories') }}"
-                                             class="btn btn-primary waves-effect waves-light">Upload Files</a>
+                                         <a href="#" class="btn btn-primary waves-effect waves-light">Questions
+                                             Bank</a>
                                      </div>
                                  </div>
                              </div>
@@ -61,11 +61,11 @@
                              <div class="card text-white bg-gradient-primary text-center">
                                  <div class="card-content">
                                      <div class="card-body">
-                                        <div class="d-block mb-1">
+                                         <div class="d-block mb-1">
                                              <img src="{{ asset('theme/app-assets/images/lmsicon/more/announcement.png') }}"
                                                  alt="element 01" width="150" class="mb-1">
                                          </div>
-                                         <a href="{{ route('student.videolessonscategories') }}"
+                                         <a href="{{ route('admin.announcements.index') }}"
                                              class="btn btn-primary waves-effect waves-light">Manage Announcement</a>
                                      </div>
                                  </div>
@@ -75,7 +75,7 @@
                              <div class="card text-white bg-gradient-primary text-center">
                                  <div class="card-content">
                                      <div class="card-body">
-                                        <div class="d-block mb-1">
+                                         <div class="d-block mb-1">
                                              <img src="{{ asset('theme/app-assets/images/lmsicon/more/report.png') }}"
                                                  alt="element 01" width="150" class="mb-1">
                                          </div>
@@ -89,7 +89,7 @@
                              <div class="card text-white bg-gradient-primary text-center">
                                  <div class="card-content">
                                      <div class="card-body">
-                                        <div class="d-block mb-1">
+                                         <div class="d-block mb-1">
                                              <img src="{{ asset('theme/app-assets/images/lmsicon/more/archive.png') }}"
                                                  alt="element 01" width="150" class="mb-1">
                                          </div>
@@ -103,7 +103,7 @@
                              <div class="card text-white bg-gradient-primary text-center">
                                  <div class="card-content">
                                      <div class="card-body">
-                                        <div class="d-block mb-1">
+                                         <div class="d-block mb-1">
                                              <img src="{{ asset('theme/app-assets/images/lmsicon/more/bill.png') }}"
                                                  alt="element 01" width="150" class="mb-1">
                                          </div>
@@ -117,11 +117,11 @@
                              <div class="card text-white bg-gradient-primary text-center">
                                  <div class="card-content">
                                      <div class="card-body">
-                                        <div class="d-block mb-1">
+                                         <div class="d-block mb-1">
                                              <img src="{{ asset('theme/app-assets/images/lmsicon/more/new-employee.png') }}"
                                                  alt="element 01" width="150" class="mb-1">
                                          </div>
-                                         <a href="{{ route('student.videolessonscategories') }}"
+                                         <a href="{{ route('admin.users.create') }}"
                                              class="btn btn-primary waves-effect waves-light">New Sign-ups</a>
                                      </div>
                                  </div>
@@ -131,7 +131,7 @@
                              <div class="card text-white bg-gradient-primary text-center">
                                  <div class="card-content">
                                      <div class="card-body">
-                                        <div class="d-block mb-1">
+                                         <div class="d-block mb-1">
                                              <img src="{{ asset('theme/app-assets/images/lmsicon/more/line-chart.png') }}"
                                                  alt="element 01" width="150" class="mb-1">
                                          </div>
@@ -141,7 +141,7 @@
                                  </div>
                              </div>
                          </div>
-                       
+
                      </div>
                  </section>
                  <!-- Dashboard Ecommerce ends -->
