@@ -79,7 +79,7 @@
                                                 <th>Name</th>
                                                 <th>Email</th>
                                                 <th>Phone</th>
-                                                <th>Address</th>
+                                                <th>Children</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -90,12 +90,22 @@
                                                     <td>{{ $parent->name }}</td>
                                                     <td>{{ $parent->email }}</td>
                                                     <td>{{ $parent->parentDetail->phone ?? 'N/A' }}</td>
-                                                    <td>{{ Str::limit($parent->parentDetail->address ?? 'N/A', 30) }}</td>
                                                     <td>
+                                                        @php $childCount = $parent->children->count(); @endphp
+                                                        @if($childCount > 0)
+                                                            <span class="badge badge-pill badge-primary">{{ $childCount }} {{ Str::plural('child', $childCount) }}</span>
+                                                        @else
+                                                            <span class="badge badge-pill badge-light-warning">No children</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{ route('admin.parents.show', $parent->id) }}" class="btn btn-sm btn-info mb-1" title="View Family">
+                                                            <i class="feather icon-eye"></i> View
+                                                        </a>
                                                         <a href="{{ route('admin.parents.edit', $parent->id) }}" class="btn btn-sm btn-primary mb-1">
                                                             <i class="feather icon-edit"></i> Edit
                                                         </a>
-                                                        <form action="{{ route('admin.parents.destroy', $parent->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this parent?');">
+                                                        <form action="{{ route('admin.parents.destroy', $parent->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this parent? All linked students will be unassigned.');">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="btn btn-sm btn-danger mb-1">

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\ParentDetail;
+use App\Models\StudentDetail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
@@ -13,7 +14,7 @@ class ParentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::where('role', 'parent')->with('parentDetail');
+        $query = User::where('role', 'parent')->with(['parentDetail', 'children.user']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -74,11 +75,35 @@ class ParentController extends Controller
         return redirect()->route('admin.parents.index')->with('success', 'Parent created successfully.');
     }
 
+    /**
+     * Display the parent profile with all linked children (family hierarchy view).
+     */
+    public function show(User $parent)
+    {
+        if ($parent->role !== 'parent') {
+            abort(404);
+        }
+
+        $parent->load(['parentDetail', 'children.user']);
+
+        // Get students that are not yet assigned to any parent (for linking)
+        $unassignedStudents = User::where('role', 'student')
+            ->whereHas('studentDetail', function ($q) {
+                $q->whereNull('parent_id');
+            })
+            ->get();
+
+        return view('admin.parents.show', compact('parent', 'unassignedStudents'));
+    }
+
     public function edit(User $parent)
     {
         if ($parent->role !== 'parent') {
             abort(404);
         }
+
+        $parent->load(['parentDetail', 'children.user']);
+
         return view('admin.parents.edit', compact('parent'));
     }
 
@@ -134,11 +159,57 @@ class ParentController extends Controller
         return redirect()->route('admin.parents.index')->with('success', 'Parent updated successfully.');
     }
 
+    /**
+     * Unlink a student from this parent (set parent_id to null).
+     */
+    public function unlinkStudent(User $parent, User $student)
+    {
+        if ($parent->role !== 'parent' || $student->role !== 'student') {
+            abort(404);
+        }
+
+        if ($student->studentDetail && $student->studentDetail->parent_id == $parent->id) {
+            $student->studentDetail->update(['parent_id' => null]);
+        }
+
+        return redirect()->back()->with('success', 'Student "' . $student->name . '" has been unlinked from this parent.');
+    }
+
+    /**
+     * Link an existing student to this parent.
+     */
+    public function linkStudent(Request $request, User $parent)
+    {
+        if ($parent->role !== 'parent') {
+            abort(404);
+        }
+
+        $request->validate([
+            'student_id' => 'required|exists:users,id',
+        ]);
+
+        $student = User::findOrFail($request->student_id);
+
+        if ($student->role !== 'student') {
+            return redirect()->back()->with('error', 'Selected user is not a student.');
+        }
+
+        if ($student->studentDetail) {
+            $student->studentDetail->update(['parent_id' => $parent->id]);
+        }
+
+        return redirect()->back()->with('success', 'Student "' . $student->name . '" has been linked to this parent.');
+    }
+
     public function destroy(User $parent)
     {
         if ($parent->role !== 'parent') {
             abort(404);
         }
+
+        // Unlink all children before deleting
+        StudentDetail::where('parent_id', $parent->id)->update(['parent_id' => null]);
+
         if ($parent->parentDetail) {
             $parent->parentDetail->delete();
         }

@@ -13,7 +13,7 @@ class StudentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::where('role', 'student')->with('studentDetail');
+        $query = User::where('role', 'student')->with(['studentDetail.parent']);
 
         if ($request->filled('search')) {
             $search = $request->search;

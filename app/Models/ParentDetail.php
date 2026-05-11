@@ -23,4 +23,12 @@ class ParentDetail extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get all students linked to this parent through the user model.
+     */
+    public function students()
+    {
+        return $this->hasMany(StudentDetail::class, 'parent_id', 'user_id');
+    }
 }

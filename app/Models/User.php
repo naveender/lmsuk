@@ -74,4 +74,13 @@ class User extends Authenticatable
     {
         return $this->hasOne(ParentDetail::class);
     }
+
+    /**
+     * Get all students (children) linked to this parent user.
+     * Only meaningful for users with role='parent'.
+     */
+    public function children()
+    {
+        return $this->hasMany(StudentDetail::class, 'parent_id');
+    }
 }

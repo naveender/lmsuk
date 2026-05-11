@@ -151,6 +151,78 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- Linked Children Section -->
+                <section id="linked-children">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">
+                                <i class="feather icon-users"></i> Linked Children
+                                <span class="badge badge-pill badge-primary ml-1">{{ $parent->children->count() }}</span>
+                            </h4>
+                            <a href="{{ route('admin.parents.show', $parent->id) }}" class="btn btn-sm btn-info">
+                                <i class="feather icon-eye"></i> View Full Family Profile
+                            </a>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body">
+                                @if($parent->children->count() > 0)
+                                    <div class="table-responsive">
+                                        <table class="table table-hover-animation">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Student Name</th>
+                                                    <th>Email</th>
+                                                    <th>Group Year</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($parent->children as $index => $child)
+                                                    <tr>
+                                                        <td>{{ $index + 1 }}</td>
+                                                        <td>
+                                                            <a href="{{ route('admin.students.edit', $child->user->id) }}" class="text-primary font-weight-bold">
+                                                                {{ $child->user->name }}
+                                                            </a>
+                                                        </td>
+                                                        <td>{{ $child->user->email }}</td>
+                                                        <td>
+                                                            @if($child->group_year)
+                                                                {{ $child->group_year }}{{ $child->group_year == 1 ? 'st' : ($child->group_year == 2 ? 'nd' : ($child->group_year == 3 ? 'rd' : 'th')) }} year
+                                                            @else
+                                                                N/A
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            <a href="{{ route('admin.students.edit', $child->user->id) }}" class="btn btn-sm btn-primary mb-1" title="Edit Student">
+                                                                <i class="feather icon-edit"></i>
+                                                            </a>
+                                                            <form action="{{ route('admin.parents.unlink-student', [$parent->id, $child->user->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('Unlink {{ $child->user->name }} from this parent?');">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-sm btn-warning mb-1" title="Unlink Student">
+                                                                    <i class="feather icon-x-circle"></i> Unlink
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @else
+                                    <div class="text-center py-2">
+                                        <p class="text-muted mb-1">No children linked to this parent yet.</p>
+                                        <a href="{{ route('admin.parents.show', $parent->id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="feather icon-plus"></i> Link a Student
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
     </div>

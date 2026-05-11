@@ -78,6 +78,7 @@
                                                 <th>#</th>
                                                 <th>Name</th>
                                                 <th>Email</th>
+                                                <th>Parent</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -87,6 +88,15 @@
                                                     <td>{{ $students->firstItem() + $index }}</td>
                                                     <td>{{ $student->name }}</td>
                                                     <td>{{ $student->email }}</td>
+                                                    <td>
+                                                        @if($student->studentDetail && $student->studentDetail->parent)
+                                                            <a href="{{ route('admin.parents.show', $student->studentDetail->parent_id) }}" class="text-primary font-weight-bold" title="View Parent Profile">
+                                                                <i class="feather icon-user"></i> {{ $student->studentDetail->parent->name }}
+                                                            </a>
+                                                        @else
+                                                            <span class="badge badge-pill badge-light-warning">Unassigned</span>
+                                                        @endif
+                                                    </td>
                                                     <td>
                                                         <a href="{{ route('admin.students.edit', $student->id) }}" class="btn btn-sm btn-primary mb-1">
                                                             <i class="feather icon-edit"></i> Edit
@@ -102,7 +112,7 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="4" class="text-center">No students found.</td>
+                                                    <td colspan="5" class="text-center">No students found.</td>
                                                 </tr>
                                             @endforelse
                                         </tbody>

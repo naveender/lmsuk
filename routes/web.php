@@ -98,10 +98,15 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         'index' => 'admin.parents.index',
         'create' => 'admin.parents.create',
         'store' => 'admin.parents.store',
+        'show' => 'admin.parents.show',
         'edit' => 'admin.parents.edit',
         'update' => 'admin.parents.update',
         'destroy' => 'admin.parents.destroy',
     ]);
+
+    // Parent-Student hierarchy management
+    Route::post('admin/parents/{parent}/unlink-student/{student}', [AdminParentController::class, 'unlinkStudent'])->name('admin.parents.unlink-student');
+    Route::post('admin/parents/{parent}/link-student', [AdminParentController::class, 'linkStudent'])->name('admin.parents.link-student');
 });
 
 // Student
