@@ -60,7 +60,8 @@
                                                                 <label>Username</label>
                                                                 <input type="text" id="username" class="form-control"
                                                                     name="username" value="{{ old('username') }}"
-                                                                    placeholder="Enter Username" required>
+                                                                    placeholder="Enter Username" autocomplete="off"
+                                                                    required>
                                                                 <small class="text-muted">Username must be unique.
                                                                     Suggested: <a href="javascript:void(0)"
                                                                         id="suggest_username"></a></small>
@@ -93,16 +94,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-12 col-sm-6">
-                                                        <div class="form-group">
-                                                            <div class="controls">
-                                                                <label>Password</label>
-                                                                <input type="password" id="password" class="form-control"
-                                                                    name="password" placeholder="Enter Your Password"
-                                                                    required>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+
 
                                                     <div class="col-12 col-sm-6">
                                                         <div class="form-group">
@@ -228,6 +220,17 @@
                                                                     </fieldset>
                                                                 </li>
                                                             </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Password</label>
+                                                                <input type="password" id="password"
+                                                                    class="form-control" name="password"
+                                                                    placeholder="Enter Your Password"
+                                                                    autocomplete="new-password" required>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-12">

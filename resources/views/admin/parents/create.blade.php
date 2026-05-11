@@ -38,8 +38,8 @@
                                             </div>
                                         @endif
 
-                                        <form class="form form-horizontal" action="{{ route('admin.parents.store') }}"
-                                            method="POST">
+                                        <form class="form form-horizontal" autocomplete="off"
+                                            action="{{ route('admin.parents.store') }}" method="POST">
                                             @csrf
                                             <div class="form-body">
                                                 <div class="row">
@@ -47,8 +47,8 @@
                                                         <div class="form-group">
                                                             <div class="controls">
                                                                 <label>Parent Name</label>
-                                                                <input type="text" id="name" class="form-control" name="name"
-                                                                    value="{{ old('name') }}"
+                                                                <input type="text" id="name" class="form-control"
+                                                                    name="name" value="{{ old('name') }}"
                                                                     placeholder="Full name of the parent or guardian."
                                                                     data-validation-required-message="This Parent Name field is required">
                                                             </div>
@@ -60,8 +60,11 @@
                                                                 <label>Username</label>
                                                                 <input type="text" id="username" class="form-control"
                                                                     name="username" value="{{ old('username') }}"
-                                                                    placeholder="Enter Username" required>
-                                                                <small class="text-muted">Username must be unique. Suggested: <a href="javascript:void(0)" id="suggest_username"></a></small>
+                                                                    placeholder="Enter Username" autocomplete="off"
+                                                                    required>
+                                                                <small class="text-muted">Username must be unique.
+                                                                    Suggested: <a href="javascript:void(0)"
+                                                                        id="suggest_username"></a></small>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -95,17 +98,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-12 col-sm-6">
-                                                        <div class="form-group">
-                                                            <div class="controls">
-                                                                <label>Password</label>
-                                                                <input type="password" class="form-control" name="password"
-                                                                    value="{{ old('password') }}"
-                                                                    placeholder="Enter Your Password"
-                                                                    data-validation-required-message="This Password field is required">
-                                                            </div>
-                                                        </div>
-                                                    </div>
+
                                                     <div class="col-12 col-sm-6">
                                                         <div class="form-group">
                                                             <div class="controls">
@@ -137,6 +130,18 @@
                                                                     name="emergency_contact"
                                                                     value="{{ old('emergency_contact') }}"
                                                                     placeholder="A contact number to be reached in case of emergencies.">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Password</label>
+                                                                <input type="password" class="form-control"
+                                                                    name="password" value="{{ old('password') }}"
+                                                                    placeholder="Enter Your Password"
+                                                                    autocomplete="new-password"
+                                                                    data-validation-required-message="This Password field is required">
                                                             </div>
                                                         </div>
                                                     </div>

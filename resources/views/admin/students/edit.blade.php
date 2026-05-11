@@ -92,17 +92,6 @@
                                                             </div>
                                                         </div>
                                                     </div>
-
-                                                    <div class="col-12 col-sm-6">
-                                                        <div class="form-group">
-                                                            <div class="controls">
-                                                                <label>Password</label>
-                                                                <input type="password" id="password" class="form-control"
-                                                                    name="password"
-                                                                    placeholder="Leave blank to keep current">
-                                                            </div>
-                                                        </div>
-                                                    </div>
                                                     <div class="col-12 col-sm-6">
                                                         <div class="form-group">
                                                             <div class="controls">
@@ -221,6 +210,16 @@
                                                                     </fieldset>
                                                                 </li>
                                                             </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Password</label>
+                                                                <input type="password" id="password"
+                                                                    class="form-control" name="password"
+                                                                    placeholder="Leave blank to keep current">
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-12">

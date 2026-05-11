@@ -37,8 +37,8 @@
                                             </div>
                                         @endif
 
-                                        <form class="form form-horizontal" action="{{ route('admin.users.store') }}"
-                                            method="POST">
+                                        <form class="form form-horizontal" autocomplete="off"
+                                            action="{{ route('admin.users.store') }}" method="POST">
                                             @csrf
                                             <div class="form-body">
                                                 <div class="row">
@@ -56,8 +56,11 @@
                                                             <div class="col-md-2"><span>Username</span></div>
                                                             <div class="col-md-10">
                                                                 <input type="text" id="username" class="form-control"
-                                                                    name="username" value="{{ old('username') }}" required>
-                                                                <small class="text-muted">Username must be unique. Suggested: <a href="javascript:void(0)" id="suggest_username"></a></small>
+                                                                    name="username" value="{{ old('username') }}"
+                                                                    autocomplete="off" required>
+                                                                <small class="text-muted">Username must be unique.
+                                                                    Suggested: <a href="javascript:void(0)"
+                                                                        id="suggest_username"></a></small>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -75,7 +78,7 @@
                                                             <div class="col-md-2"><span>Password</span></div>
                                                             <div class="col-md-10">
                                                                 <input type="password" id="password" class="form-control"
-                                                                    name="password" required>
+                                                                    name="password" autocomplete="new-password" required>
                                                             </div>
                                                         </div>
                                                     </div>
