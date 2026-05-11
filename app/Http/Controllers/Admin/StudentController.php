@@ -33,7 +33,8 @@ class StudentController extends Controller
 
     public function create()
     {
-        return view('admin.students.create');
+        $parents = User::where('role', 'parent')->get();
+        return view('admin.students.create', compact('parents'));
     }
 
     public function store(Request $request)
@@ -43,12 +44,12 @@ class StudentController extends Controller
             'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
+            'parent_id' => 'required|exists:users,id',
             'date_of_birth' => 'required|date',
             'group_year' => 'required|string|max:255',
             'academic_year' => 'required|string|max:255',
             'region' => 'required|string|max:255',
             'student_phone' => 'nullable|string|max:255',
-            'student_email' => 'nullable|string|email|max:255',
             'gender' => 'required|string|in:male,female,other',
         ]);
 
@@ -62,12 +63,12 @@ class StudentController extends Controller
             ]);
 
             $user->studentDetail()->create([
+                'parent_id' => $request->parent_id,
                 'date_of_birth' => $request->date_of_birth,
                 'group_year' => $request->group_year,
                 'academic_year' => $request->academic_year,
                 'region' => $request->region,
                 'student_phone' => $request->student_phone,
-                'student_email' => $request->student_email,
                 'gender' => $request->gender,
             ]);
         });
@@ -80,7 +81,8 @@ class StudentController extends Controller
         if ($student->role !== 'student') {
             abort(404);
         }
-        return view('admin.students.edit', compact('student'));
+        $parents = User::where('role', 'parent')->get();
+        return view('admin.students.edit', compact('student', 'parents'));
     }
 
     public function update(Request $request, User $student)
@@ -93,12 +95,12 @@ class StudentController extends Controller
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username,'.$student->id,
             'email' => 'required|string|email|max:255|unique:users,email,'.$student->id,
+            'parent_id' => 'required|exists:users,id',
             'date_of_birth' => 'required|date',
             'group_year' => 'required|string|max:255',
             'academic_year' => 'required|string|max:255',
             'region' => 'required|string|max:255',
             'student_phone' => 'nullable|string|max:255',
-            'student_email' => 'nullable|string|email|max:255',
             'gender' => 'required|string|in:male,female,other',
         ]);
 
@@ -117,22 +119,22 @@ class StudentController extends Controller
 
             if ($student->studentDetail) {
                 $student->studentDetail->update([
+                    'parent_id' => $request->parent_id,
                     'date_of_birth' => $request->date_of_birth,
                     'group_year' => $request->group_year,
                     'academic_year' => $request->academic_year,
                     'region' => $request->region,
                     'student_phone' => $request->student_phone,
-                    'student_email' => $request->student_email,
                     'gender' => $request->gender,
                 ]);
             } else {
                 $student->studentDetail()->create([
+                    'parent_id' => $request->parent_id,
                     'date_of_birth' => $request->date_of_birth,
                     'group_year' => $request->group_year,
                     'academic_year' => $request->academic_year,
                     'region' => $request->region,
                     'student_phone' => $request->student_phone,
-                    'student_email' => $request->student_email,
                     'gender' => $request->gender,
                 ]);
             }

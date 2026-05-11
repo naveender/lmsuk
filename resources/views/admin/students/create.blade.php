@@ -61,7 +61,25 @@
                                                                 <input type="text" id="username" class="form-control"
                                                                     name="username" value="{{ old('username') }}"
                                                                     placeholder="Enter Username" required>
-                                                                <small class="text-muted">Username must be unique. Suggested: <a href="javascript:void(0)" id="suggest_username"></a></small>
+                                                                <small class="text-muted">Username must be unique.
+                                                                    Suggested: <a href="javascript:void(0)"
+                                                                        id="suggest_username"></a></small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                                <label>Parent</label>
+                                                                <select class="form-control" name="parent_id" required>
+                                                                    <option value="">--Select Parent--</option>
+                                                                    @foreach ($parents as $parent)
+                                                                        <option value="{{ $parent->id }}"
+                                                                            {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
+                                                                            {{ $parent->name }} ({{ $parent->email }})
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -155,22 +173,13 @@
                                                             <div class="controls">
                                                                 <label>Student Phone Number</label>
                                                                 <input type="text" class="form-control"
-                                                                    name="student_phone" value="{{ old('student_phone') }}"
+                                                                    name="student_phone"
+                                                                    value="{{ old('student_phone') }}"
                                                                     placeholder="Direct contact number of the student, if available...(optional)">
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-12 col-sm-6">
-                                                        <div class="form-group">
-                                                            <div class="controls">
-                                                                <label>Student Email</label>
-                                                                <input type="text" class="form-control"
-                                                                    name="student_email"
-                                                                    value="{{ old('student_email') }}"
-                                                                    placeholder="Direct email address of the student, if available.(optional)">
-                                                            </div>
-                                                        </div>
-                                                    </div>
+
 
                                                     <div class="col-12 col-sm-6">
                                                         <div class="form-group">
