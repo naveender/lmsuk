@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\StudentDetail;
+use App\Models\ParentDetail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
@@ -39,21 +40,62 @@ class StudentController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        // Common student validation rules
+        $rules = [
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'parent_id' => 'required|exists:users,id',
             'date_of_birth' => 'required|date',
             'group_year' => 'required|string|max:255',
             'academic_year' => 'required|string|max:255',
             'region' => 'required|string|max:255',
             'student_phone' => 'nullable|string|max:255',
             'gender' => 'required|string|in:male,female,other',
-        ]);
+            'parent_mode' => 'required|in:existing,new',
+        ];
+
+        // Conditional parent validation based on selected mode
+        if ($request->parent_mode === 'existing') {
+            $rules['parent_id'] = 'required|exists:users,id';
+        } else {
+            // Inline new parent fields
+            $rules['parent_name'] = 'required|string|max:255';
+            $rules['parent_username'] = 'required|string|max:255|unique:users,username';
+            $rules['parent_email'] = 'required|string|email|max:255|unique:users,email';
+            $rules['parent_password'] = 'required|string|min:8';
+            $rules['parent_phone'] = 'required|string|max:255';
+            $rules['parent_relation'] = 'required|string|max:255';
+            $rules['parent_alternate_phone'] = 'nullable|string|max:255';
+            $rules['parent_emergency_contact'] = 'nullable|string|max:255';
+        }
+
+        $request->validate($rules);
 
         DB::transaction(function () use ($request) {
+            // Determine parent_id: either existing or create new parent inline
+            if ($request->parent_mode === 'new') {
+                $parentUser = User::create([
+                    'name' => $request->parent_name,
+                    'username' => $request->parent_username,
+                    'email' => $request->parent_email,
+                    'password' => Hash::make($request->parent_password),
+                    'role' => 'parent',
+                ]);
+
+                $parentUser->parentDetail()->create([
+                    'phone' => $request->parent_phone,
+                    'relation' => $request->parent_relation,
+                    'alternate_phone' => $request->parent_alternate_phone,
+                    'emergency_contact' => $request->parent_emergency_contact,
+                ]);
+
+                $parentId = $parentUser->id;
+            } else {
+                $parentId = $request->parent_id;
+            }
+
+            // Create the student user
             $user = User::create([
                 'name' => $request->name,
                 'username' => $request->username,
@@ -63,7 +105,7 @@ class StudentController extends Controller
             ]);
 
             $user->studentDetail()->create([
-                'parent_id' => $request->parent_id,
+                'parent_id' => $parentId,
                 'date_of_birth' => $request->date_of_birth,
                 'group_year' => $request->group_year,
                 'academic_year' => $request->academic_year,
