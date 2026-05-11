@@ -21,21 +21,27 @@
                 <a href="{{ route('dashboard') }}"><i class="feather icon-home"></i><span class="menu-title"
                         data-i18n="Email">Dashboard</span></a>
             </li>
-            <li class=" nav-item"><a href="#"><i class="feather icon-user"></i><span class="menu-title"
+            <li
+                class="{{ request()->routeIs('admin.users.*') || request()->routeIs('admin.students.*') || request()->routeIs('admin.parents.*') ? 'active' : '' }} nav-item">
+                <a href="#"><i class="feather icon-user"></i><span class="menu-title"
                         data-i18n="User">User</span></a>
                 <ul class="menu-content">
 
-                    <li><a href="app-user-list.html"><i class="feather icon-circle"></i><span class="menu-item"
-                                data-i18n="Add New User">Add New User</span></a>
+                    <li class="{{ request()->routeIs('admin.users.create') ? 'active' : '' }}"><a
+                            href="{{ route('admin.users.create') }}"><i class="feather icon-circle"></i><span
+                                class="menu-item" data-i18n="Add New User">Add New User</span></a>
                     </li>
-                    <li><a href="app-user-list.html"><i class="feather icon-circle"></i><span class="menu-item"
-                                data-i18n="All Users">All Users</span></a>
+                    <li class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}"><a
+                            href="{{ route('admin.users.index') }}"><i class="feather icon-circle"></i><span
+                                class="menu-item" data-i18n="All Users">All Users</span></a>
                     </li>
-                    <li><a href="app-user-view.html"><i class="feather icon-circle"></i><span class="menu-item"
-                                data-i18n="Manage Students">Manage Students</span></a>
+                    <li class="{{ request()->routeIs('admin.students.index') ? 'active' : '' }}"><a
+                            href="{{ route('admin.students.index') }}"><i class="feather icon-circle"></i><span
+                                class="menu-item" data-i18n="Manage Students">Manage Students</span></a>
                     </li>
-                    <li><a href="app-user-edit.html"><i class="feather icon-circle"></i><span class="menu-item"
-                                data-i18n="Manage Parents">Manage Parents</span></a>
+                    <li class="{{ request()->routeIs('admin.parents.index') ? 'active' : '' }}"><a
+                            href="{{ route('admin.parents.index') }}"><i class="feather icon-circle"></i><span
+                                class="menu-item" data-i18n="Manage Parents">Manage Parents</span></a>
                     </li>
                 </ul>
             </li>

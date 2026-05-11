@@ -8,6 +8,10 @@ use App\Http\Controllers\ManualBackupManagerController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\EditProfileController;
 
+use App\Http\Controllers\Admin\UsersController as AdminUsersController;
+use App\Http\Controllers\Admin\StudentController as AdminStudentController;
+use App\Http\Controllers\Admin\ParentController as AdminParentController;
+
 use App\Http\Controllers\Admin\HomeController as AdminHomeController;
 use App\Http\Controllers\Student\HomeController as StudentHomeController;
 use App\Http\Controllers\Student\LessonsController as StudentLessonsController;
@@ -69,6 +73,34 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         'edit' => 'admin.announcements.edit',
         'update' => 'admin.announcements.update',
         'destroy' => 'admin.announcements.destroy',
+    ]);
+
+    // Users Management
+    Route::resource('admin/users', AdminUsersController::class)->names([
+        'index' => 'admin.users.index',
+        'create' => 'admin.users.create',
+        'store' => 'admin.users.store',
+        'edit' => 'admin.users.edit',
+        'update' => 'admin.users.update',
+        'destroy' => 'admin.users.destroy',
+    ]);
+
+    Route::resource('admin/students', AdminStudentController::class)->names([
+        'index' => 'admin.students.index',
+        'create' => 'admin.students.create',
+        'store' => 'admin.students.store',
+        'edit' => 'admin.students.edit',
+        'update' => 'admin.students.update',
+        'destroy' => 'admin.students.destroy',
+    ]);
+
+    Route::resource('admin/parents', AdminParentController::class)->names([
+        'index' => 'admin.parents.index',
+        'create' => 'admin.parents.create',
+        'store' => 'admin.parents.store',
+        'edit' => 'admin.parents.edit',
+        'update' => 'admin.parents.update',
+        'destroy' => 'admin.parents.destroy',
     ]);
 });
 
