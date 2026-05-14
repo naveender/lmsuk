@@ -65,6 +65,16 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::put('/admin/topics/{topic}', [TopicController::class, 'update'])->name('topics.update');
     Route::delete('/admin/topics/{topic}', [TopicController::class, 'destroy'])->name('topics.destroy');
     
+    // Classes
+    Route::resource('admin/classes', \App\Http\Controllers\Admin\ClassesController::class)->names([
+        'index' => 'admin.classes.index',
+        'create' => 'admin.classes.create',
+        'store' => 'admin.classes.store',
+        'edit' => 'admin.classes.edit',
+        'update' => 'admin.classes.update',
+        'destroy' => 'admin.classes.destroy',
+    ]);
+
     // Announcements
     Route::resource('admin/announcements', \App\Http\Controllers\Admin\AnnouncementController::class)->names([
         'index' => 'admin.announcements.index',
