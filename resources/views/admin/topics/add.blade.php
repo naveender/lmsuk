@@ -61,6 +61,19 @@
                                                     </div>
                                                     <div class="col-12">
                                                         <div class="form-group">
+                                                            <label for="subject_id">Subject</label>
+                                                            <select name="subject_id" id="subject_id" class="form-control">
+                                                                <option value="">-- Select Subject --</option>
+                                                                @foreach ($subjects as $subject)
+                                                                    <option value="{{ $subject->id }}" {{ old('subject_id') == $subject->id ? 'selected' : '' }}>
+                                                                        {{ $subject->title }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                            @error('subject_id') <span class="text-danger">{{ $message }}</span> @enderror
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <div class="form-group">
                                                             <label for="contact-info-vertical">Parent Topic</label>
                                                             <select name="parent_id" id="parent_id" class="form-control">
                                                                 <option value="0">None</option>

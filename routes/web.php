@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\UsersController as AdminUsersController;
 use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Admin\ParentController as AdminParentController;
 
+use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\HomeController as AdminHomeController;
 use App\Http\Controllers\Tutor\HomeController as TutorHomeController;
 use App\Http\Controllers\Student\HomeController as StudentHomeController;
@@ -139,6 +140,18 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     // Parent-Student hierarchy management
     Route::post('admin/parents/{parent}/unlink-student/{student}', [AdminParentController::class, 'unlinkStudent'])->name('admin.parents.unlink-student');
     Route::post('admin/parents/{parent}/link-student', [AdminParentController::class, 'linkStudent'])->name('admin.parents.link-student');
+
+    // Questions
+    Route::get('admin/questions/get-topics/{subjectId?}', [AdminQuestionController::class, 'getTopics'])->name('admin.questions.get-topics');
+    Route::get('admin/questions/get-subtopics/{topicId}', [AdminQuestionController::class, 'getSubtopics'])->name('admin.questions.get-subtopics');
+    Route::resource('admin/questions', AdminQuestionController::class)->names([
+        'index'   => 'admin.questions.index',
+        'create'  => 'admin.questions.create',
+        'store'   => 'admin.questions.store',
+        'edit'    => 'admin.questions.edit',
+        'update'  => 'admin.questions.update',
+        'destroy' => 'admin.questions.destroy',
+    ]);
 });
 
 // Student
