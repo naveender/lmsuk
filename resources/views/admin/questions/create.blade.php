@@ -29,6 +29,9 @@
                 @if (session('error'))
                     <div class="alert alert-danger">{{ session('error') }}</div>
                 @endif
+                @if (session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
 
                 <form class="form" action="{{ route('admin.questions.store') }}" method="POST" enctype="multipart/form-data" id="questionForm">
                     @csrf
@@ -318,7 +321,9 @@
                     {{-- Submit --}}
                     <div class="card">
                         <div class="card-body">
+                            <input type="hidden" name="save_and_add_another" id="save_and_add_another" value="0">
                             <button type="submit" class="btn btn-primary mr-1"><i class="feather icon-save"></i> Save Question</button>
+                            <button type="submit" class="btn btn-success mr-1" id="btn-save-add-another"><i class="feather icon-plus"></i> Save and Add Another</button>
                             <a href="{{ route('admin.questions.index') }}" class="btn btn-outline-warning">Cancel</a>
                         </div>
                     </div>
@@ -486,6 +491,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const rows = this.querySelectorAll('.matching-row');
             if (rows.length > 2) e.target.closest('.matching-row').remove();
         }
+    });
+
+    // Save and Add Another button handler
+    document.getElementById('btn-save-add-another').addEventListener('click', function() {
+        document.getElementById('save_and_add_another').value = '1';
     });
 });
 </script>

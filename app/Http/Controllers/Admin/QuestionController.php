@@ -95,6 +95,11 @@ class QuestionController extends Controller
             }
 
             DB::commit();
+
+            if ($request->input('save_and_add_another') == '1') {
+                return redirect()->route('admin.questions.create')->with('success', 'Question created successfully. Add another one!');
+            }
+
             return redirect()->route('admin.questions.index')->with('success', 'Question created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();

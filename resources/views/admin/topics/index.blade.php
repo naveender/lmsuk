@@ -96,6 +96,7 @@
                                         <thead>
                                             <tr>
                                                 <th>#</th>
+                                                <th>Subject</th>
                                                 <th>Name</th>
                                                 <th>Slug</th>
                                                 <th>Sub Topics</th>
@@ -106,6 +107,7 @@
                                             @forelse($topics as $index => $topic)
                                                 <tr>
                                                     <td>{{ $topics->firstItem() + $index }}</td>
+                                                    <td>{{ $topic->subject?->title }}</td>
                                                     <td>{{ $topic->name }}</td>
                                                     <td>{{ $topic->slug }}</td>
                                                     <td>
