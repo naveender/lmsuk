@@ -87,6 +87,16 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         'destroy' => 'admin.year-groups.destroy',
     ]);
 
+    // Subjects
+    Route::resource('admin/subjects', \App\Http\Controllers\Admin\SubjectsController::class)->names([
+        'index' => 'admin.subjects.index',
+        'create' => 'admin.subjects.create',
+        'store' => 'admin.subjects.store',
+        'edit' => 'admin.subjects.edit',
+        'update' => 'admin.subjects.update',
+        'destroy' => 'admin.subjects.destroy',
+    ]);
+
     // Announcements
     Route::resource('admin/announcements', \App\Http\Controllers\Admin\AnnouncementController::class)->names([
         'index' => 'admin.announcements.index',

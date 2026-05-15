@@ -97,6 +97,10 @@
                             href="{{ route('admin.year-groups.index') }}"><i class="feather icon-circle"></i><span
                                 class="menu-item" data-i18n="">Year Groups</span></a>
                     </li>
+                    <li class="{{ request()->routeIs('admin.subjects.*') ? 'active' : '' }}"><a
+                            href="{{ route('admin.subjects.index') }}"><i class="feather icon-circle"></i><span
+                                class="menu-item" data-i18n="">Subjects</span></a>
+                    </li>
                     <li class="{{ request()->routeIs('topics') ? 'active' : '' }}"><a
                             href="{{ route('topics') }}"><i class="feather icon-circle"></i><span class="menu-item"
                                 data-i18n="Manage Students">Topics/Sub Topics</span></a>
