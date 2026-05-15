@@ -10,13 +10,13 @@
                     <div class="row breadcrumbs-top">
                         <div class="col-12">
                             <h2 class="content-header-title float-left mb-0 font-weight-bold">
-                                Classes Management
+                                Year Groups Management
                             </h2>
                             <div class="breadcrumb-wrapper col-12">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                                    <li class="breadcrumb-item"><a href="{{ route('admin.classes.index') }}">Classes</a></li>
-                                    <li class="breadcrumb-item active">Classes List</li>
+                                    <li class="breadcrumb-item"><a href="{{ route('admin.year-groups.index') }}">Year Groups</a></li>
+                                    <li class="breadcrumb-item active">Year Groups List</li>
                                 </ol>
                             </div>
                         </div>
@@ -32,10 +32,10 @@
 
                 <div class="row mb-2">
                     <div class="col-9">
-                        <p>Manage Classes</p>
+                        <p>Manage Year Groups</p>
                     </div>
                     <div class="col-3">
-                        <a href="{{ route('admin.classes.create') }}" class="btn btn-primary float-right">Add Class</a>
+                        <a href="{{ route('admin.year-groups.create') }}" class="btn btn-primary float-right">Add Year Group</a>
                     </div>
                 </div>
 
@@ -52,29 +52,16 @@
                     </div>
                     <div class="card-content collapse show">
                         <div class="card-body">
-                            <form method="GET" action="{{ route('admin.classes.index') }}" class="row mb-4 g-2 align-items-end">
+                            <form method="GET" action="{{ route('admin.year-groups.index') }}" class="row mb-4 g-2 align-items-end">
                                 <div class="col-md-3">
-                                    <label for="name" class="form-label">Name</label>
-                                    <input type="text" name="name" id="name" value="{{ request('name') }}" class="form-control" placeholder="Class Name...">
+                                    <label for="title" class="form-label">Title</label>
+                                    <input type="text" name="title" id="title" value="{{ request('title') }}" class="form-control" placeholder="Title...">
                                 </div>
-                                <div class="col-md-2">
-                                    <label for="group_year" class="form-label">Group Year</label>
-                                    <select name="group_year" id="group_year" class="form-control">
-                                        <option value="">All</option>
-                                        @foreach($yearGroups as $yg)
-                                            <option value="{{ $yg->title }}" {{ request('group_year') == $yg->title ? 'selected' : '' }}>{{ $yg->title }}</option>
-                                        @endforeach
-                                    </select>
+                                <div class="col-md-3">
+                                    <label for="value" class="form-label">Value</label>
+                                    <input type="text" name="value" id="value" value="{{ request('value') }}" class="form-control" placeholder="Value...">
                                 </div>
-                                <div class="col-md-2">
-                                    <label for="academic_year" class="form-label">Academic Year</label>
-                                    <select name="academic_year" id="academic_year" class="form-control">
-                                        <option value="">All</option>
-                                        <option value="2024-2025" {{ request('academic_year') == '2024-2025' ? 'selected' : '' }}>2024-2025</option>
-                                        <option value="2025-2026" {{ request('academic_year') == '2025-2026' ? 'selected' : '' }}>2025-2026</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <label for="is_active" class="form-label">Status</label>
                                     <select name="is_active" id="is_active" class="form-control">
                                         <option value="">All</option>
@@ -84,7 +71,7 @@
                                 </div>
                                 <div class="col-md-3 d-flex justify-content-between">
                                     <button type="submit" class="btn btn-primary flex-fill mr-1">Apply Filters</button>
-                                    <a href="{{ route('admin.classes.index') }}" class="btn btn-secondary flex-fill text-center">Reset</a>
+                                    <a href="{{ route('admin.year-groups.index') }}" class="btn btn-secondary flex-fill text-center">Reset</a>
                                 </div>
                             </form>
                         </div>
@@ -102,32 +89,32 @@
                                         <thead>
                                             <tr>
                                                 <th>#</th>
-                                                <th>Name</th>
-                                                <th>Group Year</th>
-                                                <th>Academic Year</th>
+                                                <th>Title</th>
+                                                <th>Value</th>
+                                                <th>Description</th>
                                                 <th>Status</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse($classes as $index => $class)
+                                            @forelse($yearGroups as $index => $yearGroup)
                                                 <tr>
-                                                    <td>{{ $classes->firstItem() + $index }}</td>
-                                                    <td>{{ $class->name }}</td>
-                                                    <td>{{ $class->group_year }}</td>
-                                                    <td>{{ $class->academic_year }}</td>
+                                                    <td>{{ $yearGroups->firstItem() + $index }}</td>
+                                                    <td>{{ $yearGroup->title }}</td>
+                                                    <td>{{ $yearGroup->value }}</td>
+                                                    <td>{{ Str::limit($yearGroup->description, 50) }}</td>
                                                     <td>
-                                                        @if($class->is_active)
+                                                        @if($yearGroup->is_active)
                                                             <span class="badge badge-success">Active</span>
                                                         @else
                                                             <span class="badge badge-danger">Inactive</span>
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        <a href="{{ route('admin.classes.edit', $class->id) }}" class="btn btn-sm btn-primary mb-1">
+                                                        <a href="{{ route('admin.year-groups.edit', $yearGroup->id) }}" class="btn btn-sm btn-primary mb-1">
                                                             <i class="feather icon-edit"></i> Edit
                                                         </a>
-                                                        <form action="{{ route('admin.classes.destroy', $class->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this class?');">
+                                                        <form action="{{ route('admin.year-groups.destroy', $yearGroup->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this year group?');">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="btn btn-sm btn-danger mb-1">
@@ -138,7 +125,7 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="6" class="text-center">No classes found.</td>
+                                                    <td colspan="6" class="text-center">No year groups found.</td>
                                                 </tr>
                                             @endforelse
                                         </tbody>
@@ -146,7 +133,7 @@
 
                                     <!-- Pagination -->
                                     <nav aria-label="Page navigation">
-                                        {{ $classes->appends(request()->query())->links('pagination::bootstrap-5') }}
+                                        {{ $yearGroups->appends(request()->query())->links('pagination::bootstrap-5') }}
                                     </nav>
                                 </div>
                             </div>

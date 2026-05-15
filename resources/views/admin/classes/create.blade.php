@@ -63,9 +63,9 @@
                                                             <div class="col-md-8">
                                                                 <select name="group_year" class="form-control" required>
                                                                     <option value="" disabled selected>Select Group Year</option>
-                                                                    @for($i = 1; $i <= 13; $i++)
-                                                                        <option value="Year {{ $i }}" {{ old('group_year') == "Year $i" ? 'selected' : '' }}>Year {{ $i }}</option>
-                                                                    @endfor
+                                                                    @foreach($yearGroups as $yg)
+                                                                        <option value="{{ $yg->title }}" {{ old('group_year') == $yg->title ? 'selected' : '' }}>{{ $yg->title }}</option>
+                                                                    @endforeach
                                                                 </select>
                                                             </div>
                                                         </div>
