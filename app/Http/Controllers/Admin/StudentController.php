@@ -9,6 +9,7 @@ use App\Models\StudentDetail;
 use App\Models\ParentDetail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use App\Models\YearGroup;
 
 class StudentController extends Controller
 {
@@ -35,7 +36,8 @@ class StudentController extends Controller
     public function create()
     {
         $parents = User::where('role', 'parent')->get();
-        return view('admin.students.create', compact('parents'));
+        $yearGroups = YearGroup::where('is_active', 1)->get();
+        return view('admin.students.create', compact('parents', 'yearGroups'));
     }
 
     public function store(Request $request)
@@ -124,7 +126,8 @@ class StudentController extends Controller
             abort(404);
         }
         $parents = User::where('role', 'parent')->get();
-        return view('admin.students.edit', compact('student', 'parents'));
+        $yearGroups = YearGroup::where('is_active', 1)->get();
+        return view('admin.students.edit', compact('student', 'parents', 'yearGroups'));
     }
 
     public function update(Request $request, User $student)

@@ -108,21 +108,12 @@
                                                             <label>Group Year</label>
                                                             <select class="form-control" name="group_year" required>
                                                                 <option value="">--Select Group Year--</option>
-                                                                <option value="1"
-                                                                    {{ old('group_year', optional($student->studentDetail)->group_year) == '1' ? 'selected' : '' }}>
-                                                                    1st year</option>
-                                                                <option value="2"
-                                                                    {{ old('group_year', optional($student->studentDetail)->group_year) == '2' ? 'selected' : '' }}>
-                                                                    2nd year</option>
-                                                                <option value="3"
-                                                                    {{ old('group_year', optional($student->studentDetail)->group_year) == '3' ? 'selected' : '' }}>
-                                                                    3rd year</option>
-                                                                <option value="4"
-                                                                    {{ old('group_year', optional($student->studentDetail)->group_year) == '4' ? 'selected' : '' }}>
-                                                                    4th year</option>
-                                                                <option value="5"
-                                                                    {{ old('group_year', optional($student->studentDetail)->group_year) == '5' ? 'selected' : '' }}>
-                                                                    5th year</option>
+                                                                @foreach ($yearGroups as $year)
+                                                                    <option value="{{ $year->value }}"
+                                                                        {{ old('group_year', optional($student->studentDetail)->group_year) == $year->value ? 'selected' : '' }}>
+                                                                        {{ $year->title }}
+                                                                    </option>
+                                                                @endforeach
                                                             </select>
                                                         </div>
                                                     </div>
