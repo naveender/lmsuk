@@ -1,7 +1,7 @@
 Improve the prompt:
 
 I want to build and architecture of db for for roles, student, tutor, parent, admin for question createion for test/exam
-QUESTION SETTINGS:
+COMMON TEST/EXAM SETTINGS:
 General settings for questions:
   -title, description
   - settings- Exam Template,time limit in minutes (whole quiz or test/exam)
@@ -20,6 +20,8 @@ Shuffle Questions
 
 QUESTION Creation Prcocess
 -Admin or Tutor can create questions
+-Subject or category
+-Topic and subtopic selection
 -Question types: Single choice(Radio Button),Single choice (Dropdown),Mulptiple CHoice, Picture Choice,Fill In the blacnks,Matching,Matching Text,Free Text,File Upload. 
 -Checkboxes- Required, Show Question feedback,Randomize Options,Set option points
 - I can also manage the correct answer while managing question or options
@@ -28,6 +30,21 @@ QUESTION Creation Prcocess
 Negetive marking (keep optional)
 Explaination/Solution (keep Optional)
 Button cancel,Save , Save and add another
+
+
+IMplementation of Test/Exam Paper:
+Instruction management
+Subject(Maths And Number Reasoning,English,Verbal Reasoning)
+Test Style: Dual Format,method and answer,Mixed style,Multiple choice,Multiple choice(cloze),partial word(cloze),Standard Text,Word Bank(Cloze)
+Dificulty(beginner,intermidiate,advanced)
+Year group
+Topic
+Subtopic
+Question Types
+Add/remove questions
+Keywords
+
+
 
 
 
