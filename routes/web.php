@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Admin\ParentController as AdminParentController;
 
 use App\Http\Controllers\Admin\HomeController as AdminHomeController;
+use App\Http\Controllers\Tutor\HomeController as TutorHomeController;
 use App\Http\Controllers\Student\HomeController as StudentHomeController;
 use App\Http\Controllers\Student\LessonsController as StudentLessonsController;
 use App\Http\Controllers\Student\AnalyticsController as StudentAnalyticsController;
@@ -51,6 +52,7 @@ Route::get('/dashboard', function () {
         'admin' => redirect('/admin/dashboard'),
         'student' => redirect('/student/dashboard'),
         'parent' => redirect('/parent/dashboard'),
+        'tutor' => redirect('/tutor/dashboard'),
         default => abort(403),
     };
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -140,6 +142,10 @@ Route::middleware(['auth', 'verified', 'role:parent'])->group(function () {
     Route::get('/parent/dashboard', function () {
         return view('parent.dashboard');
     })->name('parent.dashboard');
+});
+// Tutor
+Route::middleware(['auth', 'verified', 'role:tutor'])->group(function () {
+    Route::get('/tutor/dashboard', [TutorHomeController::class, 'index'])->name('tutor.dashboard');
 });
 
 Route::get('/change-theme', [HomeController::class, 'toggleTheme'])->name('change.theme');

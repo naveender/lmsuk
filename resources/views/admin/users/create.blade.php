@@ -94,9 +94,12 @@
                                                                     <option value="parent"
                                                                         {{ old('role') == 'parent' ? 'selected' : '' }}>
                                                                         Parent</option>
+                                                                    <option value="tutor"
+                                                                        {{ old('role') == 'tutor' ? 'selected' : '' }}>
+                                                                        Tutor</option>
                                                                     <option value="admin"
-                                                                        {{ old('role') == 'admin' ? 'selected' : '' }}>Admin
-                                                                    </option>
+                                                                        {{ old('role') == 'admin' ? 'selected' : '' }}>
+                                                                        Admin</option>
                                                                 </select>
                                                             </div>
                                                         </div>

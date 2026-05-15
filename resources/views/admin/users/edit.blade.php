@@ -81,6 +81,7 @@
                                                                 <select name="role" id="role" class="form-control" required>
                                                                     <option value="student" {{ old('role', $user->role) == 'student' ? 'selected' : '' }}>Student</option>
                                                                     <option value="parent" {{ old('role', $user->role) == 'parent' ? 'selected' : '' }}>Parent</option>
+                                                                    <option value="tutor" {{ old('role', $user->role) == 'tutor' ? 'selected' : '' }}>Tutor</option>
                                                                     <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
                                                                 </select>
                                                             </div>

@@ -60,6 +60,11 @@ class User extends Authenticatable
         return $this->role === 'student';
     }
 
+    public function isTutor(): bool
+    {
+        return $this->role === 'tutor';
+    }
+
     public function isParent(): bool
     {
         return $this->role === 'parent';
