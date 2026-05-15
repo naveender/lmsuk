@@ -30,13 +30,16 @@ class ClassesController extends Controller
         }
 
         $classes = $query->latest()->paginate(10);
+        
+        $yearGroups = \App\Models\YearGroup::where('is_active', true)->orderBy('title')->get();
 
-        return view('admin.classes.index', compact('classes'));
+        return view('admin.classes.index', compact('classes', 'yearGroups'));
     }
 
     public function create()
     {
-        return view('admin.classes.create');
+        $yearGroups = \App\Models\YearGroup::where('is_active', true)->orderBy('title')->get();
+        return view('admin.classes.create', compact('yearGroups'));
     }
 
     public function store(Request $request)
@@ -58,7 +61,8 @@ class ClassesController extends Controller
 
     public function edit(Classes $class)
     {
-        return view('admin.classes.edit', compact('class'));
+        $yearGroups = \App\Models\YearGroup::where('is_active', true)->orderBy('title')->get();
+        return view('admin.classes.edit', compact('class', 'yearGroups'));
     }
 
     public function update(Request $request, Classes $class)

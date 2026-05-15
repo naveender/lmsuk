@@ -9,13 +9,13 @@
                     <div class="row breadcrumbs-top">
                         <div class="col-12">
                             <h2 class="content-header-title float-left mb-0 font-weight-bold">
-                                Edit Class
+                                Edit Year Group
                             </h2>
                             <div class="breadcrumb-wrapper col-12">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                                    <li class="breadcrumb-item"><a href="{{ route('admin.classes.index') }}">Classes</a></li>
-                                    <li class="breadcrumb-item active">Edit Class</li>
+                                    <li class="breadcrumb-item"><a href="{{ route('admin.year-groups.index') }}">Year Groups</a></li>
+                                    <li class="breadcrumb-item active">Edit Year Group</li>
                                 </ol>
                             </div>
                         </div>
@@ -28,7 +28,7 @@
                         <div class="col-md-12 col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title">Class Details</h4>
+                                    <h4 class="card-title">Year Group Details</h4>
                                 </div>
                                 <div class="card-content">
                                     <div class="card-body">
@@ -41,7 +41,7 @@
                                                 </ul>
                                             </div>
                                         @endif
-                                        <form class="form form-horizontal" action="{{ route('admin.classes.update', $class->id) }}" method="POST">
+                                        <form class="form form-horizontal" action="{{ route('admin.year-groups.update', $yearGroup->id) }}" method="POST">
                                             @csrf
                                             @method('PUT')
                                             <div class="form-body">
@@ -49,39 +49,20 @@
                                                     <div class="col-12">
                                                         <div class="form-group row">
                                                             <div class="col-md-4">
-                                                                <span>Class Name</span>
+                                                                <span>Title</span>
                                                             </div>
                                                             <div class="col-md-8">
-                                                                <input type="text" class="form-control" name="name" value="{{ old('name', $class->name) }}" placeholder="e.g. Science Class A" required>
+                                                                <input type="text" class="form-control" name="title" value="{{ old('title', $yearGroup->title) }}" placeholder="e.g. Year 10" required>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-12">
                                                         <div class="form-group row">
                                                             <div class="col-md-4">
-                                                                <span>Group Year</span>
+                                                                <span>Value</span>
                                                             </div>
                                                             <div class="col-md-8">
-                                                                <select name="group_year" class="form-control" required>
-                                                                    <option value="" disabled>Select Group Year</option>
-                                                                    @foreach($yearGroups as $yg)
-                                                                        <option value="{{ $yg->title }}" {{ old('group_year', $class->group_year) == $yg->title ? 'selected' : '' }}>{{ $yg->title }}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-12">
-                                                        <div class="form-group row">
-                                                            <div class="col-md-4">
-                                                                <span>Academic Year / Session</span>
-                                                            </div>
-                                                            <div class="col-md-8">
-                                                                <select name="academic_year" class="form-control" required>
-                                                                    <option value="" disabled>Select Academic Year</option>
-                                                                    <option value="2024-2025" {{ old('academic_year', $class->academic_year) == '2024-2025' ? 'selected' : '' }}>2024-2025</option>
-                                                                    <option value="2025-2026" {{ old('academic_year', $class->academic_year) == '2025-2026' ? 'selected' : '' }}>2025-2026</option>
-                                                                </select>
+                                                                <input type="text" class="form-control" name="value" value="{{ old('value', $yearGroup->value) }}" placeholder="e.g. 10" required>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -91,7 +72,7 @@
                                                                 <span>Description</span>
                                                             </div>
                                                             <div class="col-md-8">
-                                                                <textarea class="form-control" name="description" rows="4" placeholder="Class Description...">{{ old('description', $class->description) }}</textarea>
+                                                                <textarea class="form-control" name="description" rows="4" placeholder="Description...">{{ old('description', $yearGroup->description) }}</textarea>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -102,7 +83,7 @@
                                                             </div>
                                                             <div class="col-md-8">
                                                                 <div class="custom-control custom-switch custom-control-inline">
-                                                                    <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" value="1" {{ old('is_active', $class->is_active) ? 'checked' : '' }}>
+                                                                    <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" value="1" {{ old('is_active', $yearGroup->is_active) ? 'checked' : '' }}>
                                                                     <label class="custom-control-label" for="is_active">Active</label>
                                                                 </div>
                                                             </div>
@@ -110,7 +91,7 @@
                                                     </div>
                                                     <div class="col-md-8 offset-md-4">
                                                         <button type="submit" class="btn btn-primary mr-1 mb-1">Update</button>
-                                                        <a href="{{ route('admin.classes.index') }}" class="btn btn-outline-warning mr-1 mb-1">Cancel</a>
+                                                        <a href="{{ route('admin.year-groups.index') }}" class="btn btn-outline-warning mr-1 mb-1">Cancel</a>
                                                     </div>
                                                 </div>
                                             </div>
