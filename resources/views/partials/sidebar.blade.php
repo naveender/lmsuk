@@ -89,11 +89,14 @@
                         data-i18n="User">Content Manager</span></a>
                 <ul class="menu-content">
 
-                    <li><a href="app-user-list.html"><i class="feather icon-circle"></i><span class="menu-item"
-                                data-i18n="Add New User">Class</span></a>
+                    <li class="{{ request()->routeIs('admin.classes.index') ? 'active' : '' }}"><a
+                            href="{{ route('admin.classes.index') }}"><i class="feather icon-circle"></i><span
+                                class="menu-item" data-i18n="">Classes</span></a>
                     </li>
-                    <li><a href="app-user-list.html"><i class="feather icon-circle"></i><span class="menu-item"
-                                data-i18n="All Users">Year Groups</span></a>
+                    <li class="#"><a
+                            href="#"><i class="feather icon-circle"></i><span
+                                class="menu-item" data-i18n="">
+                            Year Groups</span></a>
                     </li>
                     <li class="{{ request()->routeIs('topics') ? 'active' : '' }}"><a
                             href="{{ route('topics') }}"><i class="feather icon-circle"></i><span class="menu-item"

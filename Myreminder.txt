@@ -1,0 +1,35 @@
+Improve the prompt:
+
+I want to build and architecture of db for for roles, student, tutor, parent, admin for question createion for test/exam
+QUESTION SETTINGS:
+General settings for questions:
+  -title, description
+  - settings- Exam Template,time limit in minutes (whole quiz or test/exam)
+  - atetempts and scoring- default marks for each question =1,
+  - Enable disableing of Question Pooling: Distripute question accross multiple attempts.Userswill see different questions in each attempt,with no repeat from previous attemps.(checkbox)
+
+Advance settings (Test/Exam)
+Checkboxes: 
+Allow participant to attemptwithout signup
+Allow participant to reattempt the question
+Display the Result Question By Question
+Allow participants to see instant feebdback
+Hide result from participants
+Shuffle Questions
+
+
+QUESTION Creation Prcocess
+-Admin or Tutor can create questions
+-Question types: Single choice(Radio Button),Single choice (Dropdown),Mulptiple CHoice, Picture Choice,Fill In the blacnks,Matching,Matching Text,Free Text,File Upload. 
+-Checkboxes- Required, Show Question feedback,Randomize Options,Set option points
+- I can also manage the correct answer while managing question or options
+- allow to add options for mcq questions,
+-Add difficulty level  (keep optional)
+Negetive marking (keep optional)
+Explaination/Solution (keep Optional)
+Button cancel,Save , Save and add another
+
+
+
+
+
