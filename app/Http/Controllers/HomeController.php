@@ -16,7 +16,7 @@ class HomeController extends Controller
 
      public function toggleTheme(Request $request)
     {
-        $currentTheme = session('theme', 'dark'); // default dark
+        $currentTheme = session('theme', 'light'); // default light
         $newTheme = $currentTheme === 'dark' ? 'light' : 'dark';
 
         session(['theme' => $newTheme]);
