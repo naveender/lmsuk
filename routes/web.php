@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Admin\ParentController as AdminParentController;
 
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
+use App\Http\Controllers\Admin\PaperController as AdminPaperController;
 use App\Http\Controllers\Admin\HomeController as AdminHomeController;
 use App\Http\Controllers\Tutor\HomeController as TutorHomeController;
 use App\Http\Controllers\Student\HomeController as StudentHomeController;
@@ -151,6 +152,16 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         'edit'    => 'admin.questions.edit',
         'update'  => 'admin.questions.update',
         'destroy' => 'admin.questions.destroy',
+    ]);
+
+    // Exam Papers
+    Route::resource('admin/papers', AdminPaperController::class)->names([
+        'index'   => 'admin.papers.index',
+        'create'  => 'admin.papers.create',
+        'store'   => 'admin.papers.store',
+        'edit'    => 'admin.papers.edit',
+        'update'  => 'admin.papers.update',
+        'destroy' => 'admin.papers.destroy',
     ]);
 });
 

@@ -67,6 +67,20 @@
                     </li>
                 </ul>
             </li>
+            <li
+                class="{{ request()->routeIs('admin.papers.*') ? 'active' : '' }} nav-item"><a href="#"><i class="feather icon-file-text"></i><span class="menu-title"
+                        data-i18n="Papers Manager">Papers Manager</span></a>
+                <ul class="menu-content">
+                    <li class="{{ request()->routeIs('admin.papers.create') ? 'active' : '' }}"><a
+                            href="{{ route('admin.papers.create') }}"><i class="feather icon-circle"></i><span class="menu-item"
+                                data-i18n="Create New Paper">Create New Paper</span></a>
+                    </li>
+                    <li class="{{ request()->routeIs('admin.papers.index') ? 'active' : '' }}"><a
+                            href="{{ route('admin.papers.index') }}"><i class="feather icon-circle"></i><span class="menu-item"
+                                data-i18n="Papers Directory">Papers Directory</span></a>
+                    </li>
+                </ul>
+            </li>
             {{-- <li class="nav-item">
                 <a href="#"><i class="feather icon-upload"></i><span class="menu-title"
                         data-i18n="Questions Manager">Questions Manager</span></a>
