@@ -70,12 +70,51 @@
                             @error('title') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
                         </div>
 
-                        <!-- Quill Editor for Instruction -->
-                        <div class="form-group mb-2" wire:ignore>
-                            <label class="font-weight-bold text-dark">Add Instruction / Description (Quill Rich Text)</label>
-                            <div id="instruction-editor" class="border rounded bg-white" style="height: 180px;"></div>
+                        <!-- Robust Alpine.js-wrapped Quill Rich Text Editor for Instruction -->
+                        <div class="form-group mb-2">
+                            <label class="font-weight-bold text-dark mb-50 d-block">Add Instruction / Description (Quill Rich Text)</label>
+                            <div wire:ignore x-data="{
+                                content: @entangle('instruction'),
+                                init() {
+                                    const quill = new Quill($refs.editor, {
+                                        modules: {
+                                            toolbar: [
+                                                [{ 'header': [1, 2, 3, false] }],
+                                                ['bold', 'italic', 'underline', 'strike'],
+                                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                                ['clean']
+                                            ]
+                                        },
+                                        placeholder: 'Type instructions or description here...',
+                                        theme: 'snow'
+                                    });
+                                    
+                                    // Load initial content securely
+                                    if (this.content) {
+                                        quill.root.innerHTML = this.content;
+                                    }
+                                    
+                                    // Update editor from Livewire property updates (e.g. edit mode loads or resets)
+                                    this.$watch('content', value => {
+                                        if (value !== quill.root.innerHTML) {
+                                            quill.root.innerHTML = value || '';
+                                        }
+                                    });
+                                    
+                                    // Sync typing updates to Livewire instantly
+                                    quill.on('text-change', () => {
+                                        let html = quill.root.innerHTML;
+                                        if (html === '<p><br></p>') {
+                                            html = '';
+                                        }
+                                        this.content = html;
+                                    });
+                                }
+                            }">
+                                <div x-ref="editor" class="border rounded bg-white" style="height: 180px;"></div>
+                            </div>
+                            @error('instruction') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
                         </div>
-                        <input type="hidden" id="instruction-content" wire:model.defer="instruction">
 
                         <!-- Main Selection Grid -->
                         <div class="row">
@@ -607,44 +646,5 @@
 
     @push('scripts')
         <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                // Initialize Quill Editor
-                var toolbarOptions = [
-                    [{ 'header': [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    ['clean']
-                ];
-
-                var quill = new Quill('#instruction-editor', {
-                    modules: {
-                        toolbar: toolbarOptions
-                    },
-                    placeholder: 'Type instructions or description here...',
-                    theme: 'snow'
-                });
-
-                // Load initial content if editing
-                var initialContent = @this.get('instruction');
-                if (initialContent) {
-                    quill.root.innerHTML = initialContent;
-                }
-
-                // Sync Quill editor updates into Livewire property
-                quill.on('text-change', function () {
-                    var html = quill.root.innerHTML;
-                    if (html === '<p><br></p>') {
-                        html = '';
-                    }
-                    @this.set('instruction', html);
-                });
-
-                // Handle external resets or updates from Livewire
-                window.addEventListener('update-quill-content', event => {
-                    quill.root.innerHTML = event.detail.content || '';
-                });
-            });
-        </script>
     @endpush
 </div>
