@@ -119,7 +119,7 @@
                         <!-- Main Selection Grid -->
                         <div class="row">
                             <!-- Subject selection -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group mb-2">
                                     <label for="subject_id" class="font-weight-bold text-dark">Subject <span class="text-danger">*</span></label>
                                     <select id="subject_id" class="form-control" wire:model.defer="subject_id">
@@ -133,7 +133,7 @@
                             </div>
 
                             <!-- Class selection -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group mb-2">
                                     <label for="class_id" class="font-weight-bold text-dark">Class <span class="text-danger">*</span></label>
                                     <select id="class_id" class="form-control" wire:model.defer="class_id">
@@ -143,6 +143,20 @@
                                         @endforeach
                                     </select>
                                     @error('class_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Group Year selection -->
+                            <div class="col-md-4">
+                                <div class="form-group mb-2">
+                                    <label for="year_group_id" class="font-weight-bold text-dark">Group Year <span class="text-danger">*</span></label>
+                                    <select id="year_group_id" class="form-control" wire:model.defer="year_group_id">
+                                        <option value="">-- Select Group Year --</option>
+                                        @foreach($yearGroups as $yg)
+                                            <option value="{{ $yg->id }}">{{ $yg->title }} ({{ $yg->value }})</option>
+                                        @endforeach
+                                    </select>
+                                    @error('year_group_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
                                 </div>
                             </div>
                         </div>
@@ -236,7 +250,7 @@
                 </div>
                 <div class="card-content">
                     <div class="card-body">
-                        <fieldset class="border rounded p-2 bg-light">
+                        <fieldset class="border rounded p-2">
                             <legend class="w-auto px-1 font-weight-bold font-small-3 text-dark text-uppercase">Rules & Options</legend>
                             <div class="row">
                                 <div class="col-md-6 mb-1">

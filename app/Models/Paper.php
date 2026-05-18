@@ -15,6 +15,7 @@ class Paper extends Model
         'instruction',
         'subject_id',
         'class_id',
+        'year_group_id',
         'user_id',
         'academic_year',
         'difficulty',
@@ -66,6 +67,14 @@ class Paper extends Model
     public function class()
     {
         return $this->belongsTo(Classes::class, 'class_id');
+    }
+
+    /**
+     * Get the year group associated with this paper.
+     */
+    public function yearGroup()
+    {
+        return $this->belongsTo(YearGroup::class, 'year_group_id');
     }
 
     /**

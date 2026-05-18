@@ -9,6 +9,7 @@ use App\Models\Subject;
 use App\Models\Topic;
 use App\Models\Classes;
 use App\Models\User;
+use App\Models\YearGroup;
 use Illuminate\Support\Facades\DB;
 
 class PaperForm extends Component
@@ -23,6 +24,7 @@ class PaperForm extends Component
     public $instruction = ''; // Quill HTML binding
     public $subject_id = '';
     public $class_id = '';
+    public $year_group_id = '';
     public $user_id = '';
     public $academic_year = '';
     public $difficulty = '';
@@ -60,6 +62,7 @@ class PaperForm extends Component
         'instruction' => 'nullable|string',
         'subject_id' => 'required|exists:subjects,id',
         'class_id' => 'required|exists:classes,id',
+        'year_group_id' => 'required|exists:year_groups,id',
         'user_id' => 'required|exists:users,id',
         'academic_year' => 'required|string',
         'difficulty' => 'required|string',
@@ -78,6 +81,7 @@ class PaperForm extends Component
             $this->instruction = $paper->instruction;
             $this->subject_id = $paper->subject_id;
             $this->class_id = $paper->class_id;
+            $this->year_group_id = $paper->year_group_id;
             $this->user_id = $paper->user_id;
             $this->academic_year = $paper->academic_year;
             $this->difficulty = $paper->difficulty;
@@ -179,6 +183,7 @@ class PaperForm extends Component
                 'instruction' => $this->instruction,
                 'subject_id' => $this->subject_id,
                 'class_id' => $this->class_id,
+                'year_group_id' => $this->year_group_id,
                 'user_id' => $this->user_id,
                 'academic_year' => $this->academic_year,
                 'difficulty' => $this->difficulty,
@@ -295,6 +300,7 @@ class PaperForm extends Component
             'selectedQuestions' => $selectedQuestions,
             'subjects' => Subject::where('is_active', true)->orderBy('title')->get(),
             'classes' => Classes::where('is_active', true)->orderBy('name')->get(),
+            'yearGroups' => YearGroup::where('is_active', true)->orderBy('title')->get(),
             'tutors' => User::whereIn('role', ['admin', 'tutor'])->orderBy('name')->get(),
             'difficulties' => Paper::DIFFICULTIES,
             'questionTypes' => Question::TYPES,
