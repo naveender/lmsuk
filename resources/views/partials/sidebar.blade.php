@@ -58,7 +58,7 @@
                             href="{{ route('admin.questions.index') }}"><i class="feather icon-circle"></i><span class="menu-item"
                                 data-i18n="Questions Directory">Questions Directory</span></a>
                     </li>
-                    <li class="{{ request()->routeIs('topics') ? 'active' : '' }}"><a href="{{ route('topics') }}"><i
+                    <li><a href="#"><i
                                 class="feather icon-circle"></i><span class="menu-item"
                                 data-i18n="Import Questions">Import Questions</span></a>
                     </li>
