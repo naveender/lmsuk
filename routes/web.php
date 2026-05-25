@@ -176,6 +176,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         'update'  => 'admin.papers.update',
         'destroy' => 'admin.papers.destroy',
     ]);
+    Route::get('admin/papers/{paper}/assignments', [AdminPaperController::class, 'getAssignments'])->name('admin.papers.assignments');
+    Route::post('admin/papers/{paper}/assign', [AdminPaperController::class, 'assign'])->name('admin.papers.assign');
 });
 
 // Student
