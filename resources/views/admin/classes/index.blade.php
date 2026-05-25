@@ -125,6 +125,9 @@
                                                         @endif
                                                     </td>
                                                     <td>
+                                                        <a href="{{ route('admin.classes.students', $class->id) }}" class="btn btn-sm btn-info mb-1">
+                                                            <i class="feather icon-users"></i> Students
+                                                        </a>
                                                         <a href="{{ route('admin.classes.edit', $class->id) }}" class="btn btn-sm btn-primary mb-1">
                                                             <i class="feather icon-edit"></i> Edit
                                                         </a>

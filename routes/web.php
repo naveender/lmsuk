@@ -78,6 +78,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         'update' => 'admin.classes.update',
         'destroy' => 'admin.classes.destroy',
     ]);
+    Route::get('admin/classes/{class}/students', [\App\Http\Controllers\Admin\ClassesController::class, 'students'])->name('admin.classes.students');
+    Route::post('admin/classes/{class}/students/add', [\App\Http\Controllers\Admin\ClassesController::class, 'addStudents'])->name('admin.classes.students.add');
+    Route::post('admin/classes/{class}/students/remove/{student}', [\App\Http\Controllers\Admin\ClassesController::class, 'removeStudent'])->name('admin.classes.students.remove');
 
     // Year Groups
     Route::resource('admin/year-groups', \App\Http\Controllers\Admin\YearGroupController::class)->names([

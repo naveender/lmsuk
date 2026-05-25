@@ -16,4 +16,9 @@ class Classes extends Model
         'description',
         'is_active',
     ];
+
+    public function students()
+    {
+        return $this->belongsToMany(User::class, 'class_student', 'class_id', 'user_id')->withTimestamps();
+    }
 }
