@@ -94,84 +94,16 @@
                                                 </div>
                                             </div>
 
-                                            <button type="button" class="action-btn" data-toggle="modal" data-target="#subject-modal-{{ $subject->id }}">
+                                            <a href="#" class="action-btn">
                                                 Check Assessments <i class="feather icon-arrow-right"></i>
-                                            </button>
+                                            </a>
+                                            
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Subject Modal -->
-                            <div class="modal fade" id="subject-modal-{{ $subject->id }}" tabindex="-1" role="dialog" aria-labelledby="modal-title-{{ $subject->id }}" aria-hidden="true" style="--subject-gradient: {{ $style['gradient'] }}; --subject-gradient-light: {{ $style['light'] }}; --subject-color: {{ $style['color'] }}; --subject-shadow-color: {{ $style['shadow'] }};">
-                                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="modal-title-{{ $subject->id }}">
-                                                <i class="{{ $style['icon'] }}"></i> {{ $subject->title }} - Assigned Papers
-                                            </h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            @if ($subject->papers->isNotEmpty())
-                                                <div class="paper-list">
-                                                    @foreach ($subject->papers as $paper)
-                                                        @php
-                                                            $difficultyColors = [
-                                                                'easy' => 'badge-light-success text-success',
-                                                                'medium' => 'badge-light-warning text-warning',
-                                                                'hard' => 'badge-light-danger text-danger'
-                                                            ];
-                                                            $diffBadge = $difficultyColors[$paper->difficulty] ?? 'badge-light-primary text-primary';
-                                                            
-                                                            $typeBadges = [
-                                                                'test' => 'badge-light-info text-info',
-                                                                'exam' => 'badge-light-success text-success'
-                                                            ];
-                                                            $typeBadge = $typeBadges[$paper->type] ?? 'badge-light-primary text-primary';
-                                                        @endphp
-                                                        <div class="paper-list-item difficulty-{{ $paper->difficulty }}">
-                                                            <div>
-                                                                <div class="paper-info-title">{{ $paper->title }}</div>
-                                                                <div class="paper-meta">
-                                                                    <span>
-                                                                        <span class="badge badge-difficulty {{ $diffBadge }}">{{ $paper->difficulty ?? 'Medium' }}</span>
-                                                                    </span>
-                                                                    <span>
-                                                                        <span class="badge badge-type {{ $typeBadge }}">{{ $paper->type === 'test' ? 'Test' : 'Exam' }}</span>
-                                                                    </span>
-                                                                    <span>
-                                                                        <i class="feather icon-clock"></i> {{ $paper->total_time }} Mins
-                                                                    </span>
-                                                                    <span>
-                                                                        <i class="feather icon-award"></i> {{ $paper->default_marks }} Marks
-                                                                    </span>
-                                                                    <span>
-                                                                        <i class="feather icon-file-text"></i> {{ $paper->questions()->count() }} Questions
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                            <div>
-                                                                <button type="button" class="paper-action-btn" onclick="alert('Exam system initialized. Ready to begin attempt.')">
-                                                                    Start
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            @else
-                                                <div class="empty-state">
-                                                    <i class="feather icon-file-text"></i>
-                                                    <h5>No Assessments Yet</h5>
-                                                    <p>There are currently no active papers or practice tests assigned to you for this subject.</p>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            
                         @empty
                             <div class="col-12 text-center py-5">
                                 <div class="empty-state">
