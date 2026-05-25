@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\ParentDetail;
 use App\Models\StudentDetail;
+use App\Models\AcademicYear;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
@@ -93,7 +94,9 @@ class ParentController extends Controller
             })
             ->get();
 
-        return view('admin.parents.show', compact('parent', 'unassignedStudents'));
+        $academicYears = AcademicYear::pluck('name', 'id')->toArray();
+
+        return view('admin.parents.show', compact('parent', 'unassignedStudents', 'academicYears'));
     }
 
     public function edit(User $parent)

@@ -89,6 +89,16 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         'destroy' => 'admin.year-groups.destroy',
     ]);
 
+    // Academic Years / Sessions
+    Route::resource('admin/academic-years', \App\Http\Controllers\Admin\AcademicYearController::class)->names([
+        'index' => 'admin.academic-years.index',
+        'create' => 'admin.academic-years.create',
+        'store' => 'admin.academic-years.store',
+        'edit' => 'admin.academic-years.edit',
+        'update' => 'admin.academic-years.update',
+        'destroy' => 'admin.academic-years.destroy',
+    ]);
+
     // Subjects
     Route::resource('admin/subjects', \App\Http\Controllers\Admin\SubjectsController::class)->names([
         'index' => 'admin.subjects.index',

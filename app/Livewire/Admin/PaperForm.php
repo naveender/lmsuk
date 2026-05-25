@@ -10,6 +10,7 @@ use App\Models\Topic;
 use App\Models\Classes;
 use App\Models\User;
 use App\Models\YearGroup;
+use App\Models\AcademicYear;
 use Illuminate\Support\Facades\DB;
 
 class PaperForm extends Component
@@ -301,6 +302,7 @@ class PaperForm extends Component
             'subjects' => Subject::where('is_active', true)->orderBy('title')->get(),
             'classes' => Classes::where('is_active', true)->orderBy('name')->get(),
             'yearGroups' => YearGroup::where('is_active', true)->orderBy('title')->get(),
+            'academicYears' => AcademicYear::where('is_active', true)->orderBy('name', 'desc')->get(),
             'tutors' => User::whereIn('role', ['admin', 'tutor'])->orderBy('name')->get(),
             'difficulties' => Paper::DIFFICULTIES,
             'questionTypes' => Question::TYPES,

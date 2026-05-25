@@ -30,4 +30,9 @@ class StudentDetail extends Model
     {
         return $this->belongsTo(User::class, 'parent_id');
     }
+
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class, 'academic_year');
+    }
 }

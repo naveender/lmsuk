@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('papers', function (Blueprint $table) {
-            $table->unsignedBigInteger('year_group_id')->nullable()->after('class_id');
-            $table->foreign('year_group_id')->references('id')->on('year_groups')->onDelete('set null');
-        });
+        if (!Schema::hasColumn('papers', 'year_group_id')) {
+            Schema::table('papers', function (Blueprint $table) {
+                $table->unsignedBigInteger('year_group_id')->nullable()->after('class_id');
+                $table->foreign('year_group_id')->references('id')->on('year_groups')->onDelete('set null');
+            });
+        }
     }
 
     /**
@@ -22,9 +24,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('papers', function (Blueprint $table) {
-            $table->dropForeign(['year_group_id']);
-            $table->dropColumn('year_group_id');
-        });
+        if (Schema::hasColumn('papers', 'year_group_id')) {
+            Schema::table('papers', function (Blueprint $table) {
+                $table->dropForeign(['year_group_id']);
+                $table->dropColumn('year_group_id');
+            });
+        }
     }
 };

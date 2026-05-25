@@ -180,7 +180,12 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-2">
                                     <label for="academic_year" class="font-weight-bold text-dark">Academic Year <span class="text-danger">*</span></label>
-                                    <input type="text" id="academic_year" class="form-control" placeholder="e.g. 2026-2027" wire:model.defer="academic_year">
+                                    <select id="academic_year" class="form-control" wire:model.defer="academic_year">
+                                        <option value="">-- Select Academic Year --</option>
+                                        @foreach($academicYears as $year)
+                                            <option value="{{ $year->name }}">{{ $year->name }}</option>
+                                        @endforeach
+                                    </select>
                                     @error('academic_year') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
                                 </div>
                             </div>

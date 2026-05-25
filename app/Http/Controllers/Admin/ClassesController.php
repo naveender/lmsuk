@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Classes;
+use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -32,14 +33,16 @@ class ClassesController extends Controller
         $classes = $query->latest()->paginate(10);
         
         $yearGroups = \App\Models\YearGroup::where('is_active', true)->orderBy('title')->get();
+        $academicYears = AcademicYear::where('is_active', true)->orderBy('name', 'desc')->get();
 
-        return view('admin.classes.index', compact('classes', 'yearGroups'));
+        return view('admin.classes.index', compact('classes', 'yearGroups', 'academicYears'));
     }
 
     public function create()
     {
         $yearGroups = \App\Models\YearGroup::where('is_active', true)->orderBy('title')->get();
-        return view('admin.classes.create', compact('yearGroups'));
+        $academicYears = AcademicYear::where('is_active', true)->orderBy('name', 'desc')->get();
+        return view('admin.classes.create', compact('yearGroups', 'academicYears'));
     }
 
     public function store(Request $request)
@@ -62,7 +65,8 @@ class ClassesController extends Controller
     public function edit(Classes $class)
     {
         $yearGroups = \App\Models\YearGroup::where('is_active', true)->orderBy('title')->get();
-        return view('admin.classes.edit', compact('class', 'yearGroups'));
+        $academicYears = AcademicYear::where('is_active', true)->orderBy('name', 'desc')->get();
+        return view('admin.classes.edit', compact('class', 'yearGroups', 'academicYears'));
     }
 
     public function update(Request $request, Classes $class)
