@@ -1,5 +1,5 @@
 <!-- BEGIN: Main Menu-->
-<div class="main-menu menu-fixed menu-dark menu-accordion menu-shadow" data-scroll-to-active="true">
+<div class="main-menu menu-fixed menu-{{ $theme}} menu-accordion menu-shadow" data-scroll-to-active="true">
     <div class="navbar-header">
         <ul class="nav navbar-nav flex-row">
             <li class="nav-item mr-auto">
@@ -45,17 +45,20 @@
                     </li>
                 </ul>
             </li>
-            <li class=" nav-item"><a href="#"><i class="feather icon-help-circle"></i><span class="menu-title"
+            <li
+                class="{{ request()->routeIs('admin.questions.*') ? 'active' : '' }} nav-item"><a href="#"><i class="feather icon-help-circle"></i><span class="menu-title"
                         data-i18n="Question Bank">Question Bank</span></a>
                 <ul class="menu-content">
 
-                    <li><a href=""><i class="feather icon-circle"></i><span class="menu-item"
+                    <li class="{{ request()->routeIs('admin.questions.create') ? 'active' : '' }}"><a
+                            href="{{ route('admin.questions.create') }}"><i class="feather icon-circle"></i><span class="menu-item"
                                 data-i18n="Add New Question">Add New Question</span></a>
                     </li>
-                    <li><a href=""><i class="feather icon-circle"></i><span class="menu-item"
+                    <li class="{{ request()->routeIs('admin.questions.index') ? 'active' : '' }}"><a
+                            href="{{ route('admin.questions.index') }}"><i class="feather icon-circle"></i><span class="menu-item"
                                 data-i18n="Questions Directory">Questions Directory</span></a>
                     </li>
-                    <li class="{{ request()->routeIs('topics') ? 'active' : '' }}"><a href="{{ route('topics') }}"><i
+                    <li><a href="#"><i
                                 class="feather icon-circle"></i><span class="menu-item"
                                 data-i18n="Import Questions">Import Questions</span></a>
                     </li>
@@ -85,6 +88,10 @@
                 <a href="#"><i class="feather icon-pie-chart"></i><span class="menu-title"
                         data-i18n="Cohort Report"> Cohort Report</span></a>
             </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.announcements.index') }}"><i class="feather icon-message-square"></i><span
+                        class="menu-title" data-i18n="Manage Announcement">Manage Announcement</span></a>
+            </li>
             <li class=" nav-item"><a href="#"><i class="feather icon-list"></i><span class="menu-title"
                         data-i18n="User">Content Manager</span></a>
                 <ul class="menu-content">
@@ -107,10 +114,16 @@
                     </li>
                 </ul>
             </li>
-            <li class="nav-item">
-                <a href="{{ route('admin.announcements.index') }}"><i class="feather icon-message-square"></i><span
-                        class="menu-title" data-i18n="Manage Announcement">Manage Announcement</span></a>
+            <li class=" nav-item"><a href="#"><i class="feather icon-list"></i><span class="menu-title"
+                        data-i18n="User">Global Settings</span></a>
+                <ul class="menu-content">
+                    <li class="#"><a href="#"><i class="feather icon-circle"></i><span class="menu-item"
+                                data-i18n="">Tests/Exam Settings</span></a>
+                    </li>
+                   
+                </ul>
             </li>
+           
         </ul>
     </div>
 </div>

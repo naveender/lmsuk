@@ -13,8 +13,14 @@ class Topic extends Model
         'date_added',
         'last_modified',
         'thumbnail',
-        'sub_category_thumbnail'
+        'sub_category_thumbnail',
+        'subject_id',
     ];
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class);
+    }
 
     public function parentTopic()
     {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Topic;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 
 class TopicController extends Controller
@@ -53,7 +54,8 @@ class TopicController extends Controller
     public function add()
     {
         $topics = Topic::whereNull('parent')->orWhere('parent', 0)->get();
-        return view('admin.topics.add', compact('topics'));
+        $subjects = Subject::where('is_active', true)->orderBy('title')->get();
+        return view('admin.topics.add', compact('topics', 'subjects'));
     }
 
     public function store(Request $request)
@@ -84,6 +86,7 @@ class TopicController extends Controller
             'code' => $request->topic_code,
             'name' => $request->name,
             'parent' => $request->parent_id == 0 ? null : $request->parent_id,
+            'subject_id' => $request->subject_id,
             'slug' => $slug,
             'thumbnail' => $thumbnailPath,
         ]);
@@ -94,7 +97,8 @@ class TopicController extends Controller
     public function edit(Topic $topic)
     {
         $categories = Topic::whereNull('parent')->orWhere('parent', 0)->where('id', '!=', $topic->id)->get();
-        return view('admin.topics.edit', compact('topic', 'categories'));
+        $subjects = Subject::where('is_active', true)->orderBy('title')->get();
+        return view('admin.topics.edit', compact('topic', 'categories', 'subjects'));
     }
 
     public function update(Request $request, Topic $topic)
@@ -126,6 +130,7 @@ class TopicController extends Controller
             'code' => $request->topic_code,
             'name' => $request->name,
             'parent' => $request->parent_id == 0 ? null : $request->parent_id,
+            'subject_id' => $request->subject_id,
             'slug' => $slug,
             'thumbnail' => $thumbnailPath,
         ]);

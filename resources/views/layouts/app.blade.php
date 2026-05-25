@@ -10,7 +10,7 @@
 
 @php
     $isAdmin = auth()->check() && auth()->user()->role === 'admin';
-    $theme = session('theme', 'dark'); // default dark
+    $theme = session('theme', 'light'); // default light
     $themeLayoutClass = $theme . '-layout'; // dark-layout / light-layout
 @endphp
 
