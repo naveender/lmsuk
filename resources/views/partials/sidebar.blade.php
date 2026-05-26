@@ -114,6 +114,10 @@
                             href="{{ route('admin.classes.index') }}"><i class="feather icon-circle"></i><span
                                 class="menu-item" data-i18n="">Classes</span></a>
                     </li>
+                    <li class="{{ request()->routeIs('admin.academic-years.*') ? 'active' : '' }}"><a
+                            href="{{ route('admin.academic-years.index') }}"><i class="feather icon-circle"></i><span
+                                class="menu-item" data-i18n="">Academic Years</span></a>
+                    </li>
                     <li class="{{ request()->routeIs('admin.year-groups.*') ? 'active' : '' }}"><a
                             href="{{ route('admin.year-groups.index') }}"><i class="feather icon-circle"></i><span
                                 class="menu-item" data-i18n="">Year Groups</span></a>

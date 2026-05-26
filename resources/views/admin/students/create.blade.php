@@ -120,9 +120,11 @@
                                                 <label>Academic Year</label>
                                                 <select class="form-control" name="academic_year" required>
                                                     <option value="">--Select Academic Year--</option>
-                                                    <option value="1" {{ old('academic_year') == '1' ? 'selected' : '' }}>2024-2025</option>
-                                                    <option value="2" {{ old('academic_year') == '2' ? 'selected' : '' }}>2025-2026</option>
-                                                    <option value="3" {{ old('academic_year') == '3' ? 'selected' : '' }}>2026-2027</option>
+                                                    @foreach ($academicYears as $year)
+                                                        <option value="{{ $year->id }}" {{ old('academic_year') == $year->id ? 'selected' : '' }}>
+                                                            {{ $year->name }}
+                                                        </option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>

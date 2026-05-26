@@ -79,8 +79,11 @@
                                                             <div class="col-md-8">
                                                                 <select name="academic_year" class="form-control" required>
                                                                     <option value="" disabled>Select Academic Year</option>
-                                                                    <option value="2024-2025" {{ old('academic_year', $class->academic_year) == '2024-2025' ? 'selected' : '' }}>2024-2025</option>
-                                                                    <option value="2025-2026" {{ old('academic_year', $class->academic_year) == '2025-2026' ? 'selected' : '' }}>2025-2026</option>
+                                                                    @foreach ($academicYears as $year)
+                                                                        <option value="{{ $year->name }}" {{ old('academic_year', $class->academic_year) == $year->name ? 'selected' : '' }}>
+                                                                            {{ $year->name }}
+                                                                        </option>
+                                                                    @endforeach
                                                                 </select>
                                                             </div>
                                                         </div>

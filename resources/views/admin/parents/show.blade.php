@@ -124,9 +124,6 @@
                                                                 @endif
                                                             </td>
                                                             <td>
-                                                                @php
-                                                                    $academicYears = ['1' => '2024-2025', '2' => '2025-2026', '3' => '2026-2027'];
-                                                                @endphp
                                                                 {{ $academicYears[$child->academic_year] ?? 'N/A' }}
                                                             </td>
                                                             <td>{{ ucfirst($child->gender ?? 'N/A') }}</td>

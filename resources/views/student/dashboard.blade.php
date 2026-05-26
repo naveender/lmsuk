@@ -1,116 +1,150 @@
- @extends('layouts.app')
+@extends('layouts.app')
 
- @section('title', 'Student Dashboard')
+@section('title', 'Student Dashboard')
 
- <!-- END: Custom CSS-->
- @section('content')
- <!-- BEGIN: Content-->
- <div class="app-content content">
-     <div class="content-overlay"></div>
-     <div class="header-navbar-shadow"></div>
-     <div class="content-wrapper">
-         <div class="content-header row">
-         </div>
-         <div class="content-body">
-             <!-- Dashboard Ecommerce Starts -->
-             <section id="dashboard-ecommerce">
-                 <div class="row">
-                     <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="card text-white bg-gradient-primary text-center">
-                                <div class="card-content ">
-                                    <div class="card-body">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/Lessons.png') }}" alt="element 01" width="150" >
-                                        <h4 class="card-title text-white mt-1">Lessons</h4>
-                                        <p class="card-text">Checkout the video lessons here to enhance your learning experience.</p>
-                                        <div class="divider">
-                                            <div class="divider-text"><i class="feather icon-star"></i></div>
-                                        </div>
-                                        <a href="{{ route('student.videolessonscategories') }}" class="btn btn-primary waves-effect waves-light">Watch Now</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                         <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="card text-white bg-gradient-primary text-center">
-                                <div class="card-content d-flex">
-                                    <div class="card-body">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/Analytics.png') }}" alt="element 01" width="150" >
-                                        <h4 class="card-title text-white mt-1">Analytics</h4>
-                                        <p class="card-text">View your performance metrics and analytics.</p>
-                                        <div class="divider">
-                                            <div class="divider-text"><i class="feather icon-star"></i></div>
-                                        </div>
-                                        <button class="btn btn-primary waves-effect waves-light">View Details</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                         <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="card text-white bg-gradient-primary text-center">
-                                <div class="card-content d-flex">
-                                    <div class="card-body">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/Assessment.png') }}" alt="element 01" width="150" >
-                                        <h4 class="card-title text-white mt-1">Assessment</h4>
-                                        <p class="card-text">Take quizzes and tests to evaluate your knowledge.</p>
-                                         <div class="divider">
-                                            <div class="divider-text"><i class="feather icon-star"></i></div>
-                                        </div>
-                                        <button class="btn btn-primary waves-effect waves-light">Start Assessment</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                         <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="card text-white bg-gradient-primary text-center">
-                                <div class="card-content d-flex">
-                                    <div class="card-body">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/FocusAreas.png') }}" alt="element 01" width="150">
-                                        <h4 class="card-title text-white mt-1">Focus Areas</h4>
-                                        <p class="card-text">Focus on your weak areas to improve your skills.</p>
-                                        <div class="divider divider-dark">
-                                            <div class="divider-text"></div>
-                                        </div>
-                                        <button class="btn btn-primary waves-effect waves-light">View Focus Areas</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                         <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="card text-white bg-gradient-primary text-center">
-                                <div class="card-content">
-                                    <div class="card-body">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/Anouncement.png') }}" alt="element 01" width="150" height="128" >
-                                        <h4 class="card-title text-white mt-1">Announcements</h4>
-                                        <p class="card-text">Stay updated with the latest news and announcements.</p>
-                                         <div class="divider">
-                                            <div class="divider-text"><i class="feather icon-star"></i></div>
-                                        </div>
-                                        <button class="btn btn-primary waves-effect waves-light">View Announcements</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                         <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="card text-white bg-gradient-primary text-center">
-                                <div class="card-content">
-                                    <div class="card-body">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/Centertestscore.png') }}" alt="element 01" width="150" >
-                                        <h4 class="card-title text-white mt-1">Center Test Scores</h4>
-                                        <p class="card-text">View your performance metrics and analytics.</p>
-                                        <div class="divider">
-                                            <div class="divider-text"><i class="feather icon-star"></i></div>
-                                        </div>
-                                        <button class="btn btn-primary waves-effect waves-light">View Details</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                 </div>
-             </section>
-             <!-- Dashboard Ecommerce ends -->
 
-         </div>
-     </div>
- </div>
- <!-- END: Content-->
- @endsection
+@section('content')
+    <!-- BEGIN: Content-->
+    <div class="app-content content">
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
+        <div class="content-wrapper">
+            <div class="content-body">
+
+                <!-- Welcome Header -->
+                <div class="welcome-card">
+                    <div class="row align-items-center">
+                        <div class="col-md-8 text-center text-md-left">
+                            <h1 class="welcome-title text-white">Welcome Back, {{ auth()->user()->name }}! 🌟</h1>
+                            <p class="welcome-text">Explore your studies, evaluate your knowledge, and monitor your scores.
+                                Let's make today a highly productive learning day!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid Section -->
+                <section id="student-dashboard-grid">
+                    <div class="row">
+
+                        <!-- Lessons -->
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="dashboard-card"
+                                style="--card-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); --card-light: rgba(17, 153, 142, 0.08); --card-color: #11998e; --card-shadow: rgba(17, 153, 142, 0.35);">
+                                <div class="dashboard-card-body">
+                                    <div class="card-icon-container">
+                                        <img src="{{ asset('theme/app-assets/images/lmsicon/Lessons.png') }}"
+                                            alt="Lessons illustration">
+                                    </div>
+                                    <h4 class="dashboard-card-title">Lessons</h4>
+                                    <p class="dashboard-card-text">Checkout video lessons to strengthen and enhance your
+                                        learning experience.</p>
+                                    <a href="{{ route('student.videolessonscategories') }}" class="card-action-btn">
+                                        Watch Now <i class="feather icon-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Analytics -->
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="dashboard-card"
+                                style="--card-gradient: linear-gradient(135deg, #2f80ed 0%, #56ccf2 100%); --card-light: rgba(47, 128, 237, 0.08); --card-color: #2f80ed; --card-shadow: rgba(47, 128, 237, 0.35);">
+                                <div class="dashboard-card-body">
+                                    <div class="card-icon-container">
+                                        <img src="{{ asset('theme/app-assets/images/lmsicon/Analytics.png') }}"
+                                            alt="Analytics illustration">
+                                    </div>
+                                    <h4 class="dashboard-card-title">Analytics</h4>
+                                    <p class="dashboard-card-text">View your comprehensive performance metrics, strengths,
+                                        and historical analytics.</p>
+                                    <a href="{{ route('student.analytics') }}" class="card-action-btn">
+                                        View Details <i class="feather icon-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Assessment -->
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="dashboard-card"
+                                style="--card-gradient: linear-gradient(135deg, #7367f0 0%, #ce9ffc 100%); --card-light: rgba(115, 103, 240, 0.08); --card-color: #7367f0; --card-shadow: rgba(115, 103, 240, 0.35);">
+                                <div class="dashboard-card-body">
+                                    <div class="card-icon-container">
+                                        <img src="{{ asset('theme/app-assets/images/lmsicon/Assessment.png') }}"
+                                            alt="Assessment illustration">
+                                    </div>
+                                    <h4 class="dashboard-card-title">Assessment</h4>
+                                    <p class="dashboard-card-text">Take tests, quizzes, and assigned mock exams to evaluate
+                                        your curriculum progress.</p>
+                                    <a href="{{ route('student.assessments') }}" class="card-action-btn">
+                                        Start Assessment <i class="feather icon-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Focus Areas -->
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="dashboard-card"
+                                style="--card-gradient: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); --card-light: rgba(255, 65, 108, 0.08); --card-color: #ff416c; --card-shadow: rgba(255, 65, 108, 0.35);">
+                                <div class="dashboard-card-body">
+                                    <div class="card-icon-container">
+                                        <img src="{{ asset('theme/app-assets/images/lmsicon/FocusAreas.png') }}"
+                                            alt="Focus Areas illustration">
+                                    </div>
+                                    <h4 class="dashboard-card-title">Focus Areas</h4>
+                                    <p class="dashboard-card-text">Review and focus on your weaker topics and core skills
+                                        needing extra practice.</p>
+                                    <a href="{{ route('student.focusareas') }}" class="card-action-btn">
+                                        View Focus Areas <i class="feather icon-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Announcements -->
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="dashboard-card"
+                                style="--card-gradient: linear-gradient(135deg, #f12711 0%, #f5af19 100%); --card-light: rgba(241, 39, 17, 0.08); --card-color: #f12711; --card-shadow: rgba(241, 39, 17, 0.35);">
+                                <div class="dashboard-card-body">
+                                    <div class="card-icon-container">
+                                        <img src="{{ asset('theme/app-assets/images/lmsicon/Anouncement.png') }}"
+                                            alt="Announcements illustration">
+                                    </div>
+                                    <h4 class="dashboard-card-title">Announcements</h4>
+                                    <p class="dashboard-card-text">Stay updated with the latest news, notices, and portal
+                                        notifications from center admin.</p>
+                                    <a href="{{ route('student.announcements') }}" class="card-action-btn">
+                                        View Notifications <i class="feather icon-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Center Test Scores -->
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="dashboard-card"
+                                style="--card-gradient: linear-gradient(135deg, #e52d27 0%, #b31217 100%); --card-light: rgba(229, 45, 39, 0.08); --card-color: #e52d27; --card-shadow: rgba(229, 45, 39, 0.35);">
+                                <div class="dashboard-card-body">
+                                    <div class="card-icon-container">
+                                        <img src="{{ asset('theme/app-assets/images/lmsicon/Centertestscore.png') }}"
+                                            alt="Center Test Scores illustration">
+                                    </div>
+                                    <h4 class="dashboard-card-title">Center Test Scores</h4>
+                                    <p class="dashboard-card-text">Monitor your offline performance and track reports from
+                                        center test mock sessions.</p>
+                                    <a href="{{ route('student.centretestscores') }}" class="card-action-btn">
+                                        View Scores <i class="feather icon-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+    <!-- END: Content-->
+@endsection

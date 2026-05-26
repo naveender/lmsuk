@@ -78,6 +78,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         'update' => 'admin.classes.update',
         'destroy' => 'admin.classes.destroy',
     ]);
+    Route::get('admin/classes/{class}/students', [\App\Http\Controllers\Admin\ClassesController::class, 'students'])->name('admin.classes.students');
+    Route::post('admin/classes/{class}/students/add', [\App\Http\Controllers\Admin\ClassesController::class, 'addStudents'])->name('admin.classes.students.add');
+    Route::post('admin/classes/{class}/students/remove/{student}', [\App\Http\Controllers\Admin\ClassesController::class, 'removeStudent'])->name('admin.classes.students.remove');
 
     // Year Groups
     Route::resource('admin/year-groups', \App\Http\Controllers\Admin\YearGroupController::class)->names([
@@ -87,6 +90,16 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         'edit' => 'admin.year-groups.edit',
         'update' => 'admin.year-groups.update',
         'destroy' => 'admin.year-groups.destroy',
+    ]);
+
+    // Academic Years / Sessions
+    Route::resource('admin/academic-years', \App\Http\Controllers\Admin\AcademicYearController::class)->names([
+        'index' => 'admin.academic-years.index',
+        'create' => 'admin.academic-years.create',
+        'store' => 'admin.academic-years.store',
+        'edit' => 'admin.academic-years.edit',
+        'update' => 'admin.academic-years.update',
+        'destroy' => 'admin.academic-years.destroy',
     ]);
 
     // Subjects
@@ -163,6 +176,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         'update'  => 'admin.papers.update',
         'destroy' => 'admin.papers.destroy',
     ]);
+    Route::get('admin/papers/{paper}/assignments', [AdminPaperController::class, 'getAssignments'])->name('admin.papers.assignments');
+    Route::post('admin/papers/{paper}/assign', [AdminPaperController::class, 'assign'])->name('admin.papers.assign');
 });
 
 // Student
