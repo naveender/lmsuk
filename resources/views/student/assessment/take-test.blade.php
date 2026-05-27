@@ -839,6 +839,11 @@
                 margin-right: 6px !important;
             }
         }
+
+        /* Ensure SweetAlert is on top of the fullscreen player wrapper */
+        .swal2-container {
+            z-index: 999999 !important;
+        }
     </style>
 @endpush
 
@@ -1327,17 +1332,51 @@
             if (activeQuestionTimer) clearInterval(activeQuestionTimer);
 
             if (action === 'pause') {
-                form.action = "{{ route('student.attempts.pause', $attempt->id) }}";
+                Swal.fire({
+                    title: 'Pause Test?',
+                    text: 'Are you sure you want to pause your test? Your current progress will be saved, and you can resume later.',
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ff9f43',
+                    cancelButtonColor: '#82868b',
+                    confirmButtonText: 'Yes, pause it!',
+                    cancelButtonText: 'No, keep going'
+                }).then(function(result) {
+                    if (result && (result.value || result.isConfirmed || result === true)) {
+                        let f = document.getElementById('test-taking-form');
+                        f.action = "{{ route('student.attempts.pause', $attempt->id) }}";
+                        f.submit();
+                    } else {
+                        // Resume timer if cancelled
+                        startActiveQuestionTimer();
+                    }
+                });
             } else {
-                if (action === 'submit_auto' || confirm("Are you sure you want to finish and submit your test?")) {
+                if (action === 'submit_auto') {
                     form.action = "{{ route('student.attempts.submit', $attempt->id) }}";
+                    form.submit();
                 } else {
-                    // Resume timer if cancelled
-                    startActiveQuestionTimer();
-                    return;
+                    Swal.fire({
+                        title: 'Finish & Submit Test?',
+                        text: 'Are you sure you want to finish and submit your test? You will not be able to change your answers once submitted.',
+                        type: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28c76f',
+                        cancelButtonColor: '#82868b',
+                        confirmButtonText: 'Yes, submit it!',
+                        cancelButtonText: 'No, keep working'
+                    }).then(function(result) {
+                        if (result && (result.value || result.isConfirmed || result === true)) {
+                            let f = document.getElementById('test-taking-form');
+                            f.action = "{{ route('student.attempts.submit', $attempt->id) }}";
+                            f.submit();
+                        } else {
+                            // Resume timer if cancelled
+                            startActiveQuestionTimer();
+                        }
+                    });
                 }
             }
-            form.submit();
         }
 
         // AJAX background auto-saver

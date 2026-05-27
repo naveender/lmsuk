@@ -24,6 +24,7 @@
 
 <link rel="stylesheet" href="{{ asset("theme/app-assets/css/core/menu/menu-types/{$menuType}-menu.css") }}">
 <link rel="stylesheet" href="{{ asset('theme/app-assets/css/plugins/file-uploaders/dropzone.css') }}">
+<link rel="stylesheet" href="{{ asset('theme/app-assets/css/plugins/extensions/sweetalert2.min.css') }}">
 <link rel="stylesheet" href="{{ asset('theme/app-assets/css/core/colors/palette-gradient.css') }}">
 <link rel="stylesheet" href="{{ asset('theme/app-assets/css/pages/authentication.css') }}">
 <link rel="stylesheet" href="{{ asset('theme/app-assets/css/pages/dashboard-ecommerce.css') }}">

@@ -12,6 +12,7 @@
 <!-- BEGIN Vendor JS-->
 
 <!-- BEGIN: Page Vendor JS-->
+<script src="{{ asset('theme/app-assets/vendors/js/extensions/sweetalert2.all.min.js') }}"></script>
 <!-- END: Page Vendor JS-->
 
 <!-- BEGIN: Theme JS-->
@@ -29,5 +30,3 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script src="{{ asset('theme/app-assets/js/script.js') }}"></script>
-
-
