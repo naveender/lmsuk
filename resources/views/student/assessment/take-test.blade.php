@@ -15,15 +15,15 @@
         <div class="player-frame">
             
             <!-- Top Status Bar -->
-            <div class="top-status-bar d-flex justify-content-between align-items-center px-4 py-2 border-bottom bg-white">
-                <div class="d-flex align-items-center">
-                    <span class="badge badge-pill badge-light-primary px-3 py-1 font-weight-bold text-uppercase mr-3 d-none d-md-inline" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+            <div class="top-status-bar d-flex justify-content-between align-items-center px-3 px-md-4 py-2 border-bottom bg-white">
+                <div class="d-flex align-items-center min-width-0 flex-grow-1 mr-2">
+                    <span class="badge badge-pill badge-light-primary px-3 py-1 font-weight-bold text-uppercase mr-3 d-none d-md-inline" style="font-size: 0.7rem; letter-spacing: 0.5px; white-space: nowrap;">
                         {{ $attempt->paper->subject->title }} &nbsp;•&nbsp; {{ $attempt->paper->topic->name }}
                     </span>
-                    <h5 class="mb-0 font-weight-bold text-dark text-truncate" style="max-width: 220px; letter-spacing: -0.5px;">{{ $attempt->paper->title }}</h5>
+                    <h5 class="mb-0 font-weight-bold text-dark text-truncate" style="letter-spacing: -0.5px;">{{ $attempt->paper->title }}</h5>
                 </div>
                 
-                <div class="d-flex align-items-center justify-content-end">
+                <div class="d-flex align-items-center justify-content-end flex-shrink-0">
                     <!-- Mobile Clock -->
                     <div class="d-md-none mr-2 bg-dark py-1 px-2 rounded" style="border: 1px solid #334155;">
                         <span id="mobile-digital-clock" class="font-weight-bold text-danger text-monospace" style="font-family: 'Share Tech Mono', monospace; font-size: 1rem; text-shadow: 0 0 5px rgba(248, 113, 113, 0.5);">00:00:00</span>
@@ -135,124 +135,60 @@
                                 <div class="answer-section">
                                     <h6 class="font-weight-bold text-muted text-uppercase mb-3" style="font-size: 0.7rem; letter-spacing: 1px;">Answer Options</h6>
                                     
-                                    <!-- Choice questions grid (A, C, E vs B, D) -->
+                                    <!-- Choice questions grid -->
                                     @if(in_array($question->type, ['single_choice_radio', 'multiple_choice', 'picture_choice']))
                                         @php
                                             $options = $question->options->sortBy('sort_order')->values();
-                                            $col1 = collect();
-                                            $col2 = collect();
-                                            foreach($options as $k => $opt) {
-                                                if ($k % 2 == 0) {
-                                                    $col1->push(['index' => $k, 'opt' => $opt]);
-                                                } else {
-                                                    $col2->push(['index' => $k, 'opt' => $opt]);
-                                                }
-                                            }
                                             $letterMap = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
                                         @endphp
 
                                         <div class="row">
-                                            <!-- Left Column (A, C, E) -->
-                                            <div class="col-md-6 col-12">
-                                                @foreach($col1 as $item)
-                                                    @php
-                                                        $letter = $letterMap[$item['index']] ?? 'A';
-                                                        $option = $item['opt'];
-                                                        $isSelected = false;
-                                                        if ($question->type === 'multiple_choice') {
-                                                            $isSelected = ($ans && is_array($ans->selected_options) && in_array($option->id, $ans->selected_options));
-                                                        } else {
-                                                            $isSelected = ($ans && $ans->selected_option_id == $option->id);
-                                                        }
-                                                    @endphp
-                                                    <div class="mb-3">
-                                                        <div class="option-card {{ $isSelected ? 'selected-option-card' : '' }}" 
-                                                             id="option-container-{{ $option->id }}" 
-                                                             onclick="selectOption({{ $question->id }}, {{ $option->id }}, '{{ $question->type }}')">
-                                                            
-                                                            @if($question->type === 'multiple_choice')
-                                                                <input type="checkbox" 
-                                                                       id="opt-{{ $option->id }}" 
-                                                                       name="answers[{{ $question->id }}][selected_options][]" 
-                                                                       class="d-none test-input checkbox-input-field" 
-                                                                       value="{{ $option->id }}"
-                                                                       {{ $isSelected ? 'checked' : '' }}
-                                                                       onchange="checkMultipleAnswered({{ $index + 1 }}, {{ $question->id }})">
-                                                            @else
-                                                                <input type="radio" 
-                                                                       id="opt-{{ $option->id }}" 
-                                                                       name="answers[{{ $question->id }}][selected_option_id]" 
-                                                                       class="d-none test-input radio-input-field" 
-                                                                       value="{{ $option->id }}"
-                                                                       {{ $isSelected ? 'checked' : '' }}
-                                                                       onchange="markAnswered({{ $index + 1 }})">
+                                            @foreach($options as $k => $option)
+                                                @php
+                                                    $letter = $letterMap[$k] ?? 'A';
+                                                    $isSelected = false;
+                                                    if ($question->type === 'multiple_choice') {
+                                                        $isSelected = ($ans && is_array($ans->selected_options) && in_array($option->id, $ans->selected_options));
+                                                    } else {
+                                                        $isSelected = ($ans && $ans->selected_option_id == $option->id);
+                                                    }
+                                                @endphp
+                                                <div class="col-md-6 col-12 mb-3">
+                                                    <div class="option-card {{ $isSelected ? 'selected-option-card' : '' }}" 
+                                                         id="option-container-{{ $option->id }}" 
+                                                         onclick="selectOption({{ $question->id }}, {{ $option->id }}, '{{ $question->type }}')">
+                                                        
+                                                        @if($question->type === 'multiple_choice')
+                                                            <input type="checkbox" 
+                                                                   id="opt-{{ $option->id }}" 
+                                                                   name="answers[{{ $question->id }}][selected_options][]" 
+                                                                   class="d-none test-input checkbox-input-field" 
+                                                                   value="{{ $option->id }}"
+                                                                   {{ $isSelected ? 'checked' : '' }}
+                                                                   onchange="checkMultipleAnswered({{ $index + 1 }}, {{ $question->id }})">
+                                                        @else
+                                                            <input type="radio" 
+                                                                   id="opt-{{ $option->id }}" 
+                                                                   name="answers[{{ $question->id }}][selected_option_id]" 
+                                                                   class="d-none test-input radio-input-field" 
+                                                                   value="{{ $option->id }}"
+                                                                   {{ $isSelected ? 'checked' : '' }}
+                                                                   onchange="markAnswered({{ $index + 1 }})">
+                                                        @endif
+                                                        
+                                                        <div class="option-letter mr-3">
+                                                            {{ $letter }}
+                                                        </div>
+                                                        
+                                                        <div class="d-flex align-items-center flex-grow-1">
+                                                            @if($option->option_image)
+                                                                <img src="{{ asset('storage/' . $option->option_image) }}" class="mr-2 rounded border" style="max-height: 40px;" alt="Option Image">
                                                             @endif
-                                                            
-                                                            <div class="option-letter mr-3">
-                                                                {{ $letter }}
-                                                            </div>
-                                                            
-                                                            <div class="d-flex align-items-center flex-grow-1">
-                                                                @if($option->option_image)
-                                                                    <img src="{{ asset('storage/' . $option->option_image) }}" class="mr-2 rounded border" style="max-height: 40px;" alt="Option Image">
-                                                                @endif
-                                                                <span class="font-medium-2 text-dark font-weight-bold">{{ $option->option_text }}</span>
-                                                            </div>
+                                                            <span class="font-medium-2 text-dark font-weight-bold">{{ $option->option_text }}</span>
                                                         </div>
                                                     </div>
-                                                @endforeach
-                                            </div>
-
-                                            <!-- Right Column (B, D) -->
-                                            <div class="col-md-6 col-12">
-                                                @foreach($col2 as $item)
-                                                    @php
-                                                        $letter = $letterMap[$item['index']] ?? 'B';
-                                                        $option = $item['opt'];
-                                                        $isSelected = false;
-                                                        if ($question->type === 'multiple_choice') {
-                                                            $isSelected = ($ans && is_array($ans->selected_options) && in_array($option->id, $ans->selected_options));
-                                                        } else {
-                                                            $isSelected = ($ans && $ans->selected_option_id == $option->id);
-                                                        }
-                                                    @endphp
-                                                    <div class="mb-3">
-                                                        <div class="option-card {{ $isSelected ? 'selected-option-card' : '' }}" 
-                                                             id="option-container-{{ $option->id }}" 
-                                                             onclick="selectOption({{ $question->id }}, {{ $option->id }}, '{{ $question->type }}')">
-                                                            
-                                                            @if($question->type === 'multiple_choice')
-                                                                <input type="checkbox" 
-                                                                       id="opt-{{ $option->id }}" 
-                                                                       name="answers[{{ $question->id }}][selected_options][]" 
-                                                                       class="d-none test-input checkbox-input-field" 
-                                                                       value="{{ $option->id }}"
-                                                                       {{ $isSelected ? 'checked' : '' }}
-                                                                       onchange="checkMultipleAnswered({{ $index + 1 }}, {{ $question->id }})">
-                                                            @else
-                                                                <input type="radio" 
-                                                                       id="opt-{{ $option->id }}" 
-                                                                       name="answers[{{ $question->id }}][selected_option_id]" 
-                                                                       class="d-none test-input radio-input-field" 
-                                                                       value="{{ $option->id }}"
-                                                                       {{ $isSelected ? 'checked' : '' }}
-                                                                       onchange="markAnswered({{ $index + 1 }})">
-                                                            @endif
-                                                            
-                                                            <div class="option-letter mr-3">
-                                                                {{ $letter }}
-                                                            </div>
-                                                            
-                                                            <div class="d-flex align-items-center flex-grow-1">
-                                                                @if($option->option_image)
-                                                                    <img src="{{ asset('storage/' . $option->option_image) }}" class="mr-2 rounded border" style="max-height: 40px;" alt="Option Image">
-                                                                @endif
-                                                                <span class="font-medium-2 text-dark font-weight-bold">{{ $option->option_text }}</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endforeach
-                                            </div>
+                                                </div>
+                                            @endforeach
                                         </div>
 
                                     <!-- Single Choice Dropdown -->
@@ -277,7 +213,7 @@
                                                           rows="5" 
                                                           placeholder="Type your explanation or essay answer here..."
                                                           oninput="checkTextInput({{ $index + 1 }}, this)"
-                                                          style="border: 2px solid #7367f0; border-radius: 12px; padding: 12px; font-size: 0.95rem;"></textarea>
+                                                          style="border: 2px solid #7367f0; border-radius: 12px; padding: 12px; font-size: 0.95rem;">{{ $ans ? $ans->answer_text : '' }}</textarea>
                                             @else
                                                 <input type="text" 
                                                        name="answers[{{ $question->id }}][answer_text]" 
@@ -303,9 +239,13 @@
                             <div class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center" style="height: 55px; min-height: 55px;">
                                 <h6 class="font-weight-bold text-muted text-uppercase mb-0" style="font-size: 0.7rem; letter-spacing: 1px;">Questions Overview</h6>
                                 <!-- Digital LED clock on top nearby the header -->
-                                <div class="stopwatch-led-container py-1 px-2" style="border: 1px solid #334155; background-color: #0f172a; border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
+                                <div class="stopwatch-led-container py-1 px-2 d-none d-md-block" style="border: 1px solid #334155; background-color: #0f172a; border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
                                     <h5 id="digital-clock" class="mb-0 font-weight-bold text-danger" style="font-family: 'Share Tech Mono', monospace; font-size: 0.95rem; text-shadow: 0 0 5px rgba(248, 113, 113, 0.7); letter-spacing: 1px;">00:00:00</h5>
                                 </div>
+                                <!-- Mobile close button -->
+                                <button type="button" class="close d-md-none" onclick="toggleSidebar()" aria-label="Close" style="font-size: 1.5rem; line-height: 1; padding: 0; margin: 0; color: #475569; opacity: 0.8; background: none; border: 0;">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
                             </div>
                             <div class="table-responsive" style="flex: 1; overflow-y: auto;">
                                 <table class="table table-hover table-sm text-center mb-0" style="border: 0;">
@@ -362,7 +302,7 @@
 
                         <!-- Skip Button (Shown only when NOT answered) -->
                         <div id="skip-action-wrapper" class="d-flex align-items-center">
-                            <span class="mr-2 font-weight-bold text-secondary px-3 py-1.5 rounded-lg border bg-light d-none d-sm-inline" style="font-size: 0.72rem; background-color: #f8fafc; border-color: #e2e8f0; line-height: 1.5;">
+                            <span class="mr-2 font-weight-bold text-primary px-3 py-1.5 rounded-lg border bg-light d-none d-sm-inline" style="font-size: 0.72rem; background-color: #f8fafc; border-color: #e2e8f0; line-height: 1.5;">
                                 <span id="current-input-count">0</span> / 1 Selected
                             </span>
                             <button type="button" class="btn btn-primary btn-toolbar-skip d-flex align-items-center shadow" onclick="skipQuestion()">
@@ -431,10 +371,14 @@
 @push('styles')
     <style>
         /* Modern Jakarta Font */
-        body {
+        html, body {
             font-family: 'Plus Jakarta Sans', sans-serif !important;
             background-color: #f1f5f9 !important;
             overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            height: 100% !important;
+            width: 100% !important;
         }
 
         /* FORCE TRUE FULLSCREEN PLAYER VIEW OVERRIDING ALL THEME WRAPPERS & HORIZONTAL MENUS */
@@ -444,10 +388,8 @@
             left: 0 !important;
             right: 0 !important;
             bottom: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            max-width: 100vw !important;
-            max-height: 100vh !important;
+            width: 100% !important;
+            height: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
             z-index: 99999 !important;
@@ -480,18 +422,16 @@
             padding: 0 !important;
             margin: 0 !important;
             min-height: 100vh !important;
-            width: 100vw !important;
-            max-width: 100vw !important;
+            width: 100% !important;
+            max-width: 100% !important;
             overflow: hidden !important;
             height: 100vh !important;
         }
 
         /* COMPACT INTERNAL SCROLLING LAYOUT */
         .player-frame {
-            height: 100vh !important;
-            max-height: 100vh !important;
-            width: 100vw !important;
-            max-width: 100vw !important;
+            height: 100% !important;
+            width: 100% !important;
             margin: 0 !important;
             border: 0 !important;
             border-radius: 0 !important;
@@ -781,22 +721,29 @@
                 padding: 20px 20px !important;
             }
 
+
+            .drawer-backdrop {
+                z-index: 999999 !important;
+            }
+
             .right-panel {
-                position: fixed;
-                top: 0;
-                right: -300px;
+                position: fixed !important;
+                top: 0 !important;
+                right: -300px !important;
                 width: 300px !important;
                 max-width: 300px !important;
                 flex: 0 0 300px !important;
-                height: 100vh;
-                z-index: 100000;
-                transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-                box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
-                border-left: none;
+                height: 100vh !important;
+                z-index: 1000000 !important;
+                background-color: #f8fafc !important;
+                display: flex !important;
+                transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15) !important;
+                border-left: none !important;
             }
 
             .right-panel.open {
-                right: 0;
+                right: 0 !important;
             }
 
             /* Option cards stack on mobile */
@@ -804,39 +751,123 @@
                 max-width: 100%;
                 flex: 0 0 100%;
             }
-        }
 
-        @media (max-width: 991.98px) {
+            /* Bottom Toolbar 2-Row Stack Layout on Mobile */
             .bottom-toolbar {
-                padding: 8px 12px !important;
+                padding: 10px 14px !important;
+                display: flex !important;
+                flex-wrap: wrap !important;
+                justify-content: space-between !important;
+                gap: 10px 4px !important;
+                background: #ffffff !important;
             }
             
-            .bottom-toolbar .btn-text {
-                display: none !important; /* Hide labels under buttons to save space on tablet/mobile */
+            /* Order containers on mobile */
+            .bottom-toolbar > div:nth-child(1) { /* Left Actions (Instructions, Flag) */
+                order: 1 !important;
+                flex: 0 0 auto !important;
             }
-            
-            .bottom-toolbar .btn {
-                padding: 6px !important;
-                margin-right: 6px !important;
-                border-radius: 50% !important; /* Make buttons round icons */
-                width: 34px !important;
-                height: 34px !important;
-                min-width: 34px !important;
+            .bottom-toolbar > div:nth-child(3) { /* Right Actions (Pause, Finish) */
+                order: 2 !important;
+                flex: 0 0 auto !important;
+            }
+            .bottom-toolbar > div:nth-child(2) { /* Middle Actions (Back, Skip/Certainty) */
+                order: 3 !important;
+                flex: 0 0 100% !important;
+                justify-content: center !important;
+                margin-top: 4px !important;
+            }
+
+            /* Secondary actions (Instructions, Flag, Pause) -> icon only on mobile */
+            .btn-toolbar-instructions,
+            .btn-toolbar-flag,
+            .btn-toolbar-pause {
+                width: 38px !important;
+                height: 38px !important;
+                min-width: 38px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
                 display: inline-flex !important;
                 align-items: center !important;
                 justify-content: center !important;
+                margin-right: 6px !important;
             }
-            
-            .bottom-toolbar .btn i {
+            .btn-toolbar-instructions .btn-text,
+            .btn-toolbar-flag .btn-text,
+            .btn-toolbar-pause .btn-text {
+                display: none !important;
+            }
+            .btn-toolbar-instructions i,
+            .btn-toolbar-flag i,
+            .btn-toolbar-pause i {
                 margin-right: 0 !important;
+                font-size: 1.05rem !important;
+            }
+
+            /* Primary actions (Go Back, Skip, Certainty buttons, Finish) -> keep text labels & nice touch sizes */
+            .btn-toolbar-skip,
+            .btn-toolbar-finish {
+                border-radius: 20px !important;
+                font-size: 0.75rem !important;
+                padding: 8px 14px !important;
+                height: 38px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                margin-right: 6px !important;
+            }
+            .btn-toolbar-skip i,
+            .btn-toolbar-finish i {
                 font-size: 0.9rem !important;
+            }
+
+            /* Certainty Buttons & Back Button: circular icon-only layout on all mobile devices under 768px */
+            .btn-toolbar-back,
+            .btn-toolbar-guess,
+            .btn-toolbar-fairly-sure,
+            .btn-toolbar-sure {
+                width: 38px !important;
+                height: 38px !important;
+                min-width: 38px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                margin-right: 6px !important;
+            }
+            .btn-toolbar-back .btn-text,
+            .btn-toolbar-guess .btn-text,
+            .btn-toolbar-fairly-sure .btn-text,
+            .btn-toolbar-sure .btn-text {
+                display: none !important;
+            }
+            .btn-toolbar-back i,
+            .btn-toolbar-guess i,
+            .btn-toolbar-fairly-sure i,
+            .btn-toolbar-sure i {
+                margin-right: 0 !important;
+                font-size: 1.05rem !important;
             }
 
             #skip-action-wrapper span, 
             #confidence-action-wrapper span {
-                font-size: 0.65rem !important;
-                padding: 3px 6px !important;
+                font-size: 0.7rem !important;
+                padding: 4px 8px !important;
                 margin-right: 6px !important;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .bottom-toolbar {
+                padding: 8px 16px !important;
+            }
+            .bottom-toolbar .btn {
+                font-size: 0.7rem !important;
+                padding: 6px 10px !important;
+            }
+            .bottom-toolbar .btn i {
+                font-size: 0.8rem !important;
             }
         }
 
@@ -874,6 +905,15 @@
         let overallTimerInterval = null;
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Move right-panel to fullscreen-player-content on mobile to prevent clipping
+            if (window.innerWidth < 768) {
+                let panel = document.querySelector('.right-panel');
+                let container = document.querySelector('.fullscreen-player-content');
+                if (panel && container) {
+                    container.appendChild(panel);
+                }
+            }
+
             // Show first question
             showQuestion(1);
 
