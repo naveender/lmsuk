@@ -94,7 +94,7 @@
                                                 </div>
                                             </div>
 
-                                            <a href="#" class="action-btn">
+                                            <a href="{{ route('student.assessments.topics', ['subject' => $subject->id]) }}" class="action-btn">
                                                 Check Assessments <i class="feather icon-arrow-right"></i>
                                             </a>
                                             
