@@ -1,6 +1,7 @@
 <div>
     @push('styles')
         <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="{{ asset('theme/app-assets/vendors/css/forms/select/select2.min.css') }}">
         <style>
             /* Question bank scrolling card wrapper */
             .question-bank-card {
@@ -122,16 +123,132 @@
                             <div class="col-md-4">
                                 <div class="form-group mb-2">
                                     <label for="subject_id" class="font-weight-bold text-dark">Subject <span class="text-danger">*</span></label>
-                                    <select id="subject_id" class="form-control" wire:model.defer="subject_id">
-                                        <option value="">-- Select Subject --</option>
-                                        @foreach($subjects as $subj)
-                                            <option value="{{ $subj->id }}">{{ $subj->title }}</option>
-                                        @endforeach
-                                    </select>
+                                    <div wire:ignore x-data="{
+                                        value: @entangle('subject_id').live,
+                                        init() {
+                                            let select = $(this.$refs.select).select2({
+                                                dropdownAutoWidth: true,
+                                                width: '100%',
+                                                placeholder: '-- Select Subject --',
+                                                allowClear: true
+                                            });
+                                            select.val(this.value).trigger('change.select2');
+                                            select.on('change', () => {
+                                                this.value = select.val();
+                                            });
+                                            this.$watch('value', (val) => {
+                                                select.val(val).trigger('change.select2');
+                                            });
+                                        }
+                                    }">
+                                        <select x-ref="select" id="subject_id" class="form-control select2">
+                                            <option value="">-- Select Subject --</option>
+                                            @foreach($subjects as $subj)
+                                                <option value="{{ $subj->id }}">{{ $subj->title }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                     @error('subject_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
                                 </div>
                             </div>
 
+                            <!-- Topic selection -->
+                            <div class="col-md-4">
+                                <div class="form-group mb-2">
+                                    <label for="topic_id" class="font-weight-bold text-dark">Topic</label>
+                                    <div wire:ignore x-data="{
+                                        value: @entangle('topic_id').live,
+                                        options: @entangle('topics'),
+                                        init() {
+                                            let select = $(this.$refs.select).select2({
+                                                dropdownAutoWidth: true,
+                                                width: '100%',
+                                                placeholder: '-- Select Topic --',
+                                                allowClear: true
+                                            });
+                                            select.on('change', () => {
+                                                this.value = select.val();
+                                            });
+
+                                            this.rebuildOptions(this.options);
+
+                                            this.$watch('options', (newOptions) => {
+                                                this.rebuildOptions(newOptions);
+                                            });
+                                            this.$watch('value', (val) => {
+                                                select.val(val).trigger('change.select2');
+                                            });
+                                        },
+                                        rebuildOptions(opts) {
+                                            let select = $(this.$refs.select);
+                                            select.html('<option value=\'\'>-- Select Topic --</option>');
+                                            if (opts && Array.isArray(opts)) {
+                                                opts.forEach(opt => {
+                                                    let option = new Option(opt.name, opt.id, false, false);
+                                                    select.append(option);
+                                                });
+                                            }
+                                            select.val(this.value).trigger('change.select2');
+                                        }
+                                    }">
+                                        <select x-ref="select" id="topic_id" class="form-control select2">
+                                            <option value="">-- Select Topic --</option>
+                                        </select>
+                                    </div>
+                                    @error('topic_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Subtopic selection -->
+                            <div class="col-md-4">
+                                <div class="form-group mb-2">
+                                    <label for="subtopic_id" class="font-weight-bold text-dark">Subtopic</label>
+                                    <div wire:ignore x-data="{
+                                        value: @entangle('subtopic_id').live,
+                                        options: @entangle('subtopics'),
+                                        init() {
+                                            let select = $(this.$refs.select).select2({
+                                                dropdownAutoWidth: true,
+                                                width: '100%',
+                                                placeholder: '-- Select Subtopic --',
+                                                allowClear: true
+                                            });
+                                            select.on('change', () => {
+                                                this.value = select.val();
+                                            });
+
+                                            this.rebuildOptions(this.options);
+
+                                            this.$watch('options', (newOptions) => {
+                                                this.rebuildOptions(newOptions);
+                                            });
+                                            this.$watch('value', (val) => {
+                                                select.val(val).trigger('change.select2');
+                                            });
+                                        },
+                                        rebuildOptions(opts) {
+                                            let select = $(this.$refs.select);
+                                            select.html('<option value=\'\'>-- Select Subtopic --</option>');
+                                            if (opts && Array.isArray(opts)) {
+                                                opts.forEach(opt => {
+                                                    let option = new Option(opt.name, opt.id, false, false);
+                                                    select.append(option);
+                                                });
+                                            }
+                                            select.val(this.value).trigger('change.select2');
+                                        }
+                                    }">
+                                        <select x-ref="select" id="subtopic_id" class="form-control select2">
+                                            <option value="">-- Select Subtopic --</option>
+                                        </select>
+                                    </div>
+                                    @error('subtopic_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Class, Year & Academic Year selection Grid -->
+                        <div class="row">
                             <!-- Class selection -->
                             <div class="col-md-4">
                                 <div class="form-group mb-2">
@@ -159,6 +276,20 @@
                                     @error('year_group_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
                                 </div>
                             </div>
+
+                            <!-- Academic Year -->
+                            <div class="col-md-4">
+                                <div class="form-group mb-2">
+                                    <label for="academic_year" class="font-weight-bold text-dark">Academic Year <span class="text-danger">*</span></label>
+                                    <select id="academic_year" class="form-control" wire:model.defer="academic_year">
+                                        <option value="">-- Select Academic Year --</option>
+                                        @foreach($academicYears as $year)
+                                            <option value="{{ $year->name }}">{{ $year->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('academic_year') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row">
@@ -176,22 +307,6 @@
                                 </div>
                             </div>
 
-                            <!-- Academic Year -->
-                            <div class="col-md-6">
-                                <div class="form-group mb-2">
-                                    <label for="academic_year" class="font-weight-bold text-dark">Academic Year <span class="text-danger">*</span></label>
-                                    <select id="academic_year" class="form-control" wire:model.defer="academic_year">
-                                        <option value="">-- Select Academic Year --</option>
-                                        @foreach($academicYears as $year)
-                                            <option value="{{ $year->name }}">{{ $year->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('academic_year') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
                             <!-- Difficulty levels -->
                             <div class="col-md-6">
                                 <div class="form-group mb-2">
@@ -205,7 +320,9 @@
                                     @error('difficulty') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
                                 </div>
                             </div>
+                        </div>
 
+                        <div class="row">
                             <!-- Total time -->
                             <div class="col-md-6">
                                 <div class="form-group mb-2">
@@ -214,9 +331,7 @@
                                     @error('total_time') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="row align-items-center">
                             <!-- Default Marks -->
                             <div class="col-md-6">
                                 <div class="form-group mb-2">
@@ -225,9 +340,11 @@
                                     @error('default_marks') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
                                 </div>
                             </div>
+                        </div>
 
+                        <div class="row align-items-center">
                             <!-- Question Pooling Switch -->
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="form-group mb-2">
                                     <label class="font-weight-bold text-dark d-block mb-25">Question Pooling</label>
                                     <div class="d-flex align-items-center mt-50">
@@ -664,6 +781,7 @@
     </div>
 
     @push('scripts')
+        <script src="{{ asset('theme/app-assets/vendors/js/forms/select/select2.full.min.js') }}"></script>
         <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     @endpush
 </div>

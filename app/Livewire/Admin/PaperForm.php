@@ -24,10 +24,14 @@ class PaperForm extends Component
     public $title = '';
     public $instruction = ''; // Quill HTML binding
     public $subject_id = '';
+    public $topic_id = '';
+    public $subtopic_id = '';
     public $class_id = '';
     public $year_group_id = '';
     public $user_id = '';
     public $academic_year = '';
+    public $topics = [];
+    public $subtopics = [];
     public $difficulty = '';
     public $total_time = 0;
     public $default_marks = 1;
@@ -62,6 +66,8 @@ class PaperForm extends Component
         'title' => 'required|string|max:255',
         'instruction' => 'nullable|string',
         'subject_id' => 'required|exists:subjects,id',
+        'topic_id' => 'nullable|exists:topics,id',
+        'subtopic_id' => 'nullable|exists:topics,id',
         'class_id' => 'required|exists:classes,id',
         'year_group_id' => 'required|exists:year_groups,id',
         'user_id' => 'required|exists:users,id',
@@ -81,6 +87,8 @@ class PaperForm extends Component
             $this->title = $paper->title;
             $this->instruction = $paper->instruction;
             $this->subject_id = $paper->subject_id;
+            $this->topic_id = $paper->topic_id;
+            $this->subtopic_id = $paper->subtopic_id;
             $this->class_id = $paper->class_id;
             $this->year_group_id = $paper->year_group_id;
             $this->user_id = $paper->user_id;
@@ -89,6 +97,23 @@ class PaperForm extends Component
             $this->total_time = $paper->total_time;
             $this->default_marks = $paper->default_marks;
             $this->question_pooling = (bool)$paper->question_pooling;
+
+            // Load topics & subtopics if editing
+            if ($this->subject_id) {
+                $this->topics = Topic::where('subject_id', $this->subject_id)
+                    ->where(function ($q) {
+                        $q->whereNull('parent')->orWhere('parent', 0);
+                    })
+                    ->orderBy('name')
+                    ->get()
+                    ->toArray();
+            }
+            if ($this->topic_id) {
+                $this->subtopics = Topic::where('parent', $this->topic_id)
+                    ->orderBy('name')
+                    ->get()
+                    ->toArray();
+            }
 
             $this->allow_attempt_without_signup = (bool)$paper->allow_attempt_without_signup;
             $this->allow_reattempt_question = (bool)$paper->allow_reattempt_question;
@@ -104,6 +129,39 @@ class PaperForm extends Component
             $this->user_id = auth()->id();
             // Try to set default academic year
             $this->academic_year = date('Y') . '-' . (date('Y') + 1);
+        }
+    }
+
+    public function updatedSubjectId($value)
+    {
+        $this->topic_id = '';
+        $this->subtopic_id = '';
+        $this->subtopics = [];
+        
+        if ($value) {
+            $this->topics = Topic::where('subject_id', $value)
+                ->where(function ($q) {
+                    $q->whereNull('parent')->orWhere('parent', 0);
+                })
+                ->orderBy('name')
+                ->get()
+                ->toArray();
+        } else {
+            $this->topics = [];
+        }
+    }
+
+    public function updatedTopicId($value)
+    {
+        $this->subtopic_id = '';
+        
+        if ($value) {
+            $this->subtopics = Topic::where('parent', $value)
+                ->orderBy('name')
+                ->get()
+                ->toArray();
+        } else {
+            $this->subtopics = [];
         }
     }
 
@@ -183,6 +241,8 @@ class PaperForm extends Component
                 'title' => $this->title,
                 'instruction' => $this->instruction,
                 'subject_id' => $this->subject_id,
+                'topic_id' => $this->topic_id ?: null,
+                'subtopic_id' => $this->subtopic_id ?: null,
                 'class_id' => $this->class_id,
                 'year_group_id' => $this->year_group_id,
                 'user_id' => $this->user_id,

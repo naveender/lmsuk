@@ -14,6 +14,8 @@ class Paper extends Model
         'title',
         'instruction',
         'subject_id',
+        'topic_id',
+        'subtopic_id',
         'class_id',
         'year_group_id',
         'user_id',
@@ -59,6 +61,22 @@ class Paper extends Model
     public function subject()
     {
         return $this->belongsTo(Subject::class);
+    }
+
+    /**
+     * Get the topic that this paper belongs to.
+     */
+    public function topic()
+    {
+        return $this->belongsTo(Topic::class, 'topic_id');
+    }
+
+    /**
+     * Get the subtopic that this paper belongs to.
+     */
+    public function subtopic()
+    {
+        return $this->belongsTo(Topic::class, 'subtopic_id');
     }
 
     /**
