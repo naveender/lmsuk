@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class BackupSetting extends Model
 {
+    protected $table = 'aspire_settings';
+
     protected $fillable = ['key', 'value', 'group'];
 
     public static function get($key, $default = null)
