@@ -12,4 +12,9 @@ class Subject extends Model
         'image',
         'is_active',
     ];
+
+    public function questions()
+    {
+        return $this->hasMany(Question::class);
+    }
 }
