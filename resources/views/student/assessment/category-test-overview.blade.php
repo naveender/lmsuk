@@ -52,9 +52,9 @@
                                     'icon' => 'feather icon-award'
                                 ];
 
-                                // Compute mocked progress or placeholder logic
-                                $completedCount = 0; // Placeholder until attempts table exists
-                                $progressPercentage = $subject->total_papers > 0 ? round(($completedCount / $subject->total_papers) * 100) : 0;
+                                // Compute progress based on attempts
+                                $completedCount = $subject->completed_papers_count ?? 0;
+                                $progressPercentage = $subject->progress_percentage ?? 0;
                             @endphp
 
                             <div class="col-lg-4 col-md-12 col-sm-12">
@@ -71,16 +71,16 @@
                                         <div>
                                             <div class="stats-grid">
                                                 <div class="stat-item">
-                                                    <span class="stat-value">{{ $subject->total_papers }}</span>
-                                                    <span class="stat-label">Total</span>
+                                                    <span class="stat-value text-warning">{{ $subject->paused_papers_count }}</span>
+                                                    <span class="stat-label">Paused</span>
                                                 </div>
                                                 <div class="stat-item">
-                                                    <span class="stat-value text-info">{{ $subject->tests_count }}</span>
-                                                    <span class="stat-label">Tests</span>
+                                                    <span class="stat-value text-info">{{ $subject->completed_papers_count }}/{{ $subject->total_papers }}</span>
+                                                    <span class="stat-label">Finished</span>
                                                 </div>
                                                 <div class="stat-item">
-                                                    <span class="stat-value text-success">{{ $subject->exams_count }}</span>
-                                                    <span class="stat-label">Exams</span>
+                                                    <span class="stat-value text-success" style="font-size: 0.95rem;">{{ $subject->last_completed_at ? $subject->last_completed_at->format('d/m/Y') : 'N/A' }}</span>
+                                                    <span class="stat-label">Last Completed</span>
                                                 </div>
                                             </div>
 
@@ -90,7 +90,7 @@
                                                     <span>{{ $completedCount }} / {{ $subject->total_papers }} Done</span>
                                                 </div>
                                                 <div class="subject-progress-bar">
-                                                    <div class="subject-progress-fill" style="width: {{ $subject->total_papers > 0 ? '10%' : '0%' }}"></div>
+                                                    <div class="subject-progress-fill" style="width: {{ $progressPercentage }}%"></div>
                                                 </div>
                                             </div>
 

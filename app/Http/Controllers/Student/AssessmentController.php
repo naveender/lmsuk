@@ -41,7 +41,21 @@ class AssessmentController extends Controller
                 ->distinct('paper_id')
                 ->count('paper_id');
 
+            $pausedCount = PaperAttempt::where('user_id', $student->id)
+                ->whereIn('paper_id', $paperIds)
+                ->where('status', 'paused')
+                ->distinct('paper_id')
+                ->count('paper_id');
+
+            $lastCompleted = PaperAttempt::where('user_id', $student->id)
+                ->whereIn('paper_id', $paperIds)
+                ->where('status', 'completed')
+                ->orderBy('completed_at', 'desc')
+                ->first();
+
             $subject->completed_papers_count = $completedCount;
+            $subject->paused_papers_count = $pausedCount;
+            $subject->last_completed_at = $lastCompleted ? $lastCompleted->completed_at : null;
             $subject->progress_percentage = $subject->total_papers > 0 
                 ? round(($completedCount / $subject->total_papers) * 100) 
                 : 0;
