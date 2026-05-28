@@ -46,6 +46,27 @@
                                                 </span>
                                             @enderror
                                         </div>
+                                        <div class="form-label-group position-relative">
+                                            <input id="username" type="text"
+                                                class="form-control @error('username') is-invalid @enderror" name="username"
+                                                placeholder="Username" value="{{ old('username') }}" required autocomplete="username">
+                                            <label for="username">Username</label>
+                                            <span class="position-absolute" id="username-spinner" style="right: 15px; top: 12px; display: none; z-index: 10;">
+                                                <i class="feather icon-loader" style="animation: spin 1s linear infinite; display: inline-block;"></i>
+                                            </span>
+                                            @error('username')
+                                                <span class="invalid-feedback" role="alert" style="display:block;">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                            <div id="username-feedback" class="mt-25" style="display: none; font-size: 0.85rem;">
+                                                <span id="username-feedback-text"></span>
+                                            </div>
+                                            <div id="username-suggestions" class="mt-50" style="display: none;">
+                                                <div class="text-muted small mb-25" style="font-size: 0.75rem;">Suggested Usernames:</div>
+                                                <div id="suggestions-list" class="d-flex flex-wrap align-items-center"></div>
+                                            </div>
+                                        </div>
                                         <div class="form-label-group">
                                             <!-- <input type="email" id="inputEmail" class="form-control" placeholder="Email" required> -->
                                             <input id="email" type="email"
@@ -139,3 +160,155 @@
     </section>
 
 @endsection
+
+@push('scripts')
+<style>
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .suggestion-pill {
+        cursor: pointer;
+        background-color: rgba(115, 103, 240, 0.1);
+        color: #7367f0;
+        border: 1px solid rgba(115, 103, 240, 0.3);
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 0.8rem;
+        margin-right: 6px;
+        margin-bottom: 6px;
+        display: inline-block;
+        transition: all 0.2s ease-in-out;
+    }
+    .suggestion-pill:hover {
+        background-color: #7367f0;
+        color: #fff;
+        border-color: #7367f0;
+    }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const nameInput = document.getElementById('name');
+    const usernameInput = document.getElementById('username');
+    const spinner = document.getElementById('username-spinner');
+    const feedback = document.getElementById('username-feedback');
+    const feedbackText = document.getElementById('username-feedback-text');
+    const suggestionsDiv = document.getElementById('username-suggestions');
+    const suggestionsList = document.getElementById('suggestions-list');
+    const csrfToken = document.querySelector('input[name="_token"]').value;
+
+    let debounceTimeout = null;
+    let usernameManuallyEdited = false;
+
+    // Helper to generate suggestions from Name
+    function fetchSuggestionsFromName() {
+        const nameVal = nameInput.value.trim();
+        if (nameVal.length >= 2 && !usernameManuallyEdited && usernameInput.value.trim() === '') {
+            spinner.style.display = 'block';
+            axios.post('{{ route("register.check-username") }}', {
+                username: nameVal.replace(/\s+/g, '_').toLowerCase(),
+                name: nameVal
+            }, {
+                headers: { 'X-CSRF-TOKEN': csrfToken }
+            }).then(response => {
+                spinner.style.display = 'none';
+                if (response.data && response.data.suggestions && usernameInput.value.trim() === '') {
+                    renderSuggestions(response.data.suggestions);
+                }
+            }).catch(err => {
+                spinner.style.display = 'none';
+            });
+        }
+    }
+
+    // Keyup on Name field to auto-suggest
+    nameInput.addEventListener('input', function() {
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(fetchSuggestionsFromName, 400);
+    });
+
+    // Keyup on Username field
+    usernameInput.addEventListener('input', function () {
+        usernameManuallyEdited = true;
+        const usernameVal = usernameInput.value.trim();
+        
+        clearTimeout(debounceTimeout);
+        
+        if (usernameVal === '') {
+            feedback.style.display = 'none';
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+
+        if (usernameVal.length < 3) {
+            feedback.style.display = 'block';
+            feedbackText.className = 'text-danger';
+            feedbackText.innerHTML = '<i class="feather icon-alert-triangle mr-25"></i>Username must be at least 3 characters.';
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+
+        // Regex check
+        const regex = /^[a-zA-Z0-9_.-]+$/;
+        if (!regex.test(usernameVal)) {
+            feedback.style.display = 'block';
+            feedbackText.className = 'text-danger';
+            feedbackText.innerHTML = '<i class="feather icon-alert-triangle mr-25"></i>Only letters, numbers, dot, dash, and underscore are allowed.';
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+
+        spinner.style.display = 'block';
+        
+        debounceTimeout = setTimeout(function () {
+            axios.post('{{ route("register.check-username") }}', {
+                username: usernameVal,
+                name: nameInput.value.trim()
+            }, {
+                headers: { 'X-CSRF-TOKEN': csrfToken }
+            })
+            .then(response => {
+                spinner.style.display = 'none';
+                feedback.style.display = 'block';
+                
+                if (response.data.available) {
+                    feedbackText.className = 'text-success';
+                    feedbackText.innerHTML = '<i class="feather icon-check-circle mr-25"></i>Username is available!';
+                    suggestionsDiv.style.display = 'none';
+                } else {
+                    feedbackText.className = 'text-danger';
+                    feedbackText.innerHTML = '<i class="feather icon-alert-circle mr-25"></i>' + response.data.message;
+                    if (response.data.suggestions && response.data.suggestions.length > 0) {
+                        renderSuggestions(response.data.suggestions);
+                    } else {
+                        suggestionsDiv.style.display = 'none';
+                    }
+                }
+            })
+            .catch(error => {
+                spinner.style.display = 'none';
+                feedback.style.display = 'none';
+            });
+        }, 300);
+    });
+
+    function renderSuggestions(suggestions) {
+        suggestionsList.innerHTML = '';
+        suggestions.forEach(suggestion => {
+            const span = document.createElement('span');
+            span.className = 'suggestion-pill';
+            span.textContent = suggestion;
+            span.addEventListener('click', function () {
+                usernameInput.value = suggestion;
+                usernameManuallyEdited = true;
+                // Dispatch input event to re-validate the username field
+                const event = new Event('input', { bubbles: true });
+                usernameInput.dispatchEvent(event);
+            });
+            suggestionsList.appendChild(span);
+        });
+        suggestionsDiv.style.display = 'block';
+    }
+});
+</script>
+@endpush

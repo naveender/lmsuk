@@ -30,6 +30,7 @@ use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 Route::get('/', function () {
     return view('auth.login');
 });
+Route::post('/register/check-username', [App\Http\Controllers\Auth\RegisterUsernameController::class, 'check'])->name('register.check-username');
 // Route::get('/register', function () {
 //     return view('auth.register');
 // });

@@ -46,6 +46,16 @@
             </div>
         </div>
     </div>
+
+    <!-- BEGIN: Vendor JS-->
+    <script src="{{ asset('theme/app-assets/vendors/js/vendors.min.js') }}"></script>
+    <!-- BEGIN: Theme JS-->
+    <script src="{{ asset('theme/app-assets/js/core/app-menu.js') }}"></script>
+    <script src="{{ asset('theme/app-assets/js/core/app.js') }}"></script>
+    <script src="{{ asset('theme/app-assets/js/scripts/components.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    @stack('scripts')
 </body>
 
 </html>
