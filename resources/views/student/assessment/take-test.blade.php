@@ -455,40 +455,68 @@
                     <div class="col-md-3 col-12 bg-light d-flex flex-column justify-content-between p-0 border-left right-panel">
                         
                         <div style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
-                            <div class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center" style="height: 55px; min-height: 55px;">
-                                <h6 class="font-weight-bold text-muted text-uppercase mb-0" style="font-size: 0.7rem; letter-spacing: 1px;">Questions Overview</h6>
+                            <div class="p-3 d-flex justify-content-between align-items-center right-panel-header" style="height: 55px; min-height: 55px;">
+                                <h6 class="font-weight-bold text-primary text-uppercase mb-0" style="font-size: 0.75rem; letter-spacing: 1.5px;">Questions Overview</h6>
                                 <!-- Digital LED clock on top nearby the header -->
-                                <div class="stopwatch-led-container py-1 px-2 d-none d-md-block" style="border: 1px solid #334155; background-color: #0f172a; border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
-                                    <h5 id="digital-clock" class="mb-0 font-weight-bold text-danger" style="font-family: 'Share Tech Mono', monospace; font-size: 0.95rem; text-shadow: 0 0 5px rgba(248, 113, 113, 0.7); letter-spacing: 1px;">00:00:00</h5>
+                                <div class="stopwatch-led-container py-1 px-2 d-none d-md-block">
+                                    <h5 id="digital-clock" class="mb-0 font-weight-bold text-danger">00:00:00</h5>
                                 </div>
                                 <!-- Mobile close button -->
                                 <button type="button" class="close d-md-none" onclick="toggleSidebar()" aria-label="Close" style="font-size: 1.5rem; line-height: 1; padding: 0; margin: 0; color: #475569; opacity: 0.8; background: none; border: 0;">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="table-responsive" style="flex: 1; overflow-y: auto;">
-                                <table class="table table-hover table-sm text-center mb-0" style="border: 0;">
-                                    <thead>
-                                        <tr style="background-color: #f1f5f9; color: #475569;">
-                                            <th style="width: 60px; padding: 8px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Q</th>
-                                            <th style="padding: 8px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; text-align: right; padding-right: 25px;">Time</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($questions as $index => $question)
-                                            <tr id="sidebar-row-{{ $index + 1 }}" class="clickable-row" onclick="jumpToQuestion({{ $index + 1 }})" style="cursor: pointer; transition: background-color 0.2s;">
-                                                <td class="font-weight-bold p-2 position-relative text-dark" style="font-size: 0.9rem; border-top: 1px solid #f1f5f9;">
-                                                    <span class="active-dot d-none bg-primary" style="position: absolute; left: 6px; top: 12px; width: 6px; height: 6px; border-radius: 50%;"></span>
-                                                    <span class="q-num-label">{{ $index + 1 }}</span>
-                                                    <span class="flag-icon d-none text-danger" style="position: absolute; right: 6px; top: 8px;"><i class="feather icon-flag font-small-3"></i></span>
-                                                </td>
-                                                <td id="sidebar-time-{{ $index + 1 }}" class="p-2 font-weight-bold text-danger text-monospace" style="font-size: 0.9rem; text-align: right; padding-right: 25px; border-top: 1px solid #f1f5f9;">
+                            <div class="questions-list-wrapper" style="flex: 1; overflow-y: auto; padding: 15px;">
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    @foreach($questions as $index => $question)
+                                        @php
+                                            $ans = $answers->get($question->id);
+                                            $statusText = 'Unanswered';
+                                            $statusClass = 'status-badge-unanswered';
+                                            if ($ans) {
+                                                if ($ans->confidence !== null && $ans->confidence !== '') {
+                                                    $statusText = ucwords(str_replace('_', ' ', $ans->confidence));
+                                                    if ($ans->confidence === 'guess') {
+                                                        $statusClass = 'status-badge-guess';
+                                                    } elseif ($ans->confidence === 'fairly_sure') {
+                                                        $statusClass = 'status-badge-fairly-sure';
+                                                    } elseif ($ans->confidence === 'sure') {
+                                                        $statusClass = 'status-badge-sure';
+                                                    }
+                                                } elseif ($ans->selected_option_id || $ans->selected_options || $ans->answer_text) {
+                                                    $statusText = 'Answered';
+                                                    $statusClass = 'status-badge-answered';
+                                                }
+                                            }
+                                            $isFlagged = ($ans && $ans->is_flagged);
+                                        @endphp
+                                        <div id="sidebar-row-{{ $index + 1 }}" 
+                                             class="question-sidebar-card clickable-row d-flex align-items-center justify-content-between position-relative" 
+                                             onclick="jumpToQuestion({{ $index + 1 }})" 
+                                             style="cursor: pointer; border-radius: 12px; padding: 10px 14px; margin-bottom: 8px;">
+                                            
+                                            <!-- Left Dot Indicator for Active Question -->
+                                            <span class="active-dot d-none bg-primary" style="position: absolute; left: 6px; top: calc(50% - 4px); width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 10px #7367f0;"></span>
+
+                                            <div class="d-flex align-items-center pl-2">
+                                                <span class="q-num-label font-weight-bold text-dark mr-2">Q{{ $index + 1 }}</span>
+                                                
+                                                <span class="flag-icon {{ $isFlagged ? '' : 'd-none' }} text-danger mr-2" style="line-height: 1;"><i class="feather icon-flag font-small-3"></i></span>
+                                                
+                                                <span class="status-dot-badge badge badge-pill {{ $statusClass }} font-weight-bold">
+                                                    {{ $statusText }}
+                                                </span>
+                                            </div>
+
+                                            <div class="time-pill-container">
+                                                <i class="feather icon-clock text-primary mr-1" style="font-size: 0.7rem; vertical-align: middle;"></i>
+                                                <span id="sidebar-time-{{ $index + 1 }}" class="time-pill text-monospace font-weight-bold text-primary text-right" style="width: 38px;">
                                                     00:00
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -692,9 +720,12 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border-left: 1px solid #e2e8f0;
-            background-color: #f8fafc;
+            border-left: 1px solid rgba(226, 232, 240, 0.4) !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(241, 245, 249, 0.2) 100%) !important;
+            backdrop-filter: blur(25px) saturate(210%);
+            -webkit-backdrop-filter: blur(25px) saturate(210%);
             height: 100%;
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.015) !important;
         }
 
         .bottom-toolbar {
@@ -968,11 +999,13 @@
                 flex: 0 0 300px !important;
                 height: 100vh !important;
                 z-index: 1000000 !important;
-                background-color: #f8fafc !important;
+                background: rgba(255, 255, 255, 0.6) !important;
+                backdrop-filter: blur(25px) saturate(210%) !important;
+                -webkit-backdrop-filter: blur(25px) saturate(210%) !important;
                 display: flex !important;
                 transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-                box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15) !important;
-                border-left: none !important;
+                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05) !important;
+                border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
             }
 
             .right-panel.open {
@@ -1128,6 +1161,155 @@
         .draggable-card.selected-card {
             border-color: #28c76f !important;
             box-shadow: 0 0 0 3px rgba(40, 199, 111, 0.25) !important;
+        }
+
+        /* Premium Glassmorphic Sidebar styles */
+        .right-panel-header {
+            background: rgba(255, 255, 255, 0.35) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5) !important;
+        }
+
+        .questions-list-wrapper::-webkit-scrollbar {
+            width: 6px;
+        }
+        .questions-list-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .questions-list-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(115, 103, 240, 0.15);
+            border-radius: 4px;
+        }
+        .questions-list-wrapper::-webkit-scrollbar-thumb:hover {
+            background: rgba(115, 103, 240, 0.3);
+        }
+
+        .question-sidebar-card {
+            background: rgba(255, 255, 255, 0.35) !important;
+            border: 1px solid rgba(255, 255, 255, 0.5) !important;
+            border-left: 4px solid transparent !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01) !important;
+            border-radius: 12px !important;
+            padding: 10px 14px 10px 10px !important;
+            margin-bottom: 8px;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.05, 1) !important;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .question-sidebar-card:hover {
+            background: rgba(255, 255, 255, 0.75) !important;
+            border-color: rgba(115, 103, 240, 0.4) !important;
+            border-left: 4px solid rgba(115, 103, 240, 0.4) !important;
+            transform: translateY(-2px) scale(1.015);
+            box-shadow: 0 6px 15px rgba(115, 103, 240, 0.06) !important;
+        }
+
+        .question-sidebar-card.active-row {
+            background: linear-gradient(135deg, rgba(115, 103, 240, 0.06) 0%, rgba(115, 103, 240, 0.12) 100%) !important;
+            border-color: rgba(115, 103, 240, 0.6) !important;
+            border-left: 4px solid #7367f0 !important;
+            box-shadow: 0 6px 18px rgba(115, 103, 240, 0.1) !important;
+            transform: scale(1.02);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .question-sidebar-card.active-row .active-dot {
+            display: inline !important;
+        }
+
+        .q-num-label {
+            font-size: 0.88rem !important;
+            font-weight: 700 !important;
+            color: #1e293b !important;
+            letter-spacing: -0.3px;
+        }
+
+        /* Glass status badges */
+        .status-dot-badge {
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.4px;
+            padding: 4px 10px !important;
+            border-radius: 20px !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            text-transform: uppercase;
+        }
+        
+        .status-badge-unanswered {
+            background: rgba(239, 68, 68, 0.12) !important;
+            color: #ef4444 !important;
+            border: 1px solid rgba(239, 68, 68, 0.2) !important;
+        }
+
+        .status-badge-answered {
+            background: rgba(59, 130, 246, 0.12) !important;
+            color: #3b82f6 !important;
+            border: 1px solid rgba(59, 130, 246, 0.2) !important;
+        }
+
+        .status-badge-guess {
+            background: rgba(245, 158, 11, 0.12) !important;
+            color: #f59e0b !important;
+            border: 1px solid rgba(245, 158, 11, 0.2) !important;
+        }
+
+        .status-badge-fairly-sure {
+            background: rgba(99, 102, 241, 0.12) !important;
+            color: #6366f1 !important;
+            border: 1px solid rgba(99, 102, 241, 0.2) !important;
+        }
+
+        .status-badge-sure {
+            background: rgba(16, 185, 129, 0.12) !important;
+            color: #10b981 !important;
+            border: 1px solid rgba(16, 185, 129, 0.2) !important;
+        }
+
+        .time-pill-container {
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            border-radius: 20px;
+            padding: 2px 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .time-pill {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.78rem !important;
+            color: #475569 !important;
+        }
+
+        /* Glass stopwatch clock styling */
+        .stopwatch-led-container {
+            border: 1px solid rgba(255, 255, 255, 0.4) !important;
+            background: rgba(15, 23, 42, 0.65) !important;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 30px !important;
+            padding: 4px 12px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        #digital-clock {
+            font-family: 'Share Tech Mono', monospace;
+            color: #f43f5e !important;
+            text-shadow: 0 0 8px rgba(244, 63, 94, 0.6);
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            margin: 0;
         }
     </style>
 @endpush
@@ -1362,6 +1544,7 @@
         // Trigger skip button action (advances index, marks skipped if empty)
         function skipQuestion() {
             let card = document.getElementById('q-card-' + currentQuestion);
+            let prevQ = currentQuestion;
             if (card) {
                 let qId = card.getAttribute('data-q-id');
                 let hasAnswer = checkQuestionAnswered(qId);
@@ -1369,6 +1552,7 @@
                     questionSkipped[qId] = true;
                 }
             }
+            updateSidebarCardStatus(prevQ);
 
             if (currentQuestion < totalQuestions) {
                 showQuestion(currentQuestion + 1);
@@ -1507,6 +1691,7 @@
 
             updateCurrentInputLabel();
             updateStatsBanner();
+            updateSidebarCardStatus(currentQuestion);
         }
 
         // Handles confidence selection Guess, Fairly Sure, Sure and advances question
@@ -1517,6 +1702,7 @@
 
             let qId = card.getAttribute('data-q-id');
             document.getElementById('confidence-' + qId).value = level;
+            updateSidebarCardStatus(currentQuestion);
 
             if (allowInstantFeedback) {
                 let confidenceWrapper = document.getElementById('confidence-action-wrapper');
@@ -1615,6 +1801,7 @@
             }
             updateCurrentInputLabel();
             updateStatsBanner();
+            updateSidebarCardStatus(qNum);
         }
 
         function selectDropdownOption(qNum, element) {
@@ -1631,6 +1818,7 @@
             }
             updateCurrentInputLabel();
             updateStatsBanner();
+            updateSidebarCardStatus(qNum);
         }
 
         // Live input counters
@@ -1683,6 +1871,48 @@
             }
         }
 
+        // Update status badge on sidebar for a specific question card
+        function updateSidebarCardStatus(qNum) {
+            let card = document.getElementById('q-card-' + qNum);
+            if (!card) return;
+
+            let qId = card.getAttribute('data-q-id');
+            let badge = document.querySelector('#sidebar-row-' + qNum + ' .status-dot-badge');
+            if (!badge) return;
+
+            let confidence = document.getElementById('confidence-' + qId).value;
+            let hasAnswer = checkQuestionAnswered(qId);
+
+            let statusText = 'Unanswered';
+            let statusClass = 'status-badge-unanswered';
+
+            if (confidence !== null && confidence !== '') {
+                statusText = ucWords(confidence.replace('_', ' '));
+                if (confidence === 'guess') {
+                    statusClass = 'status-badge-guess';
+                } else if (confidence === 'fairly_sure') {
+                    statusClass = 'status-badge-fairly-sure';
+                } else if (confidence === 'sure') {
+                    statusClass = 'status-badge-sure';
+                }
+            } else if (hasAnswer) {
+                statusText = 'Answered';
+                statusClass = 'status-badge-answered';
+            } else if (questionSkipped[qId]) {
+                statusText = 'Skipped';
+                statusClass = 'status-badge-unanswered';
+            }
+
+            badge.className = 'status-dot-badge badge badge-pill ' + statusClass + ' font-weight-bold';
+            badge.textContent = statusText;
+        }
+
+        function ucWords(str) {
+            return str.replace(/\b[a-z]/g, function(letter) {
+                return letter.toUpperCase();
+            });
+        }
+
         // Refresh times and flags on sidebar table
         function updateSidebarDisplay() {
             for (let i = 1; i <= totalQuestions; i++) {
@@ -1701,6 +1931,9 @@
                 } else {
                     document.querySelector('#sidebar-row-' + i + ' .flag-icon').classList.add('d-none');
                 }
+
+                // Update status badge
+                updateSidebarCardStatus(i);
             }
         }
 
