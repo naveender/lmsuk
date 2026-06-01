@@ -216,6 +216,10 @@ class AssessmentController extends Controller
         }
 
         if ($attempt->status === 'completed') {
+            if ($attempt->paper->hide_result) {
+                return redirect()->route('student.topics.subtopics', $attempt->paper->topic_id)
+                    ->with('error', 'Results for this paper are hidden.');
+            }
             return redirect()->route('student.attempts.result', $attempt);
         }
 
@@ -248,7 +252,14 @@ class AssessmentController extends Controller
             }
         }
 
-        return view('student.assessment.take-test', compact('attempt', 'answers', 'remainingSeconds'));
+        $questions = $attempt->paper->questions;
+        if ($attempt->paper->shuffle_questions) {
+            $questions = $questions->sortBy(function($q) use ($attempt) {
+                return md5($q->id . '_' . $attempt->id);
+            })->values();
+        }
+
+        return view('student.assessment.take-test', compact('attempt', 'questions', 'answers', 'remainingSeconds'));
     }
 
     /**
@@ -263,7 +274,35 @@ class AssessmentController extends Controller
 
         $this->saveAnswers($attempt, $request->input('answers', []));
 
-        return response()->json(['success' => true]);
+        $evaluations = [];
+        if ($attempt->paper->allow_instant_feedback) {
+            $evaluations = StudentAnswer::where('paper_attempt_id', $attempt->id)
+                ->with('question.options')
+                ->get()
+                ->map(function($a) {
+                    $q = $a->question;
+                    $correctText = '';
+                    if ($q->type === 'fill_in_the_blanks') {
+                        $correctText = implode(', ', $q->metadata['blank_answers'] ?? []);
+                        if (empty($correctText)) {
+                            $correctText = $q->options->where('is_correct', true)->first()?->option_text ?? '';
+                        }
+                    } else {
+                        $correctText = implode(', ', $q->options->where('is_correct', true)->pluck('option_text')->toArray());
+                    }
+                    return [
+                        'question_id' => $a->question_id,
+                        'is_correct' => $a->is_correct,
+                        'explanation' => $q->explanation,
+                        'correct_answer' => $correctText,
+                    ];
+                });
+        }
+
+        return response()->json([
+            'success' => true,
+            'evaluations' => $evaluations
+        ]);
     }
 
     /**
@@ -320,6 +359,12 @@ class AssessmentController extends Controller
         $attempt->completed_at = now();
         $attempt->save();
 
+        if ($attempt->paper->hide_result) {
+            return redirect()
+                ->route('student.topics.subtopics', $attempt->paper->topic_id)
+                ->with('success', 'Test submitted successfully!');
+        }
+
         return redirect()
             ->route('student.attempts.result', $attempt)
             ->with('success', 'Test submitted successfully!');
@@ -336,11 +381,24 @@ class AssessmentController extends Controller
             abort(403);
         }
 
+        if ($attempt->paper->hide_result) {
+            return redirect()
+                ->route('student.topics.subtopics', $attempt->paper->topic_id)
+                ->with('error', 'Results for this paper are hidden.');
+        }
+
         $answers = StudentAnswer::where('paper_attempt_id', $attempt->id)
             ->get()
             ->keyBy('question_id');
 
-        return view('student.assessment.result', compact('attempt', 'answers'));
+        $questions = $attempt->paper->questions;
+        if ($attempt->paper->shuffle_questions) {
+            $questions = $questions->sortBy(function($q) use ($attempt) {
+                return md5($q->id . '_' . $attempt->id);
+            })->values();
+        }
+
+        return view('student.assessment.result', compact('attempt', 'questions', 'answers'));
     }
 
     /**
@@ -358,55 +416,120 @@ class AssessmentController extends Controller
                 continue;
             }
 
-            $ansData = $answersData[$qId];
-            $selectedOptId = $ansData['selected_option_id'] ?? null;
-            $selectedOptIds = $ansData['selected_options'] ?? null;
-            $ansText = $ansData['answer_text'] ?? null;
-            $qTimeSpent = $ansData['time_spent'] ?? 0;
-            $qIsFlagged = isset($ansData['is_flagged']) ? (bool)$ansData['is_flagged'] : false;
-            $qConfidence = $ansData['confidence'] ?? null;
-
-            // Get paper marks for this question
-            $paperQuestion = DB::table('paper_question')
-                ->where('paper_id', $paper->id)
+            // Get existing response if any
+            $existingAns = StudentAnswer::where('paper_attempt_id', $attempt->id)
                 ->where('question_id', $qId)
                 ->first();
-            $qMarks = $paperQuestion->marks ?? $question->marks ?? $paper->default_marks ?? 1;
 
-            $isCorrect = false;
-            $marksObtained = 0;
+            $isLocked = ($existingAns && !$paper->allow_reattempt_question && $existingAns->confidence !== null && $existingAns->confidence !== '');
 
-            // Auto-grading based on question type
-            if ($question->type === 'single_choice_radio' || $question->type === 'single_choice_dropdown') {
-                if ($selectedOptId) {
-                    $option = QuestionOption::find($selectedOptId);
-                    if ($option && $option->is_correct) {
-                        $isCorrect = true;
-                        $marksObtained = $qMarks;
+            $ansData = $answersData[$qId];
+            $qTimeSpent = $ansData['time_spent'] ?? 0;
+            if ($existingAns) {
+                $qTimeSpent = max($qTimeSpent, $existingAns->time_spent);
+            }
+            $qIsFlagged = isset($ansData['is_flagged']) ? (bool)$ansData['is_flagged'] : false;
+
+            if ($isLocked) {
+                $selectedOptId = $existingAns->selected_option_id;
+                $selectedOptIds = $existingAns->selected_options;
+                $ansText = $existingAns->answer_text;
+                $qConfidence = $existingAns->confidence;
+                $isCorrect = $existingAns->is_correct;
+                $marksObtained = $existingAns->marks_obtained;
+            } else {
+                $selectedOptId = $ansData['selected_option_id'] ?? null;
+                $selectedOptIds = $ansData['selected_options'] ?? null;
+                $ansText = $ansData['answer_text'] ?? null;
+                $qConfidence = $ansData['confidence'] ?? null;
+
+                // Get paper marks for this question
+                $paperQuestion = DB::table('paper_question')
+                    ->where('paper_id', $paper->id)
+                    ->where('question_id', $qId)
+                    ->first();
+                $qMarks = $paperQuestion->marks ?? $question->marks ?? $paper->default_marks ?? 1;
+
+                $isCorrect = false;
+                $marksObtained = 0;
+
+                // Auto-grading based on question type
+                if ($question->type === 'single_choice_radio' || $question->type === 'single_choice_dropdown' || $question->type === 'picture_choice') {
+                    if ($selectedOptId) {
+                        $option = QuestionOption::find($selectedOptId);
+                        if ($option && $option->is_correct) {
+                            $isCorrect = true;
+                            $marksObtained = $qMarks;
+                        }
                     }
-                }
-            } elseif ($question->type === 'multiple_choice') {
-                if (is_array($selectedOptIds) && count($selectedOptIds) > 0) {
-                    $correctOptIds = QuestionOption::where('question_id', $qId)
-                        ->where('is_correct', true)
-                        ->pluck('id')
-                        ->toArray();
-                    
-                    sort($selectedOptIds);
-                    sort($correctOptIds);
-                    if (!empty($correctOptIds) && $selectedOptIds === $correctOptIds) {
-                        $isCorrect = true;
-                        $marksObtained = $qMarks;
+                } elseif ($question->type === 'multiple_choice') {
+                    if (is_array($selectedOptIds) && count($selectedOptIds) > 0) {
+                        $correctOptIds = QuestionOption::where('question_id', $qId)
+                            ->where('is_correct', true)
+                            ->pluck('id')
+                            ->toArray();
+                        
+                        $selectedOptIds = array_map('intval', $selectedOptIds);
+                        $correctOptIds = array_map('intval', $correctOptIds);
+                        sort($selectedOptIds);
+                        sort($correctOptIds);
+                        if (!empty($correctOptIds) && $selectedOptIds === $correctOptIds) {
+                            $isCorrect = true;
+                            $marksObtained = $qMarks;
+                        }
                     }
-                }
-            } elseif ($question->type === 'fill_in_the_blanks' || $question->type === 'matching_text') {
-                if ($ansText !== null) {
-                    $correctOption = QuestionOption::where('question_id', $qId)
-                        ->where('is_correct', true)
-                        ->first();
-                    if ($correctOption && strtolower(trim($ansText)) === strtolower(trim($correctOption->option_text))) {
-                        $isCorrect = true;
-                        $marksObtained = $qMarks;
+                } elseif ($question->type === 'fill_in_the_blanks') {
+                    $correctAnswers = [];
+                    if (isset($question->metadata['blank_answers']) && is_array($question->metadata['blank_answers'])) {
+                        $correctAnswers = $question->metadata['blank_answers'];
+                    } else {
+                        $correctOption = QuestionOption::where('question_id', $qId)
+                            ->where('is_correct', true)
+                            ->first();
+                        if ($correctOption) {
+                            $correctAnswers = [$correctOption->option_text];
+                        }
+                    }
+
+                    $submittedAnswers = [];
+                    if (is_array($ansText)) {
+                        $submittedAnswers = $ansText;
+                    } elseif ($ansText !== null && $ansText !== '') {
+                        $decoded = json_decode($ansText, true);
+                        if (is_array($decoded)) {
+                            $submittedAnswers = $decoded;
+                        } else {
+                            $submittedAnswers = [$ansText];
+                        }
+                    }
+
+                    if (count($correctAnswers) > 0 && count($submittedAnswers) > 0) {
+                        $allCorrect = true;
+                        foreach ($correctAnswers as $idx => $correctAns) {
+                            $studentAns = $submittedAnswers[$idx] ?? '';
+                            if (strtolower(trim($studentAns)) !== strtolower(trim($correctAns))) {
+                                $allCorrect = false;
+                                break;
+                            }
+                        }
+                        if ($allCorrect && count($submittedAnswers) >= count($correctAnswers)) {
+                            $isCorrect = true;
+                            $marksObtained = $qMarks;
+                        }
+                    }
+
+                    if (is_array($ansText)) {
+                        $ansText = json_encode($ansText);
+                    }
+                } elseif ($question->type === 'matching_text') {
+                    if ($ansText !== null) {
+                        $correctOption = QuestionOption::where('question_id', $qId)
+                            ->where('is_correct', true)
+                            ->first();
+                        if ($correctOption && strtolower(trim($ansText)) === strtolower(trim($correctOption->option_text))) {
+                            $isCorrect = true;
+                            $marksObtained = $qMarks;
+                        }
                     }
                 }
             }

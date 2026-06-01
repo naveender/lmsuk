@@ -40,7 +40,7 @@
                             <i class="feather icon-list mr-2 font-medium-2"></i>
                             <div>
                                 <small class="d-block text-uppercase font-weight-bold text-muted" style="font-size: 0.55rem; letter-spacing: 0.5px;">Total Qs</small>
-                                <span class="font-weight-bold" style="font-size: 0.9rem;">{{ $attempt->paper->questions->count() }}</span>
+                                <span class="font-weight-bold" style="font-size: 0.9rem;">{{ $questions->count() }}</span>
                             </div>
                         </div>
 
@@ -74,7 +74,7 @@
                             <i class="feather icon-info mr-2 font-medium-2"></i>
                             <div>
                                 <small class="d-block text-uppercase font-weight-bold text-muted" style="font-size: 0.55rem; letter-spacing: 0.5px;">Unanswered</small>
-                                <span class="font-weight-bold" style="font-size: 0.9rem;" id="stat-unanswered">{{ $attempt->paper->questions->count() }}</span>
+                                <span class="font-weight-bold" style="font-size: 0.9rem;" id="stat-unanswered">{{ $questions->count() }}</span>
                             </div>
                         </div>
                     </div>
@@ -89,7 +89,7 @@
                     <!-- Left Panel: Single Question area -->
                     <div class="col-md-9 col-12 d-flex flex-column left-panel">
                         
-                        @foreach($attempt->paper->questions as $index => $question)
+                        @foreach($questions as $index => $question)
                             @php
                                 $ans = $answers->get($question->id);
                                 $paperQuestion = DB::table('paper_question')
@@ -97,6 +97,35 @@
                                     ->where('question_id', $question->id)
                                     ->first();
                                 $marks = $paperQuestion->marks ?? $question->marks ?? $attempt->paper->default_marks ?? 1;
+                                $isLocked = ($ans && !$attempt->paper->allow_reattempt_question && $ans->confidence !== null && $ans->confidence !== '');
+                                
+                                $description = $question->description;
+                                $hasInlineBlanks = false;
+                                if ($question->type === 'fill_in_the_blanks' && !empty($description)) {
+                                    if (preg_match('/_{3,}/', $description)) {
+                                        $hasInlineBlanks = true;
+                                        $savedAnswers = [];
+                                        if ($ans && $ans->answer_text) {
+                                            $decoded = json_decode($ans->answer_text, true);
+                                            if (is_array($decoded)) {
+                                                $savedAnswers = $decoded;
+                                            } else {
+                                                $savedAnswers = [$ans->answer_text];
+                                            }
+                                        }
+                                        $blankIndex = 0;
+                                        $description = preg_replace_callback('/_{3,}/', function($match) use (&$blankIndex, $savedAnswers, $question, $index, $isLocked) {
+                                            $val = htmlspecialchars($savedAnswers[$blankIndex] ?? '');
+                                            $inputName = "answers[{$question->id}][answer_text][]";
+                                            $inputId = "blank-{$question->id}-{$blankIndex}";
+                                            $readonlyAttr = $isLocked ? 'readonly tabindex="-1"' : '';
+                                            $borderStyle = $isLocked ? 'border: 2px solid #cbd5e1; background-color: #f1f5f9; pointer-events: none;' : 'border: 2px solid #7367f0;';
+                                            $html = '<input type="text" name="' . $inputName . '" id="' . $inputId . '" class="form-control test-input blank-input-field d-inline-block" placeholder="blank ' . ($blankIndex + 1) . '" value="' . $val . '" oninput="checkTextInput(' . ($index + 1) . ', this)" ' . $readonlyAttr . ' style="' . $borderStyle . ' border-radius: 6px; height: 32px; padding: 2px 8px; font-size: 0.95rem; width: 150px; margin: 0 4px; vertical-align: middle;">';
+                                            $blankIndex++;
+                                            return $html;
+                                        }, $description);
+                                    }
+                                }
                             @endphp
 
                             <!-- Question Card -->
@@ -119,7 +148,7 @@
                                 
                                 <!-- Question Description -->
                                 <div class="question-text mb-4 text-dark font-medium-3 leading-relaxed" style="line-height: 1.6; color: #2d3748 !important;">
-                                    {!! $question->description !!}
+                                    {!! $description !!}
                                 </div>
 
                                 <!-- Image if present -->
@@ -156,7 +185,7 @@
                                                 <div class="col-md-6 col-12 mb-3">
                                                     <div class="option-card {{ $isSelected ? 'selected-option-card' : '' }}" 
                                                          id="option-container-{{ $option->id }}" 
-                                                         onclick="selectOption({{ $question->id }}, {{ $option->id }}, '{{ $question->type }}')">
+                                                         onclick="@if($isLocked) return; @else selectOption({{ $question->id }}, {{ $option->id }}, '{{ $question->type }}') @endif">
                                                         
                                                         @if($question->type === 'multiple_choice')
                                                             <input type="checkbox" 
@@ -194,7 +223,11 @@
                                     <!-- Single Choice Dropdown -->
                                     @elseif($question->type === 'single_choice_dropdown')
                                         <div class="form-group col-md-6 col-12 pl-0">
-                                            <select name="answers[{{ $question->id }}][selected_option_id]" class="form-control test-input select-input" onchange="selectDropdownOption({{ $index + 1 }}, this)" style="border: 2px solid #7367f0; border-radius: 8px; height: 46px; font-weight: 500;">
+                                            <select name="answers[{{ $question->id }}][selected_option_id]" 
+                                                    class="form-control test-input select-input" 
+                                                    onchange="selectDropdownOption({{ $index + 1 }}, this)" 
+                                                    @if($isLocked) tabindex="-1" @endif 
+                                                    style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#7367f0' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 8px; height: 46px; font-weight: 500;">
                                                 <option value="">-- Choose Option --</option>
                                                 @foreach($question->options as $option)
                                                     <option value="{{ $option->id }}" {{ ($ans && $ans->selected_option_id == $option->id) ? 'selected' : '' }}>
@@ -206,27 +239,66 @@
 
                                     <!-- Text / Blanks / Free text -->
                                     @else
-                                        <div class="form-group mb-0">
-                                            @if($question->type === 'free_text')
-                                                <textarea name="answers[{{ $question->id }}][answer_text]" 
-                                                          class="form-control test-input text-input" 
-                                                          rows="5" 
-                                                          placeholder="Type your explanation or essay answer here..."
-                                                          oninput="checkTextInput({{ $index + 1 }}, this)"
-                                                          style="border: 2px solid #7367f0; border-radius: 12px; padding: 12px; font-size: 0.95rem;">{{ $ans ? $ans->answer_text : '' }}</textarea>
-                                            @else
-                                                <input type="text" 
-                                                       name="answers[{{ $question->id }}][answer_text]" 
-                                                       class="form-control test-input text-input" 
-                                                       placeholder="Type your answer here..."
-                                                       value="{{ $ans ? $ans->answer_text : '' }}"
-                                                       oninput="checkTextInput({{ $index + 1 }}, this)"
-                                                       style="border: 2px solid #7367f0; border-radius: 8px; height: 46px; font-size: 0.95rem; max-width: 450px;">
-                                            @endif
-                                        </div>
+                                        @if($question->type === 'fill_in_the_blanks' && $hasInlineBlanks)
+                                            <div class="text-muted font-small-3 mt-2"><i class="feather icon-info mr-1 text-info"></i> Please fill in the blanks above.</div>
+                                        @else
+                                            <div class="form-group mb-0">
+                                                @if($question->type === 'free_text')
+                                                    <textarea name="answers[{{ $question->id }}][answer_text]" 
+                                                              class="form-control test-input text-input" 
+                                                              rows="5" 
+                                                              placeholder="Type your explanation or essay answer here..."
+                                                              oninput="checkTextInput({{ $index + 1 }}, this)"
+                                                              @if($isLocked) readonly tabindex="-1" @endif
+                                                              style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#7367f0' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 12px; padding: 12px; font-size: 0.95rem;">{{ $ans ? $ans->answer_text : '' }}</textarea>
+                                                @else
+                                                    <input type="text" 
+                                                           name="answers[{{ $question->id }}][answer_text]" 
+                                                           class="form-control test-input text-input" 
+                                                           placeholder="Type your answer here..."
+                                                           value="{{ $ans ? $ans->answer_text : '' }}"
+                                                           oninput="checkTextInput({{ $index + 1 }}, this)"
+                                                           @if($isLocked) readonly tabindex="-1" @endif
+                                                           style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#7367f0' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 8px; height: 46px; font-size: 0.95rem; max-width: 450px;">
+                                                @endif
+                                            </div>
+                                        @endif
                                     @endif
 
                                 </div>
+
+                                <!-- Instant Feedback Card -->
+                                @php
+                                    $showFeedback = false;
+                                    $feedbackClass = '';
+                                    $feedbackTitle = '';
+                                    $correctValText = '';
+                                    $explanationText = $question->explanation;
+                                    
+                                    if ($attempt->paper->allow_instant_feedback && $ans && $ans->confidence !== null && $ans->confidence !== '') {
+                                        $showFeedback = true;
+                                        $isCorrect = $ans->is_correct;
+                                        $feedbackClass = $isCorrect ? 'bg-light-success border-success text-success' : 'bg-light-danger border-danger text-danger';
+                                        $feedbackTitle = $isCorrect ? 'Correct!' : 'Incorrect';
+                                        
+                                        if ($question->type === 'fill_in_the_blanks') {
+                                            $correctValText = implode(', ', $question->metadata['blank_answers'] ?? []);
+                                            if (empty($correctValText)) {
+                                                $correctValText = $question->options->where('is_correct', true)->first()?->option_text ?? '';
+                                            }
+                                        } else {
+                                            $correctValText = implode(', ', $question->options->where('is_correct', true)->pluck('option_text')->toArray());
+                                        }
+                                    }
+                                @endphp
+                                <div class="instant-feedback-box mt-4 p-3 rounded border {{ $showFeedback ? '' : 'd-none' }} {{ $feedbackClass }}" id="feedback-box-{{ $question->id }}" style="border-width: 2px !important;">
+                                    <h5 class="font-weight-bold feedback-title mb-2">{{ $feedbackTitle }}</h5>
+                                    <p class="mb-2"><strong>Correct Answer:</strong> <span class="feedback-correct-answer font-weight-bold">{{ $correctValText }}</span></p>
+                                    <div class="feedback-explanation p-3 bg-white rounded text-dark font-small-3 border mt-2 {{ $explanationText ? '' : 'd-none' }}" id="feedback-explanation-container-{{ $question->id }}">
+                                        <strong>Explanation:</strong> <span class="explanation-content">{!! $explanationText !!}</span>
+                                    </div>
+                                </div>
+
                             </div>
                         @endforeach
 
@@ -256,7 +328,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($attempt->paper->questions as $index => $question)
+                                        @foreach($questions as $index => $question)
                                             <tr id="sidebar-row-{{ $index + 1 }}" class="clickable-row" onclick="jumpToQuestion({{ $index + 1 }})" style="cursor: pointer; transition: background-color 0.2s;">
                                                 <td class="font-weight-bold p-2 position-relative text-dark" style="font-size: 0.9rem; border-top: 1px solid #f1f5f9;">
                                                     <span class="active-dot d-none bg-primary" style="position: absolute; left: 6px; top: 12px; width: 6px; height: 6px; border-radius: 50%;"></span>
@@ -324,6 +396,20 @@
                             <button type="button" class="btn btn-toolbar-sure d-flex align-items-center shadow-sm" onclick="selectConfidence('sure')">
                                 <i class="feather icon-check-circle mr-2 font-medium-1"></i>
                                 <span class="btn-text">Sure</span>
+                            </button>
+                        </div>
+
+                        <!-- Feedback Loading (Instant Feedback) -->
+                        <div id="feedback-loading-wrapper" class="d-none align-items-center">
+                            <span class="spinner-border spinner-border-sm text-primary mr-2" role="status" aria-hidden="true"></span>
+                            <span class="font-weight-bold text-muted" style="font-size: 0.8rem;">Evaluating answer...</span>
+                        </div>
+
+                        <!-- Continue Button (Instant Feedback) -->
+                        <div id="continue-action-wrapper" class="d-none align-items-center">
+                            <button type="button" class="btn btn-success d-flex align-items-center shadow" onclick="advanceAfterFeedback()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; border: none !important; border-radius: 30px; font-weight: 700; padding: 6px 20px;">
+                                <span class="btn-text mr-2">Continue</span>
+                                <i class="feather icon-arrow-right font-medium-1"></i>
                             </button>
                         </div>
 
@@ -885,14 +971,16 @@
         let elapsedSeconds = {{ max(0, $attempt->time_spent) + (int) $attempt->started_at->diffInSeconds(now()) }}; // countup backup timer if no remaining limit
 
         let currentQuestion = 1;
-        let totalQuestions = @json($attempt->paper->questions->count());
+        let totalQuestions = @json($questions->count());
+        let allowInstantFeedback = @json($attempt->paper->allow_instant_feedback);
+        let allowReattempt = @json($attempt->paper->allow_reattempt_question);
         
         let questionTimes = {}; // maps question ID -> seconds spent
         let questionFlagged = {}; // maps question ID -> is flagged (0 or 1)
         let questionSkipped = {}; // maps question ID -> is skipped (true/false)
 
         // Initialize question times, flagged states from Database values
-        @foreach($attempt->paper->questions as $question)
+        @foreach($questions as $question)
             @php
                 $ans = $answers->get($question->id);
             @endphp
@@ -916,6 +1004,17 @@
 
             // Show first question
             showQuestion(1);
+
+            // Lock inputs for already answered questions if reattempt is not allowed
+            if (!allowReattempt) {
+                document.querySelectorAll('.q-card').forEach(card => {
+                    let qId = card.getAttribute('data-q-id');
+                    let confidence = document.getElementById('confidence-' + qId).value;
+                    if (confidence !== '') {
+                        lockQuestionInputs(card);
+                    }
+                });
+            }
 
             // Start timers
             startOverallTimer();
@@ -1152,18 +1251,28 @@
         function toggleBottomToolbarActions(isAnswered) {
             let skipWrapper = document.getElementById('skip-action-wrapper');
             let confidenceWrapper = document.getElementById('confidence-action-wrapper');
+            let continueWrapper = document.getElementById('continue-action-wrapper');
+            let feedbackLoading = document.getElementById('feedback-loading-wrapper');
             if (!skipWrapper || !confidenceWrapper) return;
 
-            if (isAnswered) {
-                skipWrapper.classList.remove('d-flex');
-                skipWrapper.classList.add('d-none');
-                confidenceWrapper.classList.remove('d-none');
-                confidenceWrapper.classList.add('d-flex');
+            skipWrapper.classList.replace('d-flex', 'd-none');
+            confidenceWrapper.classList.replace('d-flex', 'd-none');
+            if (continueWrapper) continueWrapper.classList.replace('d-flex', 'd-none');
+            if (feedbackLoading) feedbackLoading.classList.replace('d-flex', 'd-none');
+
+            let card = document.getElementById('q-card-' + currentQuestion);
+            if (!card) return;
+            let qId = card.getAttribute('data-q-id');
+            let confidence = document.getElementById('confidence-' + qId).value;
+
+            if (!allowReattempt && confidence !== '') {
+                // Locked question, do not show skip or confidence buttons
             } else {
-                skipWrapper.classList.remove('d-none');
-                skipWrapper.classList.add('d-flex');
-                confidenceWrapper.classList.remove('d-flex');
-                confidenceWrapper.classList.add('d-none');
+                if (isAnswered) {
+                    confidenceWrapper.classList.replace('d-none', 'd-flex');
+                } else {
+                    skipWrapper.classList.replace('d-none', 'd-flex');
+                }
             }
         }
 
@@ -1225,17 +1334,79 @@
             let qId = card.getAttribute('data-q-id');
             document.getElementById('confidence-' + qId).value = level;
 
-            // Trigger background save
-            autoSaveAnswers();
+            if (allowInstantFeedback) {
+                let confidenceWrapper = document.getElementById('confidence-action-wrapper');
+                let feedbackLoading = document.getElementById('feedback-loading-wrapper');
+                if (confidenceWrapper) confidenceWrapper.classList.replace('d-flex', 'd-none');
+                if (feedbackLoading) {
+                    feedbackLoading.classList.remove('d-none');
+                    feedbackLoading.classList.add('d-flex');
+                }
 
-            // Advance question
-            if (currentQuestion < totalQuestions) {
-                showQuestion(currentQuestion + 1);
+                autoSaveAnswers()
+                    .then(data => {
+                        if (feedbackLoading) feedbackLoading.classList.replace('d-flex', 'd-none');
+                        
+                        if (data && data.evaluations) {
+                            let evaluation = data.evaluations.find(e => e.question_id == qId);
+                            if (evaluation) {
+                                let feedbackBox = document.getElementById('feedback-box-' + qId);
+                                if (feedbackBox) {
+                                    feedbackBox.classList.remove('d-none');
+                                    feedbackBox.classList.remove('bg-light-success', 'border-success', 'text-success', 'bg-light-danger', 'border-danger', 'text-danger');
+                                    if (evaluation.is_correct) {
+                                        feedbackBox.classList.add('bg-light-success', 'border-success', 'text-success');
+                                        feedbackBox.querySelector('.feedback-title').textContent = 'Correct!';
+                                    } else {
+                                        feedbackBox.classList.add('bg-light-danger', 'border-danger', 'text-danger');
+                                        feedbackBox.querySelector('.feedback-title').textContent = 'Incorrect';
+                                    }
+                                    
+                                    feedbackBox.querySelector('.feedback-correct-answer').textContent = evaluation.correct_answer;
+                                    
+                                    let explanationBox = document.getElementById('feedback-explanation-container-' + qId);
+                                    if (evaluation.explanation) {
+                                        explanationBox.querySelector('.explanation-content').innerHTML = evaluation.explanation;
+                                        explanationBox.classList.remove('d-none');
+                                    } else {
+                                        explanationBox.classList.add('d-none');
+                                    }
+                                }
+                            }
+                        }
+
+                        if (!allowReattempt) {
+                            lockQuestionInputs(card);
+                        }
+
+                        let continueWrapper = document.getElementById('continue-action-wrapper');
+                        if (continueWrapper) {
+                            continueWrapper.classList.remove('d-none');
+                            continueWrapper.classList.add('d-flex');
+                        }
+                        
+                        updateStatsBanner();
+                    })
+                    .catch(err => {
+                        if (feedbackLoading) feedbackLoading.classList.replace('d-flex', 'd-none');
+                        if (confidenceWrapper) confidenceWrapper.classList.replace('d-none', 'd-flex');
+                        Swal.fire('Error', 'Failed to save answer. Please try again.', 'error');
+                    });
             } else {
-                showQuestion(1); // wrap
-            }
+                autoSaveAnswers();
+                
+                if (!allowReattempt) {
+                    lockQuestionInputs(card);
+                }
 
-            updateStatsBanner();
+                if (currentQuestion < totalQuestions) {
+                    showQuestion(currentQuestion + 1);
+                } else {
+                    showQuestion(1); // wrap
+                }
+
+                updateStatsBanner();
+            }
         }
 
         function markAnswered(qNum) {
@@ -1250,7 +1421,7 @@
             let card = document.getElementById('q-card-' + qNum);
             if (card) {
                 let qId = card.getAttribute('data-q-id');
-                if (element.value.trim() !== '') {
+                if (checkQuestionAnswered(qId)) {
                     questionSkipped[qId] = false;
                     toggleBottomToolbarActions(true);
                 } else {
@@ -1266,7 +1437,7 @@
             let card = document.getElementById('q-card-' + qNum);
             if (card) {
                 let qId = card.getAttribute('data-q-id');
-                if (element.value !== '') {
+                if (checkQuestionAnswered(qId)) {
                     questionSkipped[qId] = false;
                     toggleBottomToolbarActions(true);
                 } else {
@@ -1285,6 +1456,39 @@
 
             let hasAnswer = checkQuestionAnswered(card.getAttribute('data-q-id'));
             document.getElementById('current-input-count').textContent = hasAnswer ? '1' : '0';
+        }
+
+        function lockQuestionInputs(card) {
+            if (!card) return;
+            card.querySelectorAll('.option-card').forEach(box => {
+                box.style.pointerEvents = 'none';
+            });
+            card.querySelectorAll('select').forEach(sel => {
+                sel.style.pointerEvents = 'none';
+                sel.setAttribute('tabindex', '-1');
+                sel.style.backgroundColor = '#f1f5f9';
+                sel.style.borderColor = '#cbd5e1';
+            });
+            card.querySelectorAll('input[type="text"], textarea').forEach(input => {
+                input.readOnly = true;
+                input.setAttribute('tabindex', '-1');
+                input.style.pointerEvents = 'none';
+                input.style.backgroundColor = '#f1f5f9';
+                input.style.borderColor = '#cbd5e1';
+            });
+        }
+
+        function advanceAfterFeedback() {
+            let continueWrapper = document.getElementById('continue-action-wrapper');
+            if (continueWrapper) {
+                continueWrapper.classList.replace('d-flex', 'd-none');
+            }
+
+            if (currentQuestion < totalQuestions) {
+                showQuestion(currentQuestion + 1);
+            } else {
+                showQuestion(1); // wrap
+            }
         }
 
         // Refresh times and flags on sidebar table
@@ -1422,11 +1626,11 @@
         // AJAX background auto-saver
         function autoSaveAnswers() {
             let form = document.getElementById('test-taking-form');
-            if (!form) return;
+            if (!form) return Promise.resolve(null);
 
             let formData = new FormData(form);
             
-            fetch("{{ route('student.attempts.save', $attempt->id) }}", {
+            return fetch("{{ route('student.attempts.save', $attempt->id) }}", {
                 method: "POST",
                 body: formData,
                 headers: {
@@ -1436,9 +1640,11 @@
             .then(response => response.json())
             .then(data => {
                 console.log("Answers auto-saved successfully in background.");
+                return data;
             })
             .catch(error => {
                 console.error("Auto-save error: ", error);
+                throw error;
             });
         }
     </script>

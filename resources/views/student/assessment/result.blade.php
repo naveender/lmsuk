@@ -125,13 +125,14 @@
                     </div>
                 </div>
 
+                @if($attempt->paper->display_result_question_by_question)
                 <!-- Detailed Questions Review -->
                 <div class="card shadow-sm border-0">
                     <div class="card-header bg-transparent border-0 pt-3 pb-0">
                         <h4 class="card-title font-weight-bold text-dark">Question-by-Question Review</h4>
                     </div>
                     <div class="card-body">
-                        @foreach($attempt->paper->questions as $index => $question)
+                        @foreach($questions as $index => $question)
                             @php
                                 $ans = $answers->get($question->id);
                                 $isCorrect = $ans && $ans->is_correct;
@@ -186,14 +187,37 @@
                                                             <span class="text-muted italic">No Answer Selected</span>
                                                         @endif
                                                     @else
-                                                        {{ $ans && $ans->answer_text ? $ans->answer_text : 'No Answer Entered' }}
+                                                        @if($ans && $ans->answer_text)
+                                                            @php
+                                                                $decoded = json_decode($ans->answer_text, true);
+                                                            @endphp
+                                                            @if(is_array($decoded))
+                                                                {{ implode(', ', $decoded) }}
+                                                            @else
+                                                                {{ $ans->answer_text }}
+                                                            @endif
+                                                        @else
+                                                            <span class="text-muted italic">No Answer Entered</span>
+                                                        @endif
                                                     @endif
                                                 </span>
                                             </div>
                                             <div class="col-md-6">
                                                 <span class="font-weight-bold text-secondary d-block mb-1">Correct Answer:</span>
                                                 <span class="text-success font-weight-bold">
-                                                    @if($question->type === 'single_choice_radio' || $question->type === 'single_choice_dropdown' || $question->type === 'picture_choice' || $question->type === 'multiple_choice')
+                                                    @if($question->type === 'fill_in_the_blanks')
+                                                        @php
+                                                            $correctBlanks = $question->metadata['blank_answers'] ?? [];
+                                                        @endphp
+                                                        @if(!empty($correctBlanks))
+                                                            {{ implode(', ', $correctBlanks) }}
+                                                        @else
+                                                            @php
+                                                                $correctOption = $question->options->where('is_correct', true)->first();
+                                                            @endphp
+                                                            {{ $correctOption ? $correctOption->option_text : 'N/A' }}
+                                                        @endif
+                                                    @elseif($question->type === 'single_choice_radio' || $question->type === 'single_choice_dropdown' || $question->type === 'picture_choice' || $question->type === 'multiple_choice')
                                                         @php
                                                             $correctOptions = $question->options->where('is_correct', true)->pluck('option_text')->toArray();
                                                         @endphp
@@ -222,6 +246,7 @@
                         @endforeach
                     </div>
                 </div>
+                @endif
 
             </div>
         </div>
