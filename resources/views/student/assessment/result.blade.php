@@ -153,6 +153,13 @@
                                 </div>
                                 <div class="card-body p-3">
                                     
+                                    <!-- Question Title -->
+                                    @if(!empty($question->title) && trim(strip_tags($question->title)) !== trim(strip_tags($question->description)))
+                                        <h5 class="font-weight-bold text-dark mb-2" style="font-size: 1.1rem; line-height: 1.4;">
+                                            {{ $question->title }}
+                                        </h5>
+                                    @endif
+
                                     <!-- Question Text -->
                                     <div class="question-desc text-dark font-medium-1 mb-3">
                                         {!! $question->description !!}

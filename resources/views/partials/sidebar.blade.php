@@ -23,8 +23,7 @@
             </li>
             <li
                 class="{{ request()->routeIs('admin.users.*') || request()->routeIs('admin.students.*') || request()->routeIs('admin.parents.*') ? 'active' : '' }} nav-item">
-                <a href="#"><i class="feather icon-user"></i><span class="menu-title"
-                        data-i18n="User">User</span></a>
+                <a href="#"><i class="feather icon-user"></i><span class="menu-title" data-i18n="User">User</span></a>
                 <ul class="menu-content">
 
                     <li class="{{ request()->routeIs('admin.users.create') ? 'active' : '' }}"><a
@@ -45,39 +44,39 @@
                     </li>
                 </ul>
             </li>
-            <li
-                class="{{ request()->routeIs('admin.questions.*') ? 'active' : '' }} nav-item"><a href="#"><i class="feather icon-help-circle"></i><span class="menu-title"
-                        data-i18n="Question Bank">Question Bank</span></a>
+            <li class="{{ request()->routeIs('admin.questions.*') ? 'active' : '' }} nav-item"><a href="#"><i
+                        class="feather icon-help-circle"></i><span class="menu-title" data-i18n="Question Bank">Question
+                        Bank</span></a>
                 <ul class="menu-content">
 
                     <li class="{{ request()->routeIs('admin.questions.create') ? 'active' : '' }}"><a
-                            href="{{ route('admin.questions.create') }}"><i class="feather icon-circle"></i><span class="menu-item"
-                                data-i18n="Add New Question">Add New Question</span></a>
+                            href="{{ route('admin.questions.create') }}"><i class="feather icon-circle"></i><span
+                                class="menu-item" data-i18n="Add New Question">Add New Question</span></a>
                     </li>
                     <li class="{{ request()->routeIs('admin.questions.index') ? 'active' : '' }}"><a
-                            href="{{ route('admin.questions.index') }}"><i class="feather icon-circle"></i><span class="menu-item"
-                                data-i18n="Questions Directory">Questions Directory</span></a>
+                            href="{{ route('admin.questions.index') }}"><i class="feather icon-circle"></i><span
+                                class="menu-item" data-i18n="Questions Directory">Questions Directory</span></a>
                     </li>
-                    <li><a href="#"><i
-                                class="feather icon-circle"></i><span class="menu-item"
-                                data-i18n="Import Questions">Import Questions</span></a>
+                    <li class="{{ request()->routeIs('admin.questions.import-form') ? 'active' : '' }}"><a
+                            href="{{ route('admin.questions.import-form') }}"><i class="feather icon-circle"></i><span
+                                class="menu-item" data-i18n="Import Questions">Import Questions</span></a>
                     </li>
                     <li><a href=""><i class="feather icon-circle"></i><span class="menu-item"
                                 data-i18n="Import Using AI">Import Using AI</span></a>
                     </li>
                 </ul>
             </li>
-            <li
-                class="{{ request()->routeIs('admin.papers.*') ? 'active' : '' }} nav-item"><a href="#"><i class="feather icon-file-text"></i><span class="menu-title"
-                        data-i18n="Papers Manager">Papers Manager</span></a>
+            <li class="{{ request()->routeIs('admin.papers.*') ? 'active' : '' }} nav-item"><a href="#"><i
+                        class="feather icon-file-text"></i><span class="menu-title" data-i18n="Papers Manager">Papers
+                        Manager</span></a>
                 <ul class="menu-content">
                     <li class="{{ request()->routeIs('admin.papers.create') ? 'active' : '' }}"><a
-                            href="{{ route('admin.papers.create') }}"><i class="feather icon-circle"></i><span class="menu-item"
-                                data-i18n="Create New Paper">Create New Paper</span></a>
+                            href="{{ route('admin.papers.create') }}"><i class="feather icon-circle"></i><span
+                                class="menu-item" data-i18n="Create New Paper">Create New Paper</span></a>
                     </li>
                     <li class="{{ request()->routeIs('admin.papers.index') ? 'active' : '' }}"><a
-                            href="{{ route('admin.papers.index') }}"><i class="feather icon-circle"></i><span class="menu-item"
-                                data-i18n="Papers Directory">Papers Directory</span></a>
+                            href="{{ route('admin.papers.index') }}"><i class="feather icon-circle"></i><span
+                                class="menu-item" data-i18n="Papers Directory">Papers Directory</span></a>
                     </li>
                 </ul>
             </li>
@@ -91,16 +90,16 @@
                         data-i18n="Create a Report">Create a Report</span></a>
             </li>
             <li class="nav-item">
-                <a href="#"><i class="feather icon-file"></i><span class="menu-title"
-                        data-i18n="Manage Files">Manage Files</span></a>
+                <a href="#"><i class="feather icon-file"></i><span class="menu-title" data-i18n="Manage Files">Manage
+                        Files</span></a>
             </li>
             <li class="nav-item">
                 <a href="#"><i class="feather icon-file-text"></i><span class="menu-title"
                         data-i18n="Invoice Creater">Invoice Creater</span></a>
             </li>
             <li class="nav-item">
-                <a href="#"><i class="feather icon-pie-chart"></i><span class="menu-title"
-                        data-i18n="Cohort Report"> Cohort Report</span></a>
+                <a href="#"><i class="feather icon-pie-chart"></i><span class="menu-title" data-i18n="Cohort Report">
+                        Cohort Report</span></a>
             </li>
             <li class="nav-item">
                 <a href="{{ route('admin.announcements.index') }}"><i class="feather icon-message-square"></i><span
@@ -126,8 +125,8 @@
                             href="{{ route('admin.subjects.index') }}"><i class="feather icon-circle"></i><span
                                 class="menu-item" data-i18n="">Subjects</span></a>
                     </li>
-                    <li class="{{ request()->routeIs('topics') ? 'active' : '' }}"><a
-                            href="{{ route('topics') }}"><i class="feather icon-circle"></i><span class="menu-item"
+                    <li class="{{ request()->routeIs('topics') ? 'active' : '' }}"><a href="{{ route('topics') }}"><i
+                                class="feather icon-circle"></i><span class="menu-item"
                                 data-i18n="Manage Students">Topics/Sub Topics</span></a>
                     </li>
                 </ul>
@@ -138,10 +137,10 @@
                     <li class="#"><a href="#"><i class="feather icon-circle"></i><span class="menu-item"
                                 data-i18n="">Tests/Exam Settings</span></a>
                     </li>
-                   
+
                 </ul>
             </li>
-           
+
         </ul>
     </div>
 </div>

@@ -36,11 +36,14 @@
                 @endif
 
                 <div class="row mb-2">
-                    <div class="col-9">
+                    <div class="col-md-6 col-12">
                         <p>Manage all questions in the question bank.</p>
                     </div>
-                    <div class="col-3">
-                        <a href="{{ route('admin.questions.create') }}" class="btn btn-primary float-right">
+                    <div class="col-md-6 col-12 text-right">
+                        <a href="{{ route('admin.questions.import-form') }}" class="btn btn-outline-primary mr-1">
+                            <i class="feather icon-upload"></i> Import Questions
+                        </a>
+                        <a href="{{ route('admin.questions.create') }}" class="btn btn-primary">
                             <i class="feather icon-plus"></i> Add Question
                         </a>
                     </div>

@@ -159,6 +159,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     // Questions
     Route::get('admin/questions/get-topics/{subjectId?}', [AdminQuestionController::class, 'getTopics'])->name('admin.questions.get-topics');
     Route::get('admin/questions/get-subtopics/{topicId}', [AdminQuestionController::class, 'getSubtopics'])->name('admin.questions.get-subtopics');
+    Route::get('admin/questions/import', [AdminQuestionController::class, 'showImportForm'])->name('admin.questions.import-form');
+    Route::post('admin/questions/import/parse', [AdminQuestionController::class, 'parseImportFile'])->name('admin.questions.import-parse');
+    Route::post('admin/questions/import/process', [AdminQuestionController::class, 'processImportChunk'])->name('admin.questions.import-process');
+    Route::get('admin/questions/import/sample', [AdminQuestionController::class, 'downloadSample'])->name('admin.questions.import-sample');
     Route::resource('admin/questions', AdminQuestionController::class)->names([
         'index'   => 'admin.questions.index',
         'create'  => 'admin.questions.create',

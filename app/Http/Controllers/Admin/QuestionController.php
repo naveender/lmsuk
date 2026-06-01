@@ -393,4 +393,560 @@ class QuestionController extends Controller
             }
         }
     }
+
+    /**
+     * Show the question import form.
+     */
+    public function showImportForm()
+    {
+        $subjects = Subject::where('is_active', true)->orderBy('title')->get();
+        return view('admin.questions.import', compact('subjects'));
+    }
+
+    /**
+     * Download a sample CSV import file.
+     */
+    public function downloadSample()
+    {
+        $headers = [
+            'title', 'description', 'type', 'subject', 'topic', 'subtopic', 'difficulty', 'marks', 'explanation',
+            'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'correct_options',
+            'blank_answers', 'match_left_1', 'match_right_1', 'match_left_2', 'match_right_2',
+            'match_left_3', 'match_right_3', 'match_left_4', 'match_right_4',
+            'word_limit', 'allowed_file_types', 'max_file_size'
+        ];
+
+        $samples = [
+            [
+                'What is the capital of France?',
+                'Choose the correct city from the options below.',
+                'single_choice_radio',
+                'General Knowledge',
+                'Geography',
+                'European Capitals',
+                'easy',
+                '1',
+                'Paris has been the capital of France since the 5th century.',
+                'London', 'Paris', 'Berlin', 'Madrid', '',
+                '2', // Option 2 (Paris) is correct
+                '', '', '', '', '', '', '', '', '', '', '', '', ''
+            ],
+            [
+                'Which of the following are primary colors?',
+                'Select all correct options.',
+                'multiple_choice',
+                'Science',
+                'Physics',
+                'Light and Color',
+                'medium',
+                '2',
+                'Primary colors of light are Red, Green, and Blue. For pigments, they are Red, Yellow, and Blue.',
+                'Red', 'Green', 'Yellow', 'Purple', '',
+                '1,2,3', // Options 1, 2, and 3 are correct
+                '', '', '', '', '', '', '', '', '', '', '', '', ''
+            ],
+            [
+                'Water and Oxygen Chemical Formulas',
+                'The chemical formula for water is ___ and oxygen is ___.',
+                'fill_in_the_blanks',
+                'Science',
+                'Chemistry',
+                'Molecules',
+                'medium',
+                '2',
+                'Water is H2O and Oxygen gas is O2.',
+                '', '', '', '', '', '',
+                'H2O|O2', // Blank answers pipe-separated
+                '', '', '', '', '', '', '', '', '', '', '', ''
+            ],
+            [
+                'Match the country with its capital city.',
+                'Match the items on the left with their correct pairs on the right.',
+                'matching_text',
+                'General Knowledge',
+                'Geography',
+                'Global Capitals',
+                'easy',
+                '2',
+                'Japan - Tokyo, UK - London, France - Paris.',
+                '', '', '', '', '', '', '',
+                'Japan', 'Tokyo', 'United Kingdom', 'London', 'France', 'Paris', '', '', // matching pairs
+                '', '', ''
+            ],
+            [
+                'Write an essay explaining the causes of World War I.',
+                'Provide details of the political tension, alliances, and the assassination in Sarajevo.',
+                'free_text',
+                'History',
+                'World Wars',
+                'WWI Causes',
+                'hard',
+                '5',
+                'Grading should consider depth of alliance systems, militarism, imperialism, and nationalism analysis.',
+                '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+                '500', // Word limit
+                '', ''
+            ]
+        ];
+
+        $callback = function() use ($headers, $samples) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $headers);
+            foreach ($samples as $row) {
+                fputcsv($file, $row);
+            }
+            fclose($file);
+        };
+
+        return response()->streamDownload($callback, 'questions_import_sample.csv', [
+            'Content-Type' => 'text/csv',
+            'Cache-Control' => 'no-cache, must-revalidate',
+            'Expires' => '0',
+        ]);
+    }
+
+    /**
+     * Upload and parse the import file to count rows.
+     */
+    public function parseImportFile(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:10240', // max 10MB
+        ]);
+
+        $file = $request->file('file');
+        
+        // Generate unique token
+        $token = \Illuminate\Support\Str::random(32);
+        $tempDir = storage_path('app/temp_imports');
+        if (!file_exists($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
+        
+        $tempPath = $tempDir . '/import_' . $token . '.csv';
+        $file->move($tempDir, 'import_' . $token . '.csv');
+
+        // Parse file to validate and count rows
+        $rowCount = 0;
+        $headers = [];
+        if (($handle = fopen($tempPath, 'r')) !== false) {
+            // Read headers
+            if (($data = fgetcsv($handle)) !== false) {
+                $headers = array_map('trim', $data);
+            }
+            // Count rows
+            while (fgetcsv($handle) !== false) {
+                $rowCount++;
+            }
+            fclose($handle);
+        }
+
+        // Validate required headers
+        $required = ['title', 'type'];
+        $missing = [];
+        $lowerHeaders = array_map('strtolower', $headers);
+        foreach ($required as $req) {
+            if (!in_array($req, $lowerHeaders)) {
+                $missing[] = $req;
+            }
+        }
+
+        if (!empty($missing)) {
+            if (file_exists($tempPath)) {
+                unlink($tempPath);
+            }
+            return response()->json([
+                'success' => false,
+                'message' => 'Missing required CSV columns: ' . implode(', ', $missing),
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'import_token' => $token,
+            'total_rows' => $rowCount,
+            'headers' => $headers,
+        ]);
+    }
+
+    /**
+     * Process a single chunk of rows during question import.
+     */
+    public function processImportChunk(Request $request)
+    {
+        $request->validate([
+            'import_token' => 'required|string',
+            'offset' => 'required|integer|min:0',
+            'limit' => 'required|integer|min:1',
+        ]);
+
+        $token = $request->input('import_token');
+        $offset = intval($request->input('offset'));
+        $limit = intval($request->input('limit'));
+
+        $tempPath = storage_path('app/temp_imports/import_' . $token . '.csv');
+
+        if (!file_exists($tempPath)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Import session expired or file not found.',
+            ], 400);
+        }
+
+        $results = [
+            'processed' => 0,
+            'success_count' => 0,
+            'failed_count' => 0,
+            'errors' => [],
+            'warnings' => [],
+        ];
+
+        if (($handle = fopen($tempPath, 'r')) !== false) {
+            // Read headers
+            $headers = fgetcsv($handle);
+            $headerMap = [];
+            foreach ($headers as $index => $header) {
+                $normalized = strtolower(trim($header));
+                $normalized = str_replace([' ', '-'], '_', $normalized);
+                $headerMap[$normalized] = $index;
+            }
+
+            // Skip to offset
+            $currentRow = 0;
+            while ($currentRow < $offset && fgetcsv($handle) !== false) {
+                $currentRow++;
+            }
+
+            // Process chunk
+            $processedInChunk = 0;
+            while ($processedInChunk < $limit && ($row = fgetcsv($handle)) !== false) {
+                // Skip completely empty lines
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+                
+                $processedInChunk++;
+                $rowNumber = $offset + $processedInChunk + 1; // +1 for 1-based, +1 for header
+
+                $getValue = function($key, $default = null) use ($row, $headerMap) {
+                    return isset($headerMap[$key]) && isset($row[$headerMap[$key]]) ? trim($row[$headerMap[$key]]) : $default;
+                };
+
+                $title = $getValue('title');
+                $type = $getValue('type');
+
+                if (empty($title)) {
+                    $results['errors'][] = [
+                        'row' => $rowNumber,
+                        'message' => 'Question title is missing.',
+                    ];
+                    $results['failed_count']++;
+                    continue;
+                }
+
+                if (empty($type)) {
+                    $results['errors'][] = [
+                        'row' => $rowNumber,
+                        'message' => 'Question type is missing.',
+                    ];
+                    $results['failed_count']++;
+                    continue;
+                }
+
+                // Normalize type if they wrote friendly text
+                $typeMapping = [
+                    'single choice radio' => 'single_choice_radio',
+                    'single choice dropdown' => 'single_choice_dropdown',
+                    'multiple choice' => 'multiple_choice',
+                    'picture choice' => 'picture_choice',
+                    'fill in the blanks' => 'fill_in_the_blanks',
+                    'matching drag drop' => 'matching_drag_drop',
+                    'matching text' => 'matching_text',
+                    'free text' => 'free_text',
+                    'file upload' => 'file_upload',
+                    'single choice' => 'single_choice_radio',
+                    'mcq' => 'multiple_choice',
+                    'essay' => 'free_text',
+                ];
+
+                $normalizedType = strtolower(str_replace(['_', '-'], ' ', $type));
+                if (isset($typeMapping[$normalizedType])) {
+                    $type = $typeMapping[$normalizedType];
+                }
+
+                if (!array_key_exists($type, Question::TYPES)) {
+                    $results['errors'][] = [
+                        'row' => $rowNumber,
+                        'message' => "Invalid question type: '{$type}'. Allowed types are: " . implode(', ', array_keys(Question::TYPES)),
+                    ];
+                    $results['failed_count']++;
+                    continue;
+                }
+
+                // Handle fill_in_the_blanks normalization and copy question to description
+                $description = $getValue('description');
+                if ($type === 'fill_in_the_blanks') {
+                    // Replace [blank] with ___ (three underscores) in title
+                    $title = str_replace('[blank]', '___', $title);
+                    
+                    if (!empty($description)) {
+                        $description = str_replace('[blank]', '___', $description);
+                        // If description doesn't have blanks but title does, copy title to description
+                        if (strpos($description, '___') === false && strpos($title, '___') !== false) {
+                            $description = $title;
+                        }
+                    } else {
+                        // If description is empty, set description to the question text (with blanks)
+                        $description = $title;
+                    }
+                    
+                    // Truncate title if it exceeds 255 chars
+                    if (strlen($title) > 255) {
+                        $title = mb_substr($title, 0, 250) . '...';
+                    }
+                } else {
+                    // For other types, copy long titles to description if description is empty
+                    if (empty($description) && strlen($title) > 255) {
+                        $description = $title;
+                    }
+                    if (strlen($title) > 255) {
+                        $title = mb_substr($title, 0, 250) . '...';
+                    }
+                }
+
+                // Process subject, topic, subtopic
+                $subjectName = $getValue('subject');
+                $topicName = $getValue('topic');
+                $subtopicName = $getValue('subtopic');
+
+                $subjectId = null;
+                $topicId = null;
+                $subtopicId = null;
+
+                try {
+                    DB::beginTransaction();
+
+                    if (!empty($subjectName)) {
+                        $subject = Subject::whereRaw('LOWER(title) = ?', [strtolower($subjectName)])->first();
+                        if (!$subject) {
+                            $subject = Subject::create([
+                                'title' => $subjectName,
+                                'is_active' => true,
+                            ]);
+                            $results['warnings'][] = [
+                                'row' => $rowNumber,
+                                'message' => "Subject '{$subjectName}' was not found and has been created dynamically.",
+                            ];
+                        }
+                        $subjectId = $subject->id;
+
+                        if (!empty($topicName)) {
+                            $topic = Topic::where('subject_id', $subjectId)
+                                ->where(function($q) {
+                                    $q->whereNull('parent')->orWhere('parent', 0);
+                                })
+                                ->whereRaw('LOWER(name) = ?', [strtolower($topicName)])
+                                ->first();
+
+                            if (!$topic) {
+                                $slug = \Illuminate\Support\Str::slug($topicName);
+                                $originalSlug = $slug;
+                                $count = 1;
+                                while (Topic::where('slug', $slug)->exists()) {
+                                    $slug = $originalSlug . '-' . $count;
+                                    $count++;
+                                }
+                                $topic = Topic::create([
+                                    'name' => $topicName,
+                                    'subject_id' => $subjectId,
+                                    'parent' => null,
+                                    'slug' => $slug,
+                                ]);
+                                $results['warnings'][] = [
+                                    'row' => $rowNumber,
+                                    'message' => "Topic '{$topicName}' was not found under '{$subjectName}' and has been created dynamically.",
+                                ];
+                            }
+                            $topicId = $topic->id;
+
+                            if (!empty($subtopicName)) {
+                                $subtopic = Topic::where('subject_id', $subjectId)
+                                    ->where('parent', $topicId)
+                                    ->whereRaw('LOWER(name) = ?', [strtolower($subtopicName)])
+                                    ->first();
+
+                                if (!$subtopic) {
+                                    $slug = \Illuminate\Support\Str::slug($subtopicName);
+                                    $originalSlug = $slug;
+                                    $count = 1;
+                                    while (Topic::where('slug', $slug)->exists()) {
+                                        $slug = $originalSlug . '-' . $count;
+                                        $count++;
+                                    }
+                                    $subtopic = Topic::create([
+                                        'name' => $subtopicName,
+                                        'subject_id' => $subjectId,
+                                        'parent' => $topicId,
+                                        'slug' => $slug,
+                                    ]);
+                                    $results['warnings'][] = [
+                                        'row' => $rowNumber,
+                                        'message' => "Subtopic '{$subtopicName}' was not found under '{$topicName}' and has been created dynamically.",
+                                    ];
+                                }
+                                $subtopicId = $subtopic->id;
+                            }
+                        }
+                    }
+
+                    // Build metadata
+                    $metadata = [];
+                    if ($type === 'fill_in_the_blanks') {
+                        $blankAnswersStr = $getValue('blank_answers', '');
+                        if (empty($blankAnswersStr)) {
+                            throw new \Exception("Fill in the blanks question requires 'blank_answers' column.");
+                        }
+                        $metadata['blank_answers'] = array_values(array_filter(array_map('trim', explode('|', $blankAnswersStr))));
+                        if (empty($metadata['blank_answers'])) {
+                            // Fallback to commas if no pipes are found
+                            $metadata['blank_answers'] = array_values(array_filter(array_map('trim', explode(',', $blankAnswersStr))));
+                        }
+                    } elseif ($type === 'matching_drag_drop' || $type === 'matching_text') {
+                        $pairs = [];
+                        for ($i = 1; $i <= 4; $i++) {
+                            $left = $getValue("match_left_{$i}");
+                            $right = $getValue("match_right_{$i}");
+                            if (!empty($left) && !empty($right)) {
+                                $pairs[] = ['left' => $left, 'right' => $right];
+                            }
+                        }
+                        if (empty($pairs)) {
+                            throw new \Exception("Matching question requires at least one left-right match pair.");
+                        }
+                        $metadata['matching_pairs'] = $pairs;
+                    } elseif ($type === 'free_text') {
+                        $wordLimitVal = $getValue('word_limit');
+                        $metadata['word_limit'] = !empty($wordLimitVal) ? intval($wordLimitVal) : null;
+                    } elseif ($type === 'file_upload') {
+                        $types = $getValue('allowed_file_types', 'pdf,docx,doc,jpg,png');
+                        $size = $getValue('max_file_size', '5');
+                        $metadata['allowed_file_types'] = array_map('trim', explode(',', $types));
+                        $metadata['max_file_size'] = intval($size);
+                    }
+
+                    // Difficulty
+                    $difficulty = strtolower($getValue('difficulty', 'easy'));
+                    if (!in_array($difficulty, ['easy', 'medium', 'hard'])) {
+                        $difficulty = 'easy';
+                    }
+
+                    // Marks
+                    $marks = intval($getValue('marks', 1));
+                    if ($marks <= 0) {
+                        $marks = 1;
+                    }
+
+                    // Create Question
+                    $question = Question::create([
+                        'title' => $title,
+                        'description' => $description,
+                        'type' => $type,
+                        'subject_id' => $subjectId,
+                        'topic_id' => $topicId,
+                        'subtopic_id' => $subtopicId,
+                        'difficulty' => $difficulty,
+                        'marks' => $marks,
+                        'explanation' => $getValue('explanation'),
+                        'metadata' => !empty($metadata) ? $metadata : null,
+                        'is_active' => true,
+                    ]);
+
+                    // Create Options for choice-based questions
+                    if (in_array($type, ['single_choice_radio', 'single_choice_dropdown', 'multiple_choice'])) {
+                        $optionsList = [];
+                        for ($i = 1; $i <= 5; $i++) {
+                            $optText = $getValue("option_{$i}");
+                            if (!empty($optText)) {
+                                $optionsList[] = $optText;
+                            }
+                        }
+
+                        if (count($optionsList) < 2) {
+                            throw new \Exception("Choice-based question requires at least 2 options.");
+                        }
+
+                        $correctOptionsStr = $getValue('correct_options', '');
+                        if (empty($correctOptionsStr)) {
+                            throw new \Exception("Choice-based question requires at least 1 correct option index (e.g. 1 or A).");
+                        }
+
+                        // Parse correct options indices
+                        $correctIndices = [];
+                        $correctParts = explode(',', $correctOptionsStr);
+                        foreach ($correctParts as $part) {
+                            $part = strtoupper(trim($part));
+                            if (is_numeric($part)) {
+                                $correctIndices[] = intval($part) - 1; // 0-based
+                            } else {
+                                $code = ord($part) - ord('A'); // A=0, B=1...
+                                if ($code >= 0 && $code < 26) {
+                                    $correctIndices[] = $code;
+                                }
+                            }
+                        }
+
+                        foreach ($optionsList as $index => $optText) {
+                            QuestionOption::create([
+                                'question_id' => $question->id,
+                                'option_text' => $optText,
+                                'is_correct' => in_array($index, $correctIndices),
+                                'sort_order' => $index,
+                            ]);
+                        }
+                    }
+
+                    DB::commit();
+                    $results['success_count']++;
+
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    $results['errors'][] = [
+                        'row' => $rowNumber,
+                        'message' => $e->getMessage(),
+                    ];
+                    $results['failed_count']++;
+                }
+            }
+
+            $results['processed'] = $processedInChunk;
+            fclose($handle);
+        }
+
+        // Clean up file if we reached the end
+        $totalLines = 0;
+        if (($handle = fopen($tempPath, 'r')) !== false) {
+            fgetcsv($handle); // skip header
+            while (($row = fgetcsv($handle)) !== false) {
+                if (!empty(array_filter($row))) {
+                    $totalLines++;
+                }
+            }
+            fclose($handle);
+        }
+
+        if ($offset + $limit >= $totalLines) {
+            if (file_exists($tempPath)) {
+                unlink($tempPath);
+            }
+            $results['completed'] = true;
+        } else {
+            $results['completed'] = false;
+        }
+
+        return response()->json([
+            'success' => true,
+            'results' => $results,
+        ]);
+    }
 }
+
