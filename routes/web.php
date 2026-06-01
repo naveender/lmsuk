@@ -30,6 +30,7 @@ use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 Route::get('/', function () {
     return view('auth.login');
 });
+Route::post('/register/check-username', [App\Http\Controllers\Auth\RegisterUsernameController::class, 'check'])->name('register.check-username');
 // Route::get('/register', function () {
 //     return view('auth.register');
 // });
@@ -190,6 +191,14 @@ Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
      Route::get('/student/analytics', [StudentAnalyticsController::class, 'index'])->name('student.analytics');
 
      Route::get('/student/assessments', [StudentAssessmentsController::class, 'index'])->name('student.assessments');
+     Route::get('/student/assessments/{subject}/topics', [StudentAssessmentsController::class, 'topics'])->name('student.assessments.topics');
+     Route::get('/student/topics/{topic}/subtopics', [StudentAssessmentsController::class, 'subtopics'])->name('student.topics.subtopics');
+     Route::post('/student/papers/{paper}/start', [StudentAssessmentsController::class, 'startTest'])->name('student.papers.start');
+     Route::get('/student/attempts/{attempt}', [StudentAssessmentsController::class, 'takeTest'])->name('student.attempts.take');
+     Route::post('/student/attempts/{attempt}/save', [StudentAssessmentsController::class, 'saveTest'])->name('student.attempts.save');
+     Route::post('/student/attempts/{attempt}/pause', [StudentAssessmentsController::class, 'pauseTest'])->name('student.attempts.pause');
+     Route::post('/student/attempts/{attempt}/submit', [StudentAssessmentsController::class, 'submitTest'])->name('student.attempts.submit');
+     Route::get('/student/attempts/{attempt}/result', [StudentAssessmentsController::class, 'result'])->name('student.attempts.result');
      Route::get('/student/focus-areas', [StudentFocusAreasController::class, 'index'])->name('student.focusareas');
      Route::get('/student/announcements', [StudentAnnouncementsController::class, 'index'])->name('student.announcements');
      Route::get('/student/centretestscores', [StudentCentreTestScoreController::class, 'index'])->name('student.centretestscores');
