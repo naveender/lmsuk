@@ -485,7 +485,7 @@
     <!-- Instructions Modal -->
     <div class="modal fade" id="instructionsModal" tabindex="-1" role="dialog" aria-labelledby="instructionsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden; background-color: #ffffff;">
+            <div class="modal-content border-0 shadow-lg instructions-modal-content">
                 <!-- Header Banner -->
                 <div class="modal-header text-white px-4 py-3" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 0;">
                     <div class="d-flex align-items-center">
@@ -503,34 +503,34 @@
                 </div>
                 <form id="modal-start-form" method="POST" action="">
                     @csrf
-                    <div class="modal-body text-dark p-4" style="background-color: #f8fafc;">
+                    <div class="modal-body modal-body-custom p-4">
                         
                         <!-- Paper Card Summary -->
-                        <div class="paper-summary-card p-4 mb-4" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);">
-                            <h3 class="font-weight-extrabold mb-3" id="modal-paper-title" style="font-size: 1.5rem; color: #1e293b; line-height: 1.3;">Paper Title</h3>
+                        <div class="paper-summary-card p-4 mb-4">
+                            <h3 class="font-weight-extrabold mb-3" id="modal-paper-title" style="font-size: 1.5rem; line-height: 1.3;">Paper Title</h3>
                             
                             <div class="d-flex align-items-center flex-wrap" style="gap: 12px; margin-top: 15px;">
-                                <div class="stat-pill-modern d-flex align-items-center px-3 py-2" style="background-color: #f1f5f9; border-radius: 10px; border: 1px solid #e2e8f0; gap: 8px;">
+                                <div class="stat-pill-modern d-flex align-items-center px-3 py-2" style="gap: 8px;">
                                     <i class="feather icon-help-circle text-primary" style="font-size: 1.15rem; margin-top: 2px;"></i>
                                     <div>
                                         <div class="text-muted font-small-1 text-uppercase font-weight-bold" style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Questions</div>
-                                        <span class="font-weight-bold text-dark font-small-3" id="modal-paper-questions" style="font-size: 0.85rem;">0</span>
+                                        <span class="font-weight-bold text-dark font-small-3 modal-stat-value" id="modal-paper-questions" style="font-size: 0.85rem;">0</span>
                                     </div>
                                 </div>
 
-                                <div class="stat-pill-modern d-flex align-items-center px-3 py-2" style="background-color: #f1f5f9; border-radius: 10px; border: 1px solid #e2e8f0; gap: 8px;">
+                                <div class="stat-pill-modern d-flex align-items-center px-3 py-2" style="gap: 8px;">
                                     <i class="feather icon-clock text-success" style="font-size: 1.15rem; margin-top: 2px;"></i>
                                     <div>
                                         <div class="text-muted font-small-1 text-uppercase font-weight-bold" style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Duration</div>
-                                        <span class="font-weight-bold text-dark font-small-3" id="modal-paper-time" style="font-size: 0.85rem;">0 mins</span>
+                                        <span class="font-weight-bold text-dark font-small-3 modal-stat-value" id="modal-paper-time" style="font-size: 0.85rem;">0 mins</span>
                                     </div>
                                 </div>
 
-                                <div class="stat-pill-modern d-flex align-items-center px-3 py-2" style="background-color: #f1f5f9; border-radius: 10px; border: 1px solid #e2e8f0; gap: 8px;">
+                                <div class="stat-pill-modern d-flex align-items-center px-3 py-2" style="gap: 8px;">
                                     <i class="feather icon-award text-warning" id="modal-paper-difficulty-icon" style="font-size: 1.15rem; margin-top: 2px;"></i>
                                     <div>
                                         <div class="text-muted font-small-1 text-uppercase font-weight-bold" style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Difficulty</div>
-                                        <span class="font-weight-bold text-dark font-small-3" id="modal-paper-difficulty" style="font-size: 0.85rem;">Medium</span>
+                                        <span class="font-weight-bold text-dark font-small-3 modal-stat-value" id="modal-paper-difficulty" style="font-size: 0.85rem;">Medium</span>
                                     </div>
                                 </div>
                             </div>
@@ -539,25 +539,25 @@
                         <!-- Instructions Header -->
                         <div class="d-flex align-items-center mb-3">
                             <div style="width: 4px; height: 16px; background-color: #7367f0; border-radius: 2px;" class="mr-2"></div>
-                            <h5 class="font-weight-extrabold text-dark mb-0" style="font-size: 1.1rem; letter-spacing: -0.2px;">Guidelines & Instructions</h5>
+                            <h5 class="font-weight-extrabold mb-0 instructions-heading" style="font-size: 1.1rem; letter-spacing: -0.2px;">Guidelines & Instructions</h5>
                         </div>
 
                         <!-- Instruction Rich Text container -->
-                        <div class="rich-text-container p-4 rounded mb-4" style="background-color: #ffffff; border: 1px solid #e2e8f0; max-height: 300px; overflow-y: auto; box-shadow: inset 0 2px 8px rgba(0,0,0,0.01);" id="modal-paper-instruction">
+                        <div class="rich-text-container p-4 rounded mb-4" id="modal-paper-instruction">
                             <!-- Dynamic Content -->
                         </div>
 
                         <!-- Crucial Notice Box -->
-                        <div class="alert alert-warning d-flex align-items-start border-0 p-3 mb-0" style="background-color: #fff9e6; border-radius: 12px; border-left: 4px solid #ffc107 !important; gap: 12px;">
+                        <div class="alert alert-warning d-flex align-items-start border-0 p-3 mb-0 modal-notice-box" style="gap: 12px;">
                             <i class="feather icon-alert-triangle text-warning font-medium-3 mt-1"></i>
                             <div>
                                 <h6 class="font-weight-bold text-warning mb-1" style="font-size: 0.9rem;">Important Notice</h6>
-                                <p class="text-muted font-small-3 mb-0" style="line-height: 1.4;">Starting the test initiates a timer that cannot be paused. Ensure you have a stable internet connection and are in a quiet environment before proceeding.</p>
+                                <p class="text-muted font-small-3 mb-0 modal-notice-text" style="line-height: 1.4;">Starting the test initiates a timer that cannot be paused. Ensure you have a stable internet connection and are in a quiet environment before proceeding.</p>
                             </div>
                         </div>
 
                     </div>
-                    <div class="modal-footer bg-light d-flex justify-content-between p-3" style="border-top: 1px solid #e2e8f0;">
+                    <div class="modal-footer d-flex justify-content-between p-3">
                         <button type="button" class="btn btn-outline-secondary px-4 py-2 font-weight-bold" data-dismiss="modal" style="border-radius: 8px; font-size: 0.9rem;">Cancel</button>
                         <button type="submit" class="btn btn-primary px-4 py-2 font-weight-bold d-flex align-items-center" style="background: linear-gradient(135deg, #7367f0 0%, #4f46e5 100%) !important; border: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(115, 103, 240, 0.2); font-size: 0.9rem;">
                             Start Test Now <i class="feather icon-play-circle ml-2 font-medium-1"></i>
@@ -572,10 +572,48 @@
 @push('styles')
     <style>
         /* Custom Styling for Rich Text inside Instructions Modal */
+        .instructions-modal-content {
+            border-radius: 20px !important;
+        }
+
+        .modal-body-custom {
+            background-color: #f8fafc;
+        }
+
+        .paper-summary-card {
+            background: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 16px; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        }
+
+        #modal-paper-title {
+            color: #1e293b;
+        }
+
+        .stat-pill-modern {
+            background-color: #f1f5f9; 
+            border-radius: 10px; 
+            border: 1px solid #e2e8f0;
+        }
+
+        .modal-stat-value {
+            color: #1e293b !important;
+        }
+
+        .instructions-heading {
+            color: #1e293b;
+        }
+
         .rich-text-container {
             font-size: 0.95rem;
             color: #334155;
             line-height: 1.7;
+            background-color: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            max-height: 300px; 
+            overflow-y: auto; 
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.01);
         }
 
         .rich-text-container p {
@@ -628,6 +666,16 @@
             font-weight: 600;
         }
 
+        .modal-notice-box {
+            background-color: #fff9e6; 
+            border-radius: 12px; 
+            border-left: 4px solid #ffc107 !important;
+        }
+
+        .modal-notice-text {
+            color: #64748b;
+        }
+
         /* Beautiful Scrollbar for Rich Text Container */
         .rich-text-container::-webkit-scrollbar {
             width: 8px;
@@ -642,6 +690,74 @@
         }
         .rich-text-container::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
+        }
+
+        /* DARK THEME SUPPORT OVERRIDES */
+        .dark-layout .instructions-modal-content {
+            background-color: #1e2440 !important;
+        }
+
+        .dark-layout .modal-body-custom {
+            background-color: #10163a;
+        }
+
+        .dark-layout .paper-summary-card {
+            background-color: #1e2440;
+            border-color: #2c3558;
+            box-shadow: none;
+        }
+
+        .dark-layout #modal-paper-title {
+            color: #f1f5f9;
+        }
+
+        .dark-layout .stat-pill-modern {
+            background-color: #10163a;
+            border-color: #2c3558;
+        }
+
+        .dark-layout .modal-stat-value {
+            color: #f1f5f9 !important;
+        }
+
+        .dark-layout .instructions-heading {
+            color: #f1f5f9;
+        }
+
+        .dark-layout .rich-text-container {
+            background-color: #181d36;
+            border-color: #2c3558;
+            color: #cbd5e1;
+            box-shadow: none;
+        }
+
+        .dark-layout .rich-text-container h1,
+        .dark-layout .rich-text-container h2,
+        .dark-layout .rich-text-container h3,
+        .dark-layout .rich-text-container h4,
+        .dark-layout .rich-text-container h5,
+        .dark-layout .rich-text-container h6,
+        .dark-layout .rich-text-container strong {
+            color: #f1f5f9;
+        }
+
+        .dark-layout .rich-text-container blockquote {
+            background-color: #10163a;
+            color: #94a3b8;
+        }
+
+        .dark-layout .modal-notice-box {
+            background-color: rgba(255, 193, 7, 0.08);
+            border-left-color: #ffc107 !important;
+        }
+
+        .dark-layout .modal-notice-text {
+            color: #94a3b8;
+        }
+
+        .dark-layout .modal-footer {
+            background-color: #1e2440 !important;
+            border-top-color: #2c3558 !important;
         }
 
         /* Breadcrumbs Modern styling */
