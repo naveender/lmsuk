@@ -237,6 +237,153 @@
                                             </select>
                                         </div>
 
+                                    <!-- Matching Text -->
+                                    @elseif($question->type === 'matching_text')
+                                        <div class="matching-text-container">
+                                            @php
+                                                $pairs = $question->metadata['matching_pairs'] ?? [];
+                                                // Extract all right values and shuffle them for the dropdown options
+                                                $rightOptions = collect($pairs)->pluck('right')->shuffle()->all();
+                                                $savedMatches = [];
+                                                if ($ans && $ans->answer_text) {
+                                                    $decoded = json_decode($ans->answer_text, true);
+                                                    if (is_array($decoded)) {
+                                                        $savedMatches = $decoded;
+                                                    } else {
+                                                        $savedMatches = [$ans->answer_text];
+                                                    }
+                                                }
+                                            @endphp
+                                            <div class="row">
+                                                @foreach($pairs as $pairIndex => $pair)
+                                                    <div class="col-md-6 col-12 mb-3">
+                                                        <div class="p-3 border rounded d-flex align-items-center justify-content-between" style="border-radius: 8px; background-color: rgba(115, 103, 240, 0.04); border-color: #e2e8f0;">
+                                                            <span class="font-weight-bold text-dark font-medium-1" style="font-size: 0.9rem;">{{ $pair['left'] }}</span>
+                                                            <i class="feather icon-arrow-right text-primary mx-2"></i>
+                                                            <select name="answers[{{ $question->id }}][answer_text][]" 
+                                                                    class="form-control test-input select-input matching-select" 
+                                                                    onchange="selectDropdownOption({{ $index + 1 }}, this)"
+                                                                    @if($isLocked) tabindex="-1" @endif
+                                                                    style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#7367f0' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 8px; width: 180px; height: 38px; font-weight: 500; font-size: 0.85rem;">
+                                                                <option value="">-- Match --</option>
+                                                                @foreach($rightOptions as $opt)
+                                                                    <option value="{{ $opt }}" {{ ($savedMatches[$pairIndex] ?? '') === $opt ? 'selected' : '' }}>
+                                                                        {{ $opt }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                    <!-- Matching Drag and Drop -->
+                                    @elseif($question->type === 'matching_drag_drop')
+                                        <div class="matching-drag-drop-container" id="matching-container-{{ $question->id }}">
+                                            @php
+                                                $pairs = $question->metadata['matching_pairs'] ?? [];
+                                                $savedMatches = [];
+                                                if ($ans && $ans->answer_text) {
+                                                    $decoded = json_decode($ans->answer_text, true);
+                                                    if (is_array($decoded)) {
+                                                        $savedMatches = $decoded;
+                                                    } else {
+                                                        $savedMatches = [$ans->answer_text];
+                                                    }
+                                                }
+                                                
+                                                // Find which right items are already matched
+                                                $matchedRightItems = array_filter($savedMatches);
+                                                
+                                                // Draggable right items are those that are NOT already matched, shuffled
+                                                $allRightItems = collect($pairs)->pluck('right')->all();
+                                                $unmatchedRightItems = collect($allRightItems)
+                                                    ->filter(fn($item) => !in_array($item, $matchedRightItems))
+                                                    ->shuffle()
+                                                    ->all();
+                                            @endphp
+
+                                            <div class="row">
+                                                <!-- Targets Column (Left Items) -->
+                                                <div class="col-md-7 col-12">
+                                                    <h6 class="font-weight-bold text-muted mb-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">MATCHING TARGETS</h6>
+                                                    @foreach($pairs as $pairIndex => $pair)
+                                                        @php
+                                                            $savedMatchVal = $savedMatches[$pairIndex] ?? '';
+                                                        @endphp
+                                                        <!-- Hidden input to store match value -->
+                                                        <input type="hidden" 
+                                                               name="answers[{{ $question->id }}][answer_text][]" 
+                                                               id="matching-hidden-{{ $question->id }}-{{ $pairIndex }}" 
+                                                               value="{{ $savedMatchVal }}"
+                                                               class="matching-hidden-input">
+
+                                                        <div class="d-flex align-items-center mb-3 p-2 border rounded bg-white target-row" style="border-radius: 8px; border-color: #edf2f7;">
+                                                            <!-- Left Item Text -->
+                                                            <div class="font-weight-bold text-dark px-3 py-2 rounded flex-grow-1" style="min-width: 120px; font-size: 0.9rem; background-color: #f8fafc; border: 1px solid #edf2f7;">
+                                                                {{ $pair['left'] }}
+                                                            </div>
+                                                            
+                                                            <i class="feather icon-link text-muted mx-3"></i>
+                                                            
+                                                            <!-- Drop Zone / Match Zone -->
+                                                            <div class="drop-zone border-dashed d-flex align-items-center justify-content-center" 
+                                                                 data-question-id="{{ $question->id }}"
+                                                                 data-pair-index="{{ $pairIndex }}"
+                                                                 ondragover="allowDrop(event)"
+                                                                 ondrop="handleDrop(event)"
+                                                                 onclick="handleDropzoneClick(this)"
+                                                                 style="border: 2px dashed #7367f0; border-radius: 8px; width: 180px; min-height: 42px; background-color: #fbfaff; cursor: pointer; transition: all 0.2s; padding: 4px;">
+                                                                
+                                                                @if($savedMatchVal)
+                                                                    <div class="draggable-card p-2 bg-primary text-white font-weight-bold text-center rounded matched-card" 
+                                                                         draggable="{{ $isLocked ? 'false' : 'true' }}"
+                                                                         ondragstart="handleDragStart(event)"
+                                                                         onclick="handleCardClick(event, this)"
+                                                                         data-value="{{ $savedMatchVal }}"
+                                                                         data-question-id="{{ $question->id }}"
+                                                                         style="cursor: grab; width: 100%; font-size: 0.85rem; border-radius: 6px; box-shadow: 0 2px 4px rgba(115,103,240,0.2);">
+                                                                        {{ $savedMatchVal }}
+                                                                    </div>
+                                                                @else
+                                                                    <span class="text-muted font-small-2 drag-placeholder">Drop or click here</span>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+
+                                                <!-- Draggables Pool Column (Right Items) -->
+                                                <div class="col-md-5 col-12">
+                                                    <h6 class="font-weight-bold text-muted mb-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">DRAG OR CLICK ITEMS</h6>
+                                                    <div class="draggables-pool p-3 border rounded d-flex flex-wrap align-content-start" 
+                                                         data-question-id="{{ $question->id }}"
+                                                         ondragover="allowDrop(event)"
+                                                         ondrop="handleReturnToPool(event)"
+                                                         onclick="handlePoolClick(this)"
+                                                         style="min-height: 150px; border-radius: 8px; background-color: #f8fafc; border-color: #e2e8f0; gap: 8px;">
+                                                        
+                                                        @foreach($unmatchedRightItems as $rightItem)
+                                                            <div class="draggable-card p-2 bg-white text-primary font-weight-bold text-center border border-primary rounded" 
+                                                                 draggable="{{ $isLocked ? 'false' : 'true' }}"
+                                                                 ondragstart="handleDragStart(event)"
+                                                                 onclick="handleCardClick(event, this)"
+                                                                 data-value="{{ $rightItem }}"
+                                                                 data-question-id="{{ $question->id }}"
+                                                                 style="cursor: grab; width: fit-content; max-width: 100%; font-size: 0.85rem; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-width: 2px !important; transition: all 0.2s;">
+                                                                {{ $rightItem }}
+                                                            </div>
+                                                        @endforeach
+                                                        
+                                                        @if(count($unmatchedRightItems) === 0 && count($matchedRightItems) === 0)
+                                                            <span class="text-muted font-small-2 pool-empty-message">No matching items found.</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     <!-- Text / Blanks / Free text -->
                                     @else
                                         @if($question->type === 'fill_in_the_blanks' && $hasInlineBlanks)
@@ -961,6 +1108,27 @@
         .swal2-container {
             z-index: 999999 !important;
         }
+
+        /* Drag and Drop Styles */
+        .border-dashed {
+            border-style: dashed !important;
+        }
+        .drop-zone:hover {
+            background-color: #f1efff !important;
+            border-color: #4839eb !important;
+        }
+        .drop-zone.drag-active {
+            background-color: #eef2ff !important;
+            border-color: #7367f0 !important;
+        }
+        .draggable-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.08) !important;
+        }
+        .draggable-card.selected-card {
+            border-color: #28c76f !important;
+            box-shadow: 0 0 0 3px rgba(40, 199, 111, 0.25) !important;
+        }
     </style>
 @endpush
 
@@ -1240,11 +1408,27 @@
             if (!card) return false;
 
             let radioChecked = card.querySelector('input[type="radio"]:checked');
-            let selectVal = card.querySelector('select');
-            let textVal = card.querySelector('input[type="text"], textarea');
             let checkboxChecked = card.querySelector('input[type="checkbox"]:checked');
+            
+            // Check if any select has a value
+            let selectValued = false;
+            card.querySelectorAll('select').forEach(sel => {
+                if (sel.value !== '') selectValued = true;
+            });
 
-            return !!(radioChecked || (selectVal && selectVal.value !== '') || (textVal && textVal.value.trim() !== '') || checkboxChecked);
+            // Check if any text/textarea input has text
+            let textValued = false;
+            card.querySelectorAll('input[type="text"], textarea').forEach(txt => {
+                if (txt.value.trim() !== '') textValued = true;
+            });
+
+            // Check if any matching hidden input has value
+            let matchingValued = false;
+            card.querySelectorAll('.matching-hidden-input').forEach(hidden => {
+                if (hidden.value !== '') matchingValued = true;
+            });
+
+            return !!(radioChecked || checkboxChecked || selectValued || textValued || matchingValued);
         }
 
         // Toggle actions bar between Skip and Certainty options
@@ -1476,6 +1660,14 @@
                 input.style.backgroundColor = '#f1f5f9';
                 input.style.borderColor = '#cbd5e1';
             });
+            card.querySelectorAll('.draggable-card').forEach(c => {
+                c.setAttribute('draggable', 'false');
+                c.style.pointerEvents = 'none';
+                c.style.cursor = 'default';
+            });
+            card.querySelectorAll('.drop-zone, .draggables-pool').forEach(zone => {
+                zone.style.pointerEvents = 'none';
+            });
         }
 
         function advanceAfterFeedback() {
@@ -1646,6 +1838,181 @@
                 console.error("Auto-save error: ", error);
                 throw error;
             });
+        }
+
+        // HTML5 Drag and Drop API handlers
+        let activeDraggedElement = null;
+        let activeSelectedCard = null;
+
+        function handleDragStart(e) {
+            @if($isLocked) e.preventDefault(); return; @endif
+            activeDraggedElement = e.target;
+            e.dataTransfer.setData("text/plain", e.target.getAttribute("data-value"));
+            e.dataTransfer.effectAllowed = "move";
+        }
+
+        function allowDrop(e) {
+            e.preventDefault();
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            @if($isLocked) return; @endif
+
+            let dropzone = e.target.closest('.drop-zone');
+            if (!dropzone) return;
+
+            let questionId = dropzone.getAttribute('data-question-id');
+            let pairIndex = dropzone.getAttribute('data-pair-index');
+
+            if (!activeDraggedElement) return;
+            if (activeDraggedElement.getAttribute('data-question-id') != questionId) return;
+
+            performMatch(dropzone, activeDraggedElement, questionId, pairIndex);
+            activeDraggedElement = null;
+        }
+
+        function handleReturnToPool(e) {
+            e.preventDefault();
+            @if($isLocked) return; @endif
+
+            let pool = e.target.closest('.draggables-pool');
+            if (!pool) return;
+
+            let questionId = pool.getAttribute('data-question-id');
+
+            if (!activeDraggedElement) return;
+            if (activeDraggedElement.getAttribute('data-question-id') != questionId) return;
+
+            returnCardToPool(pool, activeDraggedElement, questionId);
+            activeDraggedElement = null;
+        }
+
+        // Click to Match implementation (highly accessible and mobile friendly)
+        function handleCardClick(e, card) {
+            e.stopPropagation();
+            @if($isLocked) return; @endif
+
+            let questionId = card.getAttribute('data-question-id');
+
+            // Toggle select state
+            if (activeSelectedCard === card) {
+                card.classList.remove('selected-card');
+                activeSelectedCard = null;
+            } else {
+                if (activeSelectedCard) {
+                    activeSelectedCard.classList.remove('selected-card');
+                }
+                card.classList.add('selected-card');
+                activeSelectedCard = card;
+            }
+        }
+
+        function handleDropzoneClick(dropzone) {
+            @if($isLocked) return; @endif
+            if (!activeSelectedCard) {
+                // If they click a matched card inside the dropzone, we return it to the pool
+                let matchedCard = dropzone.querySelector('.draggable-card');
+                if (matchedCard) {
+                    let questionId = dropzone.getAttribute('data-question-id');
+                    let pool = document.querySelector(`.draggables-pool[data-question-id="${questionId}"]`);
+                    if (pool) {
+                        returnCardToPool(pool, matchedCard, questionId);
+                    }
+                }
+                return;
+            }
+
+            let questionId = dropzone.getAttribute('data-question-id');
+            let pairIndex = dropzone.getAttribute('data-pair-index');
+
+            if (activeSelectedCard.getAttribute('data-question-id') != questionId) return;
+
+            performMatch(dropzone, activeSelectedCard, questionId, pairIndex);
+            activeSelectedCard.classList.remove('selected-card');
+            activeSelectedCard = null;
+        }
+
+        function handlePoolClick(pool) {
+            @if($isLocked) return; @endif
+            if (!activeSelectedCard) return;
+
+            let questionId = pool.getAttribute('data-question-id');
+            if (activeSelectedCard.getAttribute('data-question-id') != questionId) return;
+
+            // Only return to pool if it's currently inside a dropzone
+            if (activeSelectedCard.closest('.drop-zone')) {
+                returnCardToPool(pool, activeSelectedCard, questionId);
+                activeSelectedCard.classList.remove('selected-card');
+                activeSelectedCard = null;
+            }
+        }
+
+        function performMatch(dropzone, card, questionId, pairIndex) {
+            let hiddenInput = document.getElementById(`matching-hidden-${questionId}-${pairIndex}`);
+            if (!hiddenInput) return;
+
+            // Check if dropzone already has a matched card
+            let existingCard = dropzone.querySelector('.draggable-card');
+            let pool = document.querySelector(`.draggables-pool[data-question-id="${questionId}"]`);
+
+            if (existingCard) {
+                if (existingCard === card) return; // dropped on itself
+                // Return existing card to pool
+                returnCardToPool(pool, existingCard, questionId);
+            }
+
+            // Remove placeholder if present
+            let placeholder = dropzone.querySelector('.drag-placeholder');
+            if (placeholder) placeholder.style.display = 'none';
+
+            // Add classes for styling
+            card.classList.add('matched-card');
+            card.classList.remove('bg-white', 'text-primary', 'border', 'border-primary');
+            card.classList.add('bg-primary', 'text-white');
+            card.style.width = '100%';
+
+            // Append card to dropzone
+            dropzone.appendChild(card);
+
+            // Update hidden input value
+            hiddenInput.value = card.getAttribute('data-value');
+
+            // Check input status for test validation
+            let cardElement = document.querySelector(`.q-card[data-q-id="${questionId}"]`);
+            if (cardElement) {
+                let qNum = cardElement.getAttribute('data-q-num');
+                checkTextInput(qNum, null);
+            }
+        }
+
+        function returnCardToPool(pool, card, questionId) {
+            // Find the dropzone it was in and clear its hidden input
+            let dropzone = card.closest('.drop-zone');
+            if (dropzone) {
+                let pairIndex = dropzone.getAttribute('data-pair-index');
+                let hiddenInput = document.getElementById(`matching-hidden-${questionId}-${pairIndex}`);
+                if (hiddenInput) hiddenInput.value = '';
+
+                // Restore placeholder text in the dropzone
+                let placeholder = dropzone.querySelector('.drag-placeholder');
+                if (placeholder) placeholder.style.display = 'block';
+            }
+
+            // Style back as pool item
+            card.classList.remove('matched-card', 'bg-primary', 'text-white');
+            card.classList.add('bg-white', 'text-primary', 'border', 'border-primary');
+            card.style.width = 'auto';
+
+            // Append to pool
+            pool.appendChild(card);
+
+            // Check input status for test validation
+            let cardElement = document.querySelector(`.q-card[data-q-id="${questionId}"]`);
+            if (cardElement) {
+                let qNum = cardElement.getAttribute('data-q-num');
+                checkTextInput(qNum, null);
+            }
         }
     </script>
 @endpush

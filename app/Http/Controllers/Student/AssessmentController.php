@@ -287,6 +287,13 @@ class AssessmentController extends Controller
                         if (empty($correctText)) {
                             $correctText = $q->options->where('is_correct', true)->first()?->option_text ?? '';
                         }
+                    } elseif ($q->type === 'matching_drag_drop' || $q->type === 'matching_text') {
+                        $pairs = $q->metadata['matching_pairs'] ?? [];
+                        $pairTexts = [];
+                        foreach ($pairs as $pair) {
+                            $pairTexts[] = $pair['left'] . ' ➔ ' . $pair['right'];
+                        }
+                        $correctText = implode(', ', $pairTexts);
                     } else {
                         $correctText = implode(', ', $q->options->where('is_correct', true)->pluck('option_text')->toArray());
                     }
@@ -521,15 +528,39 @@ class AssessmentController extends Controller
                     if (is_array($ansText)) {
                         $ansText = json_encode($ansText);
                     }
-                } elseif ($question->type === 'matching_text') {
-                    if ($ansText !== null) {
-                        $correctOption = QuestionOption::where('question_id', $qId)
-                            ->where('is_correct', true)
-                            ->first();
-                        if ($correctOption && strtolower(trim($ansText)) === strtolower(trim($correctOption->option_text))) {
+                } elseif ($question->type === 'matching_drag_drop' || $question->type === 'matching_text') {
+                    $pairs = $question->metadata['matching_pairs'] ?? [];
+                    
+                    $submittedMatches = [];
+                    if (is_array($ansText)) {
+                        $submittedMatches = $ansText;
+                    } elseif ($ansText !== null && $ansText !== '') {
+                        $decoded = json_decode($ansText, true);
+                        if (is_array($decoded)) {
+                            $submittedMatches = $decoded;
+                        } else {
+                            $submittedMatches = [$ansText];
+                        }
+                    }
+
+                    if (count($pairs) > 0 && count($submittedMatches) > 0) {
+                        $allCorrect = true;
+                        foreach ($pairs as $idx => $pair) {
+                            $studentMatch = $submittedMatches[$idx] ?? '';
+                            $correctMatch = $pair['right'] ?? '';
+                            if (strtolower(trim($studentMatch)) !== strtolower(trim($correctMatch))) {
+                                $allCorrect = false;
+                                break;
+                            }
+                        }
+                        if ($allCorrect && count($submittedMatches) >= count($pairs)) {
                             $isCorrect = true;
                             $marksObtained = $qMarks;
                         }
+                    }
+
+                    if (is_array($ansText)) {
+                        $ansText = json_encode($ansText);
                     }
                 }
             }

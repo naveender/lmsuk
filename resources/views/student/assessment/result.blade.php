@@ -186,6 +186,25 @@
                                                         @else
                                                             <span class="text-muted italic">No Answer Selected</span>
                                                         @endif
+                                                    @elseif($question->type === 'matching_drag_drop' || $question->type === 'matching_text')
+                                                        @if($ans && $ans->answer_text)
+                                                            @php
+                                                                $decoded = json_decode($ans->answer_text, true);
+                                                                $pairs = $question->metadata['matching_pairs'] ?? [];
+                                                                $studentPairTexts = [];
+                                                                if (is_array($decoded)) {
+                                                                    foreach ($pairs as $pairIdx => $pair) {
+                                                                        $studentMatch = $decoded[$pairIdx] ?? 'N/A';
+                                                                        $studentPairTexts[] = $pair['left'] . ' ➔ ' . $studentMatch;
+                                                                    }
+                                                                } else {
+                                                                    $studentPairTexts[] = $ans->answer_text;
+                                                                }
+                                                            @endphp
+                                                            {{ implode(', ', $studentPairTexts) }}
+                                                        @else
+                                                            <span class="text-muted italic">No Answer Selected</span>
+                                                        @endif
                                                     @else
                                                         @if($ans && $ans->answer_text)
                                                             @php
@@ -222,6 +241,15 @@
                                                             $correctOptions = $question->options->where('is_correct', true)->pluck('option_text')->toArray();
                                                         @endphp
                                                         {{ implode(', ', $correctOptions) }}
+                                                    @elseif($question->type === 'matching_drag_drop' || $question->type === 'matching_text')
+                                                        @php
+                                                            $pairs = $question->metadata['matching_pairs'] ?? [];
+                                                            $correctPairTexts = [];
+                                                            foreach ($pairs as $pair) {
+                                                                $correctPairTexts[] = $pair['left'] . ' ➔ ' . $pair['right'];
+                                                            }
+                                                        @endphp
+                                                        {{ implode(', ', $correctPairTexts) }}
                                                     @else
                                                         @php
                                                             $correctOption = $question->options->where('is_correct', true)->first();
