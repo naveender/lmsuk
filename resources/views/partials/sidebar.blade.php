@@ -22,7 +22,7 @@
                         data-i18n="Email">Dashboard</span></a>
             </li>
             <li
-                class="{{ request()->routeIs('admin.users.*') || request()->routeIs('admin.students.*') || request()->routeIs('admin.parents.*') ? 'active' : '' }} nav-item">
+                class="{{ request()->routeIs('admin.users.*') || request()->routeIs('admin.students.*') || request()->routeIs('admin.parents.*') ? 'sidebar-group-active open' : '' }} nav-item">
                 <a href="#"><i class="feather icon-user"></i><span class="menu-title" data-i18n="User">User</span></a>
                 <ul class="menu-content">
 
@@ -44,7 +44,7 @@
                     </li>
                 </ul>
             </li>
-            <li class="{{ request()->routeIs('admin.questions.*') ? 'active' : '' }} nav-item"><a href="#"><i
+            <li class="{{ request()->routeIs('admin.questions.*') ? 'sidebar-group-active open' : '' }} nav-item"><a href="#"><i
                         class="feather icon-help-circle"></i><span class="menu-title" data-i18n="Question Bank">Question
                         Bank</span></a>
                 <ul class="menu-content">
@@ -66,7 +66,7 @@
                     </li>
                 </ul>
             </li>
-            <li class="{{ request()->routeIs('admin.papers.*') ? 'active' : '' }} nav-item"><a href="#"><i
+            <li class="{{ request()->routeIs('admin.papers.*') ? 'sidebar-group-active open' : '' }} nav-item"><a href="#"><i
                         class="feather icon-file-text"></i><span class="menu-title" data-i18n="Papers Manager">Papers
                         Manager</span></a>
                 <ul class="menu-content">
@@ -105,7 +105,7 @@
                 <a href="{{ route('admin.announcements.index') }}"><i class="feather icon-message-square"></i><span
                         class="menu-title" data-i18n="Manage Announcement">Manage Announcement</span></a>
             </li>
-            <li class=" nav-item"><a href="#"><i class="feather icon-list"></i><span class="menu-title"
+            <li class="{{ request()->routeIs('admin.classes.*') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.year-groups.*') || request()->routeIs('admin.subjects.*') || request()->routeIs('topics*') || request()->routeIs('add.topic*') ? 'sidebar-group-active open' : '' }} nav-item"><a href="#"><i class="feather icon-list"></i><span class="menu-title"
                         data-i18n="User">Content Manager</span></a>
                 <ul class="menu-content">
 
