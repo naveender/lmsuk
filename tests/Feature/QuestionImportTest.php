@@ -45,7 +45,7 @@ test('admin can download sample CSV', function () {
     
     $content = $response->streamedContent();
     expect($content)->toContain('title,description,type,subject');
-    expect($content)->toContain('What is the capital of France?');
+    expect($content)->toContain('Identify the synonym of the word \'diligent\'.');
 });
 
 test('admin can parse valid CSV file', function () {

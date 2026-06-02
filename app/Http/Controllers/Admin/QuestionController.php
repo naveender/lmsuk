@@ -418,74 +418,84 @@ class QuestionController extends Controller
 
         $samples = [
             [
-                'What is the capital of France?',
-                'Choose the correct city from the options below.',
+                'Identify the synonym of the word \'diligent\'.',
+                'Choose the most appropriate synonym from the options below.',
                 'single_choice_radio',
-                'General Knowledge',
-                'Geography',
-                'European Capitals',
+                'English',
+                'Vocabulary & Synonyms',
+                'Synonyms & Antonyms',
                 'easy',
                 '1',
-                'Paris has been the capital of France since the 5th century.',
-                'London', 'Paris', 'Berlin', 'Madrid', '',
-                '2', // Option 2 (Paris) is correct
-                '', '', '', '', '', '', '', '', '', '', '', '', ''
+                '\'Diligent\' means showing care and conscientiousness in one\'s work or duties. \'Hardworking\' is its closest synonym.',
+                'Hardworking', 'Lazy', 'Careless', 'Sleepy', '',
+                '1', // Option 1 (Hardworking) is correct
+                '', // blank_answers
+                '', '', '', '', '', '', '', '', // match_left/right 1-4
+                '', '', '' // word_limit, allowed_file_types, max_file_size
             ],
             [
-                'Which of the following are primary colors?',
-                'Select all correct options.',
-                'multiple_choice',
-                'Science',
-                'Physics',
-                'Light and Color',
+                'Select all equivalent values of 1/2.',
+                'Select all options that are equal to 0.5.',
+                'multiple_choice',  
+                'Maths & Number Reasoning',
+                'Numbers & Place Value',
+                'Decimals & Fractions',
                 'medium',
                 '2',
-                'Primary colors of light are Red, Green, and Blue. For pigments, they are Red, Yellow, and Blue.',
-                'Red', 'Green', 'Yellow', 'Purple', '',
-                '1,2,3', // Options 1, 2, and 3 are correct
-                '', '', '', '', '', '', '', '', '', '', '', '', ''
+                '0.5, 2/4, and 50% are all equivalent to 1/2.',
+                '0.5', '2/4', '0.05', '0.25', '',
+                '1,2', // Options 1 and 2 are correct
+                '', // blank_answers
+                '', '', '', '', '', '', '', '', // match_left/right 1-4
+                '', '', '' // word_limit, allowed_file_types, max_file_size
             ],
             [
-                'Water and Oxygen Chemical Formulas',
-                'The chemical formula for water is ___ and oxygen is ___.',
+                'Fill in the blank with correct word.',
+                'The past tense of the word \'go\' is ___ and the past participle is ___.',
                 'fill_in_the_blanks',
-                'Science',
-                'Chemistry',
-                'Molecules',
+                'English',
+                'Vocabulary & Synonyms',
+                'Synonyms & Antonyms',
                 'medium',
                 '2',
-                'Water is H2O and Oxygen gas is O2.',
-                '', '', '', '', '', '',
-                'H2O|O2', // Blank answers pipe-separated
-                '', '', '', '', '', '', '', '', '', '', '', ''
+                'The past tense of go is went, and the past participle is gone.',
+                '', '', '', '', '', // options 1-5
+                '', // correct_options
+                'went|gone', // blank_answers
+                '', '', '', '', '', '', '', '', // match_left/right 1-4
+                '', '', '' // word_limit, allowed_file_types, max_file_size
             ],
             [
-                'Match the country with its capital city.',
-                'Match the items on the left with their correct pairs on the right.',
+                'Match the words with their antonyms.',
+                'Match the items on the left with their correct opposite words on the right.',
                 'matching_text',
-                'General Knowledge',
-                'Geography',
-                'Global Capitals',
+                'Verbal Reasoning',
+                'Analogies',
+                'Word Relationships',
                 'easy',
                 '2',
-                'Japan - Tokyo, UK - London, France - Paris.',
-                '', '', '', '', '', '', '',
-                'Japan', 'Tokyo', 'United Kingdom', 'London', 'France', 'Paris', '', '', // matching pairs
-                '', '', ''
+                'The antonym of Hot is Cold, High is Low, and Fast is Slow.',
+                '', '', '', '', '', // options 1-5
+                '', // correct_options
+                '', // blank_answers
+                'Hot', 'Cold', 'High', 'Low', 'Fast', 'Slow', '', '', // match_left/right 1-4
+                '', '', '' // word_limit, allowed_file_types, max_file_size
             ],
             [
-                'Write an essay explaining the causes of World War I.',
-                'Provide details of the political tension, alliances, and the assassination in Sarajevo.',
+                'Write an essay about your favorite book.',
+                'Explain the plot, main characters, and why you would recommend it to others.',
                 'free_text',
-                'History',
-                'World Wars',
-                'WWI Causes',
+                'English',
+                'Reading Comprehension',
+                'Inference & Deduction',
                 'hard',
                 '5',
-                'Grading should consider depth of alliance systems, militarism, imperialism, and nationalism analysis.',
-                '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
-                '500', // Word limit
-                '', ''
+                'Grading should consider vocabulary usage, sentence structure, and coherence of arguments.',
+                '', '', '', '', '', // options 1-5
+                '', // correct_options
+                '', // blank_answers
+                '', '', '', '', '', '', '', '', // match_left/right 1-4
+                '500', '', '' // word_limit, allowed_file_types, max_file_size
             ]
         ];
 
