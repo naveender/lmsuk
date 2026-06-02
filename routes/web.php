@@ -114,6 +114,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     ]);
 
     // Announcements
+    Route::get('admin/announcements/{announcement}/stats', [\App\Http\Controllers\Admin\AnnouncementController::class, 'stats'])->name('admin.announcements.stats');
+    Route::get('admin/announcements/{announcement}/audit-logs', [\App\Http\Controllers\Admin\AnnouncementController::class, 'auditLogs'])->name('admin.announcements.audit-logs');
     Route::resource('admin/announcements', \App\Http\Controllers\Admin\AnnouncementController::class)->names([
         'index' => 'admin.announcements.index',
         'create' => 'admin.announcements.create',
@@ -205,6 +207,7 @@ Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
      Route::get('/student/attempts/{attempt}/result', [StudentAssessmentsController::class, 'result'])->name('student.attempts.result');
      Route::get('/student/focus-areas', [StudentFocusAreasController::class, 'index'])->name('student.focusareas');
      Route::get('/student/announcements', [StudentAnnouncementsController::class, 'index'])->name('student.announcements');
+     Route::post('/student/announcements/{announcement}/view', [StudentAnnouncementsController::class, 'view'])->name('student.announcements.view');
      Route::get('/student/centretestscores', [StudentCentreTestScoreController::class, 'index'])->name('student.centretestscores');
    
 });
@@ -218,6 +221,8 @@ Route::middleware(['auth', 'verified', 'role:parent'])->group(function () {
 // Tutor
 Route::middleware(['auth', 'verified', 'role:tutor'])->group(function () {
     Route::get('/tutor/dashboard', [TutorHomeController::class, 'index'])->name('tutor.dashboard');
+    Route::get('/tutor/announcements', [\App\Http\Controllers\Tutor\AnnouncementsController::class, 'index'])->name('tutor.announcements');
+    Route::post('/tutor/announcements/{announcement}/view', [\App\Http\Controllers\Tutor\AnnouncementsController::class, 'view'])->name('tutor.announcements.view');
 });
 
 Route::get('/change-theme', [HomeController::class, 'toggleTheme'])->name('change.theme');

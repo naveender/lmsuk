@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Student;
+namespace App\Http\Controllers\Tutor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use App\Models\AnnouncementView;
-use App\Models\YearGroup;
 use Illuminate\Http\Request;
 
 class AnnouncementsController extends Controller
@@ -33,31 +32,10 @@ class AnnouncementsController extends Controller
                     ->where('target_id', $user->id);
             });
 
-            // Target all active students
+            // Target all tutors
             $q->orWhereHas('targets', function ($t) {
-                $t->where('target_type', 'all_active_students');
+                $t->where('target_type', 'all_tutors');
             });
-
-            // Target classes
-            $classIds = $user->classes()->pluck('classes.id')->toArray();
-            if (!empty($classIds)) {
-                $q->orWhereHas('targets', function ($t) use ($classIds) {
-                    $t->where('target_type', 'class')
-                        ->whereIn('target_id', $classIds);
-                });
-            }
-
-            // Target year groups
-            $studentDetail = $user->studentDetail;
-            if ($studentDetail && $studentDetail->group_year) {
-                $yearGroupId = YearGroup::where('value', $studentDetail->group_year)->value('id');
-                if ($yearGroupId) {
-                    $q->orWhereHas('targets', function ($t) use ($yearGroupId) {
-                        $t->where('target_type', 'year_group')
-                            ->where('target_id', $yearGroupId);
-                    });
-                }
-            }
         });
 
         $announcements = $query->orderByRaw("CASE priority WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END ASC")
@@ -67,7 +45,7 @@ class AnnouncementsController extends Controller
 
         $viewedIds = AnnouncementView::where('user_id', $user->id)->pluck('announcement_id')->toArray();
 
-        return view('student.announcements', compact('announcements', 'viewedIds'));
+        return view('tutor.announcements', compact('announcements', 'viewedIds'));
     }
 
     public function view(Announcement $announcement)
