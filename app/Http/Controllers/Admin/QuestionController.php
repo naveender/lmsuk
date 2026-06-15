@@ -65,28 +65,50 @@ class QuestionController extends Controller
         DB::beginTransaction();
 
         try {
-            // Handle question image upload
+            // Handle question image upload (legacy single)
             $imagePath = null;
             if ($request->hasFile('image')) {
                 $imagePath = $request->file('image')->store('questions', 'public');
+            }
+
+            // Handle multiple question images
+            $imagePaths = [];
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $img) {
+                    if ($img && $img->isValid()) {
+                        $imagePaths[] = $img->store('questions', 'public');
+                    }
+                }
+            }
+
+            // Handle multiple explanation images (separate from rich text)
+            $explanationImagePaths = [];
+            if ($request->hasFile('explanation_images')) {
+                foreach ($request->file('explanation_images') as $img) {
+                    if ($img && $img->isValid()) {
+                        $explanationImagePaths[] = $img->store('questions/explanation', 'public');
+                    }
+                }
             }
 
             // Build metadata based on type
             $metadata = $this->buildMetadata($request);
 
             $question = Question::create([
-                'title'       => $validated['title'],
-                'description' => $request->description,
-                'type'        => $validated['type'],
-                'subject_id'  => $request->subject_id,
-                'topic_id'    => $request->topic_id,
-                'subtopic_id' => $request->subtopic_id,
-                'difficulty'  => $request->difficulty,
-                'marks'       => $request->marks ?? 1,
-                'explanation' => $request->explanation,
-                'metadata'    => $metadata,
-                'image'       => $imagePath,
-                'is_active'   => $request->has('is_active'),
+                'title'              => $validated['title'],
+                'description'        => $request->description,
+                'type'               => $validated['type'],
+                'subject_id'         => $request->subject_id,
+                'topic_id'           => $request->topic_id,
+                'subtopic_id'        => $request->subtopic_id,
+                'difficulty'         => $request->difficulty,
+                'marks'              => $request->marks ?? 1,
+                'explanation'        => $request->explanation,
+                'explanation_images' => !empty($explanationImagePaths) ? $explanationImagePaths : null,
+                'metadata'           => $metadata,
+                'image'              => $imagePath,
+                'images'             => !empty($imagePaths) ? $imagePaths : null,
+                'is_active'          => $request->has('is_active'),
             ]);
 
             // Save options for choice-based types
@@ -145,7 +167,60 @@ class QuestionController extends Controller
         DB::beginTransaction();
 
         try {
-            // Handle question image
+            // Handle multiple question images
+            $imagePaths = $question->images ?? [];
+            if ($request->hasFile('images')) {
+                $removedImages = $request->input('removed_images', []);
+                foreach ($removedImages as $removedImg) {
+                    if (Storage::disk('public')->exists($removedImg)) {
+                        Storage::disk('public')->delete($removedImg);
+                    }
+                    $imagePaths = array_values(array_filter($imagePaths, fn($p) => $p !== $removedImg));
+                }
+                foreach ($request->file('images') as $img) {
+                    if ($img && $img->isValid()) {
+                        $imagePaths[] = $img->store('questions', 'public');
+                    }
+                }
+            } else {
+                $removedImages = $request->input('removed_images', []);
+                foreach ($removedImages as $removedImg) {
+                    if (Storage::disk('public')->exists($removedImg)) {
+                        Storage::disk('public')->delete($removedImg);
+                    }
+                    $imagePaths = array_values(array_filter($imagePaths, fn($p) => $p !== $removedImg));
+                }
+            }
+
+            // Handle multiple explanation images (separate from rich text)
+            $explanationImagePaths = $question->explanation_images ?? [];
+            if ($request->hasFile('explanation_images')) {
+                $removedExpImgs = $request->input('removed_explanation_images', []);
+                foreach ($removedExpImgs as $removedImg) {
+                    if (Storage::disk('public')->exists($removedImg)) {
+                        Storage::disk('public')->delete($removedImg);
+                    }
+                    $explanationImagePaths = array_values(array_filter($explanationImagePaths, fn($p) => $p !== $removedImg));
+                }
+                foreach ($request->file('explanation_images') as $img) {
+                    if ($img && $img->isValid()) {
+                        $explanationImagePaths[] = $img->store('questions/explanation', 'public');
+                    }
+                }
+            } else {
+                $removedExpImgs = $request->input('removed_explanation_images', []);
+                foreach ($removedExpImgs as $removedImg) {
+                    if (Storage::disk('public')->exists($removedImg)) {
+                        Storage::disk('public')->delete($removedImg);
+                    }
+                    $explanationImagePaths = array_values(array_filter($explanationImagePaths, fn($p) => $p !== $removedImg));
+                }
+            }
+
+            // Build metadata
+            $metadata = $this->buildMetadata($request);
+
+            // Handle single legacy image
             $imagePath = $question->image;
             if ($request->hasFile('image')) {
                 if ($question->image && Storage::disk('public')->exists($question->image)) {
@@ -153,7 +228,6 @@ class QuestionController extends Controller
                 }
                 $imagePath = $request->file('image')->store('questions', 'public');
             }
-
             if ($request->has('remove_image') && $question->image) {
                 if (Storage::disk('public')->exists($question->image)) {
                     Storage::disk('public')->delete($question->image);
@@ -161,30 +235,32 @@ class QuestionController extends Controller
                 $imagePath = null;
             }
 
-            // Build metadata
-            $metadata = $this->buildMetadata($request);
-
             $question->update([
-                'title'       => $validated['title'],
-                'description' => $request->description,
-                'type'        => $validated['type'],
-                'subject_id'  => $request->subject_id,
-                'topic_id'    => $request->topic_id,
-                'subtopic_id' => $request->subtopic_id,
-                'difficulty'  => $request->difficulty,
-                'marks'       => $request->marks ?? 1,
-                'explanation' => $request->explanation,
-                'metadata'    => $metadata,
-                'image'       => $imagePath,
-                'is_active'   => $request->has('is_active'),
+                'title'              => $validated['title'],
+                'description'        => $request->description,
+                'type'               => $validated['type'],
+                'subject_id'         => $request->subject_id,
+                'topic_id'           => $request->topic_id,
+                'subtopic_id'        => $request->subtopic_id,
+                'difficulty'         => $request->difficulty,
+                'marks'              => $request->marks ?? 1,
+                'explanation'        => $request->explanation,
+                'explanation_images' => !empty($explanationImagePaths) ? array_values($explanationImagePaths) : null,
+                'metadata'           => $metadata,
+                'image'              => $imagePath,
+                'images'             => !empty($imagePaths) ? array_values($imagePaths) : null,
+                'is_active'          => $request->has('is_active'),
             ]);
 
             // Update options for choice-based types
             if (in_array($validated['type'], ['single_choice_radio', 'single_choice_dropdown', 'multiple_choice', 'picture_choice'])) {
-                // Delete old option images
+                // Delete only old option images that are not being kept
+                $keptImages = $request->input('existing_option_images', []);
                 foreach ($question->options as $opt) {
-                    if ($opt->option_image && Storage::disk('public')->exists($opt->option_image)) {
-                        Storage::disk('public')->delete($opt->option_image);
+                    if ($opt->option_image && !in_array($opt->option_image, $keptImages)) {
+                        if (Storage::disk('public')->exists($opt->option_image)) {
+                            Storage::disk('public')->delete($opt->option_image);
+                        }
                     }
                 }
                 $question->options()->delete();
@@ -212,9 +288,23 @@ class QuestionController extends Controller
      */
     public function destroy(Question $question)
     {
-        // Clean up images
+        // Clean up single image
         if ($question->image && Storage::disk('public')->exists($question->image)) {
             Storage::disk('public')->delete($question->image);
+        }
+
+        // Clean up multiple question images
+        foreach ($question->images ?? [] as $img) {
+            if (Storage::disk('public')->exists($img)) {
+                Storage::disk('public')->delete($img);
+            }
+        }
+
+        // Clean up explanation images
+        foreach ($question->explanation_images ?? [] as $img) {
+            if (Storage::disk('public')->exists($img)) {
+                Storage::disk('public')->delete($img);
+            }
         }
 
         foreach ($question->options as $opt) {
@@ -226,6 +316,20 @@ class QuestionController extends Controller
         $question->delete(); // cascade deletes options
 
         return redirect()->route('admin.questions.index')->with('success', 'Question deleted successfully.');
+    }
+
+    /**
+     * AJAX: Upload an image for the Quill rich text editor.
+     */
+    public function uploadImage(Request $request)
+    {
+        $request->validate(['image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096']);
+
+        $path = $request->file('image')->store('questions/rich', 'public');
+
+        return response()->json([
+            'url' => asset('storage/' . $path),
+        ]);
     }
 
     /**
@@ -261,10 +365,14 @@ class QuestionController extends Controller
     private function validationRules(Request $request): array
     {
         $rules = [
-            'title' => 'required|string|max:1000',
-            'type'  => 'required|in:' . implode(',', array_keys(Question::TYPES)),
-            'marks' => 'nullable|integer|min:1',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'title'                 => 'required|string|max:1000',
+            'type'                  => 'required|in:' . implode(',', array_keys(Question::TYPES)),
+            'marks'                 => 'nullable|integer|min:1',
+            'image'                 => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images'                => 'nullable|array',
+            'images.*'              => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'explanation_images'    => 'nullable|array',
+            'explanation_images.*'  => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ];
 
         $type = $request->input('type');
@@ -276,8 +384,9 @@ class QuestionController extends Controller
         }
 
         if ($type === 'picture_choice') {
-            $rules['option_images']   = 'required|array|min:2';
-            $rules['option_images.*'] = 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048';
+            $isUpdate = $request->isMethod('put') || $request->isMethod('patch');
+            $rules['option_images']   = $isUpdate ? 'nullable|array' : 'required|array|min:2';
+            $rules['option_images.*'] = 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048';
             $rules['correct']         = 'required';
         }
 

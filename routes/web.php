@@ -159,6 +159,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     // Questions
     Route::get('admin/questions/get-topics/{subjectId?}', [AdminQuestionController::class, 'getTopics'])->name('admin.questions.get-topics');
     Route::get('admin/questions/get-subtopics/{topicId}', [AdminQuestionController::class, 'getSubtopics'])->name('admin.questions.get-subtopics');
+    Route::post('admin/questions/upload-image', [AdminQuestionController::class, 'uploadImage'])->name('admin.questions.upload-image');
     Route::resource('admin/questions', AdminQuestionController::class)->names([
         'index'   => 'admin.questions.index',
         'create'  => 'admin.questions.create',

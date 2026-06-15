@@ -753,10 +753,21 @@
                                                 @endif
                                             @endif
                                             
-                                            @if($q->explanation)
+                                            @if($q->explanation || ($q->explanation_images && count($q->explanation_images) > 0))
                                                 <div class="mt-75 pt-50 border-top">
-                                                    <span class="font-weight-bold text-white d-block">Explanation:</span>
-                                                    <span class="text-white font-small-3 font-italic">{{ $q->explanation }}</span>
+                                                    <span class="font-weight-bold text-white d-block mb-25"><i class="feather icon-info mr-25"></i> Explanation:</span>
+                                                    @if($q->explanation)
+                                                        <div class="text-white font-small-3 font-italic mb-50">{!! $q->explanation !!}</div>
+                                                    @endif
+                                                    @if($q->explanation_images && count($q->explanation_images) > 0)
+                                                        <div class="explanation-images-wrapper mt-2 d-flex flex-wrap align-items-center" style="gap: 8px;">
+                                                            @foreach($q->explanation_images as $expImg)
+                                                                <a href="{{ asset('storage/' . $expImg) }}" target="_blank">
+                                                                    <img src="{{ asset('storage/' . $expImg) }}" class="img-fluid rounded border bg-white" style="max-height: 80px; object-fit: contain; cursor: pointer;" alt="Explanation Image">
+                                                                </a>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
                                                 </div>
                                             @endif
                                         </div>
