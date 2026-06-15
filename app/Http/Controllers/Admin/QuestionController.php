@@ -630,10 +630,11 @@ class QuestionController extends Controller
     public function parseImportFile(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:csv,txt|max:10240', // max 10MB
+            'file' => 'required|file|mimes:csv,txt,docx|max:10240', // max 10MB
         ]);
 
         $file = $request->file('file');
+        $extension = strtolower($file->getClientOriginalExtension());
         
         // Generate unique token
         $token = \Illuminate\Support\Str::random(32);
@@ -641,9 +642,53 @@ class QuestionController extends Controller
         if (!file_exists($tempDir)) {
             mkdir($tempDir, 0755, true);
         }
+
+        // Handle DOCX parser
+        if ($extension === 'docx') {
+            try {
+                $tempDocxPath = $tempDir . '/import_' . $token . '.docx';
+                $file->move($tempDir, 'import_' . $token . '.docx');
+
+                $questions = \App\Services\DocxQuestionParser::parse($tempDocxPath);
+
+                if (file_exists($tempDocxPath)) {
+                    unlink($tempDocxPath);
+                }
+
+                $tempJsonPath = $tempDir . '/import_' . $token . '.json';
+                $jsonData = [
+                    'subject_id'  => $request->input('subject_id'),
+                    'topic_id'    => $request->input('topic_id'),
+                    'subtopic_id' => $request->input('subtopic_id'),
+                    'questions'   => $questions
+                ];
+                file_put_contents($tempJsonPath, json_encode($jsonData));
+
+                return response()->json([
+                    'success' => true,
+                    'import_token' => $token,
+                    'total_rows' => count($questions),
+                    'headers' => ['docx'],
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to parse the DOCX file: ' . $e->getMessage(),
+                ], 422);
+            }
+        }
         
         $tempPath = $tempDir . '/import_' . $token . '.csv';
         $file->move($tempDir, 'import_' . $token . '.csv');
+
+        // Save CSV metadata (selected category fallback)
+        $metaPath = $tempDir . '/import_' . $token . '_meta.json';
+        $metaData = [
+            'subject_id'  => $request->input('subject_id'),
+            'topic_id'    => $request->input('topic_id'),
+            'subtopic_id' => $request->input('subtopic_id'),
+        ];
+        file_put_contents($metaPath, json_encode($metaData));
 
         // Parse file to validate and count rows
         $rowCount = 0;
@@ -674,6 +719,9 @@ class QuestionController extends Controller
             if (file_exists($tempPath)) {
                 unlink($tempPath);
             }
+            if (file_exists($metaPath)) {
+                unlink($metaPath);
+            }
             return response()->json([
                 'success' => false,
                 'message' => 'Missing required CSV columns: ' . implode(', ', $missing),
@@ -703,15 +751,112 @@ class QuestionController extends Controller
         $offset = intval($request->input('offset'));
         $limit = intval($request->input('limit'));
 
-        $tempPath = storage_path('app/temp_imports/import_' . $token . '.csv');
+        $tempJsonPath = storage_path('app/temp_imports/import_' . $token . '.json');
+        $tempCsvPath = storage_path('app/temp_imports/import_' . $token . '.csv');
 
-        if (!file_exists($tempPath)) {
+        if (!file_exists($tempJsonPath) && !file_exists($tempCsvPath)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Import session expired or file not found.',
             ], 400);
         }
 
+        // Process DOCX / JSON questions
+        if (file_exists($tempJsonPath)) {
+            $jsonData = json_decode(file_get_contents($tempJsonPath), true);
+            $questions = $jsonData['questions'] ?? [];
+
+            $globalSubjectId = $jsonData['subject_id'] ?? null;
+            $globalTopicId = $jsonData['topic_id'] ?? null;
+            $globalSubtopicId = $jsonData['subtopic_id'] ?? null;
+
+            $results = [
+                'processed' => 0,
+                'success_count' => 0,
+                'failed_count' => 0,
+                'errors' => [],
+                'warnings' => [],
+            ];
+
+            $chunk = array_slice($questions, $offset, $limit);
+            $processedInChunk = 0;
+
+            foreach ($chunk as $index => $q) {
+                $processedInChunk++;
+                $rowNumber = $offset + $processedInChunk;
+
+                $title = $q['title'] ?? '';
+                $type = $q['type'] ?? 'single_choice_radio';
+
+                if (empty($title)) {
+                    $results['errors'][] = [
+                        'row' => $rowNumber,
+                        'message' => 'Question title is missing.',
+                    ];
+                    $results['failed_count']++;
+                    continue;
+                }
+
+                try {
+                    DB::beginTransaction();
+
+                    $question = Question::create([
+                        'title'              => $title,
+                        'description'        => $q['description'] ?? $title,
+                        'type'               => $type,
+                        'subject_id'         => $globalSubjectId,
+                        'topic_id'           => $globalTopicId,
+                        'subtopic_id'        => $globalSubtopicId,
+                        'difficulty'         => $q['difficulty'] ?? 'easy',
+                        'marks'              => $q['marks'] ?? 1,
+                        'explanation'        => $q['explanation'] ?? null,
+                        'explanation_images' => !empty($q['explanation_images']) ? $q['explanation_images'] : null,
+                        'images'             => !empty($q['images']) ? $q['images'] : null,
+                        'image'              => !empty($q['images']) ? $q['images'][0] : null,
+                        'is_active'          => true,
+                    ]);
+
+                    if ($question->usesOptions()) {
+                        foreach ($q['options'] as $optIdx => $opt) {
+                            QuestionOption::create([
+                                'question_id' => $question->id,
+                                'option_text' => $opt['option_text'],
+                                'is_correct'  => $opt['is_correct'],
+                                'sort_order'  => $optIdx,
+                            ]);
+                        }
+                    }
+
+                    DB::commit();
+                    $results['success_count']++;
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    $results['errors'][] = [
+                        'row' => $rowNumber,
+                        'message' => $e->getMessage(),
+                    ];
+                    $results['failed_count']++;
+                }
+            }
+
+            $results['processed'] = $processedInChunk;
+
+            if ($offset + $limit >= count($questions)) {
+                if (file_exists($tempJsonPath)) {
+                    unlink($tempJsonPath);
+                }
+                $results['completed'] = true;
+            } else {
+                $results['completed'] = false;
+            }
+
+            return response()->json([
+                'success' => true,
+                'results' => $results,
+            ]);
+        }
+
+        // Process CSV questions
         $results = [
             'processed' => 0,
             'success_count' => 0,
@@ -720,7 +865,13 @@ class QuestionController extends Controller
             'warnings' => [],
         ];
 
-        if (($handle = fopen($tempPath, 'r')) !== false) {
+        $metaPath = storage_path('app/temp_imports/import_' . $token . '_meta.json');
+        $metaData = [];
+        if (file_exists($metaPath)) {
+            $metaData = json_decode(file_get_contents($metaPath), true) ?: [];
+        }
+
+        if (($handle = fopen($tempCsvPath, 'r')) !== false) {
             // Read headers
             $headers = fgetcsv($handle);
             $headerMap = [];
@@ -833,7 +984,7 @@ class QuestionController extends Controller
                     }
                 }
 
-                // Process subject, topic, subtopic
+                // Process subject, topic, subtopic with fallback
                 $subjectName = $getValue('subject');
                 $topicName = $getValue('topic');
                 $subtopicName = $getValue('subtopic');
@@ -858,7 +1009,11 @@ class QuestionController extends Controller
                             ];
                         }
                         $subjectId = $subject->id;
+                    } elseif (!empty($metaData['subject_id'])) {
+                        $subjectId = intval($metaData['subject_id']);
+                    }
 
+                    if ($subjectId) {
                         if (!empty($topicName)) {
                             $topic = Topic::where('subject_id', $subjectId)
                                 ->where(function($q) {
@@ -887,7 +1042,14 @@ class QuestionController extends Controller
                                 ];
                             }
                             $topicId = $topic->id;
+                        } elseif (!empty($metaData['topic_id'])) {
+                            $topic = Topic::where('id', $metaData['topic_id'])->where('subject_id', $subjectId)->first();
+                            if ($topic) {
+                                $topicId = $topic->id;
+                            }
+                        }
 
+                        if ($topicId) {
                             if (!empty($subtopicName)) {
                                 $subtopic = Topic::where('subject_id', $subjectId)
                                     ->where('parent', $topicId)
@@ -914,6 +1076,11 @@ class QuestionController extends Controller
                                     ];
                                 }
                                 $subtopicId = $subtopic->id;
+                            } elseif (!empty($metaData['subtopic_id'])) {
+                                $subtopic = Topic::where('id', $metaData['subtopic_id'])->where('parent', $topicId)->first();
+                                if ($subtopic) {
+                                    $subtopicId = $subtopic->id;
+                                }
                             }
                         }
                     }
@@ -927,7 +1094,6 @@ class QuestionController extends Controller
                         }
                         $metadata['blank_answers'] = array_values(array_filter(array_map('trim', explode('|', $blankAnswersStr))));
                         if (empty($metadata['blank_answers'])) {
-                            // Fallback to commas if no pipes are found
                             $metadata['blank_answers'] = array_values(array_filter(array_map('trim', explode(',', $blankAnswersStr))));
                         }
                     } elseif ($type === 'matching_drag_drop' || $type === 'matching_text') {
@@ -1043,7 +1209,7 @@ class QuestionController extends Controller
 
         // Clean up file if we reached the end
         $totalLines = 0;
-        if (($handle = fopen($tempPath, 'r')) !== false) {
+        if (($handle = fopen($tempCsvPath, 'r')) !== false) {
             fgetcsv($handle); // skip header
             while (($row = fgetcsv($handle)) !== false) {
                 if (!empty(array_filter($row))) {
@@ -1054,8 +1220,11 @@ class QuestionController extends Controller
         }
 
         if ($offset + $limit >= $totalLines) {
-            if (file_exists($tempPath)) {
-                unlink($tempPath);
+            if (file_exists($tempCsvPath)) {
+                unlink($tempCsvPath);
+            }
+            if (file_exists($metaPath)) {
+                unlink($metaPath);
             }
             $results['completed'] = true;
         } else {
