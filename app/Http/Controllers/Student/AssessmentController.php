@@ -127,6 +127,10 @@ class AssessmentController extends Controller
         }
         $subtopics = $subtopicsQuery->orderBy('name')->get();
 
+        // Available subtopic list for dropdown filter
+        $allSubtopics = Topic::where('parent', $topic->id)->orderBy('name')->get();
+        $allSubtopicIds = $allSubtopics->pluck('id');
+
         // Map papers to subtopics
         foreach ($subtopics as $subtopic) {
             $papersQuery = Paper::visibleTo($student)
@@ -137,26 +141,52 @@ class AssessmentController extends Controller
             }
 
             $subtopic->papers = $papersQuery->get()->map(function ($paper) use ($student) {
-                // Get all attempts for this student on this paper
-                $paper->attempts = PaperAttempt::where('user_id', $student->id)
+                // Get active or paused attempts (optimized)
+                $paper->active_attempt = PaperAttempt::where('user_id', $student->id)
                     ->where('paper_id', $paper->id)
-                    ->orderBy('created_at', 'desc')
-                    ->get();
+                    ->whereIn('status', ['in_progress', 'paused'])
+                    ->first();
 
-                // Get active or paused attempts
-                $paper->active_attempt = $paper->attempts->firstWhere('status', 'in_progress')
-                    ?? $paper->attempts->firstWhere('status', 'paused');
-
-                $paper->completed_attempts_count = $paper->attempts->where('status', 'completed')->count();
+                $paper->completed_attempts_count = PaperAttempt::where('user_id', $student->id)
+                    ->where('paper_id', $paper->id)
+                    ->where('status', 'completed')
+                    ->count();
 
                 return $paper;
             });
         }
 
-        // Available subtopic list for dropdown filter
-        $allSubtopics = Topic::where('parent', $topic->id)->orderBy('name')->get();
+        // Fetch and paginate attempts for papers in these subtopics
+        $topicPaperIds = Paper::visibleTo($student)
+            ->whereIn('subtopic_id', $allSubtopicIds)
+            ->pluck('id');
 
-        return view('student.assessment.assessments-subtopics', compact('topic', 'subject', 'subtopics', 'allSubtopics'));
+        $attemptsQuery = PaperAttempt::where('user_id', $student->id)
+            ->whereIn('paper_id', $topicPaperIds)
+            ->with(['paper.subtopic'])
+            ->orderBy('created_at', 'desc');
+
+        // Apply attempt filters
+        if (request()->filled('attempt_paper_name')) {
+            $attemptsQuery->whereHas('paper', function ($q) {
+                $q->where('title', 'like', '%' . request('attempt_paper_name') . '%');
+            });
+        }
+
+        if (request()->filled('attempt_subtopic_id')) {
+            $attemptsQuery->whereHas('paper', function ($q) {
+                $q->where('subtopic_id', request('attempt_subtopic_id'));
+            });
+        }
+
+        if (request()->filled('attempt_status')) {
+            $attemptsQuery->where('status', request('attempt_status'));
+        }
+
+        // Paginate attempts using a custom page query param
+        $attempts = $attemptsQuery->paginate(10, ['*'], 'attempts_page')->withQueryString();
+
+        return view('student.assessment.assessments-subtopics', compact('topic', 'subject', 'subtopics', 'allSubtopics', 'attempts'));
     }
 
     /**
