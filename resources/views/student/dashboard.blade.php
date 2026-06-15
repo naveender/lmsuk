@@ -22,6 +22,34 @@
                     </div>
                 </div>
 
+                @if(isset($unreadHighPriority) && $unreadHighPriority->count() > 0)
+                    <div class="alert alert-danger alert-dismissible fade show mt-2 shadow" role="alert" style="border-left: 6px solid #ea5455; background-color: #fff;">
+                        <div class="d-flex align-items-center">
+                            <i class="feather icon-alert-circle font-large-1 mr-2 text-danger pulsing-icon"></i>
+                            <div>
+                                <h5 class="alert-heading font-weight-bold mb-0 text-danger">Urgent Notices Attention Needed!</h5>
+                                <p class="mb-0 font-small-3 text-secondary">You have <strong>{{ $unreadHighPriority->count() }}</strong> new urgent announcement(s). Please read them immediately.</p>
+                            </div>
+                            <div class="ml-auto">
+                                <a href="{{ route('student.announcements') }}" class="btn btn-danger btn-sm text-uppercase font-weight-bold">View Notices</a>
+                            </div>
+                        </div>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <style>
+                        @keyframes pulse {
+                            0% { transform: scale(1); }
+                            50% { transform: scale(1.15); }
+                            100% { transform: scale(1); }
+                        }
+                        .pulsing-icon {
+                            animation: pulse 1.5s infinite;
+                        }
+                    </style>
+                @endif
+
                 <!-- Dashboard Grid Section -->
                 <section id="student-dashboard-grid">
                     <div class="row">

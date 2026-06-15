@@ -93,4 +93,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Classes::class, 'class_student', 'user_id', 'class_id')->withTimestamps();
     }
+
+    public function paperAttempts()
+    {
+        return $this->hasMany(PaperAttempt::class);
+    }
 }

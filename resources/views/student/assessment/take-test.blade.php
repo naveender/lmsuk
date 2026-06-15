@@ -146,6 +146,13 @@
                                     </span>
                                 </div>
                                 
+                                <!-- Question Title -->
+                                @if(!empty($question->title) && trim(strip_tags($question->title)) !== trim(strip_tags($question->description)))
+                                    <h5 class="font-weight-bold text-dark mb-2" style="font-size: 1.2rem; line-height: 1.4;">
+                                        {{ $question->title }}
+                                    </h5>
+                                @endif
+
                                 <!-- Question Description -->
                                 <div class="question-text mb-4 text-dark font-medium-3 leading-relaxed" style="line-height: 1.6; color: #2d3748 !important;">
                                     {!! $description !!}
