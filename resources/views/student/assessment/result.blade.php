@@ -229,23 +229,23 @@
                                                 {!! $question->description !!}
                                             </div>
 
-                                    <!-- Question Images -->
-                                    @if($question->image || ($question->images && count($question->images) > 0))
-                                        <div class="question-images-wrapper mb-3 d-flex flex-wrap align-items-center" style="gap: 16px;">
-                                            @if($question->image)
-                                                <div class="question-img-item">
-                                                    <img src="{{ asset('storage/' . $question->image) }}" class="img-fluid rounded border shadow-sm img-zoomable" style="max-height: 220px; object-fit: contain; cursor: zoom-in; transition: transform 0.2s;" alt="Question Image">
+                                            <!-- Question Images -->
+                                            @if($question->image || ($question->images && count($question->images) > 0))
+                                                <div class="question-images-wrapper mb-3 d-flex flex-wrap align-items-center" style="gap: 16px;">
+                                                    @if($question->image)
+                                                        <div class="question-img-item">
+                                                            <img src="{{ asset('storage/' . $question->image) }}" class="img-fluid rounded border shadow-sm img-zoomable" style="max-height: 220px; object-fit: contain; cursor: zoom-in; transition: transform 0.2s;" alt="Question Image">
+                                                        </div>
+                                                    @endif
+                                                    @if($question->images)
+                                                        @foreach($question->images as $img)
+                                                            <div class="question-img-item">
+                                                                <img src="{{ asset('storage/' . $img) }}" class="img-fluid rounded border shadow-sm img-zoomable" style="max-height: 220px; object-fit: contain; cursor: zoom-in; transition: transform 0.2s;" alt="Question Image">
+                                                            </div>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             @endif
-                                            @if($question->images)
-                                                @foreach($question->images as $img)
-                                                    <div class="question-img-item">
-                                                        <img src="{{ asset('storage/' . $img) }}" class="img-fluid rounded border shadow-sm img-zoomable" style="max-height: 220px; object-fit: contain; cursor: zoom-in; transition: transform 0.2s;" alt="Question Image">
-                                                    </div>
-                                                @endforeach
-                                            @endif
-                                        </div>
-                                    @endif
 
                                             <!-- Comparative Answer Grid -->
                                             <div class="row mt-3">
@@ -379,38 +379,77 @@
                                             </div>
 
                                             <!-- Explanation Block -->
-                                            @if($question->explanation)
+                                            @if($question->explanation || ($question->explanation_images && count($question->explanation_images) > 0))
                                                 <div class="explanation-card mt-3 p-3 rounded-lg border-left-primary bg-rgba-primary-light">
                                                     <div class="d-flex align-items-center mb-1">
                                                         <i class="feather icon-help-circle text-primary font-medium-3 mr-1 font-weight-bold"></i>
                                                         <h6 class="mb-0 text-primary font-weight-bold text-uppercase font-small-3">Explanation & Concept Review</h6>
                                                     </div>
-                                                    <div class="explanation-content text-dark font-small-3" style="line-height: 1.55;">
-                                                        {!! $question->explanation !!}
-                                                    </div>
+                                                    @if($question->explanation)
+                                                        <div class="explanation-content text-dark font-small-3 mb-2" style="line-height: 1.55;">
+                                                            {!! $question->explanation !!}
+                                                        </div>
+                                                    @endif
+                                                    @if($question->explanation_images && count($question->explanation_images) > 0)
+                                                        <div class="explanation-images-wrapper d-flex flex-wrap align-items-center" style="gap: 8px;">
+                                                            @foreach($question->explanation_images as $expImg)
+                                                                <img src="{{ asset('storage/' . $expImg) }}" class="img-fluid rounded border img-zoomable" style="max-height: 120px; object-fit: contain; cursor: zoom-in; transition: transform 0.2s;" alt="Explanation Image">
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
                                                 </div>
                                             @endif
                                         </div>
                                     </div>
+                                @endforeach
+                            </div>
 
-                                    <!-- Explanation Feedback -->
-                                    @if($question->explanation || ($question->explanation_images && count($question->explanation_images) > 0))
-                                        <div class="explanation-box p-3 border rounded bg-light mt-3">
-                                            <span class="font-weight-bold text-secondary d-block mb-1"><i class="feather icon-info mr-1 text-info"></i> Explanation:</span>
-                                            @if($question->explanation)
-                                                <div class="mb-2 text-dark font-small-3">{!! $question->explanation !!}</div>
-                                            @endif
-                                            @if($question->explanation_images && count($question->explanation_images) > 0)
-                                                <div class="explanation-images-wrapper d-flex flex-wrap align-items-center" style="gap: 8px;">
-                                                    @foreach($question->explanation_images as $expImg)
-                                                        <img src="{{ asset('storage/' . $expImg) }}" class="img-fluid rounded border img-zoomable" style="max-height: 120px; object-fit: contain; cursor: zoom-in; transition: transform 0.2s;" alt="Explanation Image">
-                                                    @endforeach
-                                                </div>
-                                            @endif
+                            <!-- Sidebar Navigator Column -->
+                            <div class="col-lg-3 col-md-4 col-12">
+                                <div class="card review-navigator-sidebar position-sticky border rounded-lg" style="top: 110px;">
+                                    <div class="card-header border-bottom py-2 bg-light-header">
+                                        <h5 class="font-weight-bold mb-0 text-dark">Navigator</h5>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        <div class="nav-grid mb-3">
+                                            @foreach($questions as $index => $question)
+                                                @php
+                                                    $ans = $answers->get($question->id);
+                                                    $isCorrect = $ans && $ans->is_correct;
+                                                    $statusType = 'unanswered';
+                                                    $dotClass = 'nav-dot-unanswered';
+                                                    if ($ans) {
+                                                        $dotClass = $isCorrect ? 'nav-dot-correct' : 'nav-dot-incorrect';
+                                                        $statusType = $isCorrect ? 'correct' : 'incorrect';
+                                                    }
+                                                @endphp
+                                                <button type="button" 
+                                                    class="btn p-0 d-flex align-items-center justify-content-center font-weight-bold nav-dot {{ $dotClass }}" 
+                                                    data-status="{{ $statusType }}"
+                                                    onclick="scrollToQuestion(event, 'question-{{ $question->id }}')">
+                                                    {{ $index + 1 }}
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                        
+                                        <div class="legend border-top pt-2">
+                                            <div class="d-flex align-items-center mb-1">
+                                                <span class="legend-color legend-correct mr-2"></span>
+                                                <span class="font-small-2 text-secondary font-weight-bold">Correct</span>
+                                            </div>
+                                            <div class="d-flex align-items-center mb-1">
+                                                <span class="legend-color legend-incorrect mr-2"></span>
+                                                <span class="font-small-2 text-secondary font-weight-bold">Incorrect</span>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <span class="legend-color legend-unanswered mr-2"></span>
+                                                <span class="font-small-2 text-secondary font-weight-bold">Unanswered</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
