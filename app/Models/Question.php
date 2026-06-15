@@ -16,14 +16,18 @@ class Question extends Model
         'difficulty',
         'marks',
         'explanation',
+        'explanation_images',
         'metadata',
         'image',
+        'images',
         'is_active',
     ];
 
     protected $casts = [
-        'metadata' => 'array',
-        'is_active' => 'boolean',
+        'metadata'           => 'array',
+        'images'             => 'array',
+        'explanation_images' => 'array',
+        'is_active'          => 'boolean',
     ];
 
     public const TYPES = [

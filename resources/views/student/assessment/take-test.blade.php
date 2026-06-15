@@ -146,15 +146,33 @@
                                     </span>
                                 </div>
                                 
+                                <!-- Question Title -->
+                                @if(!empty($question->title) && trim(strip_tags($question->title)) !== trim(strip_tags($question->description)))
+                                    <h5 class="font-weight-bold text-dark mb-2" style="font-size: 1.2rem; line-height: 1.4;">
+                                        {{ $question->title }}
+                                    </h5>
+                                @endif
+
                                 <!-- Question Description -->
                                 <div class="question-text mb-4 text-dark font-medium-3 leading-relaxed" style="line-height: 1.6; color: #2d3748 !important;">
                                     {!! $description !!}
                                 </div>
 
                                 <!-- Image if present -->
-                                @if($question->image)
-                                    <div class="question-img-wrapper mb-4 text-center">
-                                        <img src="{{ asset('storage/' . $question->image) }}" class="img-fluid rounded-lg border shadow-sm" style="max-height: 180px;" alt="Question Image">
+                                @if($question->image || ($question->images && count($question->images) > 0))
+                                    <div class="question-images-wrapper mb-4 d-flex flex-wrap justify-content-center align-items-center" style="gap: 16px;">
+                                        @if($question->image)
+                                            <div class="question-img-item text-center">
+                                                <img src="{{ asset('storage/' . $question->image) }}" class="img-fluid rounded-lg border shadow img-zoomable" style="max-height: 200px; object-fit: contain; cursor: zoom-in; transition: transform 0.2s;" alt="Question Image">
+                                            </div>
+                                        @endif
+                                        @if($question->images)
+                                            @foreach($question->images as $img)
+                                                <div class="question-img-item text-center">
+                                                    <img src="{{ asset('storage/' . $img) }}" class="img-fluid rounded-lg border shadow img-zoomable" style="max-height: 200px; object-fit: contain; cursor: zoom-in; transition: transform 0.2s;" alt="Question Image">
+                                                </div>
+                                            @endforeach
+                                        @endif
                                     </div>
                                 @endif
 
@@ -441,8 +459,16 @@
                                 <div class="instant-feedback-box mt-4 p-3 rounded border {{ $showFeedback ? '' : 'd-none' }} {{ $feedbackClass }}" id="feedback-box-{{ $question->id }}" style="border-width: 2px !important;">
                                     <h5 class="font-weight-bold feedback-title mb-2">{{ $feedbackTitle }}</h5>
                                     <p class="mb-2"><strong>Correct Answer:</strong> <span class="feedback-correct-answer font-weight-bold">{{ $correctValText }}</span></p>
-                                    <div class="feedback-explanation p-3 bg-white rounded text-dark font-small-3 border mt-2 {{ $explanationText ? '' : 'd-none' }}" id="feedback-explanation-container-{{ $question->id }}">
-                                        <strong>Explanation:</strong> <span class="explanation-content">{!! $explanationText !!}</span>
+                                    <div class="feedback-explanation p-3 bg-white rounded text-dark font-small-3 border mt-2 {{ $explanationText || ($question->explanation_images && count($question->explanation_images) > 0) ? '' : 'd-none' }}" id="feedback-explanation-container-{{ $question->id }}">
+                                        <strong>Explanation:</strong> 
+                                        <div class="explanation-content">{!! $explanationText !!}</div>
+                                        @if($question->explanation_images && count($question->explanation_images) > 0)
+                                            <div class="explanation-images-wrapper mt-2 d-flex flex-wrap align-items-center" style="gap: 8px;">
+                                                @foreach($question->explanation_images as $expImg)
+                                                    <img src="{{ asset('storage/' . $expImg) }}" class="img-fluid rounded border img-zoomable" style="max-height: 120px; object-fit: contain; cursor: zoom-in; transition: transform 0.2s;" alt="Explanation Image">
+                                                @endforeach
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
 
@@ -1735,8 +1761,10 @@
                                     feedbackBox.querySelector('.feedback-correct-answer').textContent = evaluation.correct_answer;
                                     
                                     let explanationBox = document.getElementById('feedback-explanation-container-' + qId);
-                                    if (evaluation.explanation) {
-                                        explanationBox.querySelector('.explanation-content').innerHTML = evaluation.explanation;
+                                    if (evaluation.explanation || (explanationBox && explanationBox.querySelector('.explanation-images-wrapper'))) {
+                                        if (evaluation.explanation) {
+                                            explanationBox.querySelector('.explanation-content').innerHTML = evaluation.explanation;
+                                        }
                                         explanationBox.classList.remove('d-none');
                                     } else {
                                         explanationBox.classList.add('d-none');
@@ -2247,5 +2275,67 @@
                 checkTextInput(qNum, null);
             }
         }
+
+        // ── Premium Image Lightbox / Zoom Logic ───────────────────────────────
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inject lightbox HTML
+            const lightboxHtml = `
+                <div id="premium-image-lightbox" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 99999; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; cursor: zoom-out;">
+                    <span style="position: absolute; top: 20px; right: 25px; color: #f8fafc; font-size: 40px; font-weight: 200; cursor: pointer; transition: color 0.2s;" id="close-lightbox-btn">&times;</span>
+                    <img id="lightbox-zoomed-img" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); transform: scale(0.9); transition: transform 0.3s ease;" alt="Zoomed Image">
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', lightboxHtml);
+
+            // Inject CSS styles
+            const style = document.createElement('style');
+            style.innerHTML = `
+                .img-zoomable:hover {
+                    transform: scale(1.03);
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+                }
+                #close-lightbox-btn:hover {
+                    color: #ef4444 !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            const lightbox = document.getElementById('premium-image-lightbox');
+            const lightboxImg = document.getElementById('lightbox-zoomed-img');
+            const closeBtn = document.getElementById('close-lightbox-btn');
+
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('img-zoomable')) {
+                    lightboxImg.src = e.target.src;
+                    lightbox.style.display = 'flex';
+                    // Trigger reflow for transition
+                    lightbox.offsetHeight;
+                    lightbox.style.opacity = '1';
+                    lightboxImg.style.transform = 'scale(1)';
+                }
+            });
+
+            function closeLightbox() {
+                lightbox.style.opacity = '0';
+                lightboxImg.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    lightbox.style.display = 'none';
+                }, 300);
+            }
+
+            lightbox.addEventListener('click', function(e) {
+                if (e.target !== lightboxImg) {
+                    closeLightbox();
+                }
+            });
+
+            closeBtn.addEventListener('click', closeLightbox);
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && lightbox.style.display === 'flex') {
+                    closeLightbox();
+                }
+            });
+        });
     </script>
 @endpush

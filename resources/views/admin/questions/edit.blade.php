@@ -1,4 +1,54 @@
 @extends('layouts.app')
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet">
+<style>
+    /* Multi-image preview cards */
+    .q-img-thumb {
+        position: relative;
+        display: inline-block;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        overflow: hidden;
+        width: 90px;
+        height: 90px;
+    }
+    .q-img-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .q-img-thumb .remove-qimg {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        background: rgba(220, 53, 69, 0.85);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+        line-height: 20px;
+        text-align: center;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    /* Quill toolbar styling */
+    .ql-toolbar.ql-snow {
+        border-radius: 0.357rem 0.357rem 0 0;
+        border-color: #d8d6de;
+    }
+    .ql-container.ql-snow {
+        border-radius: 0 0 0.357rem 0.357rem;
+        border-color: #d8d6de;
+        min-height: 140px;
+        font-size: 0.95rem;
+    }
+</style>
+@endpush
 @section('content')
 <div class="app-content content">
     <div class="content-overlay"></div>
@@ -106,18 +156,79 @@
                         <div class="form-group"><label>Description (Optional)</label>
                             <textarea name="description" class="form-control" rows="2">{{ old('description', $question->description) }}</textarea>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6"><div class="form-group"><label>Question Image</label>
+                        {{-- Multiple Question Images --}}
+                        <div class="form-group">
+                            <label class="d-block font-weight-bold">Question Images (Optional)</label>
+                            <p class="text-muted small mb-1">Existing images below. Click &times; to remove. Add more using the button.</p>
+
+                            {{-- Existing images grid --}}
+                            <div id="question-images-preview" class="d-flex flex-wrap mb-2" style="gap:8px;">
+                                {{-- Legacy Single Image --}}
                                 @if($question->image)
-                                    <div class="mb-1"><img src="{{ asset('storage/' . $question->image) }}" style="max-height:100px;" class="rounded">
-                                        <label class="ml-2"><input type="checkbox" name="remove_image" value="1"> Remove</label>
+                                    <div class="q-img-thumb" data-existing="{{ $question->image }}" data-legacy="true">
+                                        <img src="{{ asset('storage/' . $question->image) }}" alt="Question image">
+                                        <button type="button" class="remove-qimg remove-existing-legacy-qimg" title="Remove">&times;</button>
                                     </div>
                                 @endif
-                                <input type="file" name="image" class="form-control" accept="image/*">
-                            </div></div>
-                            <div class="col-md-6"><div class="form-group"><label>Explanation</label>
-                                <textarea name="explanation" class="form-control" rows="2">{{ old('explanation', $question->explanation) }}</textarea>
-                            </div></div>
+
+                                {{-- Multiple Images --}}
+                                @foreach($question->images ?? [] as $imgPath)
+                                    <div class="q-img-thumb" data-existing="{{ $imgPath }}">
+                                        <img src="{{ asset('storage/' . $imgPath) }}" alt="Question image">
+                                        <button type="button" class="remove-qimg remove-existing-qimg" title="Remove">&times;</button>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            {{-- Track removed existing images --}}
+                            <div id="removed-images-container"></div>
+
+                            <div class="d-flex align-items-center" style="gap:8px;">
+                                <label class="btn btn-sm btn-outline-primary mb-0" for="question_images_input_temp">
+                                    <i class="feather icon-image"></i> Add Images
+                                </label>
+                                <input type="file" id="question_images_input" name="images[]" multiple accept="image/*" class="d-none">
+                                <input type="file" id="question_images_input_temp" multiple accept="image/*" class="d-none">
+                                <small class="text-muted">JPEG, PNG, GIF, WebP - up to 2MB each</small>
+                            </div>
+                        </div>
+
+                        {{-- Explanation (Rich Text with Quill) --}}
+                        <div class="form-group">
+                            <label class="font-weight-bold">Explanation (Optional)</label>
+                            <p class="text-muted small mb-1">Rich text with formatting support for student feedback.</p>
+                            {{-- Hidden textarea that gets submitted --}}
+                            <textarea name="explanation" id="explanation_input" class="d-none">{{ old('explanation', $question->explanation) }}</textarea>
+                            {{-- Quill editor container --}}
+                            <div id="explanation_editor" style="min-height:160px; background:#fff; border:1px solid #d8d6de; border-radius:0.357rem;"></div>
+                        </div>
+
+                        {{-- Explanation Images --}}
+                        <div class="form-group">
+                            <label class="d-block font-weight-bold">Explanation Images (Optional)</label>
+                            <p class="text-muted small mb-1">Existing images below. Click &times; to remove. Add more using the button.</p>
+
+                            {{-- Existing explanation images --}}
+                            <div id="explanation-images-preview" class="d-flex flex-wrap mb-2" style="gap:8px;">
+                                @foreach($question->explanation_images ?? [] as $expImg)
+                                    <div class="q-img-thumb" data-existing="{{ $expImg }}">
+                                        <img src="{{ asset('storage/' . $expImg) }}" alt="Explanation image">
+                                        <button type="button" class="remove-qimg remove-existing-exp-img" title="Remove">&times;</button>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            {{-- Track removed existing explanation images --}}
+                            <div id="removed-explanation-images-container"></div>
+
+                            <div class="d-flex align-items-center" style="gap:8px;">
+                                <label class="btn btn-sm btn-outline-info mb-0" for="explanation_images_input_temp">
+                                    <i class="feather icon-image"></i> Add Explanation Images
+                                </label>
+                                <input type="file" id="explanation_images_input" name="explanation_images[]" multiple accept="image/*" class="d-none">
+                                <input type="file" id="explanation_images_input_temp" multiple accept="image/*" class="d-none">
+                                <small class="text-muted">JPEG, PNG, GIF, WebP - up to 2MB each</small>
+                            </div>
                         </div>
                     </div></div>
                 </div>
@@ -274,8 +385,178 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // ── Quill Rich Text Editor for Explanation ───────────────────────────
+    const quill = new Quill('#explanation_editor', {
+        theme: 'snow',
+        placeholder: 'Write the answer explanation here... You can use bold, lists, links, etc.',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                ['blockquote', 'code-block'],
+                ['link'],
+                ['clean']
+            ]
+        }
+    });
+
+    // Populate Quill if there's old value
+    try {
+        const existingExplanation = document.getElementById('explanation_input').value.trim();
+        if (existingExplanation) {
+            const delta = quill.clipboard.convert({ html: existingExplanation });
+            quill.setContents(delta);
+        }
+    } catch (e) {
+        console.error('Error populating Quill editor:', e);
+    }
+
+    // ── Question Images Handler ──────────────────────────────────────────
+    const qImgInput = document.getElementById('question_images_input');
+    const qImgInputTemp = document.getElementById('question_images_input_temp');
+    const qImgPreview = document.getElementById('question-images-preview');
+    const removedContainer = document.getElementById('removed-images-container');
+    let qImgDT = new DataTransfer();
+
+    qImgInputTemp.addEventListener('change', function() {
+        Array.from(this.files).forEach(file => {
+            const already = Array.from(qImgDT.files).some(f => f.name === file.name && f.size === file.size);
+            if (!already) {
+                qImgDT.items.add(file);
+                addQuestionNewThumb(file);
+            }
+        });
+        qImgInput.files = qImgDT.files;
+        this.value = '';
+    });
+
+    function addQuestionNewThumb(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const wrap = document.createElement('div');
+            wrap.className = 'q-img-thumb';
+            wrap.innerHTML = `
+                <img src="${e.target.result}" alt="${file.name}">
+                <button type="button" class="remove-qimg" title="Remove">&times;</button>
+            `;
+            wrap.querySelector('.remove-qimg').addEventListener('click', function() {
+                const newDT = new DataTransfer();
+                Array.from(qImgDT.files).forEach(f => {
+                    if (!(f.name === file.name && f.size === file.size)) {
+                        newDT.items.add(f);
+                    }
+                });
+                qImgDT = newDT;
+                qImgInput.files = qImgDT.files;
+                wrap.remove();
+            });
+            qImgPreview.appendChild(wrap);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Handle removing existing server question images
+    document.querySelectorAll('.remove-existing-qimg').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const thumb = this.closest('.q-img-thumb');
+            const path  = thumb.dataset.existing;
+            // Add hidden input to tell controller to remove this path
+            const hidden = document.createElement('input');
+            hidden.type  = 'hidden';
+            hidden.name  = 'removed_images[]';
+            hidden.value = path;
+            removedContainer.appendChild(hidden);
+            thumb.remove();
+        });
+    });
+
+    // Handle removing existing server legacy single image
+    document.querySelectorAll('.remove-existing-legacy-qimg').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const thumb = this.closest('.q-img-thumb');
+            // Add hidden input to tell controller to remove legacy single image
+            const hidden = document.createElement('input');
+            hidden.type  = 'hidden';
+            hidden.name  = 'remove_image';
+            hidden.value = '1';
+            removedContainer.appendChild(hidden);
+            thumb.remove();
+        });
+    });
+
+    // ── Explanation Images Handler ───────────────────────────────────────
+    const expImgInput = document.getElementById('explanation_images_input');
+    const expImgInputTemp = document.getElementById('explanation_images_input_temp');
+    const expImgPreview = document.getElementById('explanation-images-preview');
+    const removedExpContainer = document.getElementById('removed-explanation-images-container');
+    let expImgDT = new DataTransfer();
+
+    expImgInputTemp.addEventListener('change', function() {
+        Array.from(this.files).forEach(file => {
+            const already = Array.from(expImgDT.files).some(f => f.name === file.name && f.size === file.size);
+            if (!already) {
+                expImgDT.items.add(file);
+                addExplanationNewThumb(file);
+            }
+        });
+        expImgInput.files = expImgDT.files;
+        this.value = '';
+    });
+
+    function addExplanationNewThumb(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const wrap = document.createElement('div');
+            wrap.className = 'q-img-thumb';
+            wrap.innerHTML = `
+                <img src="${e.target.result}" alt="${file.name}">
+                <button type="button" class="remove-qimg" title="Remove">&times;</button>
+            `;
+            wrap.querySelector('.remove-qimg').addEventListener('click', function() {
+                const newDT = new DataTransfer();
+                Array.from(expImgDT.files).forEach(f => {
+                    if (!(f.name === file.name && f.size === file.size)) {
+                        newDT.items.add(f);
+                    }
+                });
+                expImgDT = newDT;
+                expImgInput.files = expImgDT.files;
+                wrap.remove();
+            });
+            expImgPreview.appendChild(wrap);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Handle removing existing server explanation images
+    document.querySelectorAll('.remove-existing-exp-img').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const thumb = this.closest('.q-img-thumb');
+            const path  = thumb.dataset.existing;
+            const hidden = document.createElement('input');
+            hidden.type  = 'hidden';
+            hidden.name  = 'removed_explanation_images[]';
+            hidden.value = path;
+            removedExpContainer.appendChild(hidden);
+            thumb.remove();
+        });
+    });
+
+    // Sync Quill HTML content and images to inputs before form submit
+    document.getElementById('questionForm').addEventListener('submit', function() {
+        document.getElementById('explanation_input').value = quill.getSemanticHTML();
+        if (typeof qImgDT !== 'undefined' && qImgDT.files.length > 0) {
+            document.getElementById('question_images_input').files = qImgDT.files;
+        }
+        if (typeof expImgDT !== 'undefined' && expImgDT.files.length > 0) {
+            document.getElementById('explanation_images_input').files = expImgDT.files;
+        }
+    });
     const sectionMap = {
         'single_choice_radio': 'section-choices', 'single_choice_dropdown': 'section-choices',
         'multiple_choice': 'section-choices', 'picture_choice': 'section-picture',

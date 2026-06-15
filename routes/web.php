@@ -114,6 +114,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     ]);
 
     // Announcements
+    Route::get('admin/announcements/{announcement}/stats', [\App\Http\Controllers\Admin\AnnouncementController::class, 'stats'])->name('admin.announcements.stats');
+    Route::get('admin/announcements/{announcement}/audit-logs', [\App\Http\Controllers\Admin\AnnouncementController::class, 'auditLogs'])->name('admin.announcements.audit-logs');
     Route::resource('admin/announcements', \App\Http\Controllers\Admin\AnnouncementController::class)->names([
         'index' => 'admin.announcements.index',
         'create' => 'admin.announcements.create',
@@ -159,6 +161,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     // Questions
     Route::get('admin/questions/get-topics/{subjectId?}', [AdminQuestionController::class, 'getTopics'])->name('admin.questions.get-topics');
     Route::get('admin/questions/get-subtopics/{topicId}', [AdminQuestionController::class, 'getSubtopics'])->name('admin.questions.get-subtopics');
+
+    Route::post('admin/questions/upload-image', [AdminQuestionController::class, 'uploadImage'])->name('admin.questions.upload-image');
+    Route::get('admin/questions/import', [AdminQuestionController::class, 'showImportForm'])->name('admin.questions.import-form');
+    Route::post('admin/questions/import/parse', [AdminQuestionController::class, 'parseImportFile'])->name('admin.questions.import-parse');
+    Route::post('admin/questions/import/process', [AdminQuestionController::class, 'processImportChunk'])->name('admin.questions.import-process');
+    Route::get('admin/questions/import/sample', [AdminQuestionController::class, 'downloadSample'])->name('admin.questions.import-sample');
     Route::resource('admin/questions', AdminQuestionController::class)->names([
         'index'   => 'admin.questions.index',
         'create'  => 'admin.questions.create',
@@ -201,6 +209,7 @@ Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
      Route::get('/student/attempts/{attempt}/result', [StudentAssessmentsController::class, 'result'])->name('student.attempts.result');
      Route::get('/student/focus-areas', [StudentFocusAreasController::class, 'index'])->name('student.focusareas');
      Route::get('/student/announcements', [StudentAnnouncementsController::class, 'index'])->name('student.announcements');
+     Route::post('/student/announcements/{announcement}/view', [StudentAnnouncementsController::class, 'view'])->name('student.announcements.view');
      Route::get('/student/centretestscores', [StudentCentreTestScoreController::class, 'index'])->name('student.centretestscores');
    
 });
@@ -214,6 +223,8 @@ Route::middleware(['auth', 'verified', 'role:parent'])->group(function () {
 // Tutor
 Route::middleware(['auth', 'verified', 'role:tutor'])->group(function () {
     Route::get('/tutor/dashboard', [TutorHomeController::class, 'index'])->name('tutor.dashboard');
+    Route::get('/tutor/announcements', [\App\Http\Controllers\Tutor\AnnouncementsController::class, 'index'])->name('tutor.announcements');
+    Route::post('/tutor/announcements/{announcement}/view', [\App\Http\Controllers\Tutor\AnnouncementsController::class, 'view'])->name('tutor.announcements.view');
 });
 
 Route::get('/change-theme', [HomeController::class, 'toggleTheme'])->name('change.theme');
