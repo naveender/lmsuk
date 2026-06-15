@@ -29,13 +29,11 @@ class DocxQuestionParser
         $relsXml = $zip->getFromName('word/_rels/document.xml.rels');
         if ($relsXml) {
             $dom = new DOMDocument();
-            // Load XML safely
             @$dom->loadXML($relsXml, LIBXML_NOENT | LIBXML_XINCLUDE | LIBXML_NOERROR | LIBXML_NOWARNING);
             foreach ($dom->getElementsByTagName('Relationship') as $rel) {
                 $id = $rel->getAttribute('Id');
                 $type = $rel->getAttribute('Type');
                 $target = $rel->getAttribute('Target');
-                // Only capture image relationships
                 if (strpos($type, 'relationships/image') !== false) {
                     $rels[$id] = $target;
                 }
@@ -58,21 +56,58 @@ class DocxQuestionParser
         $xpath->registerNamespace('pic', 'http://schemas.openxmlformats.org/drawingml/2006/picture');
         $xpath->registerNamespace('v', 'urn:schemas-microsoft-com:vml');
 
+        // Check if it contains table elements -> Template 3
+        $hasTables = $xpath->query('//w:tbl')->length > 0;
+        if ($hasTables) {
+            $questions = self::parseTemplate3($zip, $xpath, $rels);
+            $zip->close();
+            return $questions;
+        }
+
+        // Scan paragraphs to check for Template 2 markers
+        $isTemplate2 = false;
+        $paragraphs = $xpath->query('//w:p');
+        $checkCount = 0;
+        foreach ($paragraphs as $pNode) {
+            if ($checkCount > 100) break;
+            $text = '';
+            $tNodes = $xpath->query('.//w:t', $pNode);
+            foreach ($tNodes as $tNode) {
+                $text .= $tNode->nodeValue;
+            }
+            if (preg_match('/\[MARKS\]|\[QUESTION TYPE\]|\[NEGATIVE MARKS\]/i', $text)) {
+                $isTemplate2 = true;
+                break;
+            }
+            $checkCount++;
+        }
+
+        if ($isTemplate2) {
+            $questions = self::parseTemplate2($zip, $xpath, $rels);
+        } else {
+            $questions = self::parseTemplate1($zip, $xpath, $rels);
+        }
+
+        $zip->close();
+        return $questions;
+    }
+
+    /**
+     * Parse Template 1: Paragraph-based with delimiters.
+     */
+    private static function parseTemplate1(ZipArchive $zip, DOMXPath $xpath, array $rels): array
+    {
         $paragraphs = $xpath->query('//w:p');
         $parsedParagraphs = [];
 
         foreach ($paragraphs as $pNode) {
-            // Combine all text nodes within this paragraph
             $text = '';
             $tNodes = $xpath->query('.//w:t', $pNode);
             foreach ($tNodes as $tNode) {
                 $text .= $tNode->nodeValue;
             }
 
-            // Extract any image relation IDs from modern drawing and legacy VML shape elements
             $imageRelations = [];
-            
-            // Modern drawings: <a:blip r:embed="rIdX">
             $blips = $xpath->query('.//a:blip', $pNode);
             foreach ($blips as $blip) {
                 $rId = $blip->getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'embed');
@@ -81,7 +116,6 @@ class DocxQuestionParser
                 }
             }
 
-            // Legacy VML Shapes: <v:imagedata r:id="rIdX">
             $imagedatas = $xpath->query('.//v:imagedata', $pNode);
             foreach ($imagedatas as $imagedata) {
                 $rId = $imagedata->getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
@@ -96,21 +130,16 @@ class DocxQuestionParser
             ];
         }
 
-        // 3. Process paragraphs with State Machine
         $questions = [];
         $currentQuestion = null;
-        
-        // States: 'NONE', 'QUESTION_BODY', 'QUESTION_IMAGES', 'OPTIONS', 'EXPLANATION', 'EXPLANATION_IMAGES'
         $state = 'NONE';
 
         foreach ($parsedParagraphs as $p) {
             $text = trim($p['text']);
             $targets = $p['image_targets'];
 
-            // Extract image binary content from ZIP and store them
             $storedPaths = [];
             foreach ($targets as $target) {
-                // Relationship target path could be relative to document.xml, normalize to 'word/' path prefix
                 $zipPath = 'word/' . ltrim($target, '/');
                 if (strpos($target, 'word/') === 0) {
                     $zipPath = $target;
@@ -125,7 +154,6 @@ class DocxQuestionParser
                 }
             }
 
-            // Detect question start: Q.1) or **Q.1)**
             if (preg_match('/^[\s\*]*Q[\s\.]*(\d+)\s*\)(.*)$/i', $text, $matches)) {
                 if ($currentQuestion) {
                     $questions[] = self::finalizeQuestion($currentQuestion);
@@ -134,7 +162,7 @@ class DocxQuestionParser
                 $currentQuestion = [
                     'title'              => trim($matches[2]),
                     'description'        => '',
-                    'type'               => 'single_choice_radio', // auto-detected later
+                    'type'               => 'single_choice_radio',
                     'difficulty'         => 'easy',
                     'marks'              => 1,
                     'explanation'        => '',
@@ -147,10 +175,9 @@ class DocxQuestionParser
             }
 
             if (!$currentQuestion) {
-                continue; // Skip any headers/preambles at the start of doc
+                continue;
             }
 
-            // Question Images section marker: $$)
             if (preg_match('/^\$\$\)(.*)$/', $text)) {
                 $state = 'QUESTION_IMAGES';
                 if (!empty($storedPaths)) {
@@ -159,17 +186,20 @@ class DocxQuestionParser
                 continue;
             }
 
-            // Explanation section marker: ##)
             if (preg_match('/^##\)(.*)$/', $text, $matches)) {
                 $state = 'EXPLANATION';
-                $currentQuestion['explanation'] = trim($matches[1]);
+                $explanationContent = trim($matches[1]);
+                if (strpos($explanationContent, '#*#)') !== false) {
+                    $explanationContent = trim(str_replace('#*#)', '', $explanationContent));
+                    $state = 'EXPLANATION_IMAGES';
+                }
+                $currentQuestion['explanation'] = $explanationContent;
                 if (!empty($storedPaths)) {
                     $currentQuestion['explanation_images'] = array_merge($currentQuestion['explanation_images'], $storedPaths);
                 }
                 continue;
             }
 
-            // Explanation Images section marker: #*#)
             if (preg_match('/^#\*#\)(.*)$/', $text)) {
                 $state = 'EXPLANATION_IMAGES';
                 if (!empty($storedPaths)) {
@@ -178,7 +208,6 @@ class DocxQuestionParser
                 continue;
             }
 
-            // Option item: a) Option Text or *b) Correct Option Text
             if (preg_match('/^\s*(\*)?\s*([a-g])\s*\)(.*)$/i', $text, $matches)) {
                 $state = 'OPTIONS';
                 $isCorrect = !empty($matches[1]);
@@ -193,13 +222,11 @@ class DocxQuestionParser
                 continue;
             }
 
-            // Divider: ---
             if (preg_match('/^---+\s*$/', $text)) {
                 $state = 'NONE';
                 continue;
             }
 
-            // Fallback: Append text and images to active state elements
             if ($state === 'QUESTION_BODY') {
                 if ($text !== '') {
                     $currentQuestion['title'] .= ($currentQuestion['title'] !== '' ? "\n" : "") . $text;
@@ -225,13 +252,344 @@ class DocxQuestionParser
             }
         }
 
-        // Finalize last question in document if exists
         if ($currentQuestion) {
             $questions[] = self::finalizeQuestion($currentQuestion);
         }
 
-        $zip->close();
         return $questions;
+    }
+
+    /**
+     * Parse Template 2: Paragraph-based with metadata tags.
+     */
+    private static function parseTemplate2(ZipArchive $zip, DOMXPath $xpath, array $rels): array
+    {
+        $paragraphs = $xpath->query('//w:p');
+        $parsedParagraphs = [];
+
+        foreach ($paragraphs as $pNode) {
+            $text = '';
+            $tNodes = $xpath->query('.//w:t', $pNode);
+            foreach ($tNodes as $tNode) {
+                $text .= $tNode->nodeValue;
+            }
+
+            $imageRelations = [];
+            $blips = $xpath->query('.//a:blip', $pNode);
+            foreach ($blips as $blip) {
+                $rId = $blip->getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'embed');
+                if ($rId && isset($rels[$rId])) {
+                    $imageRelations[] = $rels[$rId];
+                }
+            }
+
+            $imagedatas = $xpath->query('.//v:imagedata', $pNode);
+            foreach ($imagedatas as $imagedata) {
+                $rId = $imagedata->getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
+                if ($rId && isset($rels[$rId])) {
+                    $imageRelations[] = $rels[$rId];
+                }
+            }
+
+            $parsedParagraphs[] = [
+                'text' => $text,
+                'image_targets' => array_unique($imageRelations)
+            ];
+        }
+
+        $questions = [];
+        $currentQuestion = null;
+        $state = 'NONE';
+
+        foreach ($parsedParagraphs as $p) {
+            $text = trim($p['text']);
+            $targets = $p['image_targets'];
+
+            $storedPaths = [];
+            foreach ($targets as $target) {
+                $zipPath = 'word/' . ltrim($target, '/');
+                if (strpos($target, 'word/') === 0) {
+                    $zipPath = $target;
+                }
+                $imageBytes = $zip->getFromName($zipPath);
+                if ($imageBytes) {
+                    $ext = pathinfo($target, PATHINFO_EXTENSION) ?: 'png';
+                    $storedPath = 'questions/' . Str::uuid() . '.' . $ext;
+                    Storage::disk('public')->put($storedPath, $imageBytes);
+                    $storedPaths[] = $storedPath;
+                }
+            }
+
+            if (preg_match('/^[\s\*]*Q[\s\.]*(\d+)\s*\)(.*)$/i', $text, $matches)) {
+                if ($currentQuestion) {
+                    $questions[] = self::finalizeQuestion($currentQuestion);
+                }
+
+                $currentQuestion = [
+                    'title'              => trim($matches[2]),
+                    'description'        => '',
+                    'type'               => 'single_choice_radio',
+                    'difficulty'         => 'easy',
+                    'marks'              => 1,
+                    'negative_marks'     => 0.0,
+                    'explanation'        => '',
+                    'options'            => [],
+                    'images'             => $storedPaths,
+                    'explanation_images' => [],
+                ];
+                $state = 'QUESTION_BODY';
+                continue;
+            }
+
+            if (!$currentQuestion) {
+                continue;
+            }
+
+            if (preg_match('/^(\*)?\s*\[(\d+)\]\s*(.*)$/', $text, $matches)) {
+                $state = 'OPTIONS';
+                $isCorrect = !empty($matches[1]);
+                $optionNum = $matches[2];
+                $optionText = trim($matches[3]);
+
+                $currentQuestion['options'][] = [
+                    'option_text' => $optionText,
+                    'is_correct'  => $isCorrect,
+                    'letter'      => $optionNum
+                ];
+                continue;
+            }
+
+            if (preg_match('/^\[MARKS\]\s*(.*)$/i', $text, $matches)) {
+                $currentQuestion['marks'] = intval(trim($matches[1]));
+                continue;
+            }
+
+            if (preg_match('/^\[QUESTION TYPE\]\s*(.*)$/i', $text, $matches)) {
+                $typeVal = strtoupper(trim($matches[1]));
+                if ($typeVal === 'MC') {
+                    $currentQuestion['type'] = 'multiple_choice';
+                } elseif ($typeVal === 'SC') {
+                    $currentQuestion['type'] = 'single_choice_radio';
+                } else {
+                    $currentQuestion['type'] = strtolower($typeVal);
+                }
+                continue;
+            }
+
+            if (preg_match('/^\[NEGATIVE MARKS\]\s*(.*)$/i', $text, $matches)) {
+                $currentQuestion['negative_marks'] = floatval(trim($matches[1]));
+                continue;
+            }
+
+            if (preg_match('/^\[EXPLANATION\]\s*(.*)$/i', $text, $matches)) {
+                $state = 'EXPLANATION';
+                $currentQuestion['explanation'] = trim($matches[1]);
+                if (!empty($storedPaths)) {
+                    $currentQuestion['explanation_images'] = array_merge($currentQuestion['explanation_images'], $storedPaths);
+                }
+                continue;
+            }
+
+            if (preg_match('/^\[IMAGE(S)?\]/i', $text)) {
+                $state = 'QUESTION_IMAGES';
+                if (!empty($storedPaths)) {
+                    $currentQuestion['images'] = array_merge($currentQuestion['images'], $storedPaths);
+                }
+                continue;
+            }
+
+            if ($state === 'QUESTION_BODY') {
+                if ($text !== '') {
+                    $currentQuestion['title'] .= ($currentQuestion['title'] !== '' ? "\n" : "") . $text;
+                }
+                if (!empty($storedPaths)) {
+                    $currentQuestion['images'] = array_merge($currentQuestion['images'], $storedPaths);
+                }
+            } elseif ($state === 'EXPLANATION') {
+                if ($text !== '') {
+                    $currentQuestion['explanation'] .= ($currentQuestion['explanation'] !== '' ? "\n" : "") . $text;
+                }
+                if (!empty($storedPaths)) {
+                    $currentQuestion['explanation_images'] = array_merge($currentQuestion['explanation_images'], $storedPaths);
+                }
+            } elseif ($state === 'QUESTION_IMAGES') {
+                if (!empty($storedPaths)) {
+                    $currentQuestion['images'] = array_merge($currentQuestion['images'], $storedPaths);
+                }
+            }
+        }
+
+        if ($currentQuestion) {
+            $questions[] = self::finalizeQuestion($currentQuestion);
+        }
+
+        return $questions;
+    }
+
+    /**
+     * Parse Template 3: Table-based.
+     */
+    private static function parseTemplate3(ZipArchive $zip, DOMXPath $xpath, array $rels): array
+    {
+        $tblNodes = $xpath->query('//w:tbl');
+        $questions = [];
+
+        foreach ($tblNodes as $tblNode) {
+            $q = [
+                'title'              => '',
+                'description'        => '',
+                'type'               => 'single_choice_radio',
+                'difficulty'         => 'easy',
+                'marks'              => 1,
+                'negative_marks'     => 0.0,
+                'explanation'        => '',
+                'options'            => [],
+                'images'             => [],
+                'explanation_images' => [],
+                'metadata'           => [],
+            ];
+
+            $trNodes = $xpath->query('.//w:tr', $tblNode);
+            foreach ($trNodes as $trNode) {
+                $tcNodes = $xpath->query('.//w:tc', $trNode);
+                if ($tcNodes->length < 2) {
+                    continue;
+                }
+
+                $labelText = strtolower(trim(self::parseCellTextOnly($tcNodes->item(0), $xpath)));
+
+                if (strpos($labelText, 'question') !== false) {
+                    $cellData = self::parseCell($tcNodes->item(1), $xpath, $rels, $zip);
+                    $q['title'] = $cellData['text'];
+                    $q['images'] = array_merge($q['images'], $cellData['images']);
+                } elseif (strpos($labelText, 'explanation') !== false) {
+                    $cellData = self::parseCell($tcNodes->item(1), $xpath, $rels, $zip);
+                    $q['explanation'] = $cellData['text'];
+                    $q['explanation_images'] = array_merge($q['explanation_images'], $cellData['images']);
+                } elseif (strpos($labelText, 'type') !== false) {
+                    $typeVal = strtoupper(trim(self::parseCellTextOnly($tcNodes->item(1), $xpath)));
+                    if ($typeVal === 'SC') {
+                        $q['type'] = 'single_choice_radio';
+                    } elseif ($typeVal === 'MC') {
+                        $q['type'] = 'multiple_choice';
+                    } elseif ($typeVal === 'FB') {
+                        $q['type'] = 'fill_in_the_blanks';
+                    } else {
+                        $q['type'] = strtolower($typeVal);
+                    }
+                } elseif (strpos($labelText, 'option') !== false) {
+                    $cellData = self::parseCell($tcNodes->item(1), $xpath, $rels, $zip);
+                    $correctText = '';
+                    if ($tcNodes->length >= 3) {
+                        $correctText = strtolower(trim(self::parseCellTextOnly($tcNodes->item(2), $xpath)));
+                    }
+                    $isCorrect = (strpos($correctText, 'correct') !== false && strpos($correctText, 'incorrect') === false);
+                    $q['options'][] = [
+                        'option_text'  => $cellData['text'],
+                        'is_correct'   => $isCorrect,
+                        'option_image' => !empty($cellData['images']) ? $cellData['images'][0] : null
+                    ];
+                } elseif (strpos($labelText, 'marks') !== false) {
+                    $marksVal = intval(trim(self::parseCellTextOnly($tcNodes->item(1), $xpath)));
+                    $negPercent = 0.0;
+                    if ($tcNodes->length >= 3) {
+                        $negPercentText = self::parseCellTextOnly($tcNodes->item(2), $xpath);
+                        $negPercent = floatval(str_replace('%', '', $negPercentText));
+                    }
+                    $q['marks'] = $marksVal > 0 ? $marksVal : 1;
+                    $q['negative_marks'] = $q['marks'] * ($negPercent / 100.0);
+                }
+            }
+
+            // Post-process fill in the blanks
+            if ($q['type'] === 'fill_in_the_blanks') {
+                $title = $q['title'];
+                preg_match_all('/##(.*?)##/', $title, $matches);
+                if (!empty($matches[1])) {
+                    $q['metadata']['blank_answers'] = array_values(array_filter(array_map('trim', $matches[1])));
+                    $q['title'] = preg_replace('/##.*?##/', '___', $title);
+                }
+            }
+
+            // Skip table if no title (e.g. instruction or empty tables)
+            if (trim($q['title']) === '') {
+                continue;
+            }
+
+            $questions[] = self::finalizeQuestion($q);
+        }
+
+        return $questions;
+    }
+
+    /**
+     * Parse cell content (text and images).
+     */
+    private static function parseCell(\DOMNode $tcNode, DOMXPath $xpath, array $rels, ZipArchive $zip): array
+    {
+        $paragraphs = $xpath->query('.//w:p', $tcNode);
+        $textLines = [];
+        $storedPaths = [];
+
+        foreach ($paragraphs as $pNode) {
+            $text = '';
+            $tNodes = $xpath->query('.//w:t', $pNode);
+            foreach ($tNodes as $tNode) {
+                $text .= $tNode->nodeValue;
+            }
+            if (trim($text) !== '') {
+                $textLines[] = trim($text);
+            }
+
+            $imageRelations = [];
+            $blips = $xpath->query('.//a:blip', $pNode);
+            foreach ($blips as $blip) {
+                $rId = $blip->getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'embed');
+                if ($rId && isset($rels[$rId])) {
+                    $imageRelations[] = $rels[$rId];
+                }
+            }
+            $imagedatas = $xpath->query('.//v:imagedata', $pNode);
+            foreach ($imagedatas as $imagedata) {
+                $rId = $imagedata->getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
+                if ($rId && isset($rels[$rId])) {
+                    $imageRelations[] = $rels[$rId];
+                }
+            }
+
+            $imageRelations = array_unique($imageRelations);
+            foreach ($imageRelations as $target) {
+                $zipPath = 'word/' . ltrim($target, '/');
+                if (strpos($target, 'word/') === 0) {
+                    $zipPath = $target;
+                }
+                $imageBytes = $zip->getFromName($zipPath);
+                if ($imageBytes) {
+                    $ext = pathinfo($target, PATHINFO_EXTENSION) ?: 'png';
+                    $storedPath = 'questions/' . Str::uuid() . '.' . $ext;
+                    Storage::disk('public')->put($storedPath, $imageBytes);
+                    $storedPaths[] = $storedPath;
+                }
+            }
+        }
+
+        return [
+            'text'   => implode("\n", $textLines),
+            'images' => $storedPaths
+        ];
+    }
+
+    /**
+     * Parse cell text only.
+     */
+    private static function parseCellTextOnly(\DOMNode $tcNode, DOMXPath $xpath): string
+    {
+        $text = '';
+        $tNodes = $xpath->query('.//w:t', $tcNode);
+        foreach ($tNodes as $tNode) {
+            $text .= $tNode->nodeValue;
+        }
+        return trim($text);
     }
 
     /**
@@ -251,22 +609,24 @@ class DocxQuestionParser
             $q['description'] = $title; // default to match system behavior where description is same as title
         }
 
-        // 2. Count options and correct flags to determine question type
-        $totalOptions = count($q['options']);
-        if ($totalOptions === 0) {
-            $q['type'] = 'free_text'; // Essay if no options are defined
-        } else {
-            $correctCount = 0;
-            foreach ($q['options'] as $opt) {
-                if ($opt['is_correct']) {
-                    $correctCount++;
-                }
-            }
-
-            if ($correctCount > 1) {
-                $q['type'] = 'multiple_choice';
+        // 2. Count options and correct flags to determine question type if choice-based
+        if (!isset($q['type']) || in_array($q['type'], ['single_choice_radio', 'multiple_choice', 'single_choice_dropdown'])) {
+            $totalOptions = count($q['options']);
+            if ($totalOptions === 0) {
+                $q['type'] = 'free_text';
             } else {
-                $q['type'] = 'single_choice_radio';
+                $correctCount = 0;
+                foreach ($q['options'] as $opt) {
+                    if ($opt['is_correct']) {
+                        $correctCount++;
+                    }
+                }
+
+                if ($correctCount > 1) {
+                    $q['type'] = 'multiple_choice';
+                } else {
+                    $q['type'] = 'single_choice_radio';
+                }
             }
         }
 

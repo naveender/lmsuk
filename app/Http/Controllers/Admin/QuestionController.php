@@ -625,6 +625,42 @@ class QuestionController extends Controller
     }
 
     /**
+     * Download sample DOCX Template 1.
+     */
+    public function downloadSampleDocxTemplate1()
+    {
+        $path = public_path('importing_templates/template1.docx');
+        if (!file_exists($path)) {
+            abort(404, 'Template 1 file not found.');
+        }
+        return response()->download($path, 'template1.docx');
+    }
+
+    /**
+     * Download sample DOCX Template 2.
+     */
+    public function downloadSampleDocxTemplate2()
+    {
+        $path = public_path('importing_templates/template2.docx');
+        if (!file_exists($path)) {
+            abort(404, 'Template 2 file not found.');
+        }
+        return response()->download($path, 'template2.docx');
+    }
+
+    /**
+     * Download sample DOCX Template 3.
+     */
+    public function downloadSampleDocxTemplate3()
+    {
+        $path = public_path('importing_templates/template3.docx');
+        if (!file_exists($path)) {
+            abort(404, 'Template 3 file not found.');
+        }
+        return response()->download($path, 'template3.docx');
+    }
+
+    /**
      * Upload and parse the import file to count rows.
      */
     public function parseImportFile(Request $request)
@@ -800,6 +836,11 @@ class QuestionController extends Controller
                 try {
                     DB::beginTransaction();
 
+                    $metadata = !empty($q['metadata']) ? $q['metadata'] : [];
+                    if (isset($q['negative_marks'])) {
+                        $metadata['negative_marks'] = $q['negative_marks'];
+                    }
+
                     $question = Question::create([
                         'title'              => $title,
                         'description'        => $q['description'] ?? $title,
@@ -814,15 +855,17 @@ class QuestionController extends Controller
                         'images'             => !empty($q['images']) ? $q['images'] : null,
                         'image'              => !empty($q['images']) ? $q['images'][0] : null,
                         'is_active'          => true,
+                        'metadata'           => !empty($metadata) ? $metadata : null,
                     ]);
 
                     if ($question->usesOptions()) {
                         foreach ($q['options'] as $optIdx => $opt) {
                             QuestionOption::create([
-                                'question_id' => $question->id,
-                                'option_text' => $opt['option_text'],
-                                'is_correct'  => $opt['is_correct'],
-                                'sort_order'  => $optIdx,
+                                'question_id'  => $question->id,
+                                'option_text'  => $opt['option_text'],
+                                'is_correct'   => $opt['is_correct'],
+                                'option_image' => $opt['option_image'] ?? null,
+                                'sort_order'   => $optIdx,
                             ]);
                         }
                     }

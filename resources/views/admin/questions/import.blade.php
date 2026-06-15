@@ -192,7 +192,7 @@
                         </div>
                         <div class="card-body">
                             <p class="card-text text-muted">
-                                Follow these quick steps to upload and import questions in bulk. Supported formats: <strong>CSV, DOCX (System Template 1)</strong>.
+                                Follow these quick steps to upload and import questions in bulk. Supported formats: <strong>CSV, DOCX (Templates 1, 2 & 3)</strong>.
                             </p>
                             
                             <div class="d-flex align-items-start mb-1">
@@ -201,10 +201,21 @@
                                 </div>
                                 <div>
                                     <h5 class="font-weight-bold mb-0">Prepare Your Categories & Template</h5>
-                                    <p class="text-muted">For CSV, use our template. For DOCX, ensure it follows System Template 1 formatting. Select a Subject/Topic from the dropdowns to categorize the imported questions.</p>
-                                    <a href="{{ route('admin.questions.import-sample') }}" class="btn btn-outline-primary btn-sm mb-1">
-                                        <i class="feather icon-download mr-50"></i> Download Sample CSV Template
-                                    </a>
+                                    <p class="text-muted">For CSV, use our sample template. For DOCX, you can choose from three template formats: paragraph-based with markers (Template 1), paragraph-based with metadata tags (Template 2), or table-based (Template 3). Select a Subject/Topic from the dropdowns to categorize the imported questions.</p>
+                                    <div class="mb-1">
+                                        <a href="{{ route('admin.questions.import-sample') }}" class="btn btn-outline-primary btn-sm mb-50 mr-50">
+                                            <i class="feather icon-download mr-50"></i> Download Sample CSV Template
+                                        </a>
+                                        <a href="{{ route('admin.questions.import-sample-docx-1') }}" class="btn btn-outline-success btn-sm mb-50 mr-50">
+                                            <i class="feather icon-download mr-50"></i> Download DOCX Template 1 (Markers)
+                                        </a>
+                                        <a href="{{ route('admin.questions.import-sample-docx-2') }}" class="btn btn-outline-info btn-sm mb-50 mr-50">
+                                            <i class="feather icon-download mr-50"></i> Download DOCX Template 2 (Tags)
+                                        </a>
+                                        <a href="{{ route('admin.questions.import-sample-docx-3') }}" class="btn btn-outline-warning btn-sm mb-50">
+                                            <i class="feather icon-download mr-50"></i> Download DOCX Template 3 (Table)
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                             
