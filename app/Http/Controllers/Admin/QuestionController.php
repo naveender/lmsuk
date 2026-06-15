@@ -841,6 +841,16 @@ class QuestionController extends Controller
                         $metadata['negative_marks'] = $q['negative_marks'];
                     }
 
+                    $qImages = !empty($q['images']) ? $q['images'] : [];
+                    $singleImage = null;
+                    $multipleImages = null;
+                    if (count($qImages) > 0) {
+                        $singleImage = $qImages[0];
+                        if (count($qImages) > 1) {
+                            $multipleImages = array_slice($qImages, 1);
+                        }
+                    }
+
                     $question = Question::create([
                         'title'              => $title,
                         'description'        => $q['description'] ?? $title,
@@ -852,8 +862,8 @@ class QuestionController extends Controller
                         'marks'              => $q['marks'] ?? 1,
                         'explanation'        => $q['explanation'] ?? null,
                         'explanation_images' => !empty($q['explanation_images']) ? $q['explanation_images'] : null,
-                        'images'             => !empty($q['images']) ? $q['images'] : null,
-                        'image'              => !empty($q['images']) ? $q['images'][0] : null,
+                        'images'             => $multipleImages,
+                        'image'              => $singleImage,
                         'is_active'          => true,
                         'metadata'           => !empty($metadata) ? $metadata : null,
                     ]);

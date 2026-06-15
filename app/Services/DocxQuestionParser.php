@@ -320,6 +320,19 @@ class DocxQuestionParser
                 }
             }
 
+            // Strip and flag QIMAGE / EIMAGE tags
+            $hasQImageTag = false;
+            $hasEImageTag = false;
+
+            if (preg_match('/\[?QIMAGE(S)?\]?/i', $text)) {
+                $hasQImageTag = true;
+                $text = trim(preg_replace('/\[?QIMAGE(S)?\]?/i', '', $text));
+            }
+            if (preg_match('/\[?EIMAGE(S)?\]?/i', $text)) {
+                $hasEImageTag = true;
+                $text = trim(preg_replace('/\[?EIMAGE(S)?\]?/i', '', $text));
+            }
+
             if (preg_match('/^[\s\*]*Q[\s\.]*(\d+)\s*\)(.*)$/i', $text, $matches)) {
                 if ($currentQuestion) {
                     $questions[] = self::finalizeQuestion($currentQuestion);
@@ -337,12 +350,37 @@ class DocxQuestionParser
                     'images'             => $storedPaths,
                     'explanation_images' => [],
                 ];
-                $state = 'QUESTION_BODY';
+                
+                if ($hasQImageTag) {
+                    $state = 'QUESTION_IMAGES';
+                } else {
+                    $state = 'QUESTION_BODY';
+                }
                 continue;
             }
 
             if (!$currentQuestion) {
                 continue;
+            }
+
+            if ($hasQImageTag) {
+                $state = 'QUESTION_IMAGES';
+                if (!empty($storedPaths)) {
+                    $currentQuestion['images'] = array_merge($currentQuestion['images'], $storedPaths);
+                }
+                if ($text === '') {
+                    continue;
+                }
+            }
+
+            if ($hasEImageTag) {
+                $state = 'EXPLANATION_IMAGES';
+                if (!empty($storedPaths)) {
+                    $currentQuestion['explanation_images'] = array_merge($currentQuestion['explanation_images'], $storedPaths);
+                }
+                if ($text === '') {
+                    continue;
+                }
             }
 
             if (preg_match('/^(\*)?\s*\[(\d+)\]\s*(.*)$/', $text, $matches)) {
@@ -382,18 +420,14 @@ class DocxQuestionParser
             }
 
             if (preg_match('/^\[EXPLANATION\]\s*(.*)$/i', $text, $matches)) {
-                $state = 'EXPLANATION';
                 $currentQuestion['explanation'] = trim($matches[1]);
                 if (!empty($storedPaths)) {
                     $currentQuestion['explanation_images'] = array_merge($currentQuestion['explanation_images'], $storedPaths);
                 }
-                continue;
-            }
-
-            if (preg_match('/^\[IMAGE(S)?\]/i', $text)) {
-                $state = 'QUESTION_IMAGES';
-                if (!empty($storedPaths)) {
-                    $currentQuestion['images'] = array_merge($currentQuestion['images'], $storedPaths);
+                if ($hasEImageTag) {
+                    $state = 'EXPLANATION_IMAGES';
+                } else {
+                    $state = 'EXPLANATION';
                 }
                 continue;
             }
@@ -415,6 +449,10 @@ class DocxQuestionParser
             } elseif ($state === 'QUESTION_IMAGES') {
                 if (!empty($storedPaths)) {
                     $currentQuestion['images'] = array_merge($currentQuestion['images'], $storedPaths);
+                }
+            } elseif ($state === 'EXPLANATION_IMAGES') {
+                if (!empty($storedPaths)) {
+                    $currentQuestion['explanation_images'] = array_merge($currentQuestion['explanation_images'], $storedPaths);
                 }
             }
         }

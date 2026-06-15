@@ -353,3 +353,37 @@ test('admin can upload and parse docx via import-parse for all templates', funct
     expect($dbQuestion3->metadata['negative_marks'])->toBe(0.5);
     expect($dbQuestion3->metadata['blank_answers'])->toBe(['3']);
 });
+
+test('docx question import slices images correctly to avoid duplicates', function () {
+    Storage::fake('public');
+    $admin = User::factory()->create(['role' => 'admin', 'username' => 'admin_docx_test_images']);
+    $subject = Subject::create(['title' => 'Math', 'is_active' => true]);
+
+    $docxPath = createDummyDocx();
+    $file = new UploadedFile($docxPath, 'questions.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', null, true);
+
+    $response = $this->actingAs($admin)
+        ->postJson(route('admin.questions.import-parse'), [
+            'file' => $file,
+            'subject_id' => $subject->id,
+        ]);
+
+    $response->assertStatus(200);
+    $data = $response->json();
+    $token = $data['import_token'];
+
+    $responseChunk = $this->actingAs($admin)
+        ->postJson(route('admin.questions.import-process'), [
+            'import_token' => $token,
+            'offset' => 0,
+            'limit' => 1
+        ]);
+
+    $responseChunk->assertStatus(200);
+
+    $dbQuestion = Question::where('title', 'What is 1+1?')->first();
+    expect($dbQuestion)->not->toBeNull();
+    expect($dbQuestion->image)->not->toBeNull();
+    expect($dbQuestion->images)->toBeNull(); // Should be null because it was a single image, sliced out of images to avoid duplication
+    Storage::disk('public')->assertExists($dbQuestion->image);
+});
