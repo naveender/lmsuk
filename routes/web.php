@@ -167,6 +167,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::post('admin/questions/import/parse', [AdminQuestionController::class, 'parseImportFile'])->name('admin.questions.import-parse');
     Route::post('admin/questions/import/process', [AdminQuestionController::class, 'processImportChunk'])->name('admin.questions.import-process');
     Route::get('admin/questions/import/sample', [AdminQuestionController::class, 'downloadSample'])->name('admin.questions.import-sample');
+    Route::get('admin/questions/import/sample-docx-1', [AdminQuestionController::class, 'downloadSampleDocxTemplate1'])->name('admin.questions.import-sample-docx-1');
+    Route::get('admin/questions/import/sample-docx-2', [AdminQuestionController::class, 'downloadSampleDocxTemplate2'])->name('admin.questions.import-sample-docx-2');
+    Route::get('admin/questions/import/sample-docx-3', [AdminQuestionController::class, 'downloadSampleDocxTemplate3'])->name('admin.questions.import-sample-docx-3');
     Route::resource('admin/questions', AdminQuestionController::class)->names([
         'index'   => 'admin.questions.index',
         'create'  => 'admin.questions.create',

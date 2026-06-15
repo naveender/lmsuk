@@ -192,7 +192,7 @@
                         </div>
                         <div class="card-body">
                             <p class="card-text text-muted">
-                                Follow these quick steps to upload and import questions in bulk. Supported formats: <strong>CSV</strong>.
+                                Follow these quick steps to upload and import questions in bulk. Supported formats: <strong>CSV, DOCX (Templates 1, 2 & 3)</strong>.
                             </p>
                             
                             <div class="d-flex align-items-start mb-1">
@@ -200,11 +200,22 @@
                                     <span class="font-weight-bold text-primary">1</span>
                                 </div>
                                 <div>
-                                    <h5 class="font-weight-bold mb-0">Download the Template</h5>
-                                    <p class="text-muted">Always use our standardized CSV file to structure your question columns correctly.</p>
-                                    <a href="{{ route('admin.questions.import-sample') }}" class="btn btn-outline-primary btn-sm mb-1">
-                                        <i class="feather icon-download mr-50"></i> Download Sample CSV Template
-                                    </a>
+                                    <h5 class="font-weight-bold mb-0">Prepare Your Categories & Template</h5>
+                                    <p class="text-muted">For CSV, use our sample template. For DOCX, you can choose from three template formats: paragraph-based with markers (Template 1), paragraph-based with metadata tags (Template 2), or table-based (Template 3). Select a Subject/Topic from the dropdowns to categorize the imported questions.</p>
+                                    <div class="mb-1">
+                                        <a href="{{ route('admin.questions.import-sample') }}" class="btn btn-outline-primary btn-sm mb-50 mr-50">
+                                            <i class="feather icon-download mr-50"></i> Download Sample CSV Template
+                                        </a>
+                                        <a href="{{ route('admin.questions.import-sample-docx-1') }}" class="btn btn-outline-success btn-sm mb-50 mr-50">
+                                            <i class="feather icon-download mr-50"></i> Download DOCX Template 1 (Markers)
+                                        </a>
+                                        <a href="{{ route('admin.questions.import-sample-docx-2') }}" class="btn btn-outline-info btn-sm mb-50 mr-50">
+                                            <i class="feather icon-download mr-50"></i> Download DOCX Template 2 (Tags)
+                                        </a>
+                                        <a href="{{ route('admin.questions.import-sample-docx-3') }}" class="btn btn-outline-warning btn-sm mb-50">
+                                            <i class="feather icon-download mr-50"></i> Download DOCX Template 3 (Table)
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -234,13 +245,38 @@
                     <div class="card import-card" id="upload-card">
                         <div class="card-body">
                             <h4 class="card-title font-weight-bold mb-2">Upload File</h4>
+
+                            <!-- Category Selection Dropdowns -->
+                            <div class="row mb-3">
+                                <div class="col-md-4 mb-1">
+                                    <label class="form-label font-weight-bold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;" for="subject-select">Subject</label>
+                                    <select class="form-control" id="subject-select" style="border-radius: 8px; border: 1px solid #d8d6de; padding: 8px 12px; height: auto;">
+                                        <option value="">-- Select Subject (Optional for CSV) --</option>
+                                        @foreach($subjects as $subject)
+                                            <option value="{{ $subject->id }}">{{ $subject->title }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-1">
+                                    <label class="form-label font-weight-bold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;" for="topic-select">Topic</label>
+                                    <select class="form-control" id="topic-select" style="border-radius: 8px; border: 1px solid #d8d6de; padding: 8px 12px; height: auto;" disabled>
+                                        <option value="">-- Select Topic --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-1">
+                                    <label class="form-label font-weight-bold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;" for="subtopic-select">Subtopic</label>
+                                    <select class="form-control" id="subtopic-select" style="border-radius: 8px; border: 1px solid #d8d6de; padding: 8px 12px; height: auto;" disabled>
+                                        <option value="">-- Select Subtopic --</option>
+                                    </select>
+                                </div>
+                            </div>
                             
                             <div class="dropzone-container" id="dropzone">
-                                <input type="file" id="csv-file-input" accept=".csv" class="d-none">
+                                <input type="file" id="csv-file-input" accept=".csv,.docx" class="d-none">
                                 <div class="dropzone-icon">
                                     <i class="feather icon-upload-cloud"></i>
                                 </div>
-                                <h5 class="font-weight-bold">Drag and drop your CSV file here</h5>
+                                <h5 class="font-weight-bold">Drag and drop your CSV or DOCX file here</h5>
                                 <p class="text-muted">or click to browse from your computer</p>
                                 <div class="badge badge-light-secondary mt-1">Maximum file size: 10MB</div>
                             </div>
@@ -415,6 +451,64 @@
         let isImporting = false;
         let errorsList = [];
 
+        const subjectSelect = document.getElementById('subject-select');
+        const topicSelect = document.getElementById('topic-select');
+        const subtopicSelect = document.getElementById('subtopic-select');
+
+        // Dynamic load of Topics
+        subjectSelect.addEventListener('change', function () {
+            const subjectId = this.value;
+            topicSelect.innerHTML = '<option value="">-- Select Topic --</option>';
+            topicSelect.disabled = true;
+            subtopicSelect.innerHTML = '<option value="">-- Select Subtopic --</option>';
+            subtopicSelect.disabled = true;
+
+            if (!subjectId) return;
+
+            axios.get('{{ url("admin/questions/get-topics") }}/' + subjectId)
+                .then(response => {
+                    const topics = response.data;
+                    if (topics.length > 0) {
+                        topics.forEach(topic => {
+                            const option = document.createElement('option');
+                            option.value = topic.id;
+                            option.textContent = topic.name;
+                            topicSelect.appendChild(option);
+                        });
+                        topicSelect.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching topics:', error);
+                });
+        });
+
+        // Dynamic load of Subtopics
+        topicSelect.addEventListener('change', function () {
+            const topicId = this.value;
+            subtopicSelect.innerHTML = '<option value="">-- Select Subtopic --</option>';
+            subtopicSelect.disabled = true;
+
+            if (!topicId) return;
+
+            axios.get('{{ url("admin/questions/get-subtopics") }}/' + topicId)
+                .then(response => {
+                    const subtopics = response.data;
+                    if (subtopics.length > 0) {
+                        subtopics.forEach(subtopic => {
+                            const option = document.createElement('option');
+                            option.value = subtopic.id;
+                            option.textContent = subtopic.name;
+                            subtopicSelect.appendChild(option);
+                        });
+                        subtopicSelect.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching subtopics:', error);
+                });
+        });
+
         // Click trigger file browser
         dropzone.addEventListener('click', () => fileInput.click());
 
@@ -468,11 +562,23 @@
 
         // Parse file to get row count
         function handleFileSelect(file) {
-            if (!file.name.endsWith('.csv') && !file.name.endsWith('.txt')) {
+            const isDocx = file.name.endsWith('.docx');
+            if (!file.name.endsWith('.csv') && !file.name.endsWith('.txt') && !isDocx) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Invalid File',
-                    text: 'Please upload a valid CSV file.',
+                    text: 'Please upload a valid CSV or DOCX file.',
+                    confirmButtonClass: 'btn btn-primary',
+                    buttonsStyling: false,
+                });
+                return;
+            }
+
+            if (isDocx && !subjectSelect.value) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Subject Required',
+                    text: 'Please select a Subject before importing a DOCX file.',
                     confirmButtonClass: 'btn btn-primary',
                     buttonsStyling: false,
                 });
@@ -495,6 +601,9 @@
 
             const formData = new FormData();
             formData.append('file', selectedFile);
+            formData.append('subject_id', subjectSelect.value);
+            formData.append('topic_id', topicSelect.value);
+            formData.append('subtopic_id', subtopicSelect.value);
 
             axios.post('{{ route("admin.questions.import-parse") }}', formData, {
                 headers: {
