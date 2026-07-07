@@ -64,8 +64,8 @@
                                 <select name="week" id="week_filter" class="form-control form-control-sm filter-select">
                                     <option value="">All Weeks</option>
                                     @foreach($weeks as $wk)
-                                        <option value="{{ $wk }}" {{ request('week') == $wk ? 'selected' : '' }}>
-                                            Week {{ $wk }}
+                                        <option value="{{ $wk->id }}" {{ request('week') == $wk->id ? 'selected' : '' }}>
+                                            {{ $wk->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -100,7 +100,7 @@
                 <!-- STUDENT PORTAL Header -->
                 <div class="portal-header-wrapper mt-3 mb-2">
                     <span class="portal-badge font-weight-extrabold text-uppercase">Student Portal</span>
-                    <h2 class="portal-title font-weight-bold text-dark">{{ $courseTitle }} | YR 5 — Week {{ $selectedWeek }} Portal Hub</h2>
+                    <h2 class="portal-title font-weight-bold text-dark">{{ $courseTitle }} | YR 5 — {{ $selectedWeekName }} Portal Hub</h2>
                 </div>
 
                 <!-- OVERVIEW METRICS BAR -->

@@ -96,13 +96,21 @@ class CourseController extends Controller
      */
     public function managePapers(Course $course)
     {
-        // Get papers assigned to this course ordered by week
-        $coursePapers = $course->papers()->orderBy('course_paper.week')->get();
+        // Get papers assigned to this course ordered by week_id / week name / due date
+        $coursePapers = $course->papers()
+            ->leftJoin('weeks', 'course_paper.week_id', '=', 'weeks.id')
+            ->select('papers.*', 'weeks.name as week_name', 'course_paper.week as pivot_week', 'course_paper.week_id as pivot_week_id')
+            ->orderBy('weeks.due_date')
+            ->orderBy('weeks.name')
+            ->get();
 
         // Get all papers to populate the selection dropdown
         $allPapers = Paper::orderBy('title')->get();
 
-        return view('admin.courses.manage_papers', compact('course', 'coursePapers', 'allPapers'));
+        // Get all weeks for this course
+        $weeks = $course->weeks()->orderBy('name')->get();
+
+        return view('admin.courses.manage_papers', compact('course', 'coursePapers', 'allPapers', 'weeks'));
     }
 
     /**
@@ -112,16 +120,47 @@ class CourseController extends Controller
     {
         $request->validate([
             'paper_id' => 'required|exists:papers,id',
-            'week' => 'required|integer|min:1',
+            'week_mode' => 'required|in:existing,new',
+            'week_id' => 'required_if:week_mode,existing|nullable|exists:weeks,id',
+            'new_week_name' => 'required_if:week_mode,new|nullable|string|max:255',
+            'new_week_due_date' => 'nullable|date',
         ]);
+
+        $weekId = null;
+        $weekName = '';
+
+        if ($request->week_mode === 'existing') {
+            $weekId = $request->week_id;
+            $weekModel = \App\Models\Week::find($weekId);
+            $weekName = $weekModel ? $weekModel->name : '';
+        } else {
+            $weekModel = \App\Models\Week::create([
+                'course_id' => $course->id,
+                'name' => $request->new_week_name,
+                'due_date' => $request->new_week_due_date ?: null,
+            ]);
+            $weekId = $weekModel->id;
+            $weekName = $weekModel->name;
+        }
+
+        $weekNumber = 1;
+        if (preg_match('/(\d+)/', $weekName, $matches)) {
+            $weekNumber = (int) $matches[1];
+        }
 
         if ($course->papers()->where('paper_id', $request->paper_id)->exists()) {
             // Update the week if already assigned
-            $course->papers()->updateExistingPivot($request->paper_id, ['week' => $request->week]);
+            $course->papers()->updateExistingPivot($request->paper_id, [
+                'week' => $weekNumber,
+                'week_id' => $weekId
+            ]);
             $message = 'Paper week updated successfully.';
         } else {
             // Add new paper-course relationship
-            $course->papers()->attach($request->paper_id, ['week' => $request->week]);
+            $course->papers()->attach($request->paper_id, [
+                'week' => $weekNumber,
+                'week_id' => $weekId
+            ]);
             $message = 'Paper added to course successfully.';
         }
 

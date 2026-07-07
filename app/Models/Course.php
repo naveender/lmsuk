@@ -17,12 +17,20 @@ class Course extends Model
     ];
 
     /**
+     * Get the weeks associated with the course.
+     */
+    public function weeks()
+    {
+        return $this->hasMany(Week::class)->orderBy('name');
+    }
+
+    /**
      * Get the papers associated with the course.
      */
     public function papers()
     {
         return $this->belongsToMany(Paper::class, 'course_paper')
-            ->withPivot('week')
+            ->withPivot('week', 'week_id')
             ->withTimestamps()
             ->orderByPivot('week');
     }

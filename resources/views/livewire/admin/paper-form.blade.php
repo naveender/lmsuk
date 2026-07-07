@@ -407,6 +407,7 @@
                         </div>
 
                         <!-- Course Assignment Section -->
+                        <!-- Course Assignment Section -->
                         <div class="row border-top pt-2 mt-1">
                             <div class="col-md-12">
                                 <h5 class="font-weight-bold text-primary mb-1">
@@ -426,7 +427,7 @@
                             </div>
 
                             @if($create_new_course)
-                                <div class="col-md-8">
+                                <div class="col-md-12">
                                     <div class="form-group mb-2">
                                         <label for="new_course_name" class="font-weight-bold text-dark">New Course Name
                                             <span class="text-danger">*</span></label>
@@ -437,11 +438,11 @@
                                     </div>
                                 </div>
                             @else
-                                <div class="col-md-8">
+                                <div class="col-md-12">
                                     <div class="form-group mb-2">
                                         <label for="course_id" class="font-weight-bold text-dark">Assign to Existing
                                             Course</label>
-                                        <select id="course_id" class="form-control" wire:model.defer="course_id">
+                                        <select id="course_id" class="form-control" wire:model.live="course_id">
                                             <option value="">-- Do Not Assign --</option>
                                             @foreach($coursesList as $courseItem)
                                                 <option value="{{ $courseItem->id }}">{{ $courseItem->name }}</option>
@@ -453,16 +454,68 @@
                                 </div>
                             @endif
 
-                            <div class="col-md-4">
-                                <div class="form-group mb-2">
-                                    <label for="week" class="font-weight-bold text-dark">Week Number <span
-                                            class="text-danger">*</span></label>
-                                    <input type="number" id="week" class="form-control" placeholder="e.g. 1" min="1"
-                                        wire:model.defer="week">
-                                    @error('week') <span class="text-danger font-small-3">{{ $message }}</span>
-                                    @enderror
+                            @if($create_new_course || $course_id)
+                                <div class="col-md-12">
+                                    <div class="card bg-light border p-2 mb-2">
+                                        <h6 class="font-weight-bold mb-1 text-dark">Week Settings</h6>
+                                        
+                                        @if(!$create_new_course)
+                                            <div class="form-group mb-2">
+                                                <label class="font-weight-bold text-dark d-block">Week Selection Mode</label>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="custom-control custom-radio mr-3">
+                                                        <input type="radio" class="custom-control-input" id="week_mode_existing" value="existing"
+                                                            wire:model.live="week_mode">
+                                                        <label class="custom-control-label font-weight-bold cursor-pointer" for="week_mode_existing">
+                                                            Choose Existing Week
+                                                        </label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" class="custom-control-input" id="week_mode_new" value="new"
+                                                            wire:model.live="week_mode">
+                                                        <label class="custom-control-label font-weight-bold cursor-pointer" for="week_mode_new">
+                                                            Create New Week
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        @if($week_mode === 'existing' && !$create_new_course)
+                                            <div class="form-group mb-0">
+                                                <label for="selected_week_id" class="font-weight-bold text-dark">Select Week <span class="text-danger">*</span></label>
+                                                <select id="selected_week_id" class="form-control" wire:model.defer="selected_week_id">
+                                                    <option value="">-- Choose Week --</option>
+                                                    @foreach($courseWeeks as $cWeek)
+                                                        <option value="{{ $cWeek['id'] }}">
+                                                            {{ $cWeek['name'] }} @if($cWeek['due_date']) (Due: {{ \Carbon\Carbon::parse($cWeek['due_date'])->format('d M Y') }}) @endif
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('selected_week_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                            </div>
+                                        @else
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    <div class="form-group mb-2">
+                                                        <label for="new_week_name" class="font-weight-bold text-dark">Week Name / Title <span class="text-danger">*</span></label>
+                                                        <input type="text" id="new_week_name" class="form-control" placeholder="e.g. Week 21 - Rational Numbers"
+                                                            wire:model.defer="new_week_name">
+                                                        @error('new_week_name') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group mb-2">
+                                                        <label for="new_week_due_date" class="font-weight-bold text-dark">Due Date</label>
+                                                        <input type="date" id="new_week_due_date" class="form-control" wire:model.defer="new_week_due_date">
+                                                        @error('new_week_due_date') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>

@@ -115,7 +115,8 @@ test('admin can assign a paper to a course with a week number', function () {
     $response = $this->actingAs($admin)
         ->post(route('admin.courses.papers.add', $course->id), [
             'paper_id' => $paper->id,
-            'week' => 3,
+            'week_mode' => 'new',
+            'new_week_name' => 'Week 3',
         ]);
 
     $response->assertRedirect(route('admin.courses.papers', $course->id));

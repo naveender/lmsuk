@@ -69,9 +69,42 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="week">Week Number (Parameter)</label>
-                                            <input type="number" name="week" id="week" class="form-control" min="1" placeholder="e.g. 1, 2, 3..." required>
-                                            <small class="text-muted">Specifies the weekly order of the paper in this course.</small>
+                                            <label class="font-weight-bold">Week Selection Mode</label>
+                                            <div class="d-flex align-items-center mb-1">
+                                                <div class="custom-control custom-radio mr-2">
+                                                    <input type="radio" id="mode_existing" name="week_mode" value="existing" class="custom-control-input" checked onclick="toggleWeekFields('existing')">
+                                                    <label class="custom-control-label font-weight-bold cursor-pointer" for="mode_existing">Choose Existing Week</label>
+                                                </div>
+                                                <div class="custom-control custom-radio">
+                                                    <input type="radio" id="mode_new" name="week_mode" value="new" class="custom-control-input" onclick="toggleWeekFields('new')">
+                                                    <label class="custom-control-label font-weight-bold cursor-pointer" for="mode_new">Create New Week</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Existing Week Fields -->
+                                        <div class="form-group" id="existing_week_container">
+                                            <label for="week_id">Select Week <span class="text-danger">*</span></label>
+                                            <select name="week_id" id="week_id" class="form-control">
+                                                <option value="">-- Choose Week --</option>
+                                                @foreach($weeks as $wk)
+                                                    <option value="{{ $wk->id }}">
+                                                        {{ $wk->name }} @if($wk->due_date) (Due: {{ \Carbon\Carbon::parse($wk->due_date)->format('d M Y') }}) @endif
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <!-- New Week Fields -->
+                                        <div class="form-group d-none" id="new_week_container">
+                                            <div class="mb-1">
+                                                <label for="new_week_name">Week Name / Title <span class="text-danger">*</span></label>
+                                                <input type="text" name="new_week_name" id="new_week_name" class="form-control" placeholder="e.g. Week 21 - Rational Numbers">
+                                            </div>
+                                            <div>
+                                                <label for="new_week_due_date">Due Date</label>
+                                                <input type="date" name="new_week_due_date" id="new_week_due_date" class="form-control">
+                                            </div>
                                         </div>
 
                                         <button type="submit" class="btn btn-primary btn-block">Assign Paper</button>
@@ -106,7 +139,7 @@
                                                     <tr>
                                                         <td>
                                                             <span class="badge badge-pill badge-primary font-weight-bold" style="font-size: 0.9rem; padding: 0.5em 0.8em;">
-                                                                Week {{ $paper->pivot->week }}
+                                                                {{ $paper->week_name ?: 'Week ' . $paper->pivot_week }}
                                                             </span>
                                                         </td>
                                                         <td><strong>{{ $paper->title }}</strong></td>
@@ -146,3 +179,23 @@
     </div>
     <!-- END: Content-->
 @endsection
+
+@push('scripts')
+<script>
+    function toggleWeekFields(mode) {
+        if (mode === 'existing') {
+            document.getElementById('existing_week_container').classList.remove('d-none');
+            document.getElementById('new_week_container').classList.add('d-none');
+            document.getElementById('week_id').setAttribute('required', 'required');
+            document.getElementById('new_week_name').removeAttribute('required');
+        } else {
+            document.getElementById('existing_week_container').classList.add('d-none');
+            document.getElementById('new_week_container').classList.remove('d-none');
+            document.getElementById('week_id').removeAttribute('required');
+            document.getElementById('new_week_name').setAttribute('required', 'required');
+        }
+    }
+    // Initialize
+    toggleWeekFields('existing');
+</script>
+@endpush

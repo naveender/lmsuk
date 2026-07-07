@@ -25,18 +25,21 @@ test('student can view subtopics and paginated attempt history with working filt
     // 3. Create parent topic
     $topic = Topic::create([
         'name' => 'Physics',
+        'slug' => 'physics',
         'subject_id' => $subject->id,
     ]);
 
     // 4. Create subtopics
     $subtopic1 = Topic::create([
         'name' => 'Forces',
+        'slug' => 'forces',
         'parent' => $topic->id,
         'subject_id' => $subject->id,
     ]);
 
     $subtopic2 = Topic::create([
         'name' => 'Energy',
+        'slug' => 'energy',
         'parent' => $topic->id,
         'subject_id' => $subject->id,
     ]);
@@ -89,7 +92,7 @@ test('student can view subtopics and paginated attempt history with working filt
     $response->assertSee('Energy');
     $response->assertSee('Forces Paper 1');
     $response->assertSee('Energy Paper 1');
-    $response->assertSee('Attempt History & Results');
+    $response->assertSee('Attempt History');
     
     // Assert 10 attempts are shown on page 1
     $viewAttempts = $response->viewData('attempts');

@@ -30,20 +30,30 @@ class AssessmentController extends Controller
         // 2. Get all active courses
         $courses = Course::where('is_active', true)->orderBy('name')->get();
 
-        // 3. Get all weeks defined in course_paper
-        $weeks = DB::table('course_paper')
-            ->distinct()
-            ->pluck('week')
-            ->sort()
-            ->values();
+        // 3. Get all weeks defined in course_paper (or weeks of the selected course if filtered)
+        $weeksQuery = \App\Models\Week::query();
+        if ($request->filled('course_id')) {
+            $weeksQuery->where('course_id', $request->course_id);
+        } else {
+            $weeksQuery->whereIn('id', function($q) use ($student) {
+                $q->select('week_id')
+                  ->from('course_paper')
+                  ->whereNotNull('week_id');
+            });
+        }
+        $weeks = $weeksQuery->orderBy('due_date')->orderBy('name')->get();
 
         // 4. Query papers that are assigned to a course and are visible to the student
         $query = Paper::visibleTo($student)
             ->join('course_paper', 'papers.id', '=', 'course_paper.paper_id')
             ->join('courses', 'course_paper.course_id', '=', 'courses.id')
+            ->leftJoin('weeks', 'course_paper.week_id', '=', 'weeks.id')
             ->select(
                 'papers.*',
                 'course_paper.week',
+                'course_paper.week_id',
+                'weeks.name as week_name',
+                'weeks.due_date as week_due_date',
                 'courses.name as course_name',
                 'courses.id as course_id'
             )
@@ -59,9 +69,9 @@ class AssessmentController extends Controller
             $query->where('course_paper.course_id', $request->course_id);
         }
 
-        // Filter by Week
+        // Filter by Week (week_id)
         if ($request->filled('week')) {
-            $query->where('course_paper.week', $request->week);
+            $query->where('course_paper.week_id', $request->week);
         }
 
         // Fetch all matching tests
@@ -185,8 +195,19 @@ class AssessmentController extends Controller
             $lateCount = 1;
         }
 
+        $selectedWeekModel = null;
+        if ($request->filled('week')) {
+            $selectedWeekModel = \App\Models\Week::find($request->week);
+        }
+        $selectedWeekName = $selectedWeekModel ? $selectedWeekModel->name : ($weeks->first()?->name ?? 'Week 21');
+        $selectedWeekDueDate = $selectedWeekModel ? $selectedWeekModel->due_date : ($weeks->first()?->due_date ?? null);
+
         // Final Deadline (e.g. End of this week Sunday or standard deadline)
-        $finalDeadlineText = Carbon::now()->addDays(5)->format('d M Y 21:00');
+        if ($selectedWeekDueDate) {
+            $finalDeadlineText = Carbon::parse($selectedWeekDueDate)->format('d M Y 21:00');
+        } else {
+            $finalDeadlineText = Carbon::now()->addDays(5)->format('d M Y 21:00');
+        }
 
         $metrics = [
             'score' => $avgScore . '%',
@@ -202,9 +223,8 @@ class AssessmentController extends Controller
             $selectedCourse = Course::find($request->course_id);
         }
         $courseTitle = $selectedCourse ? $selectedCourse->name : ($courses->first()?->name ?? 'YS Maths (Sat)');
-        $selectedWeek = $request->filled('week') ? $request->week : 21;
 
-        return view('student.assessment.weeklytests', compact('subjects', 'courses', 'weeks', 'papers', 'metrics', 'courseTitle', 'selectedWeek'));
+        return view('student.assessment.weeklytests', compact('subjects', 'courses', 'weeks', 'papers', 'metrics', 'courseTitle', 'selectedWeekName'));
     }
 
     /**
