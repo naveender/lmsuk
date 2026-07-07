@@ -129,7 +129,11 @@
                             @endphp
 
                             <!-- Question Card -->
-                            <div class="q-card d-none" id="q-card-{{ $index + 1 }}" data-q-num="{{ $index + 1 }}" data-q-id="{{ $question->id }}">
+                            <div class="q-card d-none {{ $isLocked ? 'question-locked' : '' }}" 
+                                 id="q-card-{{ $index + 1 }}" 
+                                 data-q-num="{{ $index + 1 }}" 
+                                 data-q-id="{{ $question->id }}"
+                                 data-is-locked="{{ $isLocked ? 'true' : 'false' }}">
                                 
                                 <!-- Hidden Inputs for Time, Flag, and Confidence -->
                                 <input type="hidden" id="time-spent-{{ $question->id }}" name="answers[{{ $question->id }}][time_spent]" value="{{ $ans ? $ans->time_spent : 0 }}">
@@ -2106,7 +2110,11 @@
         let activeSelectedCard = null;
 
         function handleDragStart(e) {
-            @if($isLocked) e.preventDefault(); return; @endif
+            let qCard = e.target.closest('.q-card');
+            if (qCard && qCard.getAttribute('data-is-locked') === 'true') {
+                e.preventDefault();
+                return;
+            }
             activeDraggedElement = e.target;
             e.dataTransfer.setData("text/plain", e.target.getAttribute("data-value"));
             e.dataTransfer.effectAllowed = "move";
@@ -2118,10 +2126,10 @@
 
         function handleDrop(e) {
             e.preventDefault();
-            @if($isLocked) return; @endif
-
             let dropzone = e.target.closest('.drop-zone');
             if (!dropzone) return;
+            let qCard = dropzone.closest('.q-card');
+            if (qCard && qCard.getAttribute('data-is-locked') === 'true') return;
 
             let questionId = dropzone.getAttribute('data-question-id');
             let pairIndex = dropzone.getAttribute('data-pair-index');
@@ -2135,10 +2143,10 @@
 
         function handleReturnToPool(e) {
             e.preventDefault();
-            @if($isLocked) return; @endif
-
             let pool = e.target.closest('.draggables-pool');
             if (!pool) return;
+            let qCard = pool.closest('.q-card');
+            if (qCard && qCard.getAttribute('data-is-locked') === 'true') return;
 
             let questionId = pool.getAttribute('data-question-id');
 
@@ -2152,7 +2160,8 @@
         // Click to Match implementation (highly accessible and mobile friendly)
         function handleCardClick(e, card) {
             e.stopPropagation();
-            @if($isLocked) return; @endif
+            let qCard = card.closest('.q-card');
+            if (qCard && qCard.getAttribute('data-is-locked') === 'true') return;
 
             let questionId = card.getAttribute('data-question-id');
 
@@ -2170,7 +2179,8 @@
         }
 
         function handleDropzoneClick(dropzone) {
-            @if($isLocked) return; @endif
+            let qCard = dropzone.closest('.q-card');
+            if (qCard && qCard.getAttribute('data-is-locked') === 'true') return;
             if (!activeSelectedCard) {
                 // If they click a matched card inside the dropzone, we return it to the pool
                 let matchedCard = dropzone.querySelector('.draggable-card');
@@ -2195,7 +2205,8 @@
         }
 
         function handlePoolClick(pool) {
-            @if($isLocked) return; @endif
+            let qCard = pool.closest('.q-card');
+            if (qCard && qCard.getAttribute('data-is-locked') === 'true') return;
             if (!activeSelectedCard) return;
 
             let questionId = pool.getAttribute('data-question-id');

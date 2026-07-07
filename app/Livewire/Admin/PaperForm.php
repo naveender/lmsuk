@@ -11,6 +11,7 @@ use App\Models\Classes;
 use App\Models\User;
 use App\Models\YearGroup;
 use App\Models\AcademicYear;
+use App\Models\Course;
 use Illuminate\Support\Facades\DB;
 
 class PaperForm extends Component
@@ -37,6 +38,19 @@ class PaperForm extends Component
     public $default_marks = 1;
     public $question_pooling = false;
 
+    // Course assignment fields
+    public $course_id = '';
+    public $week = 1;
+    public $create_new_course = false;
+    public $new_course_name = '';
+    public $original_course_id = '';
+    public $original_week_id = '';
+    public $week_mode = 'existing'; // 'existing' or 'new'
+    public $selected_week_id = '';
+    public $new_week_name = '';
+    public $new_week_due_date = '';
+    public $courseWeeks = [];
+
     // Advanced Config Fields
     public $allow_attempt_without_signup = false;
     public $allow_reattempt_question = false;
@@ -62,7 +76,7 @@ class PaperForm extends Component
     public $perPage = 15;
 
     protected $rules = [
-        'type' => 'required|in:test,exam',
+        'type' => 'required|in:test,exam,quiz,homework',
         'title' => 'required|string|max:255',
         'instruction' => 'nullable|string',
         'subject_id' => 'required|exists:subjects,id',
@@ -75,6 +89,9 @@ class PaperForm extends Component
         'difficulty' => 'required|string',
         'total_time' => 'required|integer|min:1',
         'default_marks' => 'required|integer|min:1',
+        'course_id' => 'nullable|exists:courses,id',
+        'week' => 'nullable',
+        'new_course_name' => 'nullable|string|max:255',
     ];
 
     public function mount($paper = null)
@@ -124,11 +141,62 @@ class PaperForm extends Component
 
             // Load selected question IDs
             $this->selectedQuestionIds = $paper->questions()->pluck('questions.id')->toArray();
+
+            // Load course assignment if exists
+            $firstCourse = $paper->courses()->first();
+            if ($firstCourse) {
+                $this->course_id = $firstCourse->id;
+                $this->original_course_id = $firstCourse->id;
+                $this->week = $firstCourse->pivot->week;
+                $this->original_week_id = $firstCourse->pivot->week_id;
+                $this->selected_week_id = $firstCourse->pivot->week_id;
+                
+                if ($this->course_id) {
+                    $this->courseWeeks = \App\Models\Week::where('course_id', $this->course_id)
+                        ->orderBy('name')
+                        ->get()
+                        ->toArray();
+                }
+
+                if ($this->selected_week_id) {
+                    $this->week_mode = 'existing';
+                } else {
+                    $this->week_mode = 'new';
+                }
+            }
         } else {
             // Set default creator if possible
             $this->user_id = auth()->id();
             // Try to set default academic year
             $this->academic_year = date('Y') . '-' . (date('Y') + 1);
+        }
+    }
+
+    public function updatedCourseId($value)
+    {
+        $this->selected_week_id = '';
+        $this->courseWeeks = [];
+        if ($value) {
+            $this->courseWeeks = \App\Models\Week::where('course_id', $value)
+                ->orderBy('name')
+                ->get()
+                ->toArray();
+            
+            if (empty($this->courseWeeks)) {
+                $this->week_mode = 'new';
+            } else {
+                $this->week_mode = 'existing';
+            }
+        }
+    }
+
+    public function updatedCreateNewCourse($value)
+    {
+        if ($value) {
+            $this->week_mode = 'new';
+            $this->course_id = '';
+            $this->selected_week_id = '';
+            $this->courseWeeks = [];
         }
     }
 
@@ -234,6 +302,25 @@ class PaperForm extends Component
     {
         $this->validate();
 
+        if ($this->create_new_course) {
+            $this->validate([
+                'new_course_name' => 'required|string|max:255',
+            ]);
+        }
+
+        if ($this->create_new_course || $this->course_id) {
+            if ($this->week_mode === 'existing') {
+                $this->validate([
+                    'selected_week_id' => 'required|exists:weeks,id',
+                ]);
+            } else {
+                $this->validate([
+                    'new_week_name' => 'required|string|max:255',
+                    'new_week_due_date' => 'nullable|date',
+                ]);
+            }
+        }
+
         DB::beginTransaction();
         try {
             $data = [
@@ -275,6 +362,62 @@ class PaperForm extends Component
                 ];
             }
             $paper->questions()->sync($syncData);
+
+            // Handle Course & Week Assignment
+            $courseIdToAssign = null;
+            if ($this->create_new_course && !empty($this->new_course_name)) {
+                $newCourse = Course::create([
+                    'name' => $this->new_course_name,
+                    'is_active' => true,
+                ]);
+                $this->course_id = $newCourse->id;
+                $courseIdToAssign = $newCourse->id;
+            } elseif ($this->course_id) {
+                $courseIdToAssign = $this->course_id;
+            }
+
+            if ($courseIdToAssign) {
+                $weekId = null;
+                $weekName = '';
+                if ($this->week_mode === 'existing' && $this->selected_week_id) {
+                    $weekId = $this->selected_week_id;
+                    $weekModel = \App\Models\Week::find($weekId);
+                    $weekName = $weekModel ? $weekModel->name : '';
+                } elseif ($this->week_mode === 'new' && !empty($this->new_week_name)) {
+                    $weekModel = \App\Models\Week::create([
+                        'course_id' => $courseIdToAssign,
+                        'name' => $this->new_week_name,
+                        'due_date' => $this->new_week_due_date ?: null,
+                    ]);
+                    $weekId = $weekModel->id;
+                    $weekName = $weekModel->name;
+                }
+
+                if ($weekId) {
+                    $weekNumber = 1;
+                    if (preg_match('/(\d+)/', $weekName, $matches)) {
+                        $weekNumber = (int) $matches[1];
+                    }
+
+                    if ($this->isEdit && $this->original_course_id && $this->original_course_id != $courseIdToAssign) {
+                        $paper->courses()->detach($this->original_course_id);
+                    }
+                    
+                    $paper->courses()->syncWithoutDetaching([
+                        $courseIdToAssign => [
+                            'week' => $weekNumber,
+                            'week_id' => $weekId
+                        ]
+                    ]);
+
+                    $paper->courses()->updateExistingPivot($courseIdToAssign, [
+                        'week' => $weekNumber,
+                        'week_id' => $weekId
+                    ]);
+                }
+            } elseif ($this->isEdit && $this->original_course_id) {
+                $paper->courses()->detach($this->original_course_id);
+            }
 
             DB::commit();
 
@@ -366,6 +509,7 @@ class PaperForm extends Component
             'tutors' => User::whereIn('role', ['admin', 'tutor'])->orderBy('name')->get(),
             'difficulties' => Paper::DIFFICULTIES,
             'questionTypes' => Question::TYPES,
+            'coursesList' => Course::where('is_active', true)->orderBy('name')->get(),
         ]);
     }
 }

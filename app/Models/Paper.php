@@ -47,6 +47,8 @@ class Paper extends Model
     public const TYPES = [
         'test' => 'Test',
         'exam' => 'Exam',
+        'quiz' => 'Quiz',
+        'homework' => 'Homework',
     ];
 
     public const DIFFICULTIES = [
@@ -120,6 +122,26 @@ class Paper extends Model
     public function assignments()
     {
         return $this->hasMany(PaperAssignment::class);
+    }
+
+    /**
+     * Get the courses associated with the paper.
+     */
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'course_paper')
+            ->withPivot('week', 'week_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the weeks associated with the paper.
+     */
+    public function weeks()
+    {
+        return $this->belongsToMany(Week::class, 'course_paper', 'paper_id', 'week_id')
+            ->withPivot('course_id', 'week')
+            ->withTimestamps();
     }
 
     /**
