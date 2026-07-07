@@ -211,8 +211,9 @@
                                     <table class="table table-hover evaluation-table mb-0">
                                         <thead>
                                             <tr>
+                                                <th style="width: 10%;">Difficulty</th>
                                                 <th style="width: 10%;">Type</th>
-                                                <th style="width: 50%;">Assignment Challenge Module Title</th>
+                                                <th style="width: 40%;">Assignment Challenge Module Title</th>
                                                 <th style="width: 15%;" class="text-center">Target</th>
                                                 <th style="width: 15%;" class="text-center">Completed</th>
                                                 <th style="width: 10%;" class="text-center">Score</th>
@@ -225,21 +226,26 @@
                                                     // Dynamic type tag based on difficulty or subject
                                                     // Q (Quiz - Blue), H (Homework - Red), S (Subject test - Light Red)
                                                     
-                                                    if ($paper->type === 'test') {
-                                                        $typeChar = 'T';
-                                                        $typeClass = 'bg-light-success text-success';
-                                                    } elseif ($paper->type === 'exam') {
+                                                    if ($paper->difficulty === 'easy') {
                                                         $typeChar = 'E';
+                                                        $typeClass = 'bg-light-success text-success';
+                                                    } elseif ($paper->difficulty === 'medium') {
+                                                        $typeChar = 'M';
+                                                        $typeClass = 'bg-light-primary text-primary';
+                                                    }elseif ($paper->difficulty === 'hard') {
+                                                        $typeChar = 'H';
                                                         $typeClass = 'bg-light-rose text-rose';
-                                                    }elseif ($paper->type === 'assignment') {
-                                                        $typeChar = 'A';
-                                                        $typeClass = 'bg-light-info text-info';
                                                     } 
                                                 @endphp
                                                 <tr>
                                                     <td>
                                                         <div class="type-badge {{ $typeClass }} font-weight-extrabold text-center">
                                                             {{ $typeChar }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="type-badge {{ $paper->type }} font-weight-extrabold text-center">
+                                                            {{ ucfirst($paper->type) }}
                                                         </div>
                                                     </td>
                                                     <td>
