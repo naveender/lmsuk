@@ -8,7 +8,7 @@
 
 <!-- Immediate Inline Script to Prevent FOUC (Flash of Unstyled Content) -->
 <script>
-    (function() {
+    (function () {
         var collapsed = localStorage.getItem('admin-sidebar-collapsed') === 'true';
         if (collapsed && window.innerWidth >= 1024) {
             document.body.classList.add('sidebar-collapsed');
@@ -26,11 +26,11 @@
         --sb-accent: #7367f0;
         --sb-accent-hover: #5e50eb;
         --sb-accent-glow: rgba(115, 103, 240, 0.15);
-        
+
         --sidebar-w-expanded: 280px;
         --sidebar-w-collapsed: 80px;
         --sidebar-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        
+
         /* Light Theme Tokens */
         --sb-bg-light: #ffffff;
         --sb-border-light: #eef0f3;
@@ -41,7 +41,7 @@
         --sb-shadow-light: 0 4px 30px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.05);
         --sb-tooltip-bg-light: #0f172a;
         --sb-tooltip-text-light: #f8fafc;
-        
+
         /* Dark Theme Tokens */
         --sb-bg-dark: #0f172a;
         --sb-border-dark: #1e293b;
@@ -93,6 +93,7 @@
 
     /* Desktop Layout Padding Adjustments */
     @media (min-width: 1024px) {
+
         body.vertical-layout.vertical-menu-modern:not(.sidebar-collapsed) .app-content,
         body.vertical-layout.vertical-menu-modern:not(.sidebar-collapsed) .header-navbar {
             margin-left: var(--sidebar-w-expanded) !important;
@@ -116,7 +117,7 @@
             transition: var(--sidebar-transition) !important;
             left: 0 !important;
         }
-        
+
         /* Hide original toggle buttons in layout to avoid overlaps */
         .modern-nav-toggle {
             display: none !important;
@@ -332,13 +333,16 @@
     .modern-sidebar .sidebar-menu-content::-webkit-scrollbar {
         width: 5px;
     }
+
     .modern-sidebar .sidebar-menu-content::-webkit-scrollbar-track {
         background: transparent;
     }
+
     .modern-sidebar .sidebar-menu-content::-webkit-scrollbar-thumb {
         background: var(--sb-border);
         border-radius: 10px;
     }
+
     .modern-sidebar .sidebar-menu-content::-webkit-scrollbar-thumb:hover {
         background: var(--sb-muted);
     }
@@ -485,7 +489,8 @@
 
     .modern-sidebar .pin-btn:hover {
         opacity: 1 !important;
-        color: #eab308 !important; /* gold star */
+        color: #eab308 !important;
+        /* gold star */
         background-color: var(--sb-hover);
         transform: translateY(-50%) scale(1.05);
     }
@@ -542,7 +547,8 @@
     }
 
     .modern-sidebar .menu-item-wrapper.has-submenu.open .submenu-items {
-        max-height: 800px; /* High enough to contain submenu */
+        max-height: 800px;
+        /* High enough to contain submenu */
     }
 
     .modern-sidebar .submenu-items li {
@@ -800,6 +806,7 @@
             opacity: 0;
             transform: scale(0.95) translateY(10px);
         }
+
         to {
             opacity: 1;
             transform: scale(1) translateY(0);
@@ -832,13 +839,13 @@
         left: 0;
         height: 100%;
         width: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
         animation: sb-shimmer 1.5s infinite linear;
         transform: translateX(-100%);
     }
 
     body:not(.dark-layout) .modern-sidebar .skeleton-item::after {
-        background: linear-gradient(90deg, transparent, rgba(0,0,0,0.03), transparent);
+        background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.03), transparent);
     }
 
     .modern-sidebar .skeleton-icon {
@@ -888,7 +895,7 @@
     /* ==========================================================================
        RESPONSIVE & ADAPTIVE STYLES
        ========================================================================== */
-    
+
     /* Tablet Portrait & Landscape Layout (768px to 1023px) */
     @media (min-width: 768px) and (max-width: 1023px) {
         body.vertical-layout.vertical-menu-modern .main-menu.modern-sidebar {
@@ -937,18 +944,20 @@
         .main-menu.modern-sidebar.tablet-expanded .profile-more-icon {
             display: flex;
         }
-        
+
         .main-menu.modern-sidebar.tablet-expanded .pin-btn {
             display: flex !important;
         }
-        
+
         .modern-sidebar .sidebar-toggle-btn {
-            display: none !important; /* Hide toggle button on tablet */
+            display: none !important;
+            /* Hide toggle button on tablet */
         }
     }
 
     /* Mobile Layout (<768px) */
     @media (max-width: 767.98px) {
+
         body.vertical-layout.vertical-menu-modern .app-content,
         body.vertical-layout.vertical-menu-modern .header-navbar {
             margin-left: 0 !important;
@@ -966,7 +975,8 @@
         }
 
         .modern-sidebar .sidebar-toggle-btn {
-            display: none !important; /* Hide toggle button on mobile */
+            display: none !important;
+            /* Hide toggle button on mobile */
         }
 
         body.sidebar-open-no-scroll {
@@ -1001,13 +1011,13 @@
 
 <!-- BEGIN: Main Menu-->
 <div class="main-menu menu-fixed modern-sidebar" id="adminSidebar" data-scroll-to-active="true">
-    
+
     <!-- Sidebar Header (Logo and Toggle Button) -->
     <div class="sidebar-header">
         <a href="{{ route('admin.dashboard') }}" class="sidebar-logo-link">
             <!-- Full Brand Logo -->
             <img src="{{ asset('theme/app-assets/images/logo/Aspire-Learner-Horizontal-Full-Logo.png') }}"
-                 alt="Aspire Learner Logo" class="logo-full">
+                alt="Aspire Learner Logo" class="logo-full">
             <!-- Icon/Favicon Initials Fallback Logo -->
             <div class="logo-icon">AL</div>
         </a>
@@ -1021,7 +1031,8 @@
     <div class="sidebar-search-wrapper">
         <div class="sidebar-search-box" id="searchBoxContainer">
             <i data-lucide="search" class="search-icon"></i>
-            <input type="text" class="search-input" id="sidebarSearch" placeholder="Search pages... (/)" autocomplete="off" aria-label="Search sidebar items">
+            <input type="text" class="search-input" id="sidebarSearch" placeholder="Search pages... (/)"
+                autocomplete="off" aria-label="Search sidebar items">
             <span class="search-shortcut">/</span>
         </div>
     </div>
@@ -1041,7 +1052,10 @@
             </div>
             <!-- Simulated Skeleton state during initial client-side rendering -->
             <div class="skeleton-container" id="pinnedSkeleton">
-                <div class="skeleton-item"><div class="skeleton-icon"></div><div class="skeleton-text"></div></div>
+                <div class="skeleton-item">
+                    <div class="skeleton-icon"></div>
+                    <div class="skeleton-text"></div>
+                </div>
             </div>
             <ul class="menu-items" id="pinnedList" style="display: none;">
                 <!-- Dynamically filled by JS -->
@@ -1055,7 +1069,10 @@
             </div>
             <!-- Simulated Skeleton state -->
             <div class="skeleton-container" id="recentsSkeleton">
-                <div class="skeleton-item"><div class="skeleton-icon"></div><div class="skeleton-text"></div></div>
+                <div class="skeleton-item">
+                    <div class="skeleton-icon"></div>
+                    <div class="skeleton-text"></div>
+                </div>
             </div>
             <ul class="menu-items" id="recentsList" style="display: none;">
                 <!-- Dynamically filled by JS -->
@@ -1068,9 +1085,11 @@
                 <span>Directory</span>
             </div>
             <ul class="menu-items" id="mainMenuList">
-                
+
                 <!-- Dashboard -->
-                <li class="menu-item-wrapper {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" data-title="Dashboard" data-route="{{ route('admin.dashboard') }}" data-icon="home" data-tooltip="Dashboard">
+                <li class="menu-item-wrapper {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
+                    data-title="Dashboard" data-route="{{ route('admin.dashboard') }}" data-icon="home"
+                    data-tooltip="Dashboard">
                     <a href="{{ route('admin.dashboard') }}" class="menu-link">
                         <i data-lucide="home"></i>
                         <span class="menu-text">Dashboard</span>
@@ -1084,23 +1103,29 @@
                 @php
                     $userGroupActive = request()->routeIs('admin.users.*') || request()->routeIs('admin.students.*') || request()->routeIs('admin.parents.*');
                 @endphp
-                <li class="menu-item-wrapper has-submenu {{ $userGroupActive ? 'open' : '' }}" data-title="Users" data-tooltip="Users">
-                    <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true" aria-expanded="{{ $userGroupActive ? 'true' : 'false' }}">
+                <li class="menu-item-wrapper has-submenu {{ $userGroupActive ? 'open' : '' }}" data-title="Users"
+                    data-tooltip="Users">
+                    <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true"
+                        aria-expanded="{{ $userGroupActive ? 'true' : 'false' }}">
                         <i data-lucide="users"></i>
                         <span class="menu-text">Users</span>
                         <i data-lucide="chevron-down" class="submenu-arrow"></i>
                     </div>
                     <ul class="submenu-items">
-                        <li class="{{ request()->routeIs('admin.users.create') ? 'active' : '' }}" data-title="Add New User" data-route="{{ route('admin.users.create') }}" data-icon="user-plus">
+                        <li class="{{ request()->routeIs('admin.users.create') ? 'active' : '' }}"
+                            data-title="Add New User" data-route="{{ route('admin.users.create') }}"
+                            data-icon="user-plus">
                             <a href="{{ route('admin.users.create') }}" class="menu-link">
                                 <i data-lucide="user-plus"></i>
                                 <span class="menu-text">Add New User</span>
                             </a>
-                            <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Add New User">
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Add New User">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
-                        <li class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}" data-title="All Users" data-route="{{ route('admin.users.index') }}" data-icon="users">
+                        <li class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}" data-title="All Users"
+                            data-route="{{ route('admin.users.index') }}" data-icon="users">
                             <a href="{{ route('admin.users.index') }}" class="menu-link">
                                 <i data-lucide="users"></i>
                                 <span class="menu-text">All Users</span>
@@ -1109,21 +1134,27 @@
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
-                        <li class="{{ request()->routeIs('admin.students.index') ? 'active' : '' }}" data-title="Manage Students" data-route="{{ route('admin.students.index') }}" data-icon="graduation-cap">
+                        <li class="{{ request()->routeIs('admin.students.index') ? 'active' : '' }}"
+                            data-title="Manage Students" data-route="{{ route('admin.students.index') }}"
+                            data-icon="graduation-cap">
                             <a href="{{ route('admin.students.index') }}" class="menu-link">
                                 <i data-lucide="graduation-cap"></i>
                                 <span class="menu-text">Manage Students</span>
                             </a>
-                            <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Manage Students">
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Manage Students">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
-                        <li class="{{ request()->routeIs('admin.parents.index') ? 'active' : '' }}" data-title="Manage Parents" data-route="{{ route('admin.parents.index') }}" data-icon="heart">
+                        <li class="{{ request()->routeIs('admin.parents.index') ? 'active' : '' }}"
+                            data-title="Manage Parents" data-route="{{ route('admin.parents.index') }}"
+                            data-icon="heart">
                             <a href="{{ route('admin.parents.index') }}" class="menu-link">
                                 <i data-lucide="heart"></i>
                                 <span class="menu-text">Manage Parents</span>
                             </a>
-                            <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Manage Parents">
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Manage Parents">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
@@ -1134,37 +1165,48 @@
                 @php
                     $qBankActive = request()->routeIs('admin.questions.*');
                 @endphp
-                <li class="menu-item-wrapper has-submenu {{ $qBankActive ? 'open' : '' }}" data-title="Question Bank" data-tooltip="Question Bank">
-                    <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true" aria-expanded="{{ $qBankActive ? 'true' : 'false' }}">
+                <li class="menu-item-wrapper has-submenu {{ $qBankActive ? 'open' : '' }}" data-title="Question Bank"
+                    data-tooltip="Question Bank">
+                    <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true"
+                        aria-expanded="{{ $qBankActive ? 'true' : 'false' }}">
                         <i data-lucide="help-circle"></i>
                         <span class="menu-text">Question Bank</span>
                         <i data-lucide="chevron-down" class="submenu-arrow"></i>
                     </div>
                     <ul class="submenu-items">
-                        <li class="{{ request()->routeIs('admin.questions.create') ? 'active' : '' }}" data-title="Add New Question" data-route="{{ route('admin.questions.create') }}" data-icon="plus-circle">
+                        <li class="{{ request()->routeIs('admin.questions.create') ? 'active' : '' }}"
+                            data-title="Add New Question" data-route="{{ route('admin.questions.create') }}"
+                            data-icon="plus-circle">
                             <a href="{{ route('admin.questions.create') }}" class="menu-link">
                                 <i data-lucide="plus-circle"></i>
                                 <span class="menu-text">Add New Question</span>
                             </a>
-                            <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Add New Question">
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Add New Question">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
-                        <li class="{{ request()->routeIs('admin.questions.index') ? 'active' : '' }}" data-title="Questions Directory" data-route="{{ route('admin.questions.index') }}" data-icon="folder-open">
+                        <li class="{{ request()->routeIs('admin.questions.index') ? 'active' : '' }}"
+                            data-title="Questions Directory" data-route="{{ route('admin.questions.index') }}"
+                            data-icon="folder-open">
                             <a href="{{ route('admin.questions.index') }}" class="menu-link">
                                 <i data-lucide="folder-open"></i>
                                 <span class="menu-text">Questions Directory</span>
                             </a>
-                            <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Questions Directory">
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Questions Directory">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
-                        <li class="{{ request()->routeIs('admin.questions.import-form') ? 'active' : '' }}" data-title="Import Questions" data-route="{{ route('admin.questions.import-form') }}" data-icon="upload">
+                        <li class="{{ request()->routeIs('admin.questions.import-form') ? 'active' : '' }}"
+                            data-title="Import Questions" data-route="{{ route('admin.questions.import-form') }}"
+                            data-icon="upload">
                             <a href="{{ route('admin.questions.import-form') }}" class="menu-link">
                                 <i data-lucide="upload"></i>
                                 <span class="menu-text">Import Questions</span>
                             </a>
-                            <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Import Questions">
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Import Questions">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
@@ -1173,7 +1215,8 @@
                                 <i data-lucide="cpu"></i>
                                 <span class="menu-text">Import Using AI</span>
                             </a>
-                            <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Import Using AI">
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Import Using AI">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
@@ -1184,28 +1227,36 @@
                 @php
                     $papersActive = request()->routeIs('admin.papers.*');
                 @endphp
-                <li class="menu-item-wrapper has-submenu {{ $papersActive ? 'open' : '' }}" data-title="Papers Manager" data-tooltip="Papers Manager">
-                    <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true" aria-expanded="{{ $papersActive ? 'true' : 'false' }}">
+                <li class="menu-item-wrapper has-submenu {{ $papersActive ? 'open' : '' }}" data-title="Papers Manager"
+                    data-tooltip="Papers Manager">
+                    <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true"
+                        aria-expanded="{{ $papersActive ? 'true' : 'false' }}">
                         <i data-lucide="file-text"></i>
-                        <span class="menu-text">Papers Manager</span>
+                        <span class="menu-text">Quiz/Test Manager</span>
                         <i data-lucide="chevron-down" class="submenu-arrow"></i>
                     </div>
                     <ul class="submenu-items">
-                        <li class="{{ request()->routeIs('admin.papers.create') ? 'active' : '' }}" data-title="Create New Paper" data-route="{{ route('admin.papers.create') }}" data-icon="file-plus">
+                        <li class="{{ request()->routeIs('admin.papers.create') ? 'active' : '' }}"
+                            data-title="Create New Quiz/Test" data-route="{{ route('admin.papers.create') }}"
+                            data-icon="file-plus">
                             <a href="{{ route('admin.papers.create') }}" class="menu-link">
                                 <i data-lucide="file-plus"></i>
-                                <span class="menu-text">Create New Paper</span>
+                                <span class="menu-text">Create New Quiz/Test</span>
                             </a>
-                            <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Create New Paper">
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Create New Paper">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
-                        <li class="{{ request()->routeIs('admin.papers.index') ? 'active' : '' }}" data-title="Papers Directory" data-route="{{ route('admin.papers.index') }}" data-icon="files">
+                        <li class="{{ request()->routeIs('admin.papers.index') ? 'active' : '' }}"
+                            data-title="Quizzes/Tests Directory" data-route="{{ route('admin.papers.index') }}"
+                            data-icon="files">
                             <a href="{{ route('admin.papers.index') }}" class="menu-link">
                                 <i data-lucide="files"></i>
-                                <span class="menu-text">Papers Directory</span>
+                                <span class="menu-text">Quizzes/Tests Directory</span>
                             </a>
-                            <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Papers Directory">
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Quizzes/Tests Directory">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
@@ -1213,7 +1264,8 @@
                 </li>
 
                 <!-- Create a Report -->
-                <li class="menu-item-wrapper" data-title="Create a Report" data-route="#" data-icon="bar-chart-2" data-tooltip="Create a Report">
+                <li class="menu-item-wrapper" data-title="Create a Report" data-route="#" data-icon="bar-chart-2"
+                    data-tooltip="Create a Report">
                     <a href="#" class="menu-link">
                         <i data-lucide="bar-chart-2"></i>
                         <span class="menu-text">Create a Report</span>
@@ -1224,7 +1276,8 @@
                 </li>
 
                 <!-- Manage Files -->
-                <li class="menu-item-wrapper" data-title="Manage Files" data-route="#" data-icon="folder" data-tooltip="Manage Files">
+                <li class="menu-item-wrapper" data-title="Manage Files" data-route="#" data-icon="folder"
+                    data-tooltip="Manage Files">
                     <a href="#" class="menu-link">
                         <i data-lucide="folder"></i>
                         <span class="menu-text">Manage Files</span>
@@ -1235,7 +1288,8 @@
                 </li>
 
                 <!-- Invoice Creator -->
-                <li class="menu-item-wrapper" data-title="Invoice Creator" data-route="#" data-icon="credit-card" data-tooltip="Invoice Creator">
+                <li class="menu-item-wrapper" data-title="Invoice Creator" data-route="#" data-icon="credit-card"
+                    data-tooltip="Invoice Creator">
                     <a href="#" class="menu-link">
                         <i data-lucide="credit-card"></i>
                         <span class="menu-text">Invoice Creator</span>
@@ -1246,7 +1300,8 @@
                 </li>
 
                 <!-- Cohort Report -->
-                <li class="menu-item-wrapper" data-title="Cohort Report" data-route="#" data-icon="pie-chart" data-tooltip="Cohort Report">
+                <li class="menu-item-wrapper" data-title="Cohort Report" data-route="#" data-icon="pie-chart"
+                    data-tooltip="Cohort Report">
                     <a href="#" class="menu-link">
                         <i data-lucide="pie-chart"></i>
                         <span class="menu-text">Cohort Report</span>
@@ -1257,7 +1312,9 @@
                 </li>
 
                 <!-- Manage Announcement -->
-                <li class="menu-item-wrapper {{ request()->routeIs('admin.announcements.index') ? 'active' : '' }}" data-title="Manage Announcement" data-route="{{ route('admin.announcements.index') }}" data-icon="megaphone" data-tooltip="Manage Announcement">
+                <li class="menu-item-wrapper {{ request()->routeIs('admin.announcements.index') ? 'active' : '' }}"
+                    data-title="Manage Announcement" data-route="{{ route('admin.announcements.index') }}"
+                    data-icon="megaphone" data-tooltip="Manage Announcement">
                     <a href="{{ route('admin.announcements.index') }}" class="menu-link">
                         <i data-lucide="megaphone"></i>
                         <span class="menu-text">Manage Announcement</span>
@@ -1271,14 +1328,17 @@
                 @php
                     $contentActive = request()->routeIs('admin.classes.*') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.year-groups.*') || request()->routeIs('admin.subjects.*') || request()->routeIs('topics*') || request()->routeIs('add.topic*') || request()->routeIs('admin.courses.*');
                 @endphp
-                <li class="menu-item-wrapper has-submenu {{ $contentActive ? 'open' : '' }}" data-title="Content Manager" data-tooltip="Content Manager">
-                    <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true" aria-expanded="{{ $contentActive ? 'true' : 'false' }}">
+                <li class="menu-item-wrapper has-submenu {{ $contentActive ? 'open' : '' }}"
+                    data-title="Content Manager" data-tooltip="Content Manager">
+                    <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true"
+                        aria-expanded="{{ $contentActive ? 'true' : 'false' }}">
                         <i data-lucide="book-open"></i>
                         <span class="menu-text">Content Manager</span>
                         <i data-lucide="chevron-down" class="submenu-arrow"></i>
                     </div>
                     <ul class="submenu-items">
-                        <li class="{{ request()->routeIs('admin.courses.*') ? 'active' : '' }}" data-title="Courses" data-route="{{ route('admin.courses.index') }}" data-icon="award">
+                        <li class="{{ request()->routeIs('admin.courses.*') ? 'active' : '' }}" data-title="Courses"
+                            data-route="{{ route('admin.courses.index') }}" data-icon="award">
                             <a href="{{ route('admin.courses.index') }}" class="menu-link">
                                 <i data-lucide="award"></i>
                                 <span class="menu-text">Courses</span>
@@ -1287,7 +1347,8 @@
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
-                        <li class="{{ request()->routeIs('admin.classes.index') ? 'active' : '' }}" data-title="Classes" data-route="{{ route('admin.classes.index') }}" data-icon="shapes">
+                        <li class="{{ request()->routeIs('admin.classes.index') ? 'active' : '' }}" data-title="Classes"
+                            data-route="{{ route('admin.classes.index') }}" data-icon="shapes">
                             <a href="{{ route('admin.classes.index') }}" class="menu-link">
                                 <i data-lucide="shapes"></i>
                                 <span class="menu-text">Classes</span>
@@ -1296,16 +1357,21 @@
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
-                        <li class="{{ request()->routeIs('admin.academic-years.*') ? 'active' : '' }}" data-title="Academic Years" data-route="{{ route('admin.academic-years.index') }}" data-icon="calendar">
+                        <li class="{{ request()->routeIs('admin.academic-years.*') ? 'active' : '' }}"
+                            data-title="Academic Years" data-route="{{ route('admin.academic-years.index') }}"
+                            data-icon="calendar">
                             <a href="{{ route('admin.academic-years.index') }}" class="menu-link">
                                 <i data-lucide="calendar"></i>
                                 <span class="menu-text">Academic Years</span>
                             </a>
-                            <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Academic Years">
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Academic Years">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
-                        <li class="{{ request()->routeIs('admin.year-groups.*') ? 'active' : '' }}" data-title="Year Groups" data-route="{{ route('admin.year-groups.index') }}" data-icon="layers">
+                        <li class="{{ request()->routeIs('admin.year-groups.*') ? 'active' : '' }}"
+                            data-title="Year Groups" data-route="{{ route('admin.year-groups.index') }}"
+                            data-icon="layers">
                             <a href="{{ route('admin.year-groups.index') }}" class="menu-link">
                                 <i data-lucide="layers"></i>
                                 <span class="menu-text">Year Groups</span>
@@ -1314,7 +1380,8 @@
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
-                        <li class="{{ request()->routeIs('admin.subjects.*') ? 'active' : '' }}" data-title="Subjects" data-route="{{ route('admin.subjects.index') }}" data-icon="book">
+                        <li class="{{ request()->routeIs('admin.subjects.*') ? 'active' : '' }}" data-title="Subjects"
+                            data-route="{{ route('admin.subjects.index') }}" data-icon="book">
                             <a href="{{ route('admin.subjects.index') }}" class="menu-link">
                                 <i data-lucide="book"></i>
                                 <span class="menu-text">Subjects</span>
@@ -1323,12 +1390,14 @@
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
-                        <li class="{{ request()->routeIs('topics') ? 'active' : '' }}" data-title="Topics/Sub Topics" data-route="{{ route('topics') }}" data-icon="hash">
+                        <li class="{{ request()->routeIs('topics') ? 'active' : '' }}" data-title="Topics/Sub Topics"
+                            data-route="{{ route('topics') }}" data-icon="hash">
                             <a href="{{ route('topics') }}" class="menu-link">
                                 <i data-lucide="hash"></i>
                                 <span class="menu-text">Topics/Sub Topics</span>
                             </a>
-                            <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Topics/Sub Topics">
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Topics/Sub Topics">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
@@ -1348,7 +1417,8 @@
                                 <i data-lucide="sliders"></i>
                                 <span class="menu-text">Tests/Exam Settings</span>
                             </a>
-                            <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Tests/Exam Settings">
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Tests/Exam Settings">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
@@ -1363,8 +1433,11 @@
         <div class="profile-card" id="profileCard" tabindex="0" aria-haspopup="true" aria-expanded="false">
             <div class="profile-avatar">
                 <!-- Fallback Initials Div and Profile Image -->
-                <img src="{{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="avatar" class="profile-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="profile-initials" style="display: none;">{{ strtoupper(substr($user->name ?? 'AD', 0, 2)) }}</div>
+                <img src="{{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="avatar"
+                    class="profile-img"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="profile-initials" style="display: none;">{{ strtoupper(substr($user->name ?? 'AD', 0, 2)) }}
+                </div>
             </div>
             <div class="profile-info">
                 <span class="profile-name">{{ ucfirst($user->name ?? 'Admin') }}</span>
@@ -1403,326 +1476,326 @@
 
 <!-- Modern Sidebar Interactions Script -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. Initialize Lucide Icons
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-
-    // Elements
-    const sidebar = document.getElementById('adminSidebar');
-    const toggleBtn = document.getElementById('sidebarToggle');
-    const searchInput = document.getElementById('sidebarSearch');
-    const searchBox = document.getElementById('searchBoxContainer');
-    const searchEmptyState = document.getElementById('searchEmptyState');
-    const mainMenuList = document.getElementById('mainMenuList');
-    const sectionMain = document.getElementById('sectionMain');
-    const profileCard = document.getElementById('profileCard');
-    const profileDropdown = document.getElementById('profileDropdown');
-    const mobileMenuBtn = document.querySelector('.menu-toggle');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-    // Local Storage Keys
-    const COLLAPSED_KEY = 'admin-sidebar-collapsed';
-    const PINNED_KEY = 'admin-sidebar-pinned';
-    const RECENTS_KEY = 'admin-sidebar-recents';
-
-    // ==========================================================================
-    // SIDEBAR TOGGLING (COLLAPSE/EXPAND)
-    // ==========================================================================
-    
-    function setSidebarCollapsedState(collapsed) {
-        if (collapsed) {
-            document.body.classList.add('sidebar-collapsed');
-            localStorage.setItem(COLLAPSED_KEY, 'true');
-        } else {
-            document.body.classList.remove('sidebar-collapsed');
-            localStorage.setItem(COLLAPSED_KEY, 'false');
-            
-            // Re-sync Lucide icons after transition to make sure rendering is clean
-            setTimeout(() => {
-                if (typeof lucide !== 'undefined') lucide.createIcons();
-            }, 300);
+    document.addEventListener('DOMContentLoaded', function () {
+        // 1. Initialize Lucide Icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
         }
-    }
 
-    // Toggle click handler
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const isCollapsed = document.body.classList.contains('sidebar-collapsed');
-            setSidebarCollapsedState(!isCollapsed);
-        });
-    }
+        // Elements
+        const sidebar = document.getElementById('adminSidebar');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const searchInput = document.getElementById('sidebarSearch');
+        const searchBox = document.getElementById('searchBoxContainer');
+        const searchEmptyState = document.getElementById('searchEmptyState');
+        const mainMenuList = document.getElementById('mainMenuList');
+        const sectionMain = document.getElementById('sectionMain');
+        const profileCard = document.getElementById('profileCard');
+        const profileDropdown = document.getElementById('profileDropdown');
+        const mobileMenuBtn = document.querySelector('.menu-toggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-    // Expanded on click for Tablet
-    sidebar.addEventListener('click', function(e) {
-        if (window.innerWidth >= 768 && window.innerWidth < 1024) {
-            if (!sidebar.classList.contains('tablet-expanded')) {
-                sidebar.classList.add('tablet-expanded');
-                sidebarOverlay.classList.add('visible');
-                document.body.classList.add('sidebar-open-no-scroll');
-                
+        // Local Storage Keys
+        const COLLAPSED_KEY = 'admin-sidebar-collapsed';
+        const PINNED_KEY = 'admin-sidebar-pinned';
+        const RECENTS_KEY = 'admin-sidebar-recents';
+
+        // ==========================================================================
+        // SIDEBAR TOGGLING (COLLAPSE/EXPAND)
+        // ==========================================================================
+
+        function setSidebarCollapsedState(collapsed) {
+            if (collapsed) {
+                document.body.classList.add('sidebar-collapsed');
+                localStorage.setItem(COLLAPSED_KEY, 'true');
+            } else {
+                document.body.classList.remove('sidebar-collapsed');
+                localStorage.setItem(COLLAPSED_KEY, 'false');
+
+                // Re-sync Lucide icons after transition to make sure rendering is clean
                 setTimeout(() => {
                     if (typeof lucide !== 'undefined') lucide.createIcons();
-                }, 100);
+                }, 300);
             }
         }
-    });
 
-    // Close tablet expanded sidebar on outside click
-    function collapseTabletSidebar() {
-        if (sidebar.classList.contains('tablet-expanded')) {
-            sidebar.classList.remove('tablet-expanded');
+        // Toggle click handler
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+                setSidebarCollapsedState(!isCollapsed);
+            });
+        }
+
+        // Expanded on click for Tablet
+        sidebar.addEventListener('click', function (e) {
+            if (window.innerWidth >= 768 && window.innerWidth < 1024) {
+                if (!sidebar.classList.contains('tablet-expanded')) {
+                    sidebar.classList.add('tablet-expanded');
+                    sidebarOverlay.classList.add('visible');
+                    document.body.classList.add('sidebar-open-no-scroll');
+
+                    setTimeout(() => {
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                    }, 100);
+                }
+            }
+        });
+
+        // Close tablet expanded sidebar on outside click
+        function collapseTabletSidebar() {
+            if (sidebar.classList.contains('tablet-expanded')) {
+                sidebar.classList.remove('tablet-expanded');
+                sidebarOverlay.classList.remove('visible');
+                document.body.classList.remove('sidebar-open-no-scroll');
+            }
+        }
+
+        // ==========================================================================
+        // TABLET & MOBILE DRAWER BEHAVIOR
+        // ==========================================================================
+
+        function openMobileSidebar() {
+            sidebar.classList.add('mobile-open');
+            sidebarOverlay.classList.add('visible');
+            document.body.classList.add('sidebar-open-no-scroll');
+        }
+
+        function closeMobileSidebar() {
+            sidebar.classList.remove('mobile-open');
             sidebarOverlay.classList.remove('visible');
             document.body.classList.remove('sidebar-open-no-scroll');
         }
-    }
 
-    // ==========================================================================
-    // TABLET & MOBILE DRAWER BEHAVIOR
-    // ==========================================================================
-    
-    function openMobileSidebar() {
-        sidebar.classList.add('mobile-open');
-        sidebarOverlay.classList.add('visible');
-        document.body.classList.add('sidebar-open-no-scroll');
-    }
-
-    function closeMobileSidebar() {
-        sidebar.classList.remove('mobile-open');
-        sidebarOverlay.classList.remove('visible');
-        document.body.classList.remove('sidebar-open-no-scroll');
-    }
-
-    // Capture standard hamburger clicks
-    if (mobileMenuBtn) {
-        mobileMenuBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            openMobileSidebar();
-        });
-    }
-
-    // Overlay click closes both mobile and tablet menus
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', function() {
-            closeMobileSidebar();
-            collapseTabletSidebar();
-        });
-    }
-
-    // Close menus on Escape Key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeMobileSidebar();
-            collapseTabletSidebar();
-            closeProfileDropdown();
+        // Capture standard hamburger clicks
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openMobileSidebar();
+            });
         }
-    });
 
-    // Close mobile menu on navigation item selection
-    sidebar.addEventListener('click', function(e) {
-        const link = e.target.closest('.menu-link');
-        if (link && !link.classList.contains('submenu-toggle')) {
-            if (window.innerWidth < 768) {
+        // Overlay click closes both mobile and tablet menus
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', function () {
                 closeMobileSidebar();
-            }
+                collapseTabletSidebar();
+            });
         }
-    });
 
-    // ==========================================================================
-    // SUBMENU ACCORDION INTERACTIONS
-    // ==========================================================================
-    
-    const submenuToggles = document.querySelectorAll('.submenu-toggle');
-    submenuToggles.forEach(toggle => {
-        toggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            const parentWrapper = this.closest('.menu-item-wrapper.has-submenu');
-            const isCurrentlyOpen = parentWrapper.classList.contains('open');
-
-            // If sidebar is collapsed on desktop, expand it first
-            if (document.body.classList.contains('sidebar-collapsed') && window.innerWidth >= 1024) {
-                setSidebarCollapsedState(false);
-                parentWrapper.classList.add('open');
-                this.setAttribute('aria-expanded', 'true');
-                return;
+        // Close menus on Escape Key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeMobileSidebar();
+                collapseTabletSidebar();
+                closeProfileDropdown();
             }
+        });
 
-            // Close other sibling submenus
-            const openSiblings = parentWrapper.parentNode.querySelectorAll('.menu-item-wrapper.has-submenu.open');
-            openSiblings.forEach(sibling => {
-                if (sibling !== parentWrapper) {
-                    sibling.classList.remove('open');
-                    sibling.querySelector('.submenu-toggle').setAttribute('aria-expanded', 'false');
+        // Close mobile menu on navigation item selection
+        sidebar.addEventListener('click', function (e) {
+            const link = e.target.closest('.menu-link');
+            if (link && !link.classList.contains('submenu-toggle')) {
+                if (window.innerWidth < 768) {
+                    closeMobileSidebar();
                 }
-            });
-
-            // Toggle current submenu
-            if (isCurrentlyOpen) {
-                parentWrapper.classList.remove('open');
-                this.setAttribute('aria-expanded', 'false');
-            } else {
-                parentWrapper.classList.add('open');
-                this.setAttribute('aria-expanded', 'true');
             }
         });
 
-        // Accessibility Support (Space/Enter to toggle)
-        toggle.addEventListener('keydown', function(e) {
-            if (e.key === ' ' || e.key === 'Enter') {
+        // ==========================================================================
+        // SUBMENU ACCORDION INTERACTIONS
+        // ==========================================================================
+
+        const submenuToggles = document.querySelectorAll('.submenu-toggle');
+        submenuToggles.forEach(toggle => {
+            toggle.addEventListener('click', function (e) {
                 e.preventDefault();
-                this.click();
-            }
-        });
-    });
+                e.stopPropagation();
 
-    // ==========================================================================
-    // SIDEBAR SEARCH FILTERING
-    // ==========================================================================
-    
-    if (searchInput) {
-        // Focus styles mapping
-        searchInput.addEventListener('focus', () => searchBox.classList.add('focused'));
-        searchInput.addEventListener('blur', () => searchBox.classList.remove('focused'));
+                const parentWrapper = this.closest('.menu-item-wrapper.has-submenu');
+                const isCurrentlyOpen = parentWrapper.classList.contains('open');
 
-        // Filtering Logic
-        searchInput.addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase().trim();
-            const items = mainMenuList.querySelectorAll('li.menu-item-wrapper');
-            let matchCount = 0;
-
-            // If sidebar is collapsed and user types, expand it automatically
-            if (query.length > 0 && document.body.classList.contains('sidebar-collapsed') && window.innerWidth >= 1024) {
-                setSidebarCollapsedState(false);
-            }
-
-            // Hide/Show Favorites & Recents during search
-            const pinnedSec = document.getElementById('sectionPinned');
-            const recentsSec = document.getElementById('sectionRecents');
-            if (query.length > 0) {
-                if (pinnedSec) pinnedSec.style.display = 'none';
-                if (recentsSec) recentsSec.style.display = 'none';
-                sectionMain.querySelector('.menu-section-header').style.display = 'none';
-            } else {
-                renderPinnedList();
-                renderRecentsList();
-                sectionMain.querySelector('.menu-section-header').style.display = 'flex';
-            }
-
-            items.forEach(item => {
-                if (item.classList.contains('has-submenu')) {
-                    // Check if group title or any child links match query
-                    const groupTitle = item.dataset.title.toLowerCase();
-                    const subLinks = item.querySelectorAll('.submenu-items li');
-                    let groupMatch = false;
-
-                    subLinks.forEach(sub => {
-                        const subTitle = sub.dataset.title.toLowerCase();
-                        if (subTitle.includes(query) || groupTitle.includes(query)) {
-                            sub.style.display = 'block';
-                            groupMatch = true;
-                            matchCount++;
-                        } else {
-                            sub.style.display = 'none';
-                        }
-                    });
-
-                    if (groupMatch || query.length === 0) {
-                        item.style.display = 'block';
-                        if (query.length > 0) {
-                            item.classList.add('open');
-                        } else {
-                            // Reset to defaults
-                            if (!item.querySelector('.submenu-items .active')) {
-                                item.classList.remove('open');
-                            }
-                        }
-                    } else {
-                        item.style.display = 'none';
-                        item.classList.remove('open');
-                    }
-                } else {
-                    // Singular Link Match
-                    const itemTitle = item.dataset.title.toLowerCase();
-                    if (itemTitle.includes(query) || query.length === 0) {
-                        item.style.display = 'block';
-                        matchCount++;
-                    } else {
-                        item.style.display = 'none';
-                    }
-                }
-            });
-
-            // Display Empty State if no match
-            if (matchCount === 0 && query.length > 0) {
-                searchEmptyState.style.display = 'flex';
-                mainMenuList.style.display = 'none';
-            } else {
-                searchEmptyState.style.display = 'none';
-                mainMenuList.style.display = 'flex';
-            }
-        });
-
-        // Global hotkey: press '/' or 'Ctrl+K' to focus search
-        document.addEventListener('keydown', function(e) {
-            // Ignore if user is inside form inputs
-            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName) || document.activeElement.isContentEditable) {
-                return;
-            }
-
-            if (e.key === '/' || (e.ctrlKey && e.key === 'k')) {
-                e.preventDefault();
-                // Ensure sidebar is expanded to focus search properly
+                // If sidebar is collapsed on desktop, expand it first
                 if (document.body.classList.contains('sidebar-collapsed') && window.innerWidth >= 1024) {
                     setSidebarCollapsedState(false);
+                    parentWrapper.classList.add('open');
+                    this.setAttribute('aria-expanded', 'true');
+                    return;
                 }
-                searchInput.focus();
-                searchInput.select();
-            }
+
+                // Close other sibling submenus
+                const openSiblings = parentWrapper.parentNode.querySelectorAll('.menu-item-wrapper.has-submenu.open');
+                openSiblings.forEach(sibling => {
+                    if (sibling !== parentWrapper) {
+                        sibling.classList.remove('open');
+                        sibling.querySelector('.submenu-toggle').setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                // Toggle current submenu
+                if (isCurrentlyOpen) {
+                    parentWrapper.classList.remove('open');
+                    this.setAttribute('aria-expanded', 'false');
+                } else {
+                    parentWrapper.classList.add('open');
+                    this.setAttribute('aria-expanded', 'true');
+                }
+            });
+
+            // Accessibility Support (Space/Enter to toggle)
+            toggle.addEventListener('keydown', function (e) {
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
         });
 
-        // Escape clears search
-        searchInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                searchInput.value = '';
-                searchInput.dispatchEvent(new Event('input'));
-                searchInput.blur();
-            }
-        });
-    }
+        // ==========================================================================
+        // SIDEBAR SEARCH FILTERING
+        // ==========================================================================
 
-    // ==========================================================================
-    // FAVORITES / PINNED NAVIGATION ITEMS
-    // ==========================================================================
-    
-    let pinnedList = JSON.parse(localStorage.getItem(PINNED_KEY)) || [];
+        if (searchInput) {
+            // Focus styles mapping
+            searchInput.addEventListener('focus', () => searchBox.classList.add('focused'));
+            searchInput.addEventListener('blur', () => searchBox.classList.remove('focused'));
 
-    function renderPinnedList() {
-        const container = document.getElementById('pinnedList');
-        const headerSection = document.getElementById('sectionPinned');
-        const skeleton = document.getElementById('pinnedSkeleton');
+            // Filtering Logic
+            searchInput.addEventListener('input', function (e) {
+                const query = e.target.value.toLowerCase().trim();
+                const items = mainMenuList.querySelectorAll('li.menu-item-wrapper');
+                let matchCount = 0;
 
-        if (!container || !headerSection) return;
+                // If sidebar is collapsed and user types, expand it automatically
+                if (query.length > 0 && document.body.classList.contains('sidebar-collapsed') && window.innerWidth >= 1024) {
+                    setSidebarCollapsedState(false);
+                }
 
-        // Hide Skeleton
-        if (skeleton) skeleton.style.display = 'none';
+                // Hide/Show Favorites & Recents during search
+                const pinnedSec = document.getElementById('sectionPinned');
+                const recentsSec = document.getElementById('sectionRecents');
+                if (query.length > 0) {
+                    if (pinnedSec) pinnedSec.style.display = 'none';
+                    if (recentsSec) recentsSec.style.display = 'none';
+                    sectionMain.querySelector('.menu-section-header').style.display = 'none';
+                } else {
+                    renderPinnedList();
+                    renderRecentsList();
+                    sectionMain.querySelector('.menu-section-header').style.display = 'flex';
+                }
 
-        if (pinnedList.length === 0 || (searchInput && searchInput.value.length > 0)) {
-            headerSection.style.display = 'none';
-            container.style.display = 'none';
-            return;
+                items.forEach(item => {
+                    if (item.classList.contains('has-submenu')) {
+                        // Check if group title or any child links match query
+                        const groupTitle = item.dataset.title.toLowerCase();
+                        const subLinks = item.querySelectorAll('.submenu-items li');
+                        let groupMatch = false;
+
+                        subLinks.forEach(sub => {
+                            const subTitle = sub.dataset.title.toLowerCase();
+                            if (subTitle.includes(query) || groupTitle.includes(query)) {
+                                sub.style.display = 'block';
+                                groupMatch = true;
+                                matchCount++;
+                            } else {
+                                sub.style.display = 'none';
+                            }
+                        });
+
+                        if (groupMatch || query.length === 0) {
+                            item.style.display = 'block';
+                            if (query.length > 0) {
+                                item.classList.add('open');
+                            } else {
+                                // Reset to defaults
+                                if (!item.querySelector('.submenu-items .active')) {
+                                    item.classList.remove('open');
+                                }
+                            }
+                        } else {
+                            item.style.display = 'none';
+                            item.classList.remove('open');
+                        }
+                    } else {
+                        // Singular Link Match
+                        const itemTitle = item.dataset.title.toLowerCase();
+                        if (itemTitle.includes(query) || query.length === 0) {
+                            item.style.display = 'block';
+                            matchCount++;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    }
+                });
+
+                // Display Empty State if no match
+                if (matchCount === 0 && query.length > 0) {
+                    searchEmptyState.style.display = 'flex';
+                    mainMenuList.style.display = 'none';
+                } else {
+                    searchEmptyState.style.display = 'none';
+                    mainMenuList.style.display = 'flex';
+                }
+            });
+
+            // Global hotkey: press '/' or 'Ctrl+K' to focus search
+            document.addEventListener('keydown', function (e) {
+                // Ignore if user is inside form inputs
+                if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName) || document.activeElement.isContentEditable) {
+                    return;
+                }
+
+                if (e.key === '/' || (e.ctrlKey && e.key === 'k')) {
+                    e.preventDefault();
+                    // Ensure sidebar is expanded to focus search properly
+                    if (document.body.classList.contains('sidebar-collapsed') && window.innerWidth >= 1024) {
+                        setSidebarCollapsedState(false);
+                    }
+                    searchInput.focus();
+                    searchInput.select();
+                }
+            });
+
+            // Escape clears search
+            searchInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    searchInput.value = '';
+                    searchInput.dispatchEvent(new Event('input'));
+                    searchInput.blur();
+                }
+            });
         }
 
-        // Render Links
-        container.innerHTML = '';
-        pinnedList.forEach(item => {
-            const li = document.createElement('li');
-            li.className = 'menu-item-wrapper';
-            li.innerHTML = `
+        // ==========================================================================
+        // FAVORITES / PINNED NAVIGATION ITEMS
+        // ==========================================================================
+
+        let pinnedList = JSON.parse(localStorage.getItem(PINNED_KEY)) || [];
+
+        function renderPinnedList() {
+            const container = document.getElementById('pinnedList');
+            const headerSection = document.getElementById('sectionPinned');
+            const skeleton = document.getElementById('pinnedSkeleton');
+
+            if (!container || !headerSection) return;
+
+            // Hide Skeleton
+            if (skeleton) skeleton.style.display = 'none';
+
+            if (pinnedList.length === 0 || (searchInput && searchInput.value.length > 0)) {
+                headerSection.style.display = 'none';
+                container.style.display = 'none';
+                return;
+            }
+
+            // Render Links
+            container.innerHTML = '';
+            pinnedList.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'menu-item-wrapper';
+                li.innerHTML = `
                 <a href="${item.route}" class="menu-link">
                     <i data-lucide="${item.icon || 'star'}"></i>
                     <span class="menu-text">${item.title}</span>
@@ -1732,240 +1805,240 @@ document.addEventListener('DOMContentLoaded', function() {
                 </button>
             `;
 
-            // Unpin action handler
-            li.querySelector('.pin-btn').addEventListener('click', function(e) {
-                e.stopPropagation();
-                togglePin(item.title, item.route, item.icon);
+                // Unpin action handler
+                li.querySelector('.pin-btn').addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    togglePin(item.title, item.route, item.icon);
+                });
+
+                container.appendChild(li);
             });
 
-            container.appendChild(li);
-        });
+            headerSection.style.display = 'block';
+            container.style.display = 'flex';
 
-        headerSection.style.display = 'block';
-        container.style.display = 'flex';
-        
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    }
-
-    function togglePin(title, route, icon) {
-        const index = pinnedList.findIndex(p => p.title === title);
-        if (index > -1) {
-            pinnedList.splice(index, 1);
-        } else {
-            pinnedList.push({ title, route, icon });
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
-        localStorage.setItem(PINNED_KEY, JSON.stringify(pinnedList));
-        
-        // Sync star icons state in main menu
-        updateMainStarIcons();
-        
-        // Re-render pinned links
-        renderPinnedList();
-    }
 
-    function updateMainStarIcons() {
-        const pinButtons = document.querySelectorAll('#mainMenuList .pin-btn');
-        pinButtons.forEach(btn => {
-            const wrapper = btn.closest('.menu-item-wrapper');
-            const title = wrapper.dataset.title;
-            const isPinned = pinnedList.some(p => p.title === title);
-            
-            if (isPinned) {
-                btn.classList.add('pinned');
+        function togglePin(title, route, icon) {
+            const index = pinnedList.findIndex(p => p.title === title);
+            if (index > -1) {
+                pinnedList.splice(index, 1);
             } else {
-                btn.classList.remove('pinned');
+                pinnedList.push({ title, route, icon });
             }
+            localStorage.setItem(PINNED_KEY, JSON.stringify(pinnedList));
+
+            // Sync star icons state in main menu
+            updateMainStarIcons();
+
+            // Re-render pinned links
+            renderPinnedList();
+        }
+
+        function updateMainStarIcons() {
+            const pinButtons = document.querySelectorAll('#mainMenuList .pin-btn');
+            pinButtons.forEach(btn => {
+                const wrapper = btn.closest('.menu-item-wrapper');
+                const title = wrapper.dataset.title;
+                const isPinned = pinnedList.some(p => p.title === title);
+
+                if (isPinned) {
+                    btn.classList.add('pinned');
+                } else {
+                    btn.classList.remove('pinned');
+                }
+            });
+        }
+
+        // Attach pin click handlers to main menu items
+        const mainPinButtons = document.querySelectorAll('#mainMenuList .pin-btn');
+        mainPinButtons.forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const wrapper = this.closest('.menu-item-wrapper');
+                const title = wrapper.dataset.title;
+                const route = wrapper.dataset.route;
+                const icon = wrapper.dataset.icon;
+                togglePin(title, route, icon);
+            });
         });
-    }
 
-    // Attach pin click handlers to main menu items
-    const mainPinButtons = document.querySelectorAll('#mainMenuList .pin-btn');
-    mainPinButtons.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const wrapper = this.closest('.menu-item-wrapper');
-            const title = wrapper.dataset.title;
-            const route = wrapper.dataset.route;
-            const icon = wrapper.dataset.icon;
-            togglePin(title, route, icon);
-        });
-    });
+        // ==========================================================================
+        // RECENTLY VISITED LOGGING & RENDER
+        // ==========================================================================
 
-    // ==========================================================================
-    // RECENTLY VISITED LOGGING & RENDER
-    // ==========================================================================
-    
-    let recentsList = JSON.parse(localStorage.getItem(RECENTS_KEY)) || [];
+        let recentsList = JSON.parse(localStorage.getItem(RECENTS_KEY)) || [];
 
-    function logCurrentPageVisit() {
-        const currentPath = window.location.pathname;
-        const currentSearch = window.location.search;
-        const currentUrl = currentPath + currentSearch;
-        
-        // Find matching item in our main directory
-        const matchItem = document.querySelector(`#mainMenuList li[data-route]:not([data-route="#"]):not([data-route=""])`);
-        const matchingWrappers = document.querySelectorAll('#mainMenuList li[data-route]');
-        
-        let foundWrapper = null;
-        for (let wrap of matchingWrappers) {
-            // Match normalized routes
-            const itemRoute = wrap.dataset.route;
-            if (itemRoute && currentUrl.includes(itemRoute.replace(window.location.origin, ''))) {
-                foundWrapper = wrap;
-                break;
+        function logCurrentPageVisit() {
+            const currentPath = window.location.pathname;
+            const currentSearch = window.location.search;
+            const currentUrl = currentPath + currentSearch;
+
+            // Find matching item in our main directory
+            const matchItem = document.querySelector(`#mainMenuList li[data-route]:not([data-route="#"]):not([data-route=""])`);
+            const matchingWrappers = document.querySelectorAll('#mainMenuList li[data-route]');
+
+            let foundWrapper = null;
+            for (let wrap of matchingWrappers) {
+                // Match normalized routes
+                const itemRoute = wrap.dataset.route;
+                if (itemRoute && currentUrl.includes(itemRoute.replace(window.location.origin, ''))) {
+                    foundWrapper = wrap;
+                    break;
+                }
+            }
+
+            if (foundWrapper) {
+                const title = foundWrapper.dataset.title;
+                const route = foundWrapper.dataset.route;
+                const icon = foundWrapper.dataset.icon;
+
+                // Remove existing duplicate
+                recentsList = recentsList.filter(r => r.title !== title);
+
+                // Add to front of history list
+                recentsList.unshift({ title, route, icon });
+
+                // Caps at 4 items
+                if (recentsList.length > 4) {
+                    recentsList.pop();
+                }
+
+                localStorage.setItem(RECENTS_KEY, JSON.stringify(recentsList));
             }
         }
 
-        if (foundWrapper) {
-            const title = foundWrapper.dataset.title;
-            const route = foundWrapper.dataset.route;
-            const icon = foundWrapper.dataset.icon;
+        function renderRecentsList() {
+            const container = document.getElementById('recentsList');
+            const headerSection = document.getElementById('sectionRecents');
+            const skeleton = document.getElementById('recentsSkeleton');
 
-            // Remove existing duplicate
-            recentsList = recentsList.filter(r => r.title !== title);
+            if (!container || !headerSection) return;
 
-            // Add to front of history list
-            recentsList.unshift({ title, route, icon });
+            // Hide Skeleton
+            if (skeleton) skeleton.style.display = 'none';
 
-            // Caps at 4 items
-            if (recentsList.length > 4) {
-                recentsList.pop();
+            // Filter out the page currently being visited so we don't display redundantly
+            const currentPath = window.location.pathname;
+            const filteredRecents = recentsList.filter(item => {
+                const pathPart = item.route.replace(window.location.origin, '');
+                return !currentPath.includes(pathPart) && pathPart !== '#';
+            });
+
+            if (filteredRecents.length === 0 || (searchInput && searchInput.value.length > 0)) {
+                headerSection.style.display = 'none';
+                container.style.display = 'none';
+                return;
             }
 
-            localStorage.setItem(RECENTS_KEY, JSON.stringify(recentsList));
-        }
-    }
-
-    function renderRecentsList() {
-        const container = document.getElementById('recentsList');
-        const headerSection = document.getElementById('sectionRecents');
-        const skeleton = document.getElementById('recentsSkeleton');
-
-        if (!container || !headerSection) return;
-
-        // Hide Skeleton
-        if (skeleton) skeleton.style.display = 'none';
-
-        // Filter out the page currently being visited so we don't display redundantly
-        const currentPath = window.location.pathname;
-        const filteredRecents = recentsList.filter(item => {
-            const pathPart = item.route.replace(window.location.origin, '');
-            return !currentPath.includes(pathPart) && pathPart !== '#';
-        });
-
-        if (filteredRecents.length === 0 || (searchInput && searchInput.value.length > 0)) {
-            headerSection.style.display = 'none';
-            container.style.display = 'none';
-            return;
-        }
-
-        container.innerHTML = '';
-        filteredRecents.forEach(item => {
-            const li = document.createElement('li');
-            li.className = 'menu-item-wrapper';
-            li.innerHTML = `
+            container.innerHTML = '';
+            filteredRecents.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'menu-item-wrapper';
+                li.innerHTML = `
                 <a href="${item.route}" class="menu-link">
                     <i data-lucide="${item.icon || 'history'}"></i>
                     <span class="menu-text">${item.title}</span>
                 </a>
             `;
-            container.appendChild(li);
-        });
+                container.appendChild(li);
+            });
 
-        headerSection.style.display = 'block';
-        container.style.display = 'flex';
-        
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    }
+            headerSection.style.display = 'block';
+            container.style.display = 'flex';
 
-    // Log current page and render sections asynchronously with skeleton simulation
-    logCurrentPageVisit();
-
-    // 400ms delay to simulate loading skeleton state (premium SaaS feel)
-    setTimeout(() => {
-        renderPinnedList();
-        renderRecentsList();
-        updateMainStarIcons();
-    }, 450);
-
-    // ==========================================================================
-    // USER PROFILE MENU (POPOVER DRAWER)
-    // ==========================================================================
-    
-    function toggleProfileDropdown(e) {
-        if (e) e.stopPropagation();
-        const isOpen = profileDropdown.classList.contains('open');
-        
-        if (isOpen) {
-            closeProfileDropdown();
-        } else {
-            profileDropdown.classList.add('open');
-            profileCard.setAttribute('aria-expanded', 'true');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
-    }
 
-    function closeProfileDropdown() {
-        profileDropdown.classList.remove('open');
-        profileCard.setAttribute('aria-expanded', 'false');
-    }
+        // Log current page and render sections asynchronously with skeleton simulation
+        logCurrentPageVisit();
 
-    if (profileCard) {
-        profileCard.addEventListener('click', toggleProfileDropdown);
-        
-        // Keydown support
-        profileCard.addEventListener('keydown', function(e) {
-            if (e.key === ' ' || e.key === 'Enter') {
-                e.preventDefault();
-                toggleProfileDropdown();
+        // 400ms delay to simulate loading skeleton state (premium SaaS feel)
+        setTimeout(() => {
+            renderPinnedList();
+            renderRecentsList();
+            updateMainStarIcons();
+        }, 450);
+
+        // ==========================================================================
+        // USER PROFILE MENU (POPOVER DRAWER)
+        // ==========================================================================
+
+        function toggleProfileDropdown(e) {
+            if (e) e.stopPropagation();
+            const isOpen = profileDropdown.classList.contains('open');
+
+            if (isOpen) {
+                closeProfileDropdown();
+            } else {
+                profileDropdown.classList.add('open');
+                profileCard.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        function closeProfileDropdown() {
+            profileDropdown.classList.remove('open');
+            profileCard.setAttribute('aria-expanded', 'false');
+        }
+
+        if (profileCard) {
+            profileCard.addEventListener('click', toggleProfileDropdown);
+
+            // Keydown support
+            profileCard.addEventListener('keydown', function (e) {
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    toggleProfileDropdown();
+                }
+            });
+        }
+
+        // Close profile dropdown on outside clicks
+        document.addEventListener('click', function (e) {
+            if (profileDropdown && !profileDropdown.contains(e.target) && !profileCard.contains(e.target)) {
+                closeProfileDropdown();
             }
         });
-    }
 
-    // Close profile dropdown on outside clicks
-    document.addEventListener('click', function(e) {
-        if (profileDropdown && !profileDropdown.contains(e.target) && !profileCard.contains(e.target)) {
-            closeProfileDropdown();
-        }
-    });
+        // ==========================================================================
+        // ACCESSIBILITY: KEYBOARD ARROW KEY NAVIGATION
+        // ==========================================================================
 
-    // ==========================================================================
-    // ACCESSIBILITY: KEYBOARD ARROW KEY NAVIGATION
-    // ==========================================================================
-    
-    sidebar.addEventListener('keydown', function(e) {
-        if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+        sidebar.addEventListener('keydown', function (e) {
+            if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
 
-        // Find all visible keyboard focusable elements in the navigation items
-        const focusableSelectors = '.menu-link, .submenu-toggle, .pin-btn, #sidebarSearch, #profileCard, .profile-dropdown .dropdown-item';
-        const focusables = Array.from(sidebar.querySelectorAll(focusableSelectors)).filter(el => {
-            // Filter elements that are visible (not collapsed, not hidden by search)
-            const wrapper = el.closest('.menu-item-wrapper');
-            const submenu = el.closest('.submenu-items');
-            
-            if (el.id === 'sidebarSearch' || el.id === 'profileCard' || el.closest('.profile-dropdown')) {
+            // Find all visible keyboard focusable elements in the navigation items
+            const focusableSelectors = '.menu-link, .submenu-toggle, .pin-btn, #sidebarSearch, #profileCard, .profile-dropdown .dropdown-item';
+            const focusables = Array.from(sidebar.querySelectorAll(focusableSelectors)).filter(el => {
+                // Filter elements that are visible (not collapsed, not hidden by search)
+                const wrapper = el.closest('.menu-item-wrapper');
+                const submenu = el.closest('.submenu-items');
+
+                if (el.id === 'sidebarSearch' || el.id === 'profileCard' || el.closest('.profile-dropdown')) {
+                    return el.offsetParent !== null;
+                }
+
+                if (wrapper && wrapper.style.display === 'none') return false;
+                if (submenu && !submenu.closest('.menu-item-wrapper.has-submenu').classList.contains('open')) return false;
+
                 return el.offsetParent !== null;
+            });
+
+            const activeIndex = focusables.indexOf(document.activeElement);
+            let nextIndex = activeIndex;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                nextIndex = activeIndex + 1 < focusables.length ? activeIndex + 1 : 0;
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                nextIndex = activeIndex - 1 >= 0 ? activeIndex - 1 : focusables.length - 1;
             }
-            
-            if (wrapper && wrapper.style.display === 'none') return false;
-            if (submenu && !submenu.closest('.menu-item-wrapper.has-submenu').classList.contains('open')) return false;
-            
-            return el.offsetParent !== null;
+
+            if (focusables[nextIndex]) {
+                focusables[nextIndex].focus();
+            }
         });
-
-        const activeIndex = focusables.indexOf(document.activeElement);
-        let nextIndex = activeIndex;
-
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            nextIndex = activeIndex + 1 < focusables.length ? activeIndex + 1 : 0;
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            nextIndex = activeIndex - 1 >= 0 ? activeIndex - 1 : focusables.length - 1;
-        }
-
-        if (focusables[nextIndex]) {
-            focusables[nextIndex].focus();
-        }
     });
-});
 </script>

@@ -227,6 +227,7 @@ Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
      Route::get('/student/announcements', [StudentAnnouncementsController::class, 'index'])->name('student.announcements');
      Route::post('/student/announcements/{announcement}/view', [StudentAnnouncementsController::class, 'view'])->name('student.announcements.view');
      Route::get('/student/centretestscores', [StudentCentreTestScoreController::class, 'index'])->name('student.centretestscores');
+     Route::get('/student/weeklytests', [StudentAssessmentsController::class, 'weeklyTests'])->name('student.weeklytests');
    
 });
 
