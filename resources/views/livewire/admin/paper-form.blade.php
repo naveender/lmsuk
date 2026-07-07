@@ -359,6 +359,55 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Course Assignment Section -->
+                        <div class="row border-top pt-2 mt-1">
+                            <div class="col-md-12">
+                                <h5 class="font-weight-bold text-primary mb-1">
+                                    <i class="feather icon-award mr-50"></i>Course Assignment (Optional)
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-12 mb-1">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="create_new_course" wire:model.live="create_new_course">
+                                    <label class="custom-control-label font-weight-bold cursor-pointer text-dark" for="create_new_course">
+                                        Create a new course instantly
+                                    </label>
+                                </div>
+                            </div>
+
+                            @if($create_new_course)
+                                <div class="col-md-8">
+                                    <div class="form-group mb-2">
+                                        <label for="new_course_name" class="font-weight-bold text-dark">New Course Name <span class="text-danger">*</span></label>
+                                        <input type="text" id="new_course_name" class="form-control" placeholder="Enter new course name..." wire:model.defer="new_course_name">
+                                        @error('new_course_name') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+                            @else
+                                <div class="col-md-8">
+                                    <div class="form-group mb-2">
+                                        <label for="course_id" class="font-weight-bold text-dark">Assign to Existing Course</label>
+                                        <select id="course_id" class="form-control" wire:model.defer="course_id">
+                                            <option value="">-- Do Not Assign --</option>
+                                            @foreach($coursesList as $courseItem)
+                                                <option value="{{ $courseItem->id }}">{{ $courseItem->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('course_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+                            @endif
+
+                            <div class="col-md-4">
+                                <div class="form-group mb-2">
+                                    <label for="week" class="font-weight-bold text-dark">Week Number <span class="text-danger">*</span></label>
+                                    <input type="number" id="week" class="form-control" placeholder="e.g. 1" min="1" wire:model.defer="week">
+                                    @error('week') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

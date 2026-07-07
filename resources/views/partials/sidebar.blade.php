@@ -1269,7 +1269,7 @@
 
                 <!-- Content Manager (Submenu) -->
                 @php
-                    $contentActive = request()->routeIs('admin.classes.*') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.year-groups.*') || request()->routeIs('admin.subjects.*') || request()->routeIs('topics*') || request()->routeIs('add.topic*');
+                    $contentActive = request()->routeIs('admin.classes.*') || request()->routeIs('admin.academic-years.*') || request()->routeIs('admin.year-groups.*') || request()->routeIs('admin.subjects.*') || request()->routeIs('topics*') || request()->routeIs('add.topic*') || request()->routeIs('admin.courses.*');
                 @endphp
                 <li class="menu-item-wrapper has-submenu {{ $contentActive ? 'open' : '' }}" data-title="Content Manager" data-tooltip="Content Manager">
                     <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true" aria-expanded="{{ $contentActive ? 'true' : 'false' }}">
@@ -1278,6 +1278,15 @@
                         <i data-lucide="chevron-down" class="submenu-arrow"></i>
                     </div>
                     <ul class="submenu-items">
+                        <li class="{{ request()->routeIs('admin.courses.*') ? 'active' : '' }}" data-title="Courses" data-route="{{ route('admin.courses.index') }}" data-icon="award">
+                            <a href="{{ route('admin.courses.index') }}" class="menu-link">
+                                <i data-lucide="award"></i>
+                                <span class="menu-text">Courses</span>
+                            </a>
+                            <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Courses">
+                                <i data-lucide="star"></i>
+                            </button>
+                        </li>
                         <li class="{{ request()->routeIs('admin.classes.index') ? 'active' : '' }}" data-title="Classes" data-route="{{ route('admin.classes.index') }}" data-icon="shapes">
                             <a href="{{ route('admin.classes.index') }}" class="menu-link">
                                 <i data-lucide="shapes"></i>

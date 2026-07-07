@@ -11,6 +11,7 @@ use App\Models\Classes;
 use App\Models\User;
 use App\Models\YearGroup;
 use App\Models\AcademicYear;
+use App\Models\Course;
 use Illuminate\Support\Facades\DB;
 
 class PaperForm extends Component
@@ -36,6 +37,13 @@ class PaperForm extends Component
     public $total_time = 0;
     public $default_marks = 1;
     public $question_pooling = false;
+
+    // Course assignment fields
+    public $course_id = '';
+    public $week = 1;
+    public $create_new_course = false;
+    public $new_course_name = '';
+    public $original_course_id = '';
 
     // Advanced Config Fields
     public $allow_attempt_without_signup = false;
@@ -75,6 +83,9 @@ class PaperForm extends Component
         'difficulty' => 'required|string',
         'total_time' => 'required|integer|min:1',
         'default_marks' => 'required|integer|min:1',
+        'course_id' => 'nullable|exists:courses,id',
+        'week' => 'required|integer|min:1',
+        'new_course_name' => 'nullable|string|max:255',
     ];
 
     public function mount($paper = null)
@@ -124,6 +135,14 @@ class PaperForm extends Component
 
             // Load selected question IDs
             $this->selectedQuestionIds = $paper->questions()->pluck('questions.id')->toArray();
+
+            // Load course assignment if exists
+            $firstCourse = $paper->courses()->first();
+            if ($firstCourse) {
+                $this->course_id = $firstCourse->id;
+                $this->original_course_id = $firstCourse->id;
+                $this->week = $firstCourse->pivot->week;
+            }
         } else {
             // Set default creator if possible
             $this->user_id = auth()->id();
@@ -234,6 +253,12 @@ class PaperForm extends Component
     {
         $this->validate();
 
+        if ($this->create_new_course) {
+            $this->validate([
+                'new_course_name' => 'required|string|max:255',
+            ]);
+        }
+
         DB::beginTransaction();
         try {
             $data = [
@@ -275,6 +300,24 @@ class PaperForm extends Component
                 ];
             }
             $paper->questions()->sync($syncData);
+
+            // Handle Course Assignment
+            if ($this->create_new_course && !empty($this->new_course_name)) {
+                $newCourse = Course::create([
+                    'name' => $this->new_course_name,
+                    'is_active' => true,
+                ]);
+                $this->course_id = $newCourse->id;
+            }
+
+            if ($this->course_id) {
+                if ($this->isEdit && $this->original_course_id && $this->original_course_id != $this->course_id) {
+                    $paper->courses()->detach($this->original_course_id);
+                }
+                $paper->courses()->syncWithoutDetaching([$this->course_id => ['week' => $this->week]]);
+            } elseif ($this->isEdit && $this->original_course_id) {
+                $paper->courses()->detach($this->original_course_id);
+            }
 
             DB::commit();
 
@@ -366,6 +409,7 @@ class PaperForm extends Component
             'tutors' => User::whereIn('role', ['admin', 'tutor'])->orderBy('name')->get(),
             'difficulties' => Paper::DIFFICULTIES,
             'questionTypes' => Question::TYPES,
+            'coursesList' => Course::where('is_active', true)->orderBy('name')->get(),
         ]);
     }
 }

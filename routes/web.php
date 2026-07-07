@@ -190,6 +190,19 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     ]);
     Route::get('admin/papers/{paper}/assignments', [AdminPaperController::class, 'getAssignments'])->name('admin.papers.assignments');
     Route::post('admin/papers/{paper}/assign', [AdminPaperController::class, 'assign'])->name('admin.papers.assign');
+
+    // Courses Management
+    Route::resource('admin/courses', \App\Http\Controllers\Admin\CourseController::class)->names([
+        'index'   => 'admin.courses.index',
+        'create'  => 'admin.courses.create',
+        'store'   => 'admin.courses.store',
+        'edit'    => 'admin.courses.edit',
+        'update'  => 'admin.courses.update',
+        'destroy' => 'admin.courses.destroy',
+    ]);
+    Route::get('admin/courses/{course}/papers', [\App\Http\Controllers\Admin\CourseController::class, 'managePapers'])->name('admin.courses.papers');
+    Route::post('admin/courses/{course}/papers/add', [\App\Http\Controllers\Admin\CourseController::class, 'addPaper'])->name('admin.courses.papers.add');
+    Route::delete('admin/courses/{course}/papers/remove/{paper}', [\App\Http\Controllers\Admin\CourseController::class, 'removePaper'])->name('admin.courses.papers.remove');
 });
 
 // Student

@@ -123,6 +123,16 @@ class Paper extends Model
     }
 
     /**
+     * Get the courses associated with the paper.
+     */
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'course_paper')
+            ->withPivot('week')
+            ->withTimestamps();
+    }
+
+    /**
      * Scope a query to only include papers visible to the student.
      */
     public function scopeVisibleTo($query, User $student)
