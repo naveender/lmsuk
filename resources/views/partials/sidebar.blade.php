@@ -1227,36 +1227,36 @@
                 @php
                     $papersActive = request()->routeIs('admin.papers.*');
                 @endphp
-                <li class="menu-item-wrapper has-submenu {{ $papersActive ? 'open' : '' }}" data-title="Papers Manager"
-                    data-tooltip="Papers Manager">
+                <li class="menu-item-wrapper has-submenu {{ $papersActive ? 'open' : '' }}"
+                    data-title="Assessment Center" data-tooltip="Assessment Center">
                     <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true"
                         aria-expanded="{{ $papersActive ? 'true' : 'false' }}">
                         <i data-lucide="file-text"></i>
-                        <span class="menu-text">Quiz/Test Manager</span>
+                        <span class="menu-text">Assessment Center</span>
                         <i data-lucide="chevron-down" class="submenu-arrow"></i>
                     </div>
                     <ul class="submenu-items">
                         <li class="{{ request()->routeIs('admin.papers.create') ? 'active' : '' }}"
-                            data-title="Create New Quiz/Test" data-route="{{ route('admin.papers.create') }}"
+                            data-title="Create New Assessment" data-route="{{ route('admin.papers.create') }}"
                             data-icon="file-plus">
                             <a href="{{ route('admin.papers.create') }}" class="menu-link">
                                 <i data-lucide="file-plus"></i>
-                                <span class="menu-text">Create New Quiz/Test</span>
+                                <span class="menu-text">Create New Assessment</span>
                             </a>
                             <button type="button" class="pin-btn" title="Pin to favorites"
-                                aria-label="Pin Create New Paper">
+                                aria-label="Pin Create New Assessment">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
                         <li class="{{ request()->routeIs('admin.papers.index') ? 'active' : '' }}"
-                            data-title="Quizzes/Tests Directory" data-route="{{ route('admin.papers.index') }}"
+                            data-title="Assessment Directory" data-route="{{ route('admin.papers.index') }}"
                             data-icon="files">
                             <a href="{{ route('admin.papers.index') }}" class="menu-link">
                                 <i data-lucide="files"></i>
-                                <span class="menu-text">Quizzes/Tests Directory</span>
+                                <span class="menu-text">Assessment Directory</span>
                             </a>
                             <button type="button" class="pin-btn" title="Pin to favorites"
-                                aria-label="Pin Quizzes/Tests Directory">
+                                aria-label="Pin Assessment Directory">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>

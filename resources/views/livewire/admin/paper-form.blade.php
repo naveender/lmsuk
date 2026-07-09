@@ -30,6 +30,166 @@
             .border-left-3 {
                 border-left-width: 3px !important;
             }
+
+            /* Premium Radio Tiles Grid */
+            .paper-type-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px;
+                margin-top: 8px;
+            }
+
+            @media (max-width: 991px) {
+                .paper-type-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            @media (max-width: 576px) {
+                .paper-type-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .paper-type-tile {
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 20px 16px;
+                background: #ffffff;
+                border: 2px solid #e2e8f0;
+                border-radius: 12px;
+                cursor: pointer;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                user-select: none;
+                text-align: center;
+                height: 100%;
+            }
+
+            .paper-type-tile:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+                border-color: #cbd5e1;
+            }
+
+            .paper-type-tile:focus-within {
+                outline: none;
+                border-color: #7367F0;
+                box-shadow: 0 0 0 3px rgba(115, 103, 240, 0.25);
+            }
+
+            .paper-type-tile .icon-wrapper {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 12px;
+                font-size: 22px;
+                transition: all 0.25s ease;
+                background: #f8fafc;
+            }
+
+            .paper-type-tile .tile-title {
+                font-weight: 700;
+                font-size: 1rem;
+                color: #334155;
+                margin-bottom: 6px;
+                transition: all 0.25s ease;
+            }
+
+            .paper-type-tile .tile-description {
+                font-size: 0.75rem;
+                color: #64748b;
+                line-height: 1.4;
+            }
+
+            /* Active State Styles */
+            /* Test: Warning Theme */
+            .paper-type-tile.type-test.active {
+                border-color: #FF9F43;
+                background-color: rgba(255, 159, 67, 0.05);
+                box-shadow: 0 8px 20px -6px rgba(255, 159, 67, 0.25);
+            }
+            .paper-type-tile.type-test.active .icon-wrapper {
+                background-color: #FF9F43;
+                color: #ffffff !important;
+            }
+            .paper-type-tile.type-test.active .tile-title {
+                color: #FF9F43;
+            }
+
+            /* Exam: Success Theme */
+            .paper-type-tile.type-exam.active {
+                border-color: #28C76F;
+                background-color: rgba(40, 199, 111, 0.05);
+                box-shadow: 0 8px 20px -6px rgba(40, 199, 111, 0.25);
+            }
+            .paper-type-tile.type-exam.active .icon-wrapper {
+                background-color: #28C76F;
+                color: #ffffff !important;
+            }
+            .paper-type-tile.type-exam.active .tile-title {
+                color: #28C76F;
+            }
+
+            /* Quiz: Primary Theme */
+            .paper-type-tile.type-quiz.active {
+                border-color: #7367F0;
+                background-color: rgba(115, 103, 240, 0.05);
+                box-shadow: 0 8px 20px -6px rgba(115, 103, 240, 0.25);
+            }
+            .paper-type-tile.type-quiz.active .icon-wrapper {
+                background-color: #7367F0;
+                color: #ffffff !important;
+            }
+            .paper-type-tile.type-quiz.active .tile-title {
+                color: #7367F0;
+            }
+
+            /* Homework: Info Theme */
+            .paper-type-tile.type-homework.active {
+                border-color: #00CFE8;
+                background-color: rgba(0, 207, 232, 0.05);
+                box-shadow: 0 8px 20px -6px rgba(0, 207, 232, 0.25);
+            }
+            .paper-type-tile.type-homework.active .icon-wrapper {
+                background-color: #00CFE8;
+                color: #ffffff !important;
+            }
+            .paper-type-tile.type-homework.active .tile-title {
+                color: #00CFE8;
+            }
+
+            /* Checkmark indicator badge */
+            .paper-type-tile .check-badge {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                color: #ffffff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 10px;
+                opacity: 0;
+                transform: scale(0.5);
+                transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            .paper-type-tile.active .check-badge {
+                opacity: 1;
+                transform: scale(1);
+            }
+            .paper-type-tile.type-test.active .check-badge { background: #FF9F43; }
+            .paper-type-tile.type-exam.active .check-badge { background: #28C76F; }
+            .paper-type-tile.type-quiz.active .check-badge { background: #7367F0; }
+            .paper-type-tile.type-homework.active .check-badge { background: #00CFE8; }
         </style>
     @endpush
 
@@ -49,36 +209,58 @@
                         <div class="form-group mb-2">
                             <label class="font-weight-bold text-dark mb-1 d-block">Paper Type <span
                                     class="text-danger">*</span></label>
-                            <div class="d-flex align-items-center">
-                                <div class="custom-control custom-radio mr-3">
-                                    <input type="radio" class="custom-control-input" id="type_test" value="test"
-                                        wire:model.live="type">
-                                    <label class="custom-control-label font-weight-bold cursor-pointer" for="type_test">
-                                        <i class="feather icon-file-text text-warning mr-25"></i> Test
-                                    </label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="type_exam" value="exam"
-                                        wire:model.live="type">
-                                    <label class="custom-control-label font-weight-bold cursor-pointer" for="type_exam">
-                                        <i class="feather icon-award text-success mr-25"></i> Exam
-                                    </label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="type_quiz" value="quiz"
-                                        wire:model.live="type">
-                                    <label class="custom-control-label font-weight-bold cursor-pointer" for="type_quiz">
-                                        <i class="feather icon-award text-primary mr-25"></i> Quiz
-                                    </label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="type_homework" value="homework"
-                                        wire:model.live="type">
-                                    <label class="custom-control-label font-weight-bold cursor-pointer"
-                                        for="type_homework">
-                                        <i class="feather icon-award text-info mr-25"></i> Homework
-                                    </label>
-                                </div>
+                            <div class="paper-type-grid">
+                                <!-- Test Card -->
+                                <label class="paper-type-tile type-test {{ $type === 'test' ? 'active' : '' }}" for="type_test">
+                                    <input type="radio" class="sr-only" id="type_test" value="test" wire:model.live="type">
+                                    <div class="check-badge">
+                                        <i class="feather icon-check"></i>
+                                    </div>
+                                    <div class="icon-wrapper text-warning">
+                                        <i class="feather icon-file-text"></i>
+                                    </div>
+                                    <span class="tile-title">Test</span>
+                                    <span class="tile-description">Regular assessments & practice tests</span>
+                                </label>
+
+                                <!-- Exam Card -->
+                                <label class="paper-type-tile type-exam {{ $type === 'exam' ? 'active' : '' }}" for="type_exam">
+                                    <input type="radio" class="sr-only" id="type_exam" value="exam" wire:model.live="type">
+                                    <div class="check-badge">
+                                        <i class="feather icon-check"></i>
+                                    </div>
+                                    <div class="icon-wrapper text-success">
+                                        <i class="feather icon-award"></i>
+                                    </div>
+                                    <span class="tile-title">Exam</span>
+                                    <span class="tile-description">Formal graded examinations</span>
+                                </label>
+
+                                <!-- Quiz Card -->
+                                <label class="paper-type-tile type-quiz {{ $type === 'quiz' ? 'active' : '' }}" for="type_quiz">
+                                    <input type="radio" class="sr-only" id="type_quiz" value="quiz" wire:model.live="type">
+                                    <div class="check-badge">
+                                        <i class="feather icon-check"></i>
+                                    </div>
+                                    <div class="icon-wrapper text-primary">
+                                        <i class="feather icon-zap"></i>
+                                    </div>
+                                    <span class="tile-title">Quiz</span>
+                                    <span class="tile-description">Quick knowledge checks & quizzes</span>
+                                </label>
+
+                                <!-- Homework Card -->
+                                <label class="paper-type-tile type-homework {{ $type === 'homework' ? 'active' : '' }}" for="type_homework">
+                                    <input type="radio" class="sr-only" id="type_homework" value="homework" wire:model.live="type">
+                                    <div class="check-badge">
+                                        <i class="feather icon-check"></i>
+                                    </div>
+                                    <div class="icon-wrapper text-info">
+                                        <i class="feather icon-book-open"></i>
+                                    </div>
+                                    <span class="tile-title">Homework</span>
+                                    <span class="tile-description">Take-home learning activities</span>
+                                </label>
                             </div>
                             @error('type') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
                         </div>

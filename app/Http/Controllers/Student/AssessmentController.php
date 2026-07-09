@@ -43,6 +43,13 @@ class AssessmentController extends Controller
         }
         $weeks = $weeksQuery->orderBy('due_date')->orderBy('name')->get();
 
+        // Get all weeks defined in course_paper for dynamic filtering on the frontend
+        $allWeeks = \App\Models\Week::whereIn('id', function($q) use ($student) {
+            $q->select('week_id')
+              ->from('course_paper')
+              ->whereNotNull('week_id');
+        })->orderBy('due_date')->orderBy('name')->get();
+
         // 4. Query papers that are assigned to a course and are visible to the student
         $query = Paper::visibleTo($student)
             ->join('course_paper', 'papers.id', '=', 'course_paper.paper_id')
@@ -217,6 +224,20 @@ class AssessmentController extends Controller
             'deadline' => $finalDeadlineText,
         ];
 
+        // Paginate the collection manually (best practice)
+        $currentPage = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 10;
+        $currentItems = $papers->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        
+        $papers = new \Illuminate\Pagination\LengthAwarePaginator(
+            $currentItems,
+            $papers->count(),
+            $perPage,
+            $currentPage,
+            ['path' => \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPath()]
+        );
+        $papers->withQueryString();
+
         // Course title and week number context
         $selectedCourse = null;
         if ($request->filled('course_id')) {
@@ -224,7 +245,7 @@ class AssessmentController extends Controller
         }
         $courseTitle = $selectedCourse ? $selectedCourse->name : ($courses->first()?->name ?? 'YS Maths (Sat)');
 
-        return view('student.assessment.weeklytests', compact('subjects', 'courses', 'weeks', 'papers', 'metrics', 'courseTitle', 'selectedWeekName'));
+        return view('student.assessment.weeklytests', compact('subjects', 'courses', 'weeks', 'papers', 'metrics', 'courseTitle', 'selectedWeekName', 'allWeeks'));
     }
 
     /**

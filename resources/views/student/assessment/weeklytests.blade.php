@@ -48,7 +48,7 @@
                             <!-- Course Filter -->
                             <div class="col-lg-3 col-md-6 col-sm-12 mb-1">
                                 <label for="course_filter" class="form-label font-weight-bold text-secondary font-small-2 mb-0">Course</label>
-                                <select name="course_id" id="course_filter" class="form-control form-control-sm filter-select">
+                                <select name="course_id" id="course_filter" class="form-control form-control-sm filter-select select2">
                                     <option value="">All Courses</option>
                                     @foreach($courses as $course)
                                         <option value="{{ $course->id }}" {{ request('course_id') == $course->id ? 'selected' : '' }}>
@@ -61,10 +61,10 @@
                             <!-- Week Filter -->
                             <div class="col-lg-2 col-md-6 col-sm-12 mb-1">
                                 <label for="week_filter" class="form-label font-weight-bold text-secondary font-small-2 mb-0">Week</label>
-                                <select name="week" id="week_filter" class="form-control form-control-sm filter-select">
+                                <select name="week" id="week_filter" class="form-control form-control-sm filter-select select2">
                                     <option value="">All Weeks</option>
-                                    @foreach($weeks as $wk)
-                                        <option value="{{ $wk->id }}" {{ request('week') == $wk->id ? 'selected' : '' }}>
+                                    @foreach($allWeeks as $wk)
+                                        <option value="{{ $wk->id }}" data-course-id="{{ $wk->course_id }}" {{ request('week') == $wk->id ? 'selected' : '' }}>
                                             {{ $wk->name }}
                                         </option>
                                     @endforeach
@@ -100,7 +100,7 @@
                 <!-- STUDENT PORTAL Header -->
                 <div class="portal-header-wrapper mt-3 mb-2">
                     <span class="portal-badge font-weight-extrabold text-uppercase">Student Portal</span>
-                    <h2 class="portal-title font-weight-bold text-dark">{{ $courseTitle }} | YR 5 — {{ $selectedWeekName }} Portal Hub</h2>
+                    <h2 class="portal-title font-weight-bold text-dark">{{ $courseTitle }} | YR 5 — {{ $selectedWeekName }}</h2>
                 </div>
 
                 <!-- OVERVIEW METRICS BAR -->
@@ -160,42 +160,7 @@
                             </div>
                         </div>
 
-                        <!-- 2. EXPLANATORY MARK SCHEMES -->
-                        <div class="document-section-wrapper mb-4">
-                            <h5 class="section-heading mb-2 font-weight-extrabold text-dark">2. EXPLANATORY MARK SCHEMES</h5>
-                            
-                            <!-- Scheme Card 1 -->
-                            <div class="card shadow-sm border-0 mb-2 document-card">
-                                <div class="card-body p-2 d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center">
-                                        <div class="doc-icon-box bg-light-danger mr-2">
-                                            <span class="font-weight-bold font-medium-3 text-danger">S</span>
-                                        </div>
-                                        <div>
-                                            <h6 class="doc-title font-weight-bold text-dark mb-0 font-small-3">Year 5 Surface Area & Volume Scheme</h6>
-                                            <span class="doc-status text-danger font-weight-bold font-small-1">Late: 211 days • Review Lock</span>
-                                        </div>
-                                    </div>
-                                    <a href="#" class="document-btn-custom">Open</a>
-                                </div>
-                            </div>
-
-                            <!-- Scheme Card 2 -->
-                            <div class="card shadow-sm border-0 mb-2 document-card">
-                                <div class="card-body p-2 d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center">
-                                        <div class="doc-icon-box bg-light-danger mr-2">
-                                            <span class="font-weight-bold font-medium-3 text-danger">S</span>
-                                        </div>
-                                        <div>
-                                            <h6 class="doc-title font-weight-bold text-dark mb-0 font-small-3">Year 5 Transformations 1 Scheme</h6>
-                                            <span class="doc-status text-muted font-weight-bold font-small-1">Status: Unread Document Resource</span>
-                                        </div>
-                                    </div>
-                                    <a href="#" class="document-btn-custom red-btn-custom">View</a>
-                                </div>
-                            </div>
-                        </div>
+                        
 
                     </div>
                     
@@ -204,7 +169,7 @@
                         
                         <!-- 3. ONLINE ASSIGNMENT TASKS EVALUATION -->
                         <div class="assessment-section-wrapper mb-4">
-                            <h5 class="section-heading mb-2 font-weight-extrabold text-dark">3. ONLINE ASSIGNMENT TASKS EVALUATION</h5>
+                            <h5 class="section-heading mb-2 font-weight-extrabold text-dark">2. ONLINE ASSIGNMENT TASKS EVALUATION</h5>
                             
                             <div class="card shadow-sm border-0 overflow-hidden">
                                 <div class="table-responsive">
@@ -244,7 +209,7 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <div class="type-badge {{ $paper->type }} font-weight-extrabold text-center">
+                                                        <div class="badge {{ $paper->type }} font-weight-extrabold text-center">
                                                             {{ ucfirst($paper->type) }}
                                                         </div>
                                                     </td>
@@ -317,6 +282,12 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                <!-- Pagination -->
+                                @if($papers->hasPages())
+                                    <div class="d-flex justify-content-center py-2 border-top">
+                                        {{ $papers->links() }}
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
@@ -331,7 +302,71 @@
 @endsection
 
 @push('styles')
+    <link rel="stylesheet" type="text/css" href="{{ asset('theme/app-assets/vendors/css/forms/select/select2.min.css') }}">
     <style>
+        /* Premium Select2 Styling to match theme and filter card */
+        .select2-container--default .select2-selection--single {
+            border: 1px solid #dcdcdc !important;
+            border-radius: 6px !important;
+            height: 38px !important;
+            display: flex;
+            align-items: center;
+            background-color: #ffffff !important;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .select2-container--default .select2-selection--single:focus,
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #7367f0 !important;
+            box-shadow: 0 3px 8px rgba(115, 103, 240, 0.15) !important;
+            outline: 0;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #4e5154 !important;
+            padding-left: 12px !important;
+            font-size: 0.85rem !important;
+            font-weight: 500;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #b4b4b4 !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+            right: 8px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow b {
+            border-color: #8c8c8c transparent transparent transparent !important;
+        }
+        .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+            border-color: transparent transparent #8c8c8c transparent !important;
+        }
+        .select2-container--default .select2-dropdown {
+            border: 1px solid #e3e6eb !important;
+            border-radius: 6px !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+        }
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            border: 1px solid #dcdcdc !important;
+            border-radius: 4px !important;
+            padding: 6px 10px !important;
+            font-size: 0.85rem !important;
+        }
+        .select2-container--default .select2-results__option {
+            padding: 8px 12px !important;
+            font-size: 0.85rem !important;
+        }
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #7367f0 !important;
+            color: #ffffff !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__clear {
+            margin-right: 20px !important;
+            color: #ea5455 !important;
+            font-size: 1.1rem !important;
+        }
+        .select2-container {
+            width: 100% !important;
+        }
+
         /* Premium CSS matching the reference image layout */
         
         /* Filters design */
@@ -683,4 +718,86 @@
             }
         }
     </style>
+@endpush
+
+@push('scripts')
+    <script src="{{ asset('theme/app-assets/vendors/js/forms/select/select2.full.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const courseFilter = document.getElementById('course_filter');
+            const weekFilter = document.getElementById('week_filter');
+            
+            if (courseFilter && weekFilter) {
+                // Store all original week options from the dropdown
+                const originalWeeks = Array.from(weekFilter.options).map(opt => ({
+                    value: opt.value,
+                    text: opt.text,
+                    courseId: opt.getAttribute('data-course-id') || '',
+                    selected: opt.selected
+                }));
+
+                // Initialize Select2 on Course and Week filters
+                $(courseFilter).select2({
+                    placeholder: "All Courses",
+                    allowClear: true,
+                    width: '100%'
+                });
+
+                $(weekFilter).select2({
+                    placeholder: "All Weeks",
+                    allowClear: true,
+                    width: '100%'
+                });
+                
+                function updateWeeks(isInitialLoad = false) {
+                    const selectedCourseId = courseFilter.value;
+                    const currentSelectedWeek = weekFilter.value;
+                    
+                    // Clear existing options
+                    weekFilter.innerHTML = '';
+                    
+                    let hasSelected = false;
+                    
+                    // Rebuild options matching the selected course
+                    originalWeeks.forEach(opt => {
+                        // Always include "All Weeks" (empty value)
+                        // If no course is selected (selectedCourseId is empty), include all weeks
+                        // Otherwise, match the courseId of the week option with selectedCourseId
+                        if (opt.value === '' || !selectedCourseId || opt.courseId === selectedCourseId) {
+                            const newOpt = document.createElement('option');
+                            newOpt.value = opt.value;
+                            newOpt.text = opt.text;
+                            if (opt.courseId) {
+                                newOpt.setAttribute('data-course-id', opt.courseId);
+                            }
+                            
+                            // Restore selection if it matches
+                            if (opt.value === currentSelectedWeek) {
+                                newOpt.selected = true;
+                                hasSelected = true;
+                            }
+                            
+                            weekFilter.appendChild(newOpt);
+                        }
+                    });
+                    
+                    // If the previously selected week is not valid for the new course, default to "All Weeks"
+                    if (!hasSelected && !isInitialLoad) {
+                        weekFilter.value = '';
+                    }
+
+                    // Synchronize Select2 with updated underlying native options
+                    $(weekFilter).trigger('change.select2');
+                }
+                
+                // Listen to changes on the Course filter dropdown (using JQuery to capture Select2 select/clear events)
+                $(courseFilter).on('change', function() {
+                    updateWeeks(false);
+                });
+                
+                // Initial load filtering
+                updateWeeks(true);
+            }
+        });
+    </script>
 @endpush
