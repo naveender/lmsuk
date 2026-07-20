@@ -122,7 +122,7 @@ class SystemConfigController extends Controller
                     'bucket' => $request->bucket,
                     'endpoint' => $request->endpoint,
                     'use_path_style_endpoint' => true,
-                    'options' => [
+                    'http' => [
                         'verify' => false,
                     ],
                 ]

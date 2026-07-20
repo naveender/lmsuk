@@ -72,6 +72,7 @@ class AppServiceProvider extends ServiceProvider
                 if ($wasabiEndpoint = setting('wasabi.endpoint')) {
                     config(['filesystems.disks.wasabi.endpoint' => $wasabiEndpoint]);
                 }
+                config(['filesystems.disks.wasabi.http.verify' => false]);
 
                 // Load S3 configs
                 if ($s3Key = setting('s3.key')) {
