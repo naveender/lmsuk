@@ -304,7 +304,13 @@ class AssessmentController extends Controller
 
         $mediaFiles = $mediaFilesQuery->orderBy('created_at', 'desc')->get();
 
-        return view('student.assessment.weeklytests', compact('subjects', 'courses', 'weeks', 'papers', 'metrics', 'courseTitle', 'selectedWeekName', 'allWeeks', 'mediaFiles'));
+        // Load student watch progress for these videos
+        $videoProgressMap = \App\Models\StudentVideoProgress::where('user_id', $student->id)
+            ->whereIn('media_file_id', $mediaFiles->pluck('id'))
+            ->get()
+            ->keyBy('media_file_id');
+
+        return view('student.assessment.weeklytests', compact('subjects', 'courses', 'weeks', 'papers', 'metrics', 'courseTitle', 'selectedWeekName', 'allWeeks', 'mediaFiles', 'videoProgressMap'));
     }
 
     /**
@@ -904,5 +910,72 @@ class AssessmentController extends Controller
                 ]
             );
         }
+    }
+
+    /**
+     * Track and update student video watch time and completion status.
+     */
+    public function updateVideoProgress(Request $request)
+    {
+        $request->validate([
+            'media_file_id' => 'required|exists:media_files,id',
+            'last_position' => 'required|numeric|min:0',
+            'increment_watch_time' => 'required|integer|min:0|max:45', // max 45s threshold to handle normal heartbeat delay
+        ]);
+
+        $student = auth()->user();
+        $mediaFile = \App\Models\MediaFile::findOrFail($request->media_file_id);
+
+        // Fetch or create progress record
+        $progress = \App\Models\StudentVideoProgress::firstOrCreate(
+            [
+                'user_id' => $student->id,
+                'media_file_id' => $mediaFile->id,
+            ],
+            [
+                'watch_time' => 0,
+                'last_position' => 0,
+                'is_completed' => false,
+            ]
+        );
+
+        // Update watch time securely
+        $newWatchTime = $progress->watch_time + $request->increment_watch_time;
+        
+        // Check if completed: video is completed if watch time is at least 90% of the duration
+        $isCompleted = $progress->is_completed;
+        if (!$isCompleted && $mediaFile->duration) {
+            $durationSeconds = $this->parseDurationSeconds($mediaFile->duration);
+            if ($durationSeconds > 0 && $newWatchTime >= ($durationSeconds * 0.9)) {
+                $isCompleted = true;
+            }
+        }
+
+        $progress->update([
+            'watch_time' => $newWatchTime,
+            'last_position' => (int) $request->last_position,
+            'is_completed' => $isCompleted,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'watch_time' => $progress->watch_time,
+            'is_completed' => $progress->is_completed,
+            'last_position' => $progress->last_position,
+        ]);
+    }
+
+    /**
+     * Helper to parse MM:SS or HH:MM:SS format duration to seconds.
+     */
+    private function parseDurationSeconds($durationStr)
+    {
+        $parts = explode(':', $durationStr);
+        if (count($parts) === 2) {
+            return ((int)$parts[0] * 60) + (int)$parts[1];
+        } elseif (count($parts) === 3) {
+            return ((int)$parts[0] * 3600) + ((int)$parts[1] * 60) + (int)$parts[2];
+        }
+        return (int) $durationStr;
     }
 }

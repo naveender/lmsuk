@@ -218,6 +218,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('admin/media-files/upload-status', [\App\Http\Controllers\Admin\MediaFileController::class, 'uploadStatus'])->name('admin.media-files.upload-status');
     Route::post('admin/media-files/upload-chunk', [\App\Http\Controllers\Admin\MediaFileController::class, 'uploadChunk'])->name('admin.media-files.upload-chunk');
     Route::post('admin/media-files/upload-thumbnail', [\App\Http\Controllers\Admin\MediaFileController::class, 'uploadThumbnail'])->name('admin.media-files.upload-thumbnail');
+    Route::get('admin/media-files/{media_file}/watch-progress', [\App\Http\Controllers\Admin\MediaFileController::class, 'watchProgress'])->name('admin.media-files.watch-progress');
     
     Route::resource('admin/media-files', \App\Http\Controllers\Admin\MediaFileController::class)->names([
         'index'   => 'admin.media-files.index',
@@ -257,6 +258,7 @@ Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
      Route::post('/student/announcements/{announcement}/view', [StudentAnnouncementsController::class, 'view'])->name('student.announcements.view');
      Route::get('/student/centretestscores', [StudentCentreTestScoreController::class, 'index'])->name('student.centretestscores');
      Route::get('/student/weeklytests', [StudentAssessmentsController::class, 'weeklyTests'])->name('student.weeklytests');
+     Route::post('/student/media/progress', [StudentAssessmentsController::class, 'updateVideoProgress'])->name('student.media.progress');
    
 });
 

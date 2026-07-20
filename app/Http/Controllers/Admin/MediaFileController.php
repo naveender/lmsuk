@@ -542,4 +542,53 @@ class MediaFileController extends Controller
             }
         }
     }
+
+    /**
+     * Retrieve the list of student watch progress logs for a specific media file.
+     */
+    public function watchProgress(MediaFile $mediaFile)
+    {
+        $progressLogs = \App\Models\StudentVideoProgress::with(['user.classes'])
+            ->where('media_file_id', $mediaFile->id)
+            ->get();
+
+        $data = $progressLogs->map(function ($log) {
+            $student = $log->user;
+            $classes = $student ? $student->classes->pluck('name')->join(', ') : 'N/A';
+            
+            return [
+                'student_name' => $student ? $student->name : 'Unknown Student',
+                'student_username' => $student ? $student->username : 'Unknown',
+                'classes' => $classes,
+                'watch_time_raw' => $log->watch_time,
+                'watch_time_formatted' => $this->formatSeconds($log->watch_time),
+                'last_position_formatted' => $this->formatSeconds($log->last_position),
+                'is_completed' => (bool) $log->is_completed,
+                'last_updated' => $log->updated_at->format('M d, Y h:i A'),
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'title' => $mediaFile->title,
+            'duration' => $mediaFile->duration ?: 'N/A',
+            'progress' => $data
+        ]);
+    }
+
+    /**
+     * Helper to format seconds to MM:SS or HH:MM:SS format.
+     */
+    private function formatSeconds($seconds)
+    {
+        if ($seconds <= 0) return '00:00';
+        $hours = floor($seconds / 3600);
+        $minutes = floor(($seconds / 60) % 60);
+        $secs = $seconds % 60;
+
+        if ($hours > 0) {
+            return sprintf('%02d:%02d:%02d', $hours, $minutes, $secs);
+        }
+        return sprintf('%02d:%02d', $minutes, $secs);
+    }
 }

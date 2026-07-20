@@ -145,11 +145,11 @@
                                 @php $firstVideo = $mediaFiles->first(); @endphp
                                 <div class="card shadow-sm border-0 overflow-hidden video-card">
                                     <!-- Interactive Playable Video Box -->
-                                    <div class="video-container" id="videoContainer">
+                                    <div class="video-container" id="videoContainer" data-active-id="{{ $firstVideo->id }}">
                                         @if($firstVideo->type === 'iframe')
                                             {!! $firstVideo->embed_url !!}
                                         @elseif(in_array($firstVideo->type, ['video_file', 'video_url', 's3', 'wasabi']))
-                                            <video controls class="embed-responsive-item" src="{{ $firstVideo->embed_url }}" style="width: 100%; height: 240px; border: none;"></video>
+                                            <video id="trackedHtml5Player" controls class="embed-responsive-item" src="{{ $firstVideo->embed_url }}" style="width: 100%; height: 240px; border: none;"></video>
                                         @else
                                             <iframe id="videoIframe" class="embed-responsive-item" width="100%" height="240" src="{{ $firstVideo->embed_url }}" frameborder="0" allowfullscreen allow="autoplay" style="border: none;"></iframe>
                                         @endif
@@ -157,9 +157,14 @@
                                     <div class="card-body p-2 border-bottom">
                                         <div class="d-flex align-items-center">
                                             <div class="video-icon-box mr-2">
-                                                <i class="feather icon-play-circle text-primary font-large-1"></i>
+                                                @php $firstProgress = $videoProgressMap[$firstVideo->id] ?? null; @endphp
+                                                @if($firstProgress && $firstProgress->is_completed)
+                                                    <i class="feather icon-check-circle text-success font-large-1"></i>
+                                                @else
+                                                    <i class="feather icon-play-circle text-primary font-large-1"></i>
+                                                @endif
                                             </div>
-                                            <div>
+                                            <div class="flex-grow-1">
                                                 <h6 class="video-title font-weight-bold text-dark mb-0" id="activeVideoTitle">{{ $firstVideo->title }}</h6>
                                                 <span class="video-status text-success font-weight-bold font-small-2" id="activeVideoDuration">
                                                     @if($firstVideo->duration)
@@ -169,6 +174,15 @@
                                                     @endif
                                                 </span>
                                             </div>
+                                            <div id="activeVideoProgressBadge">
+                                                @if($firstProgress && $firstProgress->is_completed)
+                                                    <span class="badge badge-success px-1 py-50"><i class="feather icon-check mr-25"></i>Completed</span>
+                                                @elseif($firstProgress && $firstProgress->watch_time > 0)
+                                                    <span class="badge badge-light-warning px-1 py-50"><i class="feather icon-clock mr-25"></i>{{ gmdate('H:i:s', $firstProgress->watch_time) }} watched</span>
+                                                @else
+                                                    <span class="badge badge-light-secondary px-1 py-50">Not started</span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
 
@@ -177,14 +191,33 @@
                                             <h6 class="font-weight-bold text-dark mb-1"><i class="feather icon-list"></i> Weekly Video Playlist ({{ $mediaFiles->count() }} lectures)</h6>
                                             <div class="playlist-scroll-area" style="max-height: 220px; overflow-y: auto; gap: 8px; display: flex; flex-direction: column;">
                                                 @foreach($mediaFiles as $video)
-                                                    <div class="playlist-item d-flex align-items-center p-1 border rounded bg-white cursor-pointer {{ $loop->first ? 'active-playlist-item border-primary' : '' }}" 
-                                                         style="transition: all 0.2s;"
+                                                    @php
+                                                        $vProgress = $videoProgressMap[$video->id] ?? null;
+                                                        $watchPct = 0;
+                                                        if ($vProgress && $video->duration) {
+                                                            $parts = explode(':', $video->duration);
+                                                            $durSec = count($parts) === 3
+                                                                ? ((int)$parts[0]*3600 + (int)$parts[1]*60 + (int)$parts[2])
+                                                                : (count($parts) === 2 ? ((int)$parts[0]*60 + (int)$parts[1]) : (int)$video->duration);
+                                                            $watchPct = $durSec > 0 ? min(100, round(($vProgress->watch_time / $durSec) * 100)) : 0;
+                                                        }
+                                                        $isVCompleted = $vProgress && $vProgress->is_completed;
+                                                    @endphp
+                                                    <div class="playlist-item d-flex align-items-center p-1 border rounded bg-white cursor-pointer {{ $loop->first ? 'active-playlist-item border-primary' : '' }} {{ $isVCompleted ? 'playlist-completed' : '' }}" 
+                                                         style="transition: all 0.2s; position: relative; overflow: hidden;"
+                                                         data-id="{{ $video->id }}"
                                                          data-embed="{{ $video->embed_url }}" 
                                                          data-title="{{ $video->title }}" 
                                                          data-duration="{{ $video->duration }}"
-                                                         data-type="{{ $video->type }}">
+                                                         data-type="{{ $video->type }}"
+                                                         data-completed="{{ $isVCompleted ? '1' : '0' }}"
+                                                         data-watchtime="{{ $vProgress ? $vProgress->watch_time : 0 }}">
                                                         <div class="mr-1">
-                                                            <i class="feather icon-play-circle text-primary font-medium-3"></i>
+                                                            @if($isVCompleted)
+                                                                <i class="feather icon-check-circle text-success font-medium-3"></i>
+                                                            @else
+                                                                <i class="feather icon-play-circle text-primary font-medium-3"></i>
+                                                            @endif
                                                         </div>
                                                         <div class="flex-grow-1 min-width-0">
                                                             <h6 class="text-truncate font-small-3 font-weight-bold mb-0 text-dark">{{ $video->title }}</h6>
@@ -194,8 +227,22 @@
                                                                 @else
                                                                     Video Lecture
                                                                 @endif
+                                                                @if($vProgress && $vProgress->watch_time > 0 && !$isVCompleted)
+                                                                    <span class="text-warning ml-50">• {{ gmdate('i:s', $vProgress->watch_time) }} watched</span>
+                                                                @endif
                                                             </small>
                                                         </div>
+                                                        @if($isVCompleted)
+                                                            <span class="badge badge-success font-small-1 ml-50" style="white-space: nowrap;">✓ Done</span>
+                                                        @elseif($watchPct > 0)
+                                                            <span class="badge badge-light-warning font-small-1 ml-50" style="white-space: nowrap;">{{ $watchPct }}%</span>
+                                                        @endif
+                                                        {{-- Progress bar underlay --}}
+                                                        @if($watchPct > 0 && !$isVCompleted)
+                                                            <div class="playlist-progress-bar" style="position: absolute; bottom: 0; left: 0; height: 3px; width: {{ $watchPct }}%; background: #ff9f43; border-radius: 0 0 0 4px; transition: width 0.3s;"></div>
+                                                        @elseif($isVCompleted)
+                                                            <div class="playlist-progress-bar" style="position: absolute; bottom: 0; left: 0; height: 3px; width: 100%; background: #28c76f; border-radius: 0 0 4px 4px;"></div>
+                                                        @endif
                                                     </div>
                                                 @endforeach
                                             </div>
@@ -775,6 +822,22 @@
                 font-size: 1.3rem;
             }
         }
+
+        /* Watch Progress Styles */
+        .playlist-completed {
+            background-color: #f0fdf4 !important;
+            border-color: #86efac !important;
+        }
+        .playlist-completed:hover {
+            background-color: #dcfce7 !important;
+        }
+        .playlist-item:hover {
+            background-color: #f8f8ff !important;
+            border-color: #7367f0 !important;
+        }
+        #activeVideoProgressBadge .badge {
+            font-size: 0.72rem;
+        }
     </style>
 @endpush
 
@@ -857,9 +920,159 @@
                 updateWeeks(true);
             }
 
+            // --- VIDEO TRACKING MODULE ---
+            let activeVideoId = null;
+            let lastPosition = 0;
+            let accumulatedWatchTime = 0;
+            let heartbeatInterval = null;
+            let isTrackingActive = false;
+
+            const container = document.getElementById('videoContainer');
+            if (container) {
+                activeVideoId = container.getAttribute('data-active-id');
+                setupVideoTracking();
+            }
+
+            function setupVideoTracking() {
+                if (heartbeatInterval) {
+                    clearInterval(heartbeatInterval);
+                }
+                accumulatedWatchTime = 0;
+                lastPosition = 0;
+                isTrackingActive = false;
+
+                const videoEl = document.getElementById('trackedHtml5Player');
+                if (videoEl) {
+                    let lastTime = videoEl.currentTime;
+
+                    videoEl.addEventListener('play', () => {
+                        if (!isTrackingActive) {
+                            isTrackingActive = true;
+                            lastTime = videoEl.currentTime;
+                            startHeartbeatLoop(videoEl);
+                        }
+                    });
+
+                    videoEl.addEventListener('pause', () => {
+                        isTrackingActive = false;
+                        sendWatchProgress(videoEl.currentTime);
+                    });
+
+                    videoEl.addEventListener('ended', () => {
+                        isTrackingActive = false;
+                        sendWatchProgress(videoEl.currentTime);
+                    });
+
+                    videoEl.addEventListener('timeupdate', () => {
+                        if (videoEl.paused || videoEl.seeking) {
+                            lastTime = videoEl.currentTime;
+                            return;
+                        }
+                        const diff = videoEl.currentTime - lastTime;
+                        // Seek prevention: only count positive increments under 2.5 seconds
+                        if (diff > 0 && diff < 2.5) {
+                            accumulatedWatchTime += diff;
+                        }
+                        lastTime = videoEl.currentTime;
+                    });
+                }
+            }
+
+            function startHeartbeatLoop(videoEl) {
+                heartbeatInterval = setInterval(() => {
+                    if (!isTrackingActive || videoEl.paused) {
+                        clearInterval(heartbeatInterval);
+                        return;
+                    }
+                    sendWatchProgress(videoEl.currentTime);
+                }, 5000);
+            }
+
+            function sendWatchProgress(currentPos) {
+                if (!activeVideoId) return;
+                const roundedIncrement = Math.round(accumulatedWatchTime);
+                if (roundedIncrement === 0 && Math.abs(currentPos - lastPosition) < 1) {
+                    return;
+                }
+
+                accumulatedWatchTime = 0;
+                lastPosition = currentPos;
+
+                axios.post('{{ route("student.media.progress") }}', {
+                    media_file_id: activeVideoId,
+                    last_position: currentPos,
+                    increment_watch_time: roundedIncrement
+                }, {
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => {
+                    if (response.data.success) {
+                        updateProgressBadge(response.data);
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to send watch progress', err);
+                });
+            }
+
+            function updateProgressBadge(data) {
+                const badgeEl = document.getElementById('activeVideoProgressBadge');
+                if (!badgeEl) return;
+
+                if (data.is_completed) {
+                    badgeEl.innerHTML = '<span class="badge badge-success px-1 py-50"><i class="feather icon-check mr-25"></i>Completed</span>';
+                } else if (data.watch_time > 0) {
+                    const h = Math.floor(data.watch_time / 3600);
+                    const m = Math.floor((data.watch_time % 3600) / 60);
+                    const s = data.watch_time % 60;
+                    const timeStr = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+                    badgeEl.innerHTML = `<span class="badge badge-light-warning px-1 py-50"><i class="feather icon-clock mr-25"></i>${timeStr} watched</span>`;
+                }
+
+                // Also update the playlist item
+                const playlistItem = document.querySelector(`.playlist-item[data-id="${activeVideoId}"]`);
+                if (playlistItem) {
+                    if (data.is_completed) {
+                        playlistItem.classList.add('playlist-completed');
+                        playlistItem.setAttribute('data-completed', '1');
+                        // Update icon
+                        const iconEl = playlistItem.querySelector('.mr-1 i');
+                        if (iconEl) {
+                            iconEl.className = 'feather icon-check-circle text-success font-medium-3';
+                        }
+                        // Update/add badge
+                        let badge = playlistItem.querySelector('.badge');
+                        if (badge) {
+                            badge.className = 'badge badge-success font-small-1 ml-50';
+                            badge.textContent = '✓ Done';
+                            badge.style.whiteSpace = 'nowrap';
+                        }
+                        // Update progress bar
+                        let progBar = playlistItem.querySelector('.playlist-progress-bar');
+                        if (progBar) {
+                            progBar.style.width = '100%';
+                            progBar.style.background = '#28c76f';
+                        } else {
+                            const bar = document.createElement('div');
+                            bar.className = 'playlist-progress-bar';
+                            bar.style.cssText = 'position:absolute;bottom:0;left:0;height:3px;width:100%;background:#28c76f;border-radius:0 0 4px 4px;';
+                            playlistItem.appendChild(bar);
+                        }
+                    }
+                }
+            }
+
             // Playlist item click swapping
             document.querySelectorAll('.playlist-item').forEach(item => {
                 item.addEventListener('click', function() {
+                    // Send progress of previous video before switching
+                    const currentVideoEl = document.getElementById('trackedHtml5Player');
+                    if (currentVideoEl) {
+                        sendWatchProgress(currentVideoEl.currentTime);
+                    }
+
                     // Remove active class from all items
                     document.querySelectorAll('.playlist-item').forEach(i => {
                         i.classList.remove('active-playlist-item', 'border-primary');
@@ -868,15 +1081,20 @@
                     // Add active class to clicked item
                     this.classList.add('active-playlist-item', 'border-primary');
                     
+                    const videoId = this.getAttribute('data-id');
                     const embedUrl = this.getAttribute('data-embed');
                     const title = this.getAttribute('data-title');
                     const duration = this.getAttribute('data-duration');
                     const type = this.getAttribute('data-type');
                     
-                    const container = document.getElementById('videoContainer');
                     const titleEl = document.getElementById('activeVideoTitle');
                     const durEl = document.getElementById('activeVideoDuration');
                     
+                    activeVideoId = videoId;
+                    if (container) {
+                        container.setAttribute('data-active-id', videoId);
+                    }
+
                     if (titleEl) titleEl.textContent = title;
                     if (durEl) {
                         durEl.innerHTML = duration ? `<i class="feather icon-play mr-1"></i>Runtime: ${duration}` : '<i class="feather icon-play mr-1"></i>Video Lecture Stream';
@@ -887,12 +1105,15 @@
                         if (type === 'iframe') {
                             playerHtml = embedUrl; // Contains raw iframe code
                         } else if (type === 'video_file' || type === 'video_url' || type === 's3' || type === 'wasabi') {
-                            playerHtml = `<video controls class="embed-responsive-item" src="${embedUrl}" autoplay style="width:100%; height:240px; border:none;"></video>`;
+                            playerHtml = `<video id="trackedHtml5Player" controls class="embed-responsive-item" src="${embedUrl}" autoplay style="width:100%; height:240px; border:none;"></video>`;
                         } else {
                             playerHtml = `<iframe class="embed-responsive-item" width="100%" height="240" src="${embedUrl}" frameborder="0" allowfullscreen allow="autoplay" style="border:none;"></iframe>`;
                         }
                         container.innerHTML = playerHtml;
                     }
+
+                    // Setup tracking for the new player instance
+                    setupVideoTracking();
                 });
             });
         });
