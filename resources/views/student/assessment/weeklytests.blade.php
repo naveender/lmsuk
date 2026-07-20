@@ -141,23 +141,78 @@
                         <div class="video-section-wrapper mb-4">
                             <h5 class="section-heading mb-2 font-weight-extrabold text-dark">1. CORE VIDEO LECTURE STREAMS</h5>
                             
-                            <div class="card shadow-sm border-0 overflow-hidden video-card">
-                                <!-- Interactive Playable Video Box -->
-                                <div class="video-container" id="videoContainer">
-                                    <iframe id="videoIframe" width="100%" height="240" src="https://www.youtube.com/embed/dK4oXvKmsxM?enablejsapi=1" title="Coordinates Video Lecture" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                                </div>
-                                <div class="card-body p-2">
-                                    <div class="d-flex align-items-center">
-                                        <div class="video-icon-box mr-2">
-                                            <i class="feather icon-play-circle text-primary font-large-1"></i>
+                            @if($mediaFiles->isNotEmpty())
+                                @php $firstVideo = $mediaFiles->first(); @endphp
+                                <div class="card shadow-sm border-0 overflow-hidden video-card">
+                                    <!-- Interactive Playable Video Box -->
+                                    <div class="video-container" id="videoContainer">
+                                        @if($firstVideo->type === 'iframe')
+                                            {!! $firstVideo->embed_url !!}
+                                        @elseif(in_array($firstVideo->type, ['video_file', 'video_url', 's3', 'wasabi']))
+                                            <video controls class="embed-responsive-item" src="{{ $firstVideo->embed_url }}" style="width: 100%; height: 240px; border: none;"></video>
+                                        @else
+                                            <iframe id="videoIframe" class="embed-responsive-item" width="100%" height="240" src="{{ $firstVideo->embed_url }}" frameborder="0" allowfullscreen allow="autoplay" style="border: none;"></iframe>
+                                        @endif
+                                    </div>
+                                    <div class="card-body p-2 border-bottom">
+                                        <div class="d-flex align-items-center">
+                                            <div class="video-icon-box mr-2">
+                                                <i class="feather icon-play-circle text-primary font-large-1"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="video-title font-weight-bold text-dark mb-0" id="activeVideoTitle">{{ $firstVideo->title }}</h6>
+                                                <span class="video-status text-success font-weight-bold font-small-2" id="activeVideoDuration">
+                                                    @if($firstVideo->duration)
+                                                        <i class="feather icon-play mr-1"></i>Runtime: {{ $firstVideo->duration }}
+                                                    @else
+                                                        <i class="feather icon-play mr-1"></i>Video Lecture Stream
+                                                    @endif
+                                                </span>
+                                            </div>
                                         </div>
+                                    </div>
+
+                                    @if($mediaFiles->count() > 1)
+                                        <div class="playlist-container p-2 bg-light">
+                                            <h6 class="font-weight-bold text-dark mb-1"><i class="feather icon-list"></i> Weekly Video Playlist ({{ $mediaFiles->count() }} lectures)</h6>
+                                            <div class="playlist-scroll-area" style="max-height: 220px; overflow-y: auto; gap: 8px; display: flex; flex-direction: column;">
+                                                @foreach($mediaFiles as $video)
+                                                    <div class="playlist-item d-flex align-items-center p-1 border rounded bg-white cursor-pointer {{ $loop->first ? 'active-playlist-item border-primary' : '' }}" 
+                                                         style="transition: all 0.2s;"
+                                                         data-embed="{{ $video->embed_url }}" 
+                                                         data-title="{{ $video->title }}" 
+                                                         data-duration="{{ $video->duration }}"
+                                                         data-type="{{ $video->type }}">
+                                                        <div class="mr-1">
+                                                            <i class="feather icon-play-circle text-primary font-medium-3"></i>
+                                                        </div>
+                                                        <div class="flex-grow-1 min-width-0">
+                                                            <h6 class="text-truncate font-small-3 font-weight-bold mb-0 text-dark">{{ $video->title }}</h6>
+                                                            <small class="text-muted font-small-1">
+                                                                @if($video->duration)
+                                                                    <i class="feather icon-clock mr-25"></i>{{ $video->duration }}
+                                                                @else
+                                                                    Video Lecture
+                                                                @endif
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            @else
+                                <div class="alert alert-info py-2" role="alert">
+                                    <div class="alert-body d-flex align-items-center">
+                                        <i class="feather icon-info mr-1" style="font-size: 1.5rem;"></i>
                                         <div>
-                                            <h6 class="video-title font-weight-bold text-dark mb-0">Coordinates and Transformations I</h6>
-                                            <span class="video-status text-success font-weight-bold font-small-2"><i class="feather icon-play mr-1"></i>Runtime: 35m 44s (Completed)</span>
+                                            <h6 class="alert-heading font-weight-bold mb-25">No Video Lectures Scheduled</h6>
+                                            <span class="font-small-3 text-muted">There are no core video lecture streams assigned to this course/week schedule.</span>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endif
                         </div>
 
                         
@@ -197,9 +252,12 @@
                                                     } elseif ($paper->difficulty === 'medium') {
                                                         $typeChar = 'M';
                                                         $typeClass = 'bg-light-primary text-primary';
-                                                    }elseif ($paper->difficulty === 'hard') {
+                                                    } elseif ($paper->difficulty === 'hard') {
                                                         $typeChar = 'H';
                                                         $typeClass = 'bg-light-rose text-rose';
+                                                    } else {
+                                                        $typeChar = 'T';
+                                                        $typeClass = 'bg-light-secondary text-secondary';
                                                     } 
                                                 @endphp
                                                 <tr>
@@ -798,6 +856,45 @@
                 // Initial load filtering
                 updateWeeks(true);
             }
+
+            // Playlist item click swapping
+            document.querySelectorAll('.playlist-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all items
+                    document.querySelectorAll('.playlist-item').forEach(i => {
+                        i.classList.remove('active-playlist-item', 'border-primary');
+                    });
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active-playlist-item', 'border-primary');
+                    
+                    const embedUrl = this.getAttribute('data-embed');
+                    const title = this.getAttribute('data-title');
+                    const duration = this.getAttribute('data-duration');
+                    const type = this.getAttribute('data-type');
+                    
+                    const container = document.getElementById('videoContainer');
+                    const titleEl = document.getElementById('activeVideoTitle');
+                    const durEl = document.getElementById('activeVideoDuration');
+                    
+                    if (titleEl) titleEl.textContent = title;
+                    if (durEl) {
+                        durEl.innerHTML = duration ? `<i class="feather icon-play mr-1"></i>Runtime: ${duration}` : '<i class="feather icon-play mr-1"></i>Video Lecture Stream';
+                    }
+
+                    if (container) {
+                        let playerHtml = '';
+                        if (type === 'iframe') {
+                            playerHtml = embedUrl; // Contains raw iframe code
+                        } else if (type === 'video_file' || type === 'video_url' || type === 's3' || type === 'wasabi') {
+                            playerHtml = `<video controls class="embed-responsive-item" src="${embedUrl}" autoplay style="width:100%; height:240px; border:none;"></video>`;
+                        } else {
+                            playerHtml = `<iframe class="embed-responsive-item" width="100%" height="240" src="${embedUrl}" frameborder="0" allowfullscreen allow="autoplay" style="border:none;"></iframe>`;
+                        }
+                        container.innerHTML = playerHtml;
+                    }
+                });
+            });
         });
     </script>
 @endpush

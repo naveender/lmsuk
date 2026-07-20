@@ -245,7 +245,66 @@ class AssessmentController extends Controller
         }
         $courseTitle = $selectedCourse ? $selectedCourse->name : ($courses->first()?->name ?? 'YS Maths (Sat)');
 
-        return view('student.assessment.weeklytests', compact('subjects', 'courses', 'weeks', 'papers', 'metrics', 'courseTitle', 'selectedWeekName', 'allWeeks'));
+        // Media files weekly query based on student profile visibility settings
+        $detail = $student->studentDetail;
+        $groupYearName = $detail?->group_year;
+        $academicYearVal = $detail?->academic_year;
+        $classIds = $student->classes()->pluck('classes.id');
+        
+        $yearGroupId = null;
+        if ($groupYearName) {
+            $yearGroupId = \App\Models\YearGroup::where('value', $groupYearName)
+                ->orWhere('title', $groupYearName)
+                ->value('id');
+        }
+
+        $selectedCourseId = $selectedCourse ? $selectedCourse->id : ($courses->first()?->id ?? null);
+        $selectedWeekId = $selectedWeekModel ? $selectedWeekModel->id : ($weeks->first()?->id ?? null);
+
+        $mediaFilesQuery = \App\Models\MediaFile::where('publication_status', 'published');
+
+        if ($request->filled('subject_id')) {
+            $mediaFilesQuery->where('subject_id', $request->subject_id);
+        }
+
+        // Visibility matches
+        $mediaFilesQuery->where(function($q) use ($classIds) {
+            if ($classIds->isNotEmpty()) {
+                $q->whereNull('class_id')->orWhereIn('class_id', $classIds);
+            } else {
+                $q->whereNull('class_id');
+            }
+        });
+
+        $mediaFilesQuery->where(function($q) use ($yearGroupId) {
+            if ($yearGroupId) {
+                $q->whereNull('year_group_id')->orWhere('year_group_id', $yearGroupId);
+            } else {
+                $q->whereNull('year_group_id');
+            }
+        });
+
+        $mediaFilesQuery->where(function($q) use ($academicYearVal) {
+            if ($academicYearVal) {
+                $q->whereNull('academic_year')->orWhere('academic_year', $academicYearVal);
+            } else {
+                $q->whereNull('academic_year');
+            }
+        });
+
+        // Weekly schedule pivot match
+        if ($selectedCourseId && $selectedWeekId) {
+            $mediaFilesQuery->whereHas('courses', function ($q) use ($selectedCourseId, $selectedWeekId) {
+                $q->where('course_media_file.course_id', $selectedCourseId)
+                  ->where('course_media_file.week_id', $selectedWeekId);
+            });
+        } else {
+            $mediaFilesQuery->whereRaw('0 = 1');
+        }
+
+        $mediaFiles = $mediaFilesQuery->orderBy('created_at', 'desc')->get();
+
+        return view('student.assessment.weeklytests', compact('subjects', 'courses', 'weeks', 'papers', 'metrics', 'courseTitle', 'selectedWeekName', 'allWeeks', 'mediaFiles'));
     }
 
     /**
