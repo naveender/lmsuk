@@ -63,8 +63,103 @@
         border-radius: 4px;
         font-size: 11px;
     }
-</style>
-@endpush
+    /* List View Layout Styles */
+    #media_container.layout-list .media-item {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 1.5rem;
+    }
+    #media_container.layout-list .media-card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background: #fff;
+        border: 1px solid #ebe9f1;
+        border-radius: 8px;
+        height: 120px;
+    }
+    #media_container.layout-list .thumbnail-wrapper {
+        width: 180px;
+        height: 120px;
+        border-radius: 8px 0 0 8px;
+        flex-shrink: 0;
+        position: relative;
+    }
+    #media_container.layout-list .thumbnail-img {
+        border-radius: 8px 0 0 8px;
+    }
+    #media_container.layout-list .media-card .card-body {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 15px 25px !important;
+        height: 100%;
+    }
+    #media_container.layout-list .media-info-block {
+        flex: 1;
+        min-width: 0;
+        margin-right: 25px;
+    }
+    #media_container.layout-list .media-meta-block {
+        width: 280px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-right: 20px;
+    }
+    #media_container.layout-list .media-actions-block {
+        width: 140px;
+        flex-shrink: 0;
+        display: flex;
+        justify-content: flex-end;
+        border-top: none !important;
+        padding-top: 0 !important;
+    }
+    #media_container.layout-list .card-text {
+        height: auto !important;
+        margin-bottom: 0 !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block !important;
+    }
+    /* Action Buttons UI/UX Improvements */
+    .action-btn-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .action-btn-group .btn {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50% !important;
+        transition: all 0.2s ease;
+        border: none;
+    }
+    .action-btn-group .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+    .action-btn-group .btn-light-primary {
+        background-color: rgba(115, 103, 240, 0.1) !important;
+        color: #7367f0 !important;
+    }
+    .action-btn-group .btn-light-warning {
+        background-color: rgba(255, 159, 67, 0.1) !important;
+        color: #ff9f43 !important;
+    }
+    .action-btn-group .btn-light-danger {
+        background-color: rgba(234, 84, 85, 0.1) !important;
+        color: #ea5455 !important;
+    }
+</style>@endpush
 
 @section('content')
 <!-- BEGIN: Content-->
@@ -73,7 +168,7 @@
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper">
         <div class="content-header row">
-            <div class="content-header-left col-md-9 col-12 mb-2">
+            <div class="content-header-left col-md-8 col-12 mb-2">
                 <div class="row breadcrumbs-top">
                     <div class="col-12">
                         <h2 class="content-header-title float-left mb-0 font-weight-bold">Manage Files</h2>
@@ -86,8 +181,16 @@
                     </div>
                 </div>
             </div>
-            <div class="content-header-right col-md-3 col-12 d-md-block d-none">
-                <div class="form-group breadcrum-right text-right">
+            <div class="content-header-right col-md-4 col-12 d-md-block d-none">
+                <div class="form-group breadcrum-right text-right d-flex align-items-center justify-content-end">
+                    <div class="btn-group mr-1" role="group" aria-label="Layout toggle">
+                        <button type="button" class="btn btn-outline-primary active" id="btn_layout_grid" title="Grid View">
+                            <i class="feather icon-grid"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="btn_layout_list" title="List View">
+                            <i class="feather icon-list"></i>
+                        </button>
+                    </div>
                     <a href="{{ route('admin.media-files.create') }}" class="btn btn-primary font-weight-bold">
                         <i class="feather icon-plus mr-25"></i> Add New Video / File
                     </a>
@@ -170,9 +273,9 @@
             </div>
 
             <!-- Video Grid -->
-            <div class="row">
+            <div class="row" id="media_container">
                 @forelse($files as $file)
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-12">
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-12 media-item">
                         <div class="card media-card overflow-hidden">
                             <!-- Thumbnail Wrapper -->
                             <div class="thumbnail-wrapper">
@@ -239,54 +342,58 @@
 
                             <!-- Card Body -->
                             <div class="card-body p-1">
-                                <div class="d-flex align-items-center mb-50">
-                                    @if($file->publication_status === 'draft')
-                                        <span class="badge badge-dot badge-danger mr-50" title="Draft" style="width: 8px; height: 8px;"></span>
-                                    @else
-                                        <span class="badge badge-dot badge-success mr-50" title="Published" style="width: 8px; height: 8px;"></span>
-                                    @endif
-                                    <h5 class="card-title text-truncate font-weight-bold mb-0" style="max-width: 85%;" title="{{ $file->title }}">
-                                        {{ $file->title }}
-                                    </h5>
+                                <div class="media-info-block">
+                                    <div class="d-flex align-items-center mb-50">
+                                        @if($file->publication_status === 'draft')
+                                            <span class="badge badge-dot badge-danger mr-50" title="Draft" style="width: 8px; height: 8px;"></span>
+                                        @else
+                                            <span class="badge badge-dot badge-success mr-50" title="Published" style="width: 8px; height: 8px;"></span>
+                                        @endif
+                                        <h5 class="card-title text-truncate font-weight-bold mb-0" style="max-width: 85%;" title="{{ $file->title }}">
+                                            {{ $file->title }}
+                                        </h5>
+                                    </div>
+                                    <p class="card-text text-muted text-truncate mb-1" style="-webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; white-space: normal; height: 38px;">
+                                        {{ $file->description ?? 'No description provided.' }}
+                                    </p>
                                 </div>
                                 
-                                <div class="mb-50 d-flex flex-wrap align-items-center">
-                                    @if($file->duration)
-                                        <span class="badge badge-pill badge-light-secondary font-small-1 mr-25 mb-25"><i class="feather icon-clock"></i> {{ $file->duration }}</span>
-                                    @endif
-                                    @if($file->subject)
-                                        <span class="badge badge-pill badge-light-info font-small-1 mr-25 mb-25">{{ $file->subject->title }}</span>
-                                    @endif
-                                    @if($file->class)
-                                        <span class="badge badge-pill badge-light-primary font-small-1 mb-25">{{ $file->class->name }}</span>
-                                    @endif
+                                <div class="media-meta-block">
+                                    <div class="mb-50 d-flex flex-wrap align-items-center">
+                                        @if($file->duration)
+                                            <span class="badge badge-pill badge-light-secondary font-small-1 mr-25 mb-25"><i class="feather icon-clock"></i> {{ $file->duration }}</span>
+                                        @endif
+                                        @if($file->subject)
+                                            <span class="badge badge-pill badge-light-info font-small-1 mr-25 mb-25">{{ $file->subject->title }}</span>
+                                        @endif
+                                        @if($file->class)
+                                            <span class="badge badge-pill badge-light-primary font-small-1 mb-25">{{ $file->class->name }}</span>
+                                        @endif
+                                    </div>
+                                    <small class="text-muted"><i class="feather icon-calendar"></i> {{ $file->created_at->format('M d, Y') }}</small>
                                 </div>
 
-                                <p class="card-text text-muted text-truncate mb-1" style="-webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; white-space: normal; height: 38px;">
-                                    {{ $file->description ?? 'No description provided.' }}
-                                </p>
-                                <div class="d-flex justify-content-between align-items-center border-top pt-1">
-                                    <small class="text-muted"><i class="feather icon-calendar"></i> {{ $file->created_at->format('M d, Y') }}</small>
-                                    
-                                    <div class="d-flex">
-                                        <button type="button" class="btn btn-sm btn-flat-primary mr-25" data-toggle="modal" data-target="#detailsModal"
+                                <div class="media-actions-block border-top pt-1">
+                                    <div class="action-btn-group">
+                                        <button type="button" class="btn btn-light-primary" data-toggle="modal" data-target="#detailsModal"
                                                 data-title="{{ $file->title }}"
                                                 data-desc="{{ $file->description }}"
                                                 data-type="{{ $typeLabel }}"
                                                 data-url="{{ $file->url }}"
                                                 data-disk="{{ $file->storage_disk ?: 'N/A' }}"
-                                                data-size="{{ $file->file_size ? round($file->file_size / (1024 * 1024), 2) . ' MB' : 'N/A' }}">
+                                                data-size="{{ $file->file_size ? round($file->file_size / (1024 * 1024), 2) . ' MB' : 'N/A' }}"
+                                                title="View Details">
                                             <i class="feather icon-info"></i>
                                         </button>
                                         
-                                        <a href="{{ route('admin.media-files.edit', $file->id) }}" class="btn btn-sm btn-flat-warning mr-25" title="Edit Video">
+                                        <a href="{{ route('admin.media-files.edit', $file->id) }}" class="btn btn-light-warning" title="Edit Video">
                                             <i class="feather icon-edit-2"></i>
                                         </a>
                                         
-                                        <form action="{{ route('admin.media-files.destroy', $file->id) }}" method="POST" class="delete-form">
+                                        <form action="{{ route('admin.media-files.destroy', $file->id) }}" method="POST" class="delete-form d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-flat-danger btn-delete">
+                                            <button type="submit" class="btn btn-light-danger btn-delete" title="Delete Video">
                                                 <i class="feather icon-trash-2"></i>
                                             </button>
                                         </form>
@@ -310,7 +417,7 @@
             <!-- Pagination -->
             <div class="row">
                 <div class="col-12 d-flex justify-content-center mt-2">
-                    {{ $files->links() }}
+                    {{ $files->appends(request()->query())->links() }}
                 </div>
             </div>
         </div>
@@ -449,6 +556,45 @@
                 }
             });
         });
+
+        // Layout Grid/List Toggle persistence
+        const btnLayoutGrid = document.getElementById('btn_layout_grid');
+        const btnLayoutList = document.getElementById('btn_layout_list');
+        const mediaContainer = document.getElementById('media_container');
+
+        function setLayout(layout) {
+            localStorage.setItem('media_layout', layout);
+            if (layout === 'list') {
+                btnLayoutList.classList.add('active');
+                btnLayoutGrid.classList.remove('active');
+                if (mediaContainer) {
+                    mediaContainer.classList.add('layout-list');
+                    document.querySelectorAll('.media-item').forEach(el => {
+                        el.classList.remove('col-xl-3', 'col-lg-4', 'col-md-6');
+                        el.classList.add('col-12');
+                    });
+                }
+            } else {
+                btnLayoutGrid.classList.add('active');
+                btnLayoutList.classList.remove('active');
+                if (mediaContainer) {
+                    mediaContainer.classList.remove('layout-list');
+                    document.querySelectorAll('.media-item').forEach(el => {
+                        el.classList.remove('col-12');
+                        el.classList.add('col-xl-3', 'col-lg-4', 'col-md-6');
+                    });
+                }
+            }
+        }
+
+        if (btnLayoutGrid && btnLayoutList) {
+            btnLayoutGrid.addEventListener('click', () => setLayout('grid'));
+            btnLayoutList.addEventListener('click', () => setLayout('list'));
+
+            // Initialize layout from localStorage
+            const savedLayout = localStorage.getItem('media_layout') || 'grid';
+            setLayout(savedLayout);
+        }
     });
 </script>
 @endpush
