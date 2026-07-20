@@ -176,4 +176,90 @@ class CourseController extends Controller
 
         return redirect()->route('admin.courses.papers', $course->id)->with('success', 'Paper removed from course successfully.');
     }
+
+    /**
+     * Show the media management page for a specific course.
+     */
+    public function manageMedia(Course $course)
+    {
+        // Get media files assigned to this course ordered by week_id / week name
+        $courseMedia = $course->mediaFiles()
+            ->leftJoin('weeks', 'course_media_file.week_id', '=', 'weeks.id')
+            ->select('media_files.*', 'weeks.name as week_name', 'course_media_file.week as pivot_week', 'course_media_file.week_id as pivot_week_id')
+            ->orderBy('weeks.due_date')
+            ->orderBy('weeks.name')
+            ->get();
+
+        // Get all media files to populate the selection dropdown
+        $allMedia = MediaFile::orderBy('title')->get();
+
+        // Get all weeks for this course
+        $weeks = $course->weeks()->orderBy('name')->get();
+
+        return view('admin.courses.manage_media', compact('course', 'courseMedia', 'allMedia', 'weeks'));
+    }
+
+    /**
+     * Add a media file to the course with a weekly parameter.
+     */
+    public function addMedia(Request $request, Course $course)
+    {
+        $request->validate([
+            'media_file_id' => 'required|exists:media_files,id',
+            'week_mode' => 'required|in:existing,new',
+            'week_id' => 'required_if:week_mode,existing|nullable|exists:weeks,id',
+            'new_week_name' => 'required_if:week_mode,new|nullable|string|max:255',
+            'new_week_due_date' => 'nullable|date',
+        ]);
+
+        $weekId = null;
+        $weekName = '';
+
+        if ($request->week_mode === 'existing') {
+            $weekId = $request->week_id;
+            $weekModel = \App\Models\Week::find($weekId);
+            $weekName = $weekModel ? $weekModel->name : '';
+        } else {
+            $weekModel = \App\Models\Week::create([
+                'course_id' => $course->id,
+                'name' => $request->new_week_name,
+                'due_date' => $request->new_week_due_date ?: null,
+            ]);
+            $weekId = $weekModel->id;
+            $weekName = $weekModel->name;
+        }
+
+        $weekNumber = 1;
+        if (preg_match('/(\d+)/', $weekName, $matches)) {
+            $weekNumber = (int) $matches[1];
+        }
+
+        if ($course->mediaFiles()->where('media_file_id', $request->media_file_id)->exists()) {
+            // Update the week if already assigned
+            $course->mediaFiles()->updateExistingPivot($request->media_file_id, [
+                'week' => $weekNumber,
+                'week_id' => $weekId
+            ]);
+            $message = 'Media week updated successfully.';
+        } else {
+            // Add new media-course relationship
+            $course->mediaFiles()->attach($request->media_file_id, [
+                'week' => $weekNumber,
+                'week_id' => $weekId
+            ]);
+            $message = 'Media added to course successfully.';
+        }
+
+        return redirect()->route('admin.courses.media', $course->id)->with('success', $message);
+    }
+
+    /**
+     * Remove a media file from the course.
+     */
+    public function removeMedia(Course $course, MediaFile $mediaFile)
+    {
+        $course->mediaFiles()->detach($mediaFile->id);
+
+        return redirect()->route('admin.courses.media', $course->id)->with('success', 'Media file removed from course successfully.');
+    }
 }

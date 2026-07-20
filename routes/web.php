@@ -203,6 +203,35 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('admin/courses/{course}/papers', [\App\Http\Controllers\Admin\CourseController::class, 'managePapers'])->name('admin.courses.papers');
     Route::post('admin/courses/{course}/papers/add', [\App\Http\Controllers\Admin\CourseController::class, 'addPaper'])->name('admin.courses.papers.add');
     Route::delete('admin/courses/{course}/papers/remove/{paper}', [\App\Http\Controllers\Admin\CourseController::class, 'removePaper'])->name('admin.courses.papers.remove');
+
+    // System Configurations Management
+    Route::get('admin/system-configs', [\App\Http\Controllers\Admin\SystemConfigController::class, 'index'])->name('admin.system-configs.index');
+    Route::post('admin/system-configs', [\App\Http\Controllers\Admin\SystemConfigController::class, 'update'])->name('admin.system-configs.update');
+    Route::post('admin/system-configs/test-smtp', [\App\Http\Controllers\Admin\SystemConfigController::class, 'testSmtp'])->name('admin.system-configs.test-smtp');
+    Route::post('admin/system-configs/test-wasabi', [\App\Http\Controllers\Admin\SystemConfigController::class, 'testWasabi'])->name('admin.system-configs.test-wasabi');
+    Route::post('admin/system-configs/test-s3', [\App\Http\Controllers\Admin\SystemConfigController::class, 'testS3'])->name('admin.system-configs.test-s3');
+
+    // Manage Files / Media Repository
+    Route::get('admin/media-files/background-upload', function () {
+        return view('admin.media-files.background-upload');
+    })->name('admin.media-files.background-upload');
+    Route::get('admin/media-files/upload-status', [\App\Http\Controllers\Admin\MediaFileController::class, 'uploadStatus'])->name('admin.media-files.upload-status');
+    Route::post('admin/media-files/upload-chunk', [\App\Http\Controllers\Admin\MediaFileController::class, 'uploadChunk'])->name('admin.media-files.upload-chunk');
+    Route::post('admin/media-files/upload-thumbnail', [\App\Http\Controllers\Admin\MediaFileController::class, 'uploadThumbnail'])->name('admin.media-files.upload-thumbnail');
+    
+    Route::resource('admin/media-files', \App\Http\Controllers\Admin\MediaFileController::class)->names([
+        'index'   => 'admin.media-files.index',
+        'create'  => 'admin.media-files.create',
+        'store'   => 'admin.media-files.store',
+        'edit'    => 'admin.media-files.edit',
+        'update'  => 'admin.media-files.update',
+        'destroy' => 'admin.media-files.destroy',
+    ])->except(['show']);
+
+    // Course Media Weekly Scheduler
+    Route::get('admin/courses/{course}/media', [\App\Http\Controllers\Admin\CourseController::class, 'manageMedia'])->name('admin.courses.media');
+    Route::post('admin/courses/{course}/media/add', [\App\Http\Controllers\Admin\CourseController::class, 'addMedia'])->name('admin.courses.media.add');
+    Route::delete('admin/courses/{course}/media/remove/{media_file}', [\App\Http\Controllers\Admin\CourseController::class, 'removeMedia'])->name('admin.courses.media.remove');
 });
 
 // Student

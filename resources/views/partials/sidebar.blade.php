@@ -1276,9 +1276,9 @@
                 </li>
 
                 <!-- Manage Files -->
-                <li class="menu-item-wrapper" data-title="Manage Files" data-route="#" data-icon="folder"
+                <li class="menu-item-wrapper {{ request()->routeIs('admin.media-files.*') ? 'active' : '' }}" data-title="Manage Files" data-route="{{ route('admin.media-files.index') }}" data-icon="folder"
                     data-tooltip="Manage Files">
-                    <a href="#" class="menu-link">
+                    <a href="{{ route('admin.media-files.index') }}" class="menu-link">
                         <i data-lucide="folder"></i>
                         <span class="menu-text">Manage Files</span>
                     </a>
@@ -1405,8 +1405,11 @@
                 </li>
 
                 <!-- Global Settings (Submenu) -->
-                <li class="menu-item-wrapper has-submenu" data-title="Global Settings" data-tooltip="Global Settings">
-                    <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true" aria-expanded="false">
+                @php
+                    $settingsActive = request()->routeIs('admin.system-configs.*');
+                @endphp
+                <li class="menu-item-wrapper has-submenu {{ $settingsActive ? 'open' : '' }}" data-title="Global Settings" data-tooltip="Global Settings">
+                    <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true" aria-expanded="{{ $settingsActive ? 'true' : 'false' }}">
                         <i data-lucide="settings"></i>
                         <span class="menu-text">Global Settings</span>
                         <i data-lucide="chevron-down" class="submenu-arrow"></i>
@@ -1419,6 +1422,16 @@
                             </a>
                             <button type="button" class="pin-btn" title="Pin to favorites"
                                 aria-label="Pin Tests/Exam Settings">
+                                <i data-lucide="star"></i>
+                            </button>
+                        </li>
+                        <li class="{{ request()->routeIs('admin.system-configs.*') ? 'active' : '' }}" data-title="System Configurations" data-route="{{ route('admin.system-configs.index') }}" data-icon="settings">
+                            <a href="{{ route('admin.system-configs.index') }}" class="menu-link">
+                                <i data-lucide="settings"></i>
+                                <span class="menu-text">System Configs</span>
+                            </a>
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin System Configs">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
