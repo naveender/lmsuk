@@ -660,7 +660,7 @@
         // Chunk Upload Variables
         let selectedFile = null;
         let uploaderInstance = null; // tracking active uploader loop
-        const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks
+        const CHUNK_SIZE = 1 * 1024 * 1024; // 1MB chunks (compatible with standard PHP 2MB upload limits)
 
         typeSelect.addEventListener('change', function() {
             const val = this.value;
