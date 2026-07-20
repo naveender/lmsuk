@@ -1227,36 +1227,36 @@
                 @php
                     $papersActive = request()->routeIs('admin.papers.*');
                 @endphp
-                <li class="menu-item-wrapper has-submenu {{ $papersActive ? 'open' : '' }}"
-                    data-title="Assessment Center" data-tooltip="Assessment Center">
+                <li class="menu-item-wrapper has-submenu {{ $papersActive ? 'open' : '' }}" data-title="Papers Manager"
+                    data-tooltip="Papers Manager">
                     <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true"
                         aria-expanded="{{ $papersActive ? 'true' : 'false' }}">
                         <i data-lucide="file-text"></i>
-                        <span class="menu-text">Assessment Center</span>
+                        <span class="menu-text">Quiz/Test Manager</span>
                         <i data-lucide="chevron-down" class="submenu-arrow"></i>
                     </div>
                     <ul class="submenu-items">
                         <li class="{{ request()->routeIs('admin.papers.create') ? 'active' : '' }}"
-                            data-title="Create New Assessment" data-route="{{ route('admin.papers.create') }}"
+                            data-title="Create New Quiz/Test" data-route="{{ route('admin.papers.create') }}"
                             data-icon="file-plus">
                             <a href="{{ route('admin.papers.create') }}" class="menu-link">
                                 <i data-lucide="file-plus"></i>
-                                <span class="menu-text">Create New Assessment</span>
+                                <span class="menu-text">Create New Quiz/Test</span>
                             </a>
                             <button type="button" class="pin-btn" title="Pin to favorites"
-                                aria-label="Pin Create New Assessment">
+                                aria-label="Pin Create New Paper">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
                         <li class="{{ request()->routeIs('admin.papers.index') ? 'active' : '' }}"
-                            data-title="Assessment Directory" data-route="{{ route('admin.papers.index') }}"
+                            data-title="Quizzes/Tests Directory" data-route="{{ route('admin.papers.index') }}"
                             data-icon="files">
                             <a href="{{ route('admin.papers.index') }}" class="menu-link">
                                 <i data-lucide="files"></i>
-                                <span class="menu-text">Assessment Directory</span>
+                                <span class="menu-text">Quizzes/Tests Directory</span>
                             </a>
                             <button type="button" class="pin-btn" title="Pin to favorites"
-                                aria-label="Pin Assessment Directory">
+                                aria-label="Pin Quizzes/Tests Directory">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
@@ -1276,9 +1276,10 @@
                 </li>
 
                 <!-- Manage Files -->
-                <li class="menu-item-wrapper" data-title="Manage Files" data-route="#" data-icon="folder"
+                <li class="menu-item-wrapper {{ request()->routeIs('admin.media-files.*') ? 'active' : '' }}"
+                    data-title="Manage Files" data-route="{{ route('admin.media-files.index') }}" data-icon="folder"
                     data-tooltip="Manage Files">
-                    <a href="#" class="menu-link">
+                    <a href="{{ route('admin.media-files.index') }}" class="menu-link">
                         <i data-lucide="folder"></i>
                         <span class="menu-text">Manage Files</span>
                     </a>
@@ -1405,8 +1406,13 @@
                 </li>
 
                 <!-- Global Settings (Submenu) -->
-                <li class="menu-item-wrapper has-submenu" data-title="Global Settings" data-tooltip="Global Settings">
-                    <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true" aria-expanded="false">
+                @php
+                    $settingsActive = request()->routeIs('admin.system-configs.*');
+                @endphp
+                <li class="menu-item-wrapper has-submenu {{ $settingsActive ? 'open' : '' }}"
+                    data-title="Global Settings" data-tooltip="Global Settings">
+                    <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true"
+                        aria-expanded="{{ $settingsActive ? 'true' : 'false' }}">
                         <i data-lucide="settings"></i>
                         <span class="menu-text">Global Settings</span>
                         <i data-lucide="chevron-down" class="submenu-arrow"></i>
@@ -1419,6 +1425,18 @@
                             </a>
                             <button type="button" class="pin-btn" title="Pin to favorites"
                                 aria-label="Pin Tests/Exam Settings">
+                                <i data-lucide="star"></i>
+                            </button>
+                        </li>
+                        <li class="{{ request()->routeIs('admin.system-configs.*') ? 'active' : '' }}"
+                            data-title="System Configurations" data-route="{{ route('admin.system-configs.index') }}"
+                            data-icon="settings">
+                            <a href="{{ route('admin.system-configs.index') }}" class="menu-link">
+                                <i data-lucide="settings"></i>
+                                <span class="menu-text">System Configs</span>
+                            </a>
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin System Configs">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>

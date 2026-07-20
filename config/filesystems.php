@@ -68,7 +68,7 @@ return [
             'bucket' => env('WASABI_BUCKET'),
             'endpoint' => env('WASABI_ENDPOINT', 'https://s3.wasabisys.com'),
             'use_path_style_endpoint' => true,
-            'options' => [
+            'http' => [
                 'verify' => false,  // disable SSL verification (for local dev only)
             ],
         ],

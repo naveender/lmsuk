@@ -34,4 +34,15 @@ class Course extends Model
             ->withTimestamps()
             ->orderByPivot('week');
     }
+
+    /**
+     * Get the media files associated with the course.
+     */
+    public function mediaFiles()
+    {
+        return $this->belongsToMany(MediaFile::class, 'course_media_file', 'course_id', 'media_file_id')
+            ->withPivot('week', 'week_id')
+            ->withTimestamps()
+            ->orderByPivot('week');
+    }
 }

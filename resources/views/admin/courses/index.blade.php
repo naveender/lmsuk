@@ -87,6 +87,7 @@
                                                 <th>Course Name</th>
                                                 <th>Description</th>
                                                 <th>Total Papers</th>
+                                                <th>Total Videos</th>
                                                 <th>Status</th>
                                                 <th>Actions</th>
                                             </tr>
@@ -103,6 +104,11 @@
                                                         </span>
                                                     </td>
                                                     <td>
+                                                        <span class="badge badge-pill badge-light-info font-weight-bold">
+                                                            {{ $course->mediaFiles()->count() }} Videos
+                                                        </span>
+                                                    </td>
+                                                    <td>
                                                         @if($course->is_active)
                                                             <span class="badge badge-success">Active</span>
                                                         @else
@@ -112,6 +118,9 @@
                                                     <td>
                                                         <a href="{{ route('admin.courses.papers', $course->id) }}" class="btn btn-sm btn-info mb-1">
                                                             <i class="feather icon-file-text"></i> Manage Papers
+                                                        </a>
+                                                        <a href="{{ route('admin.courses.media', $course->id) }}" class="btn btn-sm btn-warning mb-1 text-white">
+                                                            <i class="feather icon-video"></i> Manage Videos
                                                         </a>
                                                         <a href="{{ route('admin.courses.edit', $course->id) }}" class="btn btn-sm btn-primary mb-1">
                                                             <i class="feather icon-edit"></i> Edit
