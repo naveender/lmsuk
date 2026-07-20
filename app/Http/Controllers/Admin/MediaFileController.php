@@ -285,6 +285,7 @@ class MediaFileController extends Controller
             'storage_target' => 'required|in:local,s3,wasabi',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'media_file_id' => 'nullable|integer|exists:media_files,id',
             
             // Metadata
             'subject_id' => 'required|exists:subjects,id',
@@ -373,28 +374,65 @@ class MediaFileController extends Controller
                 $storageTarget = 'public';
             }
 
-            // Create db record
-            $media = MediaFile::create([
-                'title' => $request->title,
-                'description' => $request->description,
-                'type' => $request->storage_target === 'local' ? 'video_file' : $request->storage_target,
-                'path' => $finalPath,
-                'storage_disk' => $storageTarget,
-                'original_name' => $filename,
-                'file_size' => $fileSize,
-                'mime_type' => $mimeType,
-                'status' => 'completed',
-                'upload_id' => $uploadId,
+            if ($request->filled('media_file_id')) {
+                $media = MediaFile::findOrFail($request->media_file_id);
                 
-                // Metadata
-                'subject_id' => $request->subject_id,
-                'class_id' => $request->class_id,
-                'year_group_id' => $request->year_group_id,
-                'academic_year' => $request->academic_year,
-                'duration' => $request->duration,
-                'thumbnail_path' => $request->thumbnail_path,
-                'publication_status' => $request->publication_status,
-            ]);
+                // Delete previous file from storage
+                if ($media->path && in_array($media->type, ['video_file', 's3', 'wasabi'])) {
+                    $oldDisk = $media->storage_disk ?: 'public';
+                    try {
+                        if (Storage::disk($oldDisk)->exists($media->path)) {
+                            Storage::disk($oldDisk)->delete($media->path);
+                        }
+                    } catch (\Exception $e) {
+                        logger()->error("Failed to delete previous video file: " . $e->getMessage());
+                    }
+                }
+
+                // Update dynamic parameters
+                $media->update([
+                    'title' => $request->title,
+                    'description' => $request->description,
+                    'type' => $request->storage_target === 'local' ? 'video_file' : $request->storage_target,
+                    'path' => $finalPath,
+                    'storage_disk' => $storageTarget,
+                    'original_name' => $filename,
+                    'file_size' => $fileSize,
+                    'mime_type' => $mimeType,
+                    'status' => 'completed',
+                    'upload_id' => $uploadId,
+                    'subject_id' => $request->subject_id,
+                    'class_id' => $request->class_id,
+                    'year_group_id' => $request->year_group_id,
+                    'academic_year' => $request->academic_year,
+                    'duration' => $request->duration,
+                    'thumbnail_path' => $request->thumbnail_path ?: $media->thumbnail_path,
+                    'publication_status' => $request->publication_status,
+                ]);
+            } else {
+                // Create db record
+                $media = MediaFile::create([
+                    'title' => $request->title,
+                    'description' => $request->description,
+                    'type' => $request->storage_target === 'local' ? 'video_file' : $request->storage_target,
+                    'path' => $finalPath,
+                    'storage_disk' => $storageTarget,
+                    'original_name' => $filename,
+                    'file_size' => $fileSize,
+                    'mime_type' => $mimeType,
+                    'status' => 'completed',
+                    'upload_id' => $uploadId,
+                    
+                    // Metadata
+                    'subject_id' => $request->subject_id,
+                    'class_id' => $request->class_id,
+                    'year_group_id' => $request->year_group_id,
+                    'academic_year' => $request->academic_year,
+                    'duration' => $request->duration,
+                    'thumbnail_path' => $request->thumbnail_path,
+                    'publication_status' => $request->publication_status,
+                ]);
+            }
 
             // Assign course if provided in request parameters
             if ($request->filled('course_id')) {

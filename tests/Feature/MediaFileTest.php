@@ -181,3 +181,69 @@ test('admin can assign media to course weekly scheduling', function () {
     expect($course->mediaFiles()->where('media_files.id', $media->id)->exists())->toBeTrue();
     expect($course->mediaFiles()->first()->pivot->week_id)->toBe($week->id);
 });
+
+test('admin can replace existing media file with a new file and delete previous file', function () {
+    Storage::fake('public');
+    
+    $admin = User::factory()->create(['role' => 'admin', 'username' => 'admin_test']);
+    
+    // Create dependencies first to satisfy database foreign keys
+    $subject = Subject::create(['title' => 'Test Subject', 'is_active' => true]);
+    $class = Classes::create(['name' => 'Test Class', 'group_year' => 'Year 1', 'academic_year' => '2024-2025', 'is_active' => true]);
+    $yearGroup = YearGroup::create(['title' => 'Year 1', 'value' => 'Year 1', 'is_active' => true]);
+
+    // Create previous media file record & mock file
+    $oldPath = 'videos/old_video.mp4';
+    Storage::disk('public')->put($oldPath, 'Old Video Content');
+    
+    $media = MediaFile::create([
+        'title' => 'Original Video',
+        'type' => 'video_file',
+        'path' => $oldPath,
+        'storage_disk' => 'public',
+        'status' => 'completed',
+        'subject_id' => $subject->id,
+        'class_id' => $class->id,
+        'year_group_id' => $yearGroup->id,
+        'academic_year' => '2024-2025',
+        'publication_status' => 'published',
+    ]);
+
+    $newFile = UploadedFile::fake()->create('new_video.mp4', 512); // 512B new file
+
+    // Upload first and only chunk (total_chunks = 1) for the replacement
+    $response = $this->actingAs($admin)
+        ->post(route('admin.media-files.upload-chunk'), [
+            'file' => $newFile,
+            'chunk_index' => 0,
+            'total_chunks' => 1,
+            'filename' => 'new_video.mp4',
+            'upload_id' => 'replace_upload_999',
+            'storage_target' => 'local',
+            'media_file_id' => $media->id,
+            'title' => 'Updated Video Title',
+            'description' => 'Updated Description',
+            'subject_id' => $subject->id,
+            'class_id' => $class->id,
+            'year_group_id' => $yearGroup->id,
+            'academic_year' => '2024-2025',
+            'publication_status' => 'published',
+        ]);
+
+    $response->assertStatus(200);
+    
+    // Check old file was deleted
+    Storage::disk('public')->assertMissing($oldPath);
+    
+    // Check database was updated
+    $media->refresh();
+    expect($media->title)->toBe('Updated Video Title');
+    expect($media->original_name)->toBe('new_video.mp4');
+    expect($media->storage_disk)->toBe('public');
+    
+    // Clean up physically created file on the real filesystem
+    $physicalPath = storage_path('app/public/' . $media->path);
+    if (\Illuminate\Support\Facades\File::exists($physicalPath)) {
+        \Illuminate\Support\Facades\File::delete($physicalPath);
+    }
+});

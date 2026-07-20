@@ -231,10 +231,67 @@
                                             <input type="text" name="path" id="media_path" class="form-control" value="{{ $mediaFile->path }}" required>
                                         </div>
                                     @else
-                                        <div class="alert alert-info py-1">
+                                        <div class="alert alert-info py-1 mb-2">
                                             <i class="feather icon-video"></i> Video file is stored on: <b>{{ strtoupper($mediaFile->storage_disk) }}</b> <br>
                                             Original Name: <code>{{ $mediaFile->original_name }}</code> <br>
                                             Path: <code>{{ $mediaFile->path }}</code>
+                                        </div>
+
+                                        <!-- Video File Replacement Panel -->
+                                        <div class="card border mb-2 shadow-none">
+                                            <div class="card-body">
+                                                <h5 class="text-primary font-weight-bold mb-1"><i class="feather icon-refresh-cw"></i> Video File Replacement</h5>
+                                                <p class="text-muted small">If you want to upload a new video file to replace the existing one, toggle the checkbox below. The previous file will be automatically deleted from storage upon successful upload.</p>
+                                                
+                                                <div class="custom-control custom-checkbox mb-1">
+                                                    <input type="checkbox" class="custom-control-input" id="replace_video_switch" name="replace_video" value="1">
+                                                    <label class="custom-control-label font-weight-bold" for="replace_video_switch">I want to replace the current video file</label>
+                                                </div>
+
+                                                <div id="replacementUploaderSection" style="display: none;">
+                                                    <div class="form-group">
+                                                        <label class="font-weight-bold">Destination Storage Location</label>
+                                                        <select class="form-control" id="upload_storage_disk">
+                                                            <option value="local" {{ $mediaFile->storage_disk === 'public' ? 'selected' : '' }}>Local Storage Disk</option>
+                                                            <option value="wasabi" {{ $mediaFile->storage_disk === 'wasabi' ? 'selected' : '' }}>Wasabi Cloud storage</option>
+                                                            <option value="s3" {{ $mediaFile->storage_disk === 's3' ? 'selected' : '' }}>Amazon AWS S3 bucket</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="font-weight-bold">Select Replacement File</label>
+                                                        <div class="upload-box" id="uploadDropZone">
+                                                            <i class="feather icon-upload-cloud text-primary" style="font-size: 3rem;"></i>
+                                                            <p class="mt-1 mb-0">Drag and drop your video file here, or click to browse</p>
+                                                            <input type="file" id="media_file_input" class="d-none" accept="video/*">
+                                                        </div>
+                                                        <div class="mt-50 d-flex justify-content-between align-items-center" id="selectedFileDetails" style="display: none !important;">
+                                                            <span class="text-success font-weight-bold" id="lblSelectedFileName"></span>
+                                                            <button type="button" class="btn btn-sm btn-flat-danger" id="btnCancelFile">Remove</button>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Uploader Progress Widget -->
+                                                    <div class="progress-wrapper" id="uploaderProgressWidget" style="display: none;">
+                                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                                            <span id="lblProgressStatus" class="badge badge-light-warning">Preparing Chunks...</span>
+                                                            <span id="lblProgressPercentage" class="h5 font-weight-bold mb-0">0%</span>
+                                                        </div>
+                                                        <div class="progress progress-bar-primary" style="height: 10px;">
+                                                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBarValue" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between align-items-center mt-1 text-muted small">
+                                                            <span id="lblProgressSize">0 MB / 0 MB</span>
+                                                            <span id="lblProgressSpeed">0 KB/s</span>
+                                                            <span id="lblProgressEta">ETA: --</span>
+                                                        </div>
+                                                        <div class="d-flex justify-content-end mt-1">
+                                                            <button type="button" class="btn btn-sm btn-warning font-weight-bold" id="btnPauseUpload" style="display: none;"><i class="feather icon-pause"></i> Pause</button>
+                                                            <button type="button" class="btn btn-sm btn-success font-weight-bold" id="btnResumeUpload" style="display: none;"><i class="feather icon-play"></i> Resume</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     @endif
 
@@ -547,32 +604,336 @@
             });
         });
 
-        // Validation before submit
-        document.getElementById('editForm').addEventListener('submit', function(e) {
+        // Chunk Upload Variables
+        let selectedFile = null;
+        let uploaderInstance = null; // tracking active uploader loop
+        const CHUNK_SIZE = 1 * 1024 * 1024; // 1MB chunks (compatible with standard PHP 2MB upload limits)
+
+        // Dropzone & Replacement switches
+        const replaceVideoSwitch = document.getElementById('replace_video_switch');
+        const replacementUploaderSection = document.getElementById('replacementUploaderSection');
+        
+        if (replaceVideoSwitch) {
+            replaceVideoSwitch.addEventListener('change', function() {
+                replacementUploaderSection.style.display = this.checked ? 'block' : 'none';
+                if (!this.checked) {
+                    selectedFile = null;
+                    document.getElementById('selectedFileDetails').setAttribute('style', 'display: none !important;');
+                }
+            });
+        }
+
+        const dropZone = document.getElementById('uploadDropZone');
+        const fileInput = document.getElementById('media_file_input');
+        const btnCancelFile = document.getElementById('btnCancelFile');
+
+        if (dropZone && fileInput) {
+            dropZone.addEventListener('click', () => fileInput.click());
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#28c76f';
+            });
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.style.borderColor = '#7367f0';
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#7367f0';
+                if(e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileSelect(fileInput.files[0]);
+                }
+            });
+            fileInput.addEventListener('change', (e) => {
+                if(e.target.files.length) {
+                    handleFileSelect(e.target.files[0]);
+                }
+            });
+        }
+
+        if (btnCancelFile) {
+            btnCancelFile.addEventListener('click', () => {
+                selectedFile = null;
+                fileInput.value = '';
+                document.getElementById('selectedFileDetails').setAttribute('style', 'display: none !important;');
+            });
+        }
+
+        function handleFileSelect(file) {
+            selectedFile = file;
+            document.getElementById('lblSelectedFileName').textContent = file.name;
+            document.getElementById('selectedFileDetails').removeAttribute('style');
+        }
+
+        function roundSize(bytes) {
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        // Custom Chunk Uploader Object
+        function startChunkedUpload() {
+            const title = document.getElementById('media_title').value;
+            const targetDisk = document.getElementById('upload_storage_disk').value;
+            const description = document.getElementById('media_description').value;
+
+            // Generate unique upload ID based on file metadata
+            const fileSignature = `${selectedFile.name}_${selectedFile.size}`;
+            const uploadId = 'up_' + btoa(unescape(encodeURIComponent(fileSignature))).replace(/=/g, '').substr(0, 20);
+
+            // UI switches
+            document.getElementById('btnPauseUpload').style.display = 'inline-block';
+            document.getElementById('btnResumeUpload').style.display = 'none';
+            document.getElementById('lblProgressStatus').textContent = 'Uploading Chunks...';
+            document.getElementById('lblProgressStatus').className = 'badge badge-light-warning';
+            document.getElementById('uploaderProgressWidget').style.display = 'block';
+
+            uploaderInstance = {
+                file: selectedFile,
+                uploadId: uploadId,
+                title: title,
+                description: description,
+                targetDisk: targetDisk,
+                totalChunks: Math.ceil(selectedFile.size / CHUNK_SIZE),
+                isPaused: false,
+                startTime: Date.now(),
+                uploadedBytes: 0,
+                completedChunks: []
+            };
+
+            // 1. Ask server which chunks are already completed (resumability check!)
+            axios.get(`/admin/media-files/upload-status?upload_id=${uploadId}`)
+                .then(response => {
+                    uploaderInstance.completedChunks = response.data.completed_chunks || [];
+                    uploadNextChunk(0);
+                })
+                .catch(err => {
+                    console.error('Failed to get status', err);
+                    uploadNextChunk(0);
+                });
+        }
+
+        function uploadNextChunk(index) {
+            if(!uploaderInstance || uploaderInstance.isPaused) return;
+
+            if(index >= uploaderInstance.totalChunks) {
+                return;
+            }
+
+            // If this chunk was already uploaded, skip it!
+            if(uploaderInstance.completedChunks.includes(index)) {
+                const completedBytes = Math.min((index + 1) * CHUNK_SIZE, uploaderInstance.file.size);
+                updateProgressUI(completedBytes);
+                uploadNextChunk(index + 1);
+                return;
+            }
+
+            const start = index * CHUNK_SIZE;
+            const end = Math.min(start + CHUNK_SIZE, uploaderInstance.file.size);
+            const chunk = uploaderInstance.file.slice(start, end);
+
+            const formData = new FormData();
+            formData.append('file', chunk);
+            formData.append('chunk_index', index);
+            formData.append('total_chunks', uploaderInstance.totalChunks);
+            formData.append('filename', uploaderInstance.file.name);
+            formData.append('upload_id', uploaderInstance.uploadId);
+            formData.append('storage_target', uploaderInstance.targetDisk);
+            formData.append('title', uploaderInstance.title);
+            formData.append('description', uploaderInstance.description);
+            formData.append('media_file_id', '{{ $mediaFile->id }}'); // TARGET UPDATE FIELD!
+            
+            // Metadata parameters
+            formData.append('subject_id', document.getElementById('media_subject_id').value);
+            formData.append('class_id', document.getElementById('media_class_id').value);
+            formData.append('year_group_id', document.getElementById('media_year_group_id').value);
+            formData.append('academic_year', document.getElementById('media_academic_year').value);
+            formData.append('duration', document.getElementById('media_duration').value);
+            formData.append('thumbnail_path', thumbPathHidden.value);
+            formData.append('publication_status', document.getElementById('media_publication_status').value);
+
+            // Course assignment parameters
+            if (assignSwitch.checked) {
+                formData.append('course_id', document.getElementById('assignment_course_id').value);
+                formData.append('week_mode', weekModeSelect.value);
+                formData.append('selected_week_id', document.getElementById('assignment_selected_week_id').value);
+                formData.append('new_week_name', document.getElementById('assignment_new_week_name').value);
+                formData.append('new_week_due_date', document.getElementById('assignment_new_week_due_date').value);
+                formData.append('create_new_course', newCourseSwitch.checked ? '1' : '0');
+                formData.append('new_course_name', document.getElementById('assignment_new_course_name').value);
+            }
+
+            const chunkStartTime = Date.now();
+
+            axios.post('{{ route("admin.media-files.upload-chunk") }}', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                onUploadProgress: (progressEvent) => {
+                    const loadedInChunk = progressEvent.loaded;
+                    const totalLoadedBytes = start + loadedInChunk;
+                    updateProgressUI(totalLoadedBytes);
+                }
+            })
+            .then(response => {
+                if(response.data.status === 'completed') {
+                    // Success completed!
+                    document.getElementById('lblProgressStatus').textContent = 'Completed!';
+                    document.getElementById('lblProgressStatus').className = 'badge badge-light-success';
+                    document.getElementById('progressBarValue').style.width = '100%';
+                    document.getElementById('lblProgressPercentage').textContent = '100%';
+                    
+                    Swal.fire({
+                        title: 'Success',
+                        text: 'File replaced and updated successfully!',
+                        type: 'success'
+                    }).then(() => {
+                        window.location.href = '{{ route("admin.media-files.index") }}';
+                    });
+                } else {
+                    uploaderInstance.completedChunks.push(index);
+                    uploadNextChunk(index + 1);
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                document.getElementById('lblProgressStatus').textContent = 'Failed';
+                document.getElementById('lblProgressStatus').className = 'badge badge-light-danger';
+                Swal.fire('Upload Error', 'Failed to upload file chunk. Click Resume to try again.', 'error');
+                
+                document.getElementById('btnPauseUpload').style.display = 'none';
+                document.getElementById('btnResumeUpload').style.display = 'inline-block';
+            });
+        }
+
+        function updateProgressUI(loadedBytes) {
+            const file = uploaderInstance.file;
+            const percentage = Math.round((loadedBytes / file.size) * 100);
+            
+            document.getElementById('progressBarValue').style.width = `${percentage}%`;
+            document.getElementById('lblProgressPercentage').textContent = `${percentage}%`;
+            document.getElementById('lblProgressSize').textContent = `${roundSize(loadedBytes)} / ${roundSize(file.size)}`;
+
+            const elapsedSeconds = (Date.now() - uploaderInstance.startTime) / 1000;
+            if(elapsedSeconds > 0) {
+                const speedBytesPerSec = loadedBytes / elapsedSeconds;
+                const speedKbps = speedBytesPerSec / 1024;
+                if(speedKbps > 1024) {
+                    document.getElementById('lblProgressSpeed').textContent = `${(speedKbps / 1024).toFixed(2)} MB/s`;
+                } else {
+                    document.getElementById('lblProgressSpeed').textContent = `${speedKbps.toFixed(2)} KB/s`;
+                }
+
+                const remainingBytes = file.size - loadedBytes;
+                const etaSeconds = remainingBytes / speedBytesPerSec;
+                if(etaSeconds > 60) {
+                    document.getElementById('lblProgressEta').textContent = `ETA: ${Math.floor(etaSeconds / 60)}m ${Math.round(etaSeconds % 60)}s`;
+                } else {
+                    document.getElementById('lblProgressEta').textContent = `ETA: ${Math.round(etaSeconds)}s`;
+                }
+            }
+        }
+
+        // Pause/Resume listeners
+        const btnPause = document.getElementById('btnPauseUpload');
+        const btnResume = document.getElementById('btnResumeUpload');
+
+        if(btnPause && btnResume) {
+            btnPause.addEventListener('click', () => {
+                if(uploaderInstance) {
+                    uploaderInstance.isPaused = true;
+                    btnPause.style.display = 'none';
+                    btnResume.style.display = 'inline-block';
+                    document.getElementById('lblProgressStatus').textContent = 'Paused';
+                    document.getElementById('lblProgressStatus').className = 'badge badge-light-secondary';
+                }
+            });
+
+            btnResume.addEventListener('click', () => {
+                if(uploaderInstance) {
+                    uploaderInstance.isPaused = false;
+                    btnPause.style.display = 'inline-block';
+                    btnResume.style.display = 'none';
+                    document.getElementById('lblProgressStatus').textContent = 'Uploading Chunks...';
+                    document.getElementById('lblProgressStatus').className = 'badge badge-light-warning';
+                    
+                    // Resume search from last incomplete chunk
+                    for(let idx = 0; idx < uploaderInstance.totalChunks; idx++) {
+                        if(!uploaderInstance.completedChunks.includes(idx)) {
+                            uploadNextChunk(idx);
+                            break;
+                        }
+                    }
+                }
+            });
+        }
+
+        // Form Validation & submit intercepting
+        function validateMetadata() {
+            if(!document.getElementById('media_title').value) {
+                Swal.fire('Required Field', 'Please enter the video Title.', 'error');
+                return false;
+            }
+            if(!document.getElementById('media_subject_id').value) {
+                Swal.fire('Required Field', 'Please select a Subject.', 'error');
+                return false;
+            }
+            if(!document.getElementById('media_class_id').value) {
+                Swal.fire('Required Field', 'Please select a Class.', 'error');
+                return false;
+            }
+            if(!document.getElementById('media_year_group_id').value) {
+                Swal.fire('Required Field', 'Please select a Group Year.', 'error');
+                return false;
+            }
+            if(!document.getElementById('media_academic_year').value) {
+                Swal.fire('Required Field', 'Please select an Academic Year.', 'error');
+                return false;
+            }
+
             if(assignSwitch.checked) {
                 if(newCourseSwitch.checked) {
                     if(!document.getElementById('assignment_new_course_name').value) {
-                        e.preventDefault();
                         Swal.fire('Required Field', 'Please enter the New Course Name.', 'error');
+                        return false;
                     }
                 } else {
                     if(!document.getElementById('assignment_course_id').value) {
-                        e.preventDefault();
                         Swal.fire('Required Field', 'Please select a Course.', 'error');
+                        return false;
                     }
                 }
 
                 if(weekModeSelect.value === 'existing') {
                     if(!document.getElementById('assignment_selected_week_id').value) {
-                        e.preventDefault();
                         Swal.fire('Required Field', 'Please select an existing Week.', 'error');
+                        return false;
                     }
                 } else {
                     if(!document.getElementById('assignment_new_week_name').value) {
-                        e.preventDefault();
                         Swal.fire('Required Field', 'Please enter the New Week Name.', 'error');
+                        return false;
                     }
                 }
+            }
+
+            return true;
+        }
+
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if(!validateMetadata()) return;
+
+            const isReplaceActive = replaceVideoSwitch && replaceVideoSwitch.checked;
+            if(isReplaceActive) {
+                if(!selectedFile) {
+                    Swal.fire('Required Field', 'Please select a replacement video file or uncheck the replacement option.', 'error');
+                    return;
+                }
+                // Start chunked upload
+                startChunkedUpload();
+            } else {
+                // Submit form normally
+                this.submit();
             }
         });
     });
