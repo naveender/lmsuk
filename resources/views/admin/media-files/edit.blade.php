@@ -528,7 +528,10 @@
             thumbSpinner.style.display = 'block';
 
             axios.post('{{ route("admin.media-files.upload-thumbnail") }}', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
             })
             .then(res => {
                 thumbSpinner.style.display = 'none';
