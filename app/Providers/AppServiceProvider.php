@@ -88,6 +88,14 @@ class AppServiceProvider extends ServiceProvider
                     config(['filesystems.disks.s3.bucket' => $s3Bucket]);
                 }
             }
+
+            // Share active subjects dynamically with horizontalbar partial
+            if (app()->bound('db') && Schema::hasTable('subjects')) {
+                view()->composer('partials.horizontalbar', function ($view) {
+                    $activeSubjects = \App\Models\Subject::where('is_active', true)->get();
+                    $view->with('navSubjects', $activeSubjects);
+                });
+            }
         } catch (\Exception $e) {
             // Prevent app crash during migrations or early boot
             logger()->error('Failed to load dynamic configurations: ' . $e->getMessage());

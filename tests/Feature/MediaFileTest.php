@@ -247,3 +247,85 @@ test('admin can replace existing media file with a new file and delete previous 
         \Illuminate\Support\Facades\File::delete($physicalPath);
     }
 });
+
+test('student can view video lessons category list matching visibility rules', function () {
+    $subject = Subject::create(['title' => 'Maths Category', 'is_active' => true]);
+    
+    $class = Classes::create(['name' => 'Year 5 Advanced', 'group_year' => 'Year 5', 'academic_year' => '2025-2026', 'is_active' => true]);
+    $student = User::factory()->create(['role' => 'student', 'username' => 'student_maths']);
+    $student->classes()->attach($class->id);
+    
+    // Create Student Detail with matching group year & academic year
+    \App\Models\StudentDetail::create([
+        'user_id' => $student->id,
+        'group_year' => 'Year 5',
+        'academic_year' => '2025-2026',
+        'status' => 'active'
+    ]);
+
+    $yearGroup = YearGroup::create(['title' => 'Year 5', 'value' => 'Year 5', 'is_active' => true]);
+
+    // Create 1 general video matching student profile details
+    $matchingMedia = MediaFile::create([
+        'title' => 'Visible General Video',
+        'type' => 'video_file',
+        'path' => 'videos/vid1.mp4',
+        'storage_disk' => 'public',
+        'status' => 'completed',
+        'subject_id' => $subject->id,
+        'class_id' => $class->id,
+        'year_group_id' => $yearGroup->id,
+        'academic_year' => '2025-2026',
+        'publication_status' => 'published',
+    ]);
+
+    // Create 1 general video NOT matching student profile (different class)
+    $otherClass = Classes::create(['name' => 'Year 6 Advanced', 'group_year' => 'Year 6', 'academic_year' => '2025-2026', 'is_active' => true]);
+    $nonMatchingMedia = MediaFile::create([
+        'title' => 'Hidden General Video',
+        'type' => 'video_file',
+        'path' => 'videos/vid2.mp4',
+        'storage_disk' => 'public',
+        'status' => 'completed',
+        'subject_id' => $subject->id,
+        'class_id' => $otherClass->id,
+        'year_group_id' => $yearGroup->id,
+        'academic_year' => '2025-2026',
+        'publication_status' => 'published',
+    ]);
+
+    $response = $this->actingAs($student)
+        ->get(route('student.videolessonscategories'));
+
+    $response->assertStatus(200);
+    $response->assertSee('Maths Category');
+    
+    // Ensure controller counts matching visible videos
+    $categoriesData = $response->viewData('progressBySubject');
+    expect($categoriesData)->toHaveKey($subject->id);
+    expect($categoriesData[$subject->id]['total'])->toBe(1); // Only visible matching video is counted
+});
+
+test('student can view video lessons list page for a specific subject', function () {
+    $subject = Subject::create(['title' => 'Verbal Category', 'is_active' => true]);
+    $student = User::factory()->create(['role' => 'student', 'username' => 'student_verbal']);
+
+    // Create a matching general video
+    $media = MediaFile::create([
+        'title' => 'Visible Verbal Video',
+        'type' => 'video_file',
+        'path' => 'videos/verbal.mp4',
+        'storage_disk' => 'public',
+        'status' => 'completed',
+        'subject_id' => $subject->id,
+        'publication_status' => 'published',
+    ]);
+
+    $response = $this->actingAs($student)
+        ->get(route('student.videolessonslist', ['subject_id' => $subject->id]));
+
+    $response->assertStatus(200);
+    $response->assertSee('Visible Verbal Video');
+    $response->assertSee('Playlist (1 Videos)');
+});
+

@@ -17,4 +17,9 @@ class Subject extends Model
     {
         return $this->hasMany(Question::class);
     }
+
+    public function mediaFiles()
+    {
+        return $this->hasMany(MediaFile::class);
+    }
 }

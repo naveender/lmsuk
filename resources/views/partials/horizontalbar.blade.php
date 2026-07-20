@@ -25,19 +25,38 @@
                 </li>
 
                 <li class="{{ request()->routeIs('student.videolessonscategories') || request()->routeIs('student.videolessonslist') ? 'active' : '' }} dropdown nav-item"
-                    data-menu="dropdown"><a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown"><i
-                            class="feather icon-package"></i><span data-i18n="videoLessons">Lessons</span></a>
+                    data-menu="dropdown">
+                    <a class="dropdown-toggle nav-link" href="{{ route('student.videolessonscategories') }}" data-toggle="dropdown">
+                        <i class="feather icon-package"></i>
+                        <span data-i18n="videoLessons">Lessons</span>
+                    </a>
                     <ul class="dropdown-menu">
-                        <li data-menu=""><a class="dropdown-item" href="/" data-toggle="dropdown" data-i18n="Email"><i
-                                    class="feather icon-mail"></i>Maths And Number Reasoning</a>
+                        <li data-menu="">
+                            <a class="dropdown-item d-flex align-items-center" href="{{ route('student.videolessonscategories') }}">
+                                <i class="feather icon-grid"></i>All Categories
+                            </a>
                         </li>
-                        <li data-menu=""><a class="dropdown-item" href="/" data-toggle="dropdown" data-i18n="Chat"><i
-                                    class="feather icon-message-square"></i>English</a>
-                        </li>
-                        <li data-menu=""><a class="dropdown-item" href="/" data-toggle="dropdown" data-i18n="Todo"><i
-                                    class="feather icon-check-square"></i>Verbal Reasoning</a>
-                        </li>
-
+                        @if(isset($navSubjects) && $navSubjects->isNotEmpty())
+                            <div class="dropdown-divider"></div>
+                            @foreach($navSubjects as $subject)
+                                @php
+                                    $titleLower = strtolower($subject->title);
+                                    $icon = 'icon-book';
+                                    if (strpos($titleLower, 'math') !== false) {
+                                        $icon = 'icon-award';
+                                    } elseif (strpos($titleLower, 'english') !== false) {
+                                        $icon = 'icon-feather';
+                                    } elseif (strpos($titleLower, 'verbal') !== false) {
+                                        $icon = 'icon-cpu';
+                                    }
+                                @endphp
+                                <li data-menu="">
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('student.videolessonslist', ['subject_id' => $subject->id]) }}">
+                                        <i class="feather {{ $icon }}"></i>{{ $subject->title }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        @endif
                     </ul>
                 </li>
                 <li class="{{ request()->routeIs('student.analytics') ? 'active' : '' }} dropdown nav-item"
