@@ -159,6 +159,9 @@
         background-color: rgba(234, 84, 85, 0.1) !important;
         color: #ea5455 !important;
     }
+    #media_table_container td .thumbnail-wrapper:hover .play-btn-overlay {
+        opacity: 1 !important;
+    }
 </style>@endpush
 
 @section('content')
@@ -187,7 +190,7 @@
                         <button type="button" class="btn btn-outline-primary active" id="btn_layout_grid" title="Grid View">
                             <i class="feather icon-grid"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-primary" id="btn_layout_list" title="List View">
+                        <button type="button" class="btn btn-outline-primary" id="btn_layout_table" title="Table View">
                             <i class="feather icon-list"></i>
                         </button>
                     </div>
@@ -272,8 +275,8 @@
                 </div>
             </div>
 
-            <!-- Video Grid -->
-            <div class="row" id="media_container">
+             <!-- Video Grid -->
+            <div class="row" id="media_grid_container">
                 @forelse($files as $file)
                     <div class="col-xl-3 col-lg-4 col-md-6 col-12 media-item">
                         <div class="card media-card overflow-hidden">
@@ -412,6 +415,150 @@
                         </a>
                     </div>
                 @endforelse
+            </div>
+
+            <!-- Video Table View -->
+            <div class="card" id="media_table_container" style="display: none;">
+                <div class="card-content">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Video</th>
+                                    <th>Title & Description</th>
+                                    <th>Type</th>
+                                    <th>Duration</th>
+                                    <th>Subject</th>
+                                    <th>Class</th>
+                                    <th>Status</th>
+                                    <th>Created At</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($files as $file)
+                                    @php
+                                        $badgeClass = 'badge-secondary';
+                                        $typeLabel = ucfirst($file->type);
+                                        switch($file->type) {
+                                            case 'youtube': $badgeClass = 'badge-danger'; $typeLabel = 'YouTube'; break;
+                                            case 'vimeo': $badgeClass = 'badge-info'; $typeLabel = 'Vimeo'; break;
+                                            case 'video_file': $badgeClass = 'badge-primary'; $typeLabel = 'Video File'; break;
+                                            case 'video_url': $badgeClass = 'badge-success'; $typeLabel = 'MP4 URL'; break;
+                                            case 's3': $badgeClass = 'badge-warning text-dark'; $typeLabel = 'Amazon S3'; break;
+                                            case 'wasabi': $badgeClass = 'badge-light-info'; $typeLabel = 'Wasabi'; break;
+                                            case 'google_drive': $badgeClass = 'badge-warning'; $typeLabel = 'Google Drive'; break;
+                                            case 'iframe': $badgeClass = 'badge-light-primary'; $typeLabel = 'Iframe'; break;
+                                        }
+                                    @endphp
+                                    <tr>
+                                        <!-- Thumbnail with play overlay -->
+                                        <td>
+                                            <div class="thumbnail-wrapper position-relative" style="width: 70px; height: 42px; border-radius: 4px; overflow: hidden; background: #ebe9f1; display: flex; align-items: center; justify-content: center;">
+                                                @if($file->thumbnail_url)
+                                                    <img src="{{ $file->thumbnail_url }}" alt="Thumb" style="width: 100%; height: 100%; object-fit: cover;">
+                                                @else
+                                                    <div style="background: linear-gradient(135deg, #7367f0, #ce9ffc); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                                        <i class="feather icon-video text-white" style="font-size: 1.1rem;"></i>
+                                                    </div>
+                                                @endif
+                                                <div class="play-btn-overlay" data-toggle="modal" data-target="#previewModal" 
+                                                     data-title="{{ $file->title }}" 
+                                                     data-embed="{{ $file->embed_url }}" 
+                                                     data-type="{{ $file->type }}"
+                                                     style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s ease; cursor: pointer; color: #fff;">
+                                                    <i class="feather icon-play" style="font-size: 0.9rem; margin-left: 1px;"></i>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <!-- Title & Desc -->
+                                        <td>
+                                            <div class="font-weight-bold text-dark mb-25">{{ $file->title }}</div>
+                                            @if($file->file_size)
+                                                <small class="text-muted mr-50"><i class="feather icon-hard-drive"></i> {{ round($file->file_size / (1024 * 1024), 2) }} MB</small>
+                                            @endif
+                                            <small class="text-muted d-block text-truncate" style="max-width: 250px;">{{ $file->description ?? 'No description provided' }}</small>
+                                        </td>
+                                        <!-- Type -->
+                                        <td>
+                                            <span class="badge {{ $badgeClass }}">{{ $typeLabel }}</span>
+                                        </td>
+                                        <!-- Duration -->
+                                        <td>
+                                            @if($file->duration)
+                                                <span class="badge badge-pill badge-light-secondary"><i class="feather icon-clock"></i> {{ $file->duration }}</span>
+                                            @else
+                                                <span class="text-muted">N/A</span>
+                                            @endif
+                                        </td>
+                                        <!-- Subject -->
+                                        <td>
+                                            @if($file->subject)
+                                                <span class="badge badge-pill badge-light-info">{{ $file->subject->title }}</span>
+                                            @else
+                                                <span class="text-muted">N/A</span>
+                                            @endif
+                                        </td>
+                                        <!-- Class -->
+                                        <td>
+                                            @if($file->class)
+                                                <span class="badge badge-pill badge-light-primary">{{ $file->class->name }}</span>
+                                            @else
+                                                <span class="text-muted">N/A</span>
+                                            @endif
+                                        </td>
+                                        <!-- Status -->
+                                        <td>
+                                            @if($file->publication_status === 'draft')
+                                                <span class="badge badge-pill badge-light-danger">Draft</span>
+                                            @else
+                                                <span class="badge badge-pill badge-light-success">Published</span>
+                                            @endif
+                                        </td>
+                                        <!-- Created At -->
+                                        <td>
+                                            <small class="text-muted"><i class="feather icon-calendar"></i> {{ $file->created_at->format('M d, Y') }}</small>
+                                        </td>
+                                        <!-- Actions -->
+                                        <td class="text-right">
+                                            <div class="action-btn-group justify-content-end">
+                                                <button type="button" class="btn btn-light-primary" data-toggle="modal" data-target="#detailsModal"
+                                                        data-title="{{ $file->title }}"
+                                                        data-desc="{{ $file->description }}"
+                                                        data-type="{{ $typeLabel }}"
+                                                        data-url="{{ $file->url }}"
+                                                        data-disk="{{ $file->storage_disk ?: 'N/A' }}"
+                                                        data-size="{{ $file->file_size ? round($file->file_size / (1024 * 1024), 2) . ' MB' : 'N/A' }}"
+                                                        title="View Details">
+                                                    <i class="feather icon-info"></i>
+                                                </button>
+                                                
+                                                <a href="{{ route('admin.media-files.edit', $file->id) }}" class="btn btn-light-warning" title="Edit Video">
+                                                    <i class="feather icon-edit-2"></i>
+                                                </a>
+                                                
+                                                <form action="{{ route('admin.media-files.destroy', $file->id) }}" method="POST" class="delete-form d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-light-danger btn-delete" title="Delete Video">
+                                                        <i class="feather icon-trash-2"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center py-3">
+                                            <i class="feather icon-folder-open text-muted mb-1" style="font-size: 3rem;"></i>
+                                            <h5 class="text-muted">No media files found</h5>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- Pagination -->
@@ -557,39 +704,30 @@
             });
         });
 
-        // Layout Grid/List Toggle persistence
+        // Layout Grid/Table Toggle persistence
         const btnLayoutGrid = document.getElementById('btn_layout_grid');
-        const btnLayoutList = document.getElementById('btn_layout_list');
-        const mediaContainer = document.getElementById('media_container');
+        const btnLayoutTable = document.getElementById('btn_layout_table');
+        const mediaGridContainer = document.getElementById('media_grid_container');
+        const mediaTableContainer = document.getElementById('media_table_container');
 
         function setLayout(layout) {
             localStorage.setItem('media_layout', layout);
-            if (layout === 'list') {
-                btnLayoutList.classList.add('active');
-                btnLayoutGrid.classList.remove('active');
-                if (mediaContainer) {
-                    mediaContainer.classList.add('layout-list');
-                    document.querySelectorAll('.media-item').forEach(el => {
-                        el.classList.remove('col-xl-3', 'col-lg-4', 'col-md-6');
-                        el.classList.add('col-12');
-                    });
-                }
+            if (layout === 'table' || layout === 'list') { // fallback list to table
+                if (btnLayoutTable) btnLayoutTable.classList.add('active');
+                if (btnLayoutGrid) btnLayoutGrid.classList.remove('active');
+                if (mediaGridContainer) mediaGridContainer.style.display = 'none';
+                if (mediaTableContainer) mediaTableContainer.style.display = 'block';
             } else {
-                btnLayoutGrid.classList.add('active');
-                btnLayoutList.classList.remove('active');
-                if (mediaContainer) {
-                    mediaContainer.classList.remove('layout-list');
-                    document.querySelectorAll('.media-item').forEach(el => {
-                        el.classList.remove('col-12');
-                        el.classList.add('col-xl-3', 'col-lg-4', 'col-md-6');
-                    });
-                }
+                if (btnLayoutGrid) btnLayoutGrid.classList.add('active');
+                if (btnLayoutTable) btnLayoutTable.classList.remove('active');
+                if (mediaGridContainer) mediaGridContainer.style.display = 'flex';
+                if (mediaTableContainer) mediaTableContainer.style.display = 'none';
             }
         }
 
-        if (btnLayoutGrid && btnLayoutList) {
+        if (btnLayoutGrid && btnLayoutTable) {
             btnLayoutGrid.addEventListener('click', () => setLayout('grid'));
-            btnLayoutList.addEventListener('click', () => setLayout('list'));
+            btnLayoutTable.addEventListener('click', () => setLayout('table'));
 
             // Initialize layout from localStorage
             const savedLayout = localStorage.getItem('media_layout') || 'grid';

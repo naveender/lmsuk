@@ -85,9 +85,6 @@ class MediaFile extends Model
         return null;
     }
 
-    /**
-     * Get the public URL of the media asset.
-     */
     public function getUrlAttribute()
     {
         if (in_array($this->type, ['video_file', 's3', 'wasabi'])) {
@@ -95,6 +92,13 @@ class MediaFile extends Model
                 return null;
             }
             $disk = $this->storage_disk ?: 'public';
+            if (in_array($disk, ['s3', 'wasabi'])) {
+                try {
+                    return Storage::disk($disk)->temporaryUrl($this->path, now()->addHours(4));
+                } catch (\Exception $e) {
+                    logger()->warning("Could not generate signed URL for {$disk}: " . $e->getMessage());
+                }
+            }
             return Storage::disk($disk)->url($this->path);
         }
 
