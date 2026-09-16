@@ -11,12 +11,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Models\YearGroup;
 use App\Models\AcademicYear;
+use App\Models\Classes;
 
 class StudentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::where('role', 'student')->with(['studentDetail.parent']);
+        $query = User::where('role', 'student')->with(['studentDetail.parent', 'classes']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -39,7 +40,8 @@ class StudentController extends Controller
         $parents = User::where('role', 'parent')->get();
         $yearGroups = YearGroup::where('is_active', 1)->get();
         $academicYears = AcademicYear::where('is_active', 1)->orderBy('name', 'desc')->get();
-        return view('admin.students.create', compact('parents', 'yearGroups', 'academicYears'));
+        $classes = Classes::where('is_active', true)->orderBy('name')->get();
+        return view('admin.students.create', compact('parents', 'yearGroups', 'academicYears', 'classes'));
     }
 
     public function store(Request $request)
@@ -53,6 +55,7 @@ class StudentController extends Controller
             'date_of_birth' => 'required|date',
             'group_year' => 'required|string|max:255',
             'academic_year' => 'required|string|max:255',
+            'class_id' => 'nullable|exists:classes,id',
             'region' => 'required|string|max:255',
             'student_phone' => 'nullable|string|max:255',
             'gender' => 'required|string|in:male,female,other',
@@ -117,6 +120,13 @@ class StudentController extends Controller
                 'student_phone' => $request->student_phone,
                 'gender' => $request->gender,
             ]);
+
+            // Assign class if selected
+            if ($request->filled('class_id')) {
+                $user->classes()->sync([$request->class_id]);
+            } elseif ($request->filled('class_ids') && is_array($request->class_ids)) {
+                $user->classes()->sync(array_filter($request->class_ids));
+            }
         });
 
         return redirect()->route('admin.students.index')->with('success', 'Student created successfully.');
@@ -127,10 +137,12 @@ class StudentController extends Controller
         if ($student->role !== 'student') {
             abort(404);
         }
+        $student->load('classes');
         $parents = User::where('role', 'parent')->get();
         $yearGroups = YearGroup::where('is_active', 1)->get();
         $academicYears = AcademicYear::where('is_active', 1)->orderBy('name', 'desc')->get();
-        return view('admin.students.edit', compact('student', 'parents', 'yearGroups', 'academicYears'));
+        $classes = Classes::where('is_active', true)->orderBy('name')->get();
+        return view('admin.students.edit', compact('student', 'parents', 'yearGroups', 'academicYears', 'classes'));
     }
 
     public function update(Request $request, User $student)
@@ -147,6 +159,7 @@ class StudentController extends Controller
             'date_of_birth' => 'required|date',
             'group_year' => 'required|string|max:255',
             'academic_year' => 'required|string|max:255',
+            'class_id' => 'nullable|exists:classes,id',
             'region' => 'required|string|max:255',
             'student_phone' => 'nullable|string|max:255',
             'gender' => 'required|string|in:male,female,other',
@@ -185,6 +198,17 @@ class StudentController extends Controller
                     'student_phone' => $request->student_phone,
                     'gender' => $request->gender,
                 ]);
+            }
+
+            // Sync or detach class
+            if ($request->has('class_id')) {
+                if ($request->filled('class_id')) {
+                    $student->classes()->sync([$request->class_id]);
+                } else {
+                    $student->classes()->detach();
+                }
+            } elseif ($request->has('class_ids')) {
+                $student->classes()->sync(array_filter((array) $request->class_ids));
             }
         });
 

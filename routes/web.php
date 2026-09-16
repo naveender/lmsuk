@@ -191,6 +191,18 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('admin/papers/{paper}/assignments', [AdminPaperController::class, 'getAssignments'])->name('admin.papers.assignments');
     Route::post('admin/papers/{paper}/assign', [AdminPaperController::class, 'assign'])->name('admin.papers.assign');
 
+    // Homework Management
+    Route::get('admin/homeworks/{homework}/download', [\App\Http\Controllers\Admin\HomeworkController::class, 'download'])->name('admin.homeworks.download');
+    Route::patch('admin/homeworks/{homework}/toggle-status', [\App\Http\Controllers\Admin\HomeworkController::class, 'toggleStatus'])->name('admin.homeworks.toggle-status');
+    Route::resource('admin/homeworks', \App\Http\Controllers\Admin\HomeworkController::class)->names([
+        'index'   => 'admin.homeworks.index',
+        'create'  => 'admin.homeworks.create',
+        'store'   => 'admin.homeworks.store',
+        'edit'    => 'admin.homeworks.edit',
+        'update'  => 'admin.homeworks.update',
+        'destroy' => 'admin.homeworks.destroy',
+    ]);
+
     // Courses Management
     Route::resource('admin/courses', \App\Http\Controllers\Admin\CourseController::class)->names([
         'index'   => 'admin.courses.index',
@@ -258,6 +270,7 @@ Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
      Route::post('/student/announcements/{announcement}/view', [StudentAnnouncementsController::class, 'view'])->name('student.announcements.view');
      Route::get('/student/centretestscores', [StudentCentreTestScoreController::class, 'index'])->name('student.centretestscores');
      Route::get('/student/weeklytests', [StudentAssessmentsController::class, 'weeklyTests'])->name('student.weeklytests');
+     Route::get('/student/homeworks/{homework}/download', [StudentAssessmentsController::class, 'downloadHomework'])->name('student.homeworks.download');
      Route::post('/student/media/progress', [StudentAssessmentsController::class, 'updateVideoProgress'])->name('student.media.progress');
    
 });

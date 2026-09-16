@@ -45,4 +45,15 @@ class Course extends Model
             ->withTimestamps()
             ->orderByPivot('week');
     }
+
+    /**
+     * Get the homeworks associated with the course.
+     */
+    public function homeworks()
+    {
+        return $this->belongsToMany(Homework::class, 'course_homework')
+            ->withPivot('week', 'week_id')
+            ->withTimestamps()
+            ->orderByPivot('week');
+    }
 }

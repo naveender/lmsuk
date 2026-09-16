@@ -1263,6 +1263,46 @@
                     </ul>
                 </li>
 
+                <!-- Homework Manager (Submenu) -->
+                @php
+                    $homeworksActive = request()->routeIs('admin.homeworks.*');
+                @endphp
+                <li class="menu-item-wrapper has-submenu {{ $homeworksActive ? 'open' : '' }}" data-title="Homework Manager"
+                    data-tooltip="Homework Manager">
+                    <div class="menu-link submenu-toggle" tabindex="0" aria-haspopup="true"
+                        aria-expanded="{{ $homeworksActive ? 'true' : 'false' }}">
+                        <i data-lucide="book-open"></i>
+                        <span class="menu-text">Homework Manager</span>
+                        <i data-lucide="chevron-down" class="submenu-arrow"></i>
+                    </div>
+                    <ul class="submenu-items">
+                        <li class="{{ request()->routeIs('admin.homeworks.create') ? 'active' : '' }}"
+                            data-title="Create New Homework" data-route="{{ route('admin.homeworks.create') }}"
+                            data-icon="file-plus">
+                            <a href="{{ route('admin.homeworks.create') }}" class="menu-link">
+                                <i data-lucide="file-plus"></i>
+                                <span class="menu-text">Create New Homework</span>
+                            </a>
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Create New Homework">
+                                <i data-lucide="star"></i>
+                            </button>
+                        </li>
+                        <li class="{{ request()->routeIs('admin.homeworks.index') ? 'active' : '' }}"
+                            data-title="Homeworks Directory" data-route="{{ route('admin.homeworks.index') }}"
+                            data-icon="files">
+                            <a href="{{ route('admin.homeworks.index') }}" class="menu-link">
+                                <i data-lucide="files"></i>
+                                <span class="menu-text">Homeworks Directory</span>
+                            </a>
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Homeworks Directory">
+                                <i data-lucide="star"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </li>
+
                 <!-- Create a Report -->
                 <li class="menu-item-wrapper" data-title="Create a Report" data-route="#" data-icon="bar-chart-2"
                     data-tooltip="Create a Report">

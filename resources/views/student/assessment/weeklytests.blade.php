@@ -400,6 +400,138 @@
 
                 </div>
 
+                <!-- 3. HOMEWORK TASKS -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="homework-section-wrapper mb-4">
+                            <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap" style="gap: 10px;">
+                                <h5 class="section-heading mb-0 font-weight-extrabold text-dark d-flex align-items-center">
+                                    <i class="feather icon-book-open mr-1 text-primary"></i> 3. HOMEWORK TASKS
+                                </h5>
+                                @if(isset($homeworks) && $homeworks->isNotEmpty())
+                                    <span class="badge badge-light-primary font-small-2 font-weight-bold px-1 py-50">
+                                        <i class="feather icon-file-text mr-25"></i> {{ $homeworks->count() }} {{ \Illuminate\Support\Str::plural('Assignment', $homeworks->count()) }} Scheduled
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="card shadow-sm border-0 overflow-hidden">
+                                <div class="table-responsive">
+                                    <table class="table table-hover evaluation-table mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 8%;">Type</th>
+                                                <th style="width: 32%;">Homework Task Title & Instructions</th>
+                                                <th style="width: 25%;">Curriculum Topic & Class</th>
+                                                <th style="width: 15%;" class="text-center">Due Date</th>
+                                                <th style="width: 20%; text-align: right;">Attachment File</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($homeworks as $homework)
+                                                <tr>
+                                                    <td>
+                                                        <div class="type-badge bg-light-warning text-warning font-weight-extrabold text-center" 
+                                                             title="Homework Assignment" 
+                                                             style="width: 32px; height: 32px; line-height: 32px; border-radius: 6px; font-size: 0.85rem; background-color: rgba(255, 159, 67, 0.12); color: #ff9f43; border: 1px solid rgba(255, 159, 67, 0.3);">
+                                                            HW
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="font-weight-bold text-dark module-title mb-25">{{ $homework->title }}</div>
+                                                        @if($homework->description)
+                                                            <div class="text-muted font-small-2" style="max-width: 500px; line-height: 1.4;">
+                                                                {{ \Illuminate\Support\Str::limit(strip_tags($homework->description), 130) }}
+                                                            </div>
+                                                        @else
+                                                            <span class="text-muted font-small-1 font-italic">No additional instructions</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex flex-wrap align-items-center mb-50" style="gap: 5px;">
+                                                            <span class="badge badge-light-secondary font-small-1 font-weight-semibold">
+                                                                <i class="feather icon-bookmark mr-25"></i>{{ $homework->subject->title ?? 'General' }}
+                                                            </span>
+                                                            @if($homework->topic)
+                                                                <span class="badge badge-light-primary font-small-1 font-weight-semibold">
+                                                                    {{ $homework->topic->name }}
+                                                                </span>
+                                                            @endif
+                                                            @if($homework->subtopic)
+                                                                <span class="badge badge-light-info font-small-1 font-weight-semibold">
+                                                                    {{ $homework->subtopic->name }}
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                        @if($homework->class || $homework->yearGroup || $homework->academic_year)
+                                                            <div class="text-muted font-small-1 d-flex flex-wrap align-items-center" style="gap: 10px;">
+                                                                @if($homework->class)
+                                                                    <span><i class="feather icon-users mr-25 text-secondary"></i>{{ $homework->class->name }}</span>
+                                                                @endif
+                                                                @if($homework->yearGroup)
+                                                                    <span><i class="feather icon-calendar mr-25 text-secondary"></i>{{ $homework->yearGroup->title ?? $homework->yearGroup->value }}</span>
+                                                                @endif
+                                                                @if($homework->academic_year)
+                                                                    <span><i class="feather icon-clock mr-25 text-secondary"></i>{{ $homework->academic_year }}</span>
+                                                                @endif
+                                                            </div>
+                                                        @endif
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @if($selectedWeekDueDate)
+                                                            <div class="font-weight-bold font-small-2 text-dark">
+                                                                {{ \Carbon\Carbon::parse($selectedWeekDueDate)->format('d M Y') }}
+                                                            </div>
+                                                            <small class="text-muted font-small-1 font-weight-semibold">
+                                                                {{ \Carbon\Carbon::parse($selectedWeekDueDate)->format('h:i A') }}
+                                                            </small>
+                                                        @else
+                                                            <span class="text-muted font-small-2 font-weight-semibold">{{ $selectedWeekName ?? 'Week Schedule' }}</span>
+                                                        @endif
+                                                    </td>
+                                                    <td style="text-align: right;">
+                                                        @if($homework->file_path)
+                                                            <div class="d-inline-flex flex-column align-items-end">
+                                                                <a href="{{ route('student.homeworks.download', $homework->id) }}" 
+                                                                   class="download-btn-custom shadow-sm"
+                                                                   title="Download {{ $homework->file_name ?: 'Attached File' }}">
+                                                                    <i class="feather icon-download mr-50"></i> Download
+                                                                </a>
+                                                                <div class="text-muted font-small-1 mt-25 d-inline-flex align-items-center">
+                                                                    <span class="badge badge-light-secondary font-small-1 mr-50 text-uppercase font-weight-bold">
+                                                                        {{ $homework->file_type ?? 'FILE' }}
+                                                                    </span>
+                                                                    @if($homework->formatted_file_size)
+                                                                        <span>{{ $homework->formatted_file_size }}</span>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                        @else
+                                                            <span class="badge badge-light-secondary px-1 py-50 font-small-2">
+                                                                <i class="feather icon-slash mr-25"></i> No attachment
+                                                            </span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted py-5">
+                                                        <div class="my-2">
+                                                            <i class="feather icon-book-open font-large-3 text-secondary mb-1 d-block" style="opacity: 0.35;"></i>
+                                                            <h5 class="text-dark font-weight-bold mb-50">No Homework Tasks Scheduled</h5>
+                                                            <p class="mb-0 text-secondary font-small-3">There are no homework tasks assigned for this course and week schedule.</p>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -765,6 +897,35 @@
             color: #ffffff !important;
             border-color: #4a5568 !important;
             transform: translateY(-1px) !important;
+            text-decoration: none !important;
+        }
+
+        .download-btn-custom {
+            background-color: #7367f0 !important;
+            color: #ffffff !important;
+            border: 1px solid #7367f0 !important;
+            border-radius: 6px !important;
+            font-size: 0.8rem !important;
+            padding: 6px 14px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-weight: 700 !important;
+            transition: all 0.2s ease-in-out !important;
+            cursor: pointer !important;
+            text-decoration: none !important;
+            min-width: 100px !important;
+            line-height: 1.5 !important;
+            box-sizing: border-box !important;
+            box-shadow: 0 2px 4px rgba(115, 103, 240, 0.2) !important;
+        }
+
+        .download-btn-custom:hover {
+            background-color: #5e50ee !important;
+            border-color: #5e50ee !important;
+            color: #ffffff !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 8px rgba(115, 103, 240, 0.3) !important;
             text-decoration: none !important;
         }
 
