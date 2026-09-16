@@ -78,6 +78,7 @@
                                                 <th>#</th>
                                                 <th>Name</th>
                                                 <th>Email</th>
+                                                <th>Class</th>
                                                 <th>Parent</th>
                                                 <th>Actions</th>
                                             </tr>
@@ -88,6 +89,17 @@
                                                     <td>{{ $students->firstItem() + $index }}</td>
                                                     <td>{{ $student->name }}</td>
                                                     <td>{{ $student->email }}</td>
+                                                    <td>
+                                                        @if($student->classes->isNotEmpty())
+                                                            @foreach($student->classes as $c)
+                                                                <a href="{{ route('admin.classes.students', $c->id) }}" class="badge badge-pill badge-light-primary mr-50" title="View class members">
+                                                                    <i class="feather icon-book mr-25"></i>{{ $c->name }}
+                                                                </a>
+                                                            @endforeach
+                                                        @else
+                                                            <span class="badge badge-pill badge-light-secondary">No Class</span>
+                                                        @endif
+                                                    </td>
                                                     <td>
                                                         @if($student->studentDetail && $student->studentDetail->parent)
                                                             <a href="{{ route('admin.parents.show', $student->studentDetail->parent_id) }}" class="text-primary font-weight-bold" title="View Parent Profile">
@@ -112,7 +124,7 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="5" class="text-center">No students found.</td>
+                                                    <td colspan="6" class="text-center">No students found.</td>
                                                 </tr>
                                             @endforelse
                                         </tbody>

@@ -11,8 +11,10 @@ use App\Models\Course;
 use App\Models\StudentAnswer;
 use App\Models\Question;
 use App\Models\QuestionOption;
+use App\Models\Homework;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class AssessmentController extends Controller
@@ -30,24 +32,32 @@ class AssessmentController extends Controller
         // 2. Get all active courses
         $courses = Course::where('is_active', true)->orderBy('name')->get();
 
-        // 3. Get all weeks defined in course_paper (or weeks of the selected course if filtered)
+        // 3. Get all weeks defined in course_paper, course_homework, or course_media_file (or weeks of the selected course if filtered)
         $weeksQuery = \App\Models\Week::query();
         if ($request->filled('course_id')) {
             $weeksQuery->where('course_id', $request->course_id);
         } else {
-            $weeksQuery->whereIn('id', function($q) use ($student) {
-                $q->select('week_id')
-                  ->from('course_paper')
-                  ->whereNotNull('week_id');
+            $weeksQuery->where(function($sub) {
+                $sub->whereIn('id', function($q) {
+                    $q->select('week_id')->from('course_paper')->whereNotNull('week_id');
+                })->orWhereIn('id', function($q) {
+                    $q->select('week_id')->from('course_homework')->whereNotNull('week_id');
+                })->orWhereIn('id', function($q) {
+                    $q->select('week_id')->from('course_media_file')->whereNotNull('week_id');
+                });
             });
         }
         $weeks = $weeksQuery->orderBy('due_date')->orderBy('name')->get();
 
-        // Get all weeks defined in course_paper for dynamic filtering on the frontend
-        $allWeeks = \App\Models\Week::whereIn('id', function($q) use ($student) {
-            $q->select('week_id')
-              ->from('course_paper')
-              ->whereNotNull('week_id');
+        // Get all weeks defined in course_paper, course_homework, or course_media_file for dynamic filtering on the frontend
+        $allWeeks = \App\Models\Week::where(function($sub) {
+            $sub->whereIn('id', function($q) {
+                $q->select('week_id')->from('course_paper')->whereNotNull('week_id');
+            })->orWhereIn('id', function($q) {
+                $q->select('week_id')->from('course_homework')->whereNotNull('week_id');
+            })->orWhereIn('id', function($q) {
+                $q->select('week_id')->from('course_media_file')->whereNotNull('week_id');
+            });
         })->orderBy('due_date')->orderBy('name')->get();
 
         // 4. Query papers that are assigned to a course and are visible to the student
@@ -245,7 +255,7 @@ class AssessmentController extends Controller
         }
         $courseTitle = $selectedCourse ? $selectedCourse->name : ($courses->first()?->name ?? 'YS Maths (Sat)');
 
-        // Media files weekly query based on student profile visibility settings
+        // Media files & homework weekly query based on student profile visibility settings
         $detail = $student->studentDetail;
         $groupYearName = $detail?->group_year;
         $academicYearVal = $detail?->academic_year;
@@ -258,6 +268,45 @@ class AssessmentController extends Controller
                 ->value('id');
         }
 
+        // 1. Resolve Year Group IDs (from student details and from assigned classes)
+        $yearGroupIds = collect();
+        if ($yearGroupId) {
+            $yearGroupIds->push($yearGroupId);
+        }
+        $classGroupYears = $student->classes()->pluck('classes.group_year')->filter();
+        if ($classGroupYears->isNotEmpty()) {
+            $classYgIds = \App\Models\YearGroup::whereIn('value', $classGroupYears)
+                ->orWhereIn('title', $classGroupYears)
+                ->pluck('id');
+            $yearGroupIds = $yearGroupIds->merge($classYgIds);
+        }
+        $yearGroupIds = $yearGroupIds->unique()->filter()->values();
+
+        // 2. Resolve Academic Years (both names like "2026-2027" and IDs like 4, from student details and assigned classes)
+        $studentAcademicYears = collect();
+        if ($academicYearVal) {
+            $studentAcademicYears->push($academicYearVal);
+            if (is_numeric($academicYearVal)) {
+                $ayName = \App\Models\AcademicYear::find($academicYearVal)?->name;
+                if ($ayName) $studentAcademicYears->push($ayName);
+            } else {
+                $ayId = \App\Models\AcademicYear::where('name', $academicYearVal)->value('id');
+                if ($ayId) $studentAcademicYears->push((string)$ayId);
+            }
+        }
+        $classAcademicYears = $student->classes()->pluck('classes.academic_year')->filter();
+        foreach ($classAcademicYears as $cay) {
+            $studentAcademicYears->push($cay);
+            if (is_numeric($cay)) {
+                $ayName = \App\Models\AcademicYear::find($cay)?->name;
+                if ($ayName) $studentAcademicYears->push($ayName);
+            } else {
+                $ayId = \App\Models\AcademicYear::where('name', $cay)->value('id');
+                if ($ayId) $studentAcademicYears->push((string)$ayId);
+            }
+        }
+        $studentAcademicYears = $studentAcademicYears->unique()->filter()->values();
+
         $selectedCourseId = $selectedCourse ? $selectedCourse->id : ($courses->first()?->id ?? null);
         $selectedWeekId = $selectedWeekModel ? $selectedWeekModel->id : ($weeks->first()?->id ?? null);
 
@@ -268,38 +317,43 @@ class AssessmentController extends Controller
         }
 
         // Visibility matches
+        // Class matching: if media file has a class_id, student must belong to that class
         $mediaFilesQuery->where(function($q) use ($classIds) {
+            $q->whereNull('class_id');
             if ($classIds->isNotEmpty()) {
-                $q->whereNull('class_id')->orWhereIn('class_id', $classIds);
-            } else {
-                $q->whereNull('class_id');
+                $q->orWhereIn('class_id', $classIds);
             }
         });
 
-        $mediaFilesQuery->where(function($q) use ($yearGroupId) {
-            if ($yearGroupId) {
-                $q->whereNull('year_group_id')->orWhere('year_group_id', $yearGroupId);
-            } else {
-                $q->whereNull('year_group_id');
+        // Year Group matching: if media file has a year_group_id, student must belong to that year group
+        $mediaFilesQuery->where(function($q) use ($yearGroupIds) {
+            $q->whereNull('year_group_id');
+            if ($yearGroupIds->isNotEmpty()) {
+                $q->orWhereIn('year_group_id', $yearGroupIds);
             }
         });
 
-        $mediaFilesQuery->where(function($q) use ($academicYearVal) {
-            if ($academicYearVal) {
-                $q->whereNull('academic_year')->orWhere('academic_year', $academicYearVal);
-            } else {
-                $q->whereNull('academic_year');
+        // Academic Year matching: if media file has an academic_year, student must match that academic year
+        $mediaFilesQuery->where(function($q) use ($studentAcademicYears) {
+            $q->whereNull('academic_year');
+            if ($studentAcademicYears->isNotEmpty()) {
+                $q->orWhereIn('academic_year', $studentAcademicYears);
             }
         });
 
         // Weekly schedule pivot match
         if ($selectedCourseId && $selectedWeekId) {
-            $mediaFilesQuery->whereHas('courses', function ($q) use ($selectedCourseId, $selectedWeekId) {
-                $q->where('course_media_file.course_id', $selectedCourseId)
-                  ->where('course_media_file.week_id', $selectedWeekId);
+            $mediaFilesQuery->where(function ($q) use ($selectedCourseId, $selectedWeekId) {
+                $q->whereHas('courses', function ($cq) use ($selectedCourseId, $selectedWeekId) {
+                    $cq->where('course_media_file.course_id', $selectedCourseId)
+                       ->where(function ($wq) use ($selectedWeekId) {
+                           $wq->where('course_media_file.week_id', $selectedWeekId)
+                              ->orWhereNull('course_media_file.week_id');
+                       });
+                })->orWhereDoesntHave('courses');
             });
         } else {
-            $mediaFilesQuery->whereRaw('0 = 1');
+            $mediaFilesQuery->whereDoesntHave('courses');
         }
 
         $mediaFiles = $mediaFilesQuery->orderBy('created_at', 'desc')->get();
@@ -310,7 +364,92 @@ class AssessmentController extends Controller
             ->get()
             ->keyBy('media_file_id');
 
-        return view('student.assessment.weeklytests', compact('subjects', 'courses', 'weeks', 'papers', 'metrics', 'courseTitle', 'selectedWeekName', 'allWeeks', 'mediaFiles', 'videoProgressMap'));
+        // Homework tasks weekly query based on student profile visibility settings & selected course/week
+        $homeworksQuery = Homework::with(['subject', 'topic', 'subtopic', 'class', 'yearGroup', 'courses'])
+            ->where('is_active', true);
+
+        if ($request->filled('subject_id')) {
+            $homeworksQuery->where('subject_id', $request->subject_id);
+        }
+
+        // 1. Class matching: if homework has a class_id, student must be enrolled in that class
+        $homeworksQuery->where(function ($q) use ($classIds) {
+            $q->whereNull('class_id');
+            if ($classIds->isNotEmpty()) {
+                $q->orWhereIn('class_id', $classIds);
+            }
+        });
+
+        // 2. Year Group matching: if homework has a year_group_id, student must belong to that year group
+        $homeworksQuery->where(function ($q) use ($yearGroupIds) {
+            $q->whereNull('year_group_id');
+            if ($yearGroupIds->isNotEmpty()) {
+                $q->orWhereIn('year_group_id', $yearGroupIds);
+            }
+        });
+
+        // 3. Academic Year matching: if homework has an academic_year, student must match that academic year
+        $homeworksQuery->where(function ($q) use ($studentAcademicYears) {
+            $q->whereNull('academic_year');
+            if ($studentAcademicYears->isNotEmpty()) {
+                $q->orWhereIn('academic_year', $studentAcademicYears);
+            }
+        });
+
+        // 4. Weekly schedule pivot match
+        if ($selectedCourseId && $selectedWeekId) {
+            $homeworksQuery->where(function ($q) use ($selectedCourseId, $selectedWeekId) {
+                $q->whereHas('courses', function ($cq) use ($selectedCourseId, $selectedWeekId) {
+                    $cq->where('course_homework.course_id', $selectedCourseId)
+                       ->where('course_homework.week_id', $selectedWeekId);
+                })->orWhereDoesntHave('courses');
+            });
+        } else {
+            $homeworksQuery->whereDoesntHave('courses');
+        }
+
+        $homeworks = $homeworksQuery->orderBy('created_at', 'desc')->get();
+
+        return view('student.assessment.weeklytests', compact(
+            'subjects',
+            'courses',
+            'weeks',
+            'papers',
+            'metrics',
+            'courseTitle',
+            'selectedWeekName',
+            'selectedWeekDueDate',
+            'allWeeks',
+            'mediaFiles',
+            'videoProgressMap',
+            'homeworks'
+        ));
+    }
+
+    /**
+     * Download homework file for student.
+     */
+    public function downloadHomework(Homework $homework)
+    {
+        if (!$homework->is_active) {
+            return redirect()->back()->with('error', 'This homework assignment is currently inactive or not available.');
+        }
+
+        $student = auth()->user();
+        if ($student && $student->role === 'student' && $homework->class_id) {
+            $classIds = $student->classes()->pluck('classes.id');
+            if (!$classIds->contains($homework->class_id)) {
+                abort(403, 'You do not have permission to access this homework assignment.');
+            }
+        }
+
+        if (!$homework->file_path || !Storage::disk('public')->exists($homework->file_path)) {
+            return redirect()->back()->with('error', 'The requested file does not exist or has been deleted.');
+        }
+
+        $downloadName = $homework->file_name ?: basename($homework->file_path);
+
+        return Storage::disk('public')->download($homework->file_path, $downloadName);
     }
 
     /**

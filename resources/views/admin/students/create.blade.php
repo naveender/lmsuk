@@ -105,7 +105,7 @@
                                         <div class="col-12 col-sm-6">
                                             <div class="form-group">
                                                 <label>Group Year</label>
-                                                <select class="form-control" name="group_year" required>
+                                                <select class="form-control" name="group_year" id="student_group_year" required>
                                                     <option value="">--Select Group Year--</option>
                                                     @foreach ($yearGroups as $year)
                                                         <option value="{{ $year->value }}" {{ old('group_year') == $year->value ? 'selected' : '' }}>
@@ -118,7 +118,7 @@
                                         <div class="col-12 col-sm-6">
                                             <div class="form-group">
                                                 <label>Academic Year</label>
-                                                <select class="form-control" name="academic_year" required>
+                                                <select class="form-control" name="academic_year" id="student_academic_year" required>
                                                     <option value="">--Select Academic Year--</option>
                                                     @foreach ($academicYears as $year)
                                                         <option value="{{ $year->id }}" {{ old('academic_year') == $year->id ? 'selected' : '' }}>
@@ -126,6 +126,28 @@
                                                         </option>
                                                     @endforeach
                                                 </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                            <div class="form-group">
+                                                <label>Assign to Class</label>
+                                                <select class="form-control" name="class_id" id="class_id">
+                                                    <option value="">-- Select Class (Optional) --</option>
+                                                    @foreach ($classes as $class)
+                                                        @php
+                                                            $matchingAy = $academicYears->firstWhere('name', $class->academic_year);
+                                                            $ayId = $matchingAy ? $matchingAy->id : '';
+                                                        @endphp
+                                                        <option value="{{ $class->id }}"
+                                                            data-group-year="{{ $class->group_year }}"
+                                                            data-academic-year-id="{{ $ayId }}"
+                                                            data-academic-year-name="{{ $class->academic_year }}"
+                                                            {{ old('class_id') == $class->id ? 'selected' : '' }}>
+                                                            {{ $class->name }} ({{ $class->group_year }} &bull; {{ $class->academic_year }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <small class="text-muted">Optionally assign this student to a class.</small>
                                             </div>
                                         </div>
                                         <div class="col-12 col-sm-6">
@@ -447,6 +469,61 @@
             // === Initialize parent mode from old value ===
             const initialMode = document.getElementById('parent_mode').value || 'new';
             setParentMode(initialMode);
+
+            // === Class Filtering by Group Year and Academic Year ===
+            const groupYearSelect = document.getElementById('student_group_year');
+            const academicYearSelect = document.getElementById('student_academic_year');
+            const classSelect = document.getElementById('class_id');
+
+            function filterClasses() {
+                if (!classSelect || !groupYearSelect || !academicYearSelect) return;
+                const selectedGy = groupYearSelect.value;
+                const selectedAyId = academicYearSelect.value;
+
+                if (!selectedGy && !selectedAyId) {
+                    Array.from(classSelect.options).forEach(opt => {
+                        opt.style.display = '';
+                        opt.disabled = false;
+                    });
+                    return;
+                }
+
+                let matchCount = 0;
+                Array.from(classSelect.options).forEach((opt, idx) => {
+                    if (idx === 0) return;
+                    const optGy = opt.getAttribute('data-group-year');
+                    const optAyId = opt.getAttribute('data-academic-year-id');
+
+                    let match = true;
+                    if (selectedGy && optGy && optGy !== selectedGy) match = false;
+                    if (selectedAyId && optAyId && optAyId !== selectedAyId) match = false;
+
+                    if (match) {
+                        opt.style.display = '';
+                        opt.disabled = false;
+                        matchCount++;
+                    } else {
+                        opt.style.display = 'none';
+                        opt.disabled = true;
+                    }
+                });
+
+                if (matchCount === 0) {
+                    Array.from(classSelect.options).forEach(opt => {
+                        opt.style.display = '';
+                        opt.disabled = false;
+                    });
+                } else {
+                    const selectedOpt = classSelect.options[classSelect.selectedIndex];
+                    if (selectedOpt && selectedOpt.disabled) {
+                        classSelect.value = '';
+                    }
+                }
+            }
+
+            if (groupYearSelect) groupYearSelect.addEventListener('change', filterClasses);
+            if (academicYearSelect) academicYearSelect.addEventListener('change', filterClasses);
+            filterClasses();
         });
 
         function setParentMode(mode) {

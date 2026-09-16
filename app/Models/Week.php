@@ -33,4 +33,14 @@ class Week extends Model
             ->withPivot('course_id', 'week')
             ->withTimestamps();
     }
+
+    /**
+     * Get the homeworks assigned to this week.
+     */
+    public function homeworks()
+    {
+        return $this->belongsToMany(Homework::class, 'course_homework', 'week_id', 'homework_id')
+            ->withPivot('course_id', 'week')
+            ->withTimestamps();
+    }
 }

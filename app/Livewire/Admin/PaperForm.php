@@ -76,7 +76,7 @@ class PaperForm extends Component
     public $perPage = 15;
 
     protected $rules = [
-        'type' => 'required|in:test,exam,quiz,homework',
+        'type' => 'required|in:test,exam,quiz',
         'title' => 'required|string|max:255',
         'instruction' => 'nullable|string',
         'subject_id' => 'required|exists:subjects,id',

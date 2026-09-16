@@ -34,7 +34,7 @@
             /* Premium Radio Tiles Grid */
             .paper-type-grid {
                 display: grid;
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(3, 1fr);
                 gap: 16px;
                 margin-top: 8px;
             }
@@ -150,19 +150,7 @@
                 color: #7367F0;
             }
 
-            /* Homework: Info Theme */
-            .paper-type-tile.type-homework.active {
-                border-color: #00CFE8;
-                background-color: rgba(0, 207, 232, 0.05);
-                box-shadow: 0 8px 20px -6px rgba(0, 207, 232, 0.25);
-            }
-            .paper-type-tile.type-homework.active .icon-wrapper {
-                background-color: #00CFE8;
-                color: #ffffff !important;
-            }
-            .paper-type-tile.type-homework.active .tile-title {
-                color: #00CFE8;
-            }
+
 
             /* Checkmark indicator badge */
             .paper-type-tile .check-badge {
@@ -189,7 +177,6 @@
             .paper-type-tile.type-test.active .check-badge { background: #FF9F43; }
             .paper-type-tile.type-exam.active .check-badge { background: #28C76F; }
             .paper-type-tile.type-quiz.active .check-badge { background: #7367F0; }
-            .paper-type-tile.type-homework.active .check-badge { background: #00CFE8; }
         </style>
     @endpush
 
@@ -247,19 +234,6 @@
                                     </div>
                                     <span class="tile-title">Quiz</span>
                                     <span class="tile-description">Quick knowledge checks & quizzes</span>
-                                </label>
-
-                                <!-- Homework Card -->
-                                <label class="paper-type-tile type-homework {{ $type === 'homework' ? 'active' : '' }}" for="type_homework">
-                                    <input type="radio" class="sr-only" id="type_homework" value="homework" wire:model.live="type">
-                                    <div class="check-badge">
-                                        <i class="feather icon-check"></i>
-                                    </div>
-                                    <div class="icon-wrapper text-info">
-                                        <i class="feather icon-book-open"></i>
-                                    </div>
-                                    <span class="tile-title">Homework</span>
-                                    <span class="tile-description">Take-home learning activities</span>
                                 </label>
                             </div>
                             @error('type') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
