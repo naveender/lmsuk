@@ -1511,10 +1511,10 @@
                 <span>{{ $user->email ?? 'admin@aspire.com' }}</span>
             </div>
             <hr class="dropdown-divider">
-            <a href="{{ route('edit-profile') }}" class="dropdown-item" role="menuitem">
+            <a href="{{ route('account.index') }}" class="dropdown-item" role="menuitem">
                 <i data-lucide="user"></i> My Account
             </a>
-            <a href="{{ route('edit-profile') }}" class="dropdown-item" role="menuitem">
+            <a href="{{ route('settings.index') }}" class="dropdown-item" role="menuitem">
                 <i data-lucide="settings"></i> Settings
             </a>
             <a href="{{ route('change.theme') }}" class="dropdown-item" role="menuitem">

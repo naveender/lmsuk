@@ -7,6 +7,7 @@ use App\Http\Controllers\LogsController;
 use App\Http\Controllers\ManualBackupManagerController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\EditProfileController;
+use App\Http\Controllers\AccountController;
 
 use App\Http\Controllers\Admin\UsersController as AdminUsersController;
 use App\Http\Controllers\Admin\StudentController as AdminStudentController;
@@ -40,7 +41,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/logs', [LogsController::class, 'index'])->name('logs');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
-    Route::get('/edit-profile', [SettingsController::class, 'profile'])->name('edit-profile');
+
+    // Account & Profile Management
+    Route::get('/account', [AccountController::class, 'index'])->name('account.index');
+    Route::get('/edit-profile', [AccountController::class, 'index'])->name('edit-profile');
+    Route::put('/account/profile', [AccountController::class, 'updateProfile'])->name('account.updateProfile');
+    Route::put('/account/password', [AccountController::class, 'updatePassword'])->name('account.updatePassword');
 });
 
 // Dashboard redirect after login

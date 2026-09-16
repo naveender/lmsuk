@@ -33,10 +33,10 @@
                                     alt="avatar" height="40" width="40"></span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="{{ route('edit-profile') }}"><i
+                            <a class="dropdown-item" href="{{ route('account.index') }}"><i
                                     class="feather icon-user"></i>
                                 My Account</a>
-                            <a class="dropdown-item" href="{{ route('edit-profile') }}"><i
+                            <a class="dropdown-item" href="{{ route('settings.index') }}"><i
                                     class="feather icon-settings"></i>
                                 Settings</a>
                             <a class="dropdown-item" href="{{ route('change.theme') }}" id="themeToggleBtn"><i
