@@ -33,32 +33,68 @@ class LessonsController extends Controller
                 ->value('id');
         }
 
+        // 1. Resolve Year Group IDs (from student details and assigned classes)
+        $yearGroupIds = collect();
+        if ($yearGroupId) {
+            $yearGroupIds->push($yearGroupId);
+        }
+        $classGroupYears = $student->classes()->pluck('classes.group_year')->filter();
+        if ($classGroupYears->isNotEmpty()) {
+            $classYgIds = YearGroup::whereIn('value', $classGroupYears)
+                ->orWhereIn('title', $classGroupYears)
+                ->pluck('id');
+            $yearGroupIds = $yearGroupIds->merge($classYgIds);
+        }
+        $yearGroupIds = $yearGroupIds->unique()->filter()->values();
+
+        // 2. Resolve Academic Years (both names like "2026-2027" and IDs like 4, from student details and assigned classes)
+        $studentAcademicYears = collect();
+        if ($academicYearVal) {
+            $studentAcademicYears->push($academicYearVal);
+            if (is_numeric($academicYearVal)) {
+                $ayName = \App\Models\AcademicYear::find($academicYearVal)?->name;
+                if ($ayName) $studentAcademicYears->push($ayName);
+            } else {
+                $ayId = \App\Models\AcademicYear::where('name', $academicYearVal)->value('id');
+                if ($ayId) $studentAcademicYears->push((string)$ayId);
+            }
+        }
+        $classAcademicYears = $student->classes()->pluck('classes.academic_year')->filter();
+        foreach ($classAcademicYears as $cay) {
+            $studentAcademicYears->push($cay);
+            if (is_numeric($cay)) {
+                $ayName = \App\Models\AcademicYear::find($cay)?->name;
+                if ($ayName) $studentAcademicYears->push($ayName);
+            } else {
+                $ayId = \App\Models\AcademicYear::where('name', $cay)->value('id');
+                if ($ayId) $studentAcademicYears->push((string)$ayId);
+            }
+        }
+        $studentAcademicYears = $studentAcademicYears->unique()->filter()->values();
+
         // Build base query for general (unassigned) published video files
         $baseQuery = MediaFile::where('publication_status', 'published')
             ->whereDoesntHave('courses');
 
         // Apply visibility filters
         $baseQuery->where(function ($q) use ($classIds) {
+            $q->whereNull('class_id');
             if ($classIds->isNotEmpty()) {
-                $q->whereNull('class_id')->orWhereIn('class_id', $classIds);
-            } else {
-                $q->whereNull('class_id');
+                $q->orWhereIn('class_id', $classIds);
             }
         });
 
-        $baseQuery->where(function ($q) use ($yearGroupId) {
-            if ($yearGroupId) {
-                $q->whereNull('year_group_id')->orWhere('year_group_id', $yearGroupId);
-            } else {
-                $q->whereNull('year_group_id');
+        $baseQuery->where(function ($q) use ($yearGroupIds) {
+            $q->whereNull('year_group_id');
+            if ($yearGroupIds->isNotEmpty()) {
+                $q->orWhereIn('year_group_id', $yearGroupIds);
             }
         });
 
-        $baseQuery->where(function ($q) use ($academicYearVal) {
-            if ($academicYearVal) {
-                $q->whereNull('academic_year')->orWhere('academic_year', $academicYearVal);
-            } else {
-                $q->whereNull('academic_year');
+        $baseQuery->where(function ($q) use ($studentAcademicYears) {
+            $q->whereNull('academic_year');
+            if ($studentAcademicYears->isNotEmpty()) {
+                $q->orWhereIn('academic_year', $studentAcademicYears);
             }
         });
 
@@ -122,6 +158,45 @@ class LessonsController extends Controller
                 ->value('id');
         }
 
+        // 1. Resolve Year Group IDs (from student details and assigned classes)
+        $yearGroupIds = collect();
+        if ($yearGroupId) {
+            $yearGroupIds->push($yearGroupId);
+        }
+        $classGroupYears = $student->classes()->pluck('classes.group_year')->filter();
+        if ($classGroupYears->isNotEmpty()) {
+            $classYgIds = YearGroup::whereIn('value', $classGroupYears)
+                ->orWhereIn('title', $classGroupYears)
+                ->pluck('id');
+            $yearGroupIds = $yearGroupIds->merge($classYgIds);
+        }
+        $yearGroupIds = $yearGroupIds->unique()->filter()->values();
+
+        // 2. Resolve Academic Years (both names like "2026-2027" and IDs like 4, from student details and assigned classes)
+        $studentAcademicYears = collect();
+        if ($academicYearVal) {
+            $studentAcademicYears->push($academicYearVal);
+            if (is_numeric($academicYearVal)) {
+                $ayName = \App\Models\AcademicYear::find($academicYearVal)?->name;
+                if ($ayName) $studentAcademicYears->push($ayName);
+            } else {
+                $ayId = \App\Models\AcademicYear::where('name', $academicYearVal)->value('id');
+                if ($ayId) $studentAcademicYears->push((string)$ayId);
+            }
+        }
+        $classAcademicYears = $student->classes()->pluck('classes.academic_year')->filter();
+        foreach ($classAcademicYears as $cay) {
+            $studentAcademicYears->push($cay);
+            if (is_numeric($cay)) {
+                $ayName = \App\Models\AcademicYear::find($cay)?->name;
+                if ($ayName) $studentAcademicYears->push($ayName);
+            } else {
+                $ayId = \App\Models\AcademicYear::where('name', $cay)->value('id');
+                if ($ayId) $studentAcademicYears->push((string)$ayId);
+            }
+        }
+        $studentAcademicYears = $studentAcademicYears->unique()->filter()->values();
+
         // Query general (unassigned) published videos for this subject
         $mediaQuery = MediaFile::where('publication_status', 'published')
             ->where('subject_id', $subjectId)
@@ -129,26 +204,23 @@ class LessonsController extends Controller
 
         // Apply visibility filters
         $mediaQuery->where(function ($q) use ($classIds) {
+            $q->whereNull('class_id');
             if ($classIds->isNotEmpty()) {
-                $q->whereNull('class_id')->orWhereIn('class_id', $classIds);
-            } else {
-                $q->whereNull('class_id');
+                $q->orWhereIn('class_id', $classIds);
             }
         });
 
-        $mediaQuery->where(function ($q) use ($yearGroupId) {
-            if ($yearGroupId) {
-                $q->whereNull('year_group_id')->orWhere('year_group_id', $yearGroupId);
-            } else {
-                $q->whereNull('year_group_id');
+        $mediaQuery->where(function ($q) use ($yearGroupIds) {
+            $q->whereNull('year_group_id');
+            if ($yearGroupIds->isNotEmpty()) {
+                $q->orWhereIn('year_group_id', $yearGroupIds);
             }
         });
 
-        $mediaQuery->where(function ($q) use ($academicYearVal) {
-            if ($academicYearVal) {
-                $q->whereNull('academic_year')->orWhere('academic_year', $academicYearVal);
-            } else {
-                $q->whereNull('academic_year');
+        $mediaQuery->where(function ($q) use ($studentAcademicYears) {
+            $q->whereNull('academic_year');
+            if ($studentAcademicYears->isNotEmpty()) {
+                $q->orWhereIn('academic_year', $studentAcademicYears);
             }
         });
 

@@ -150,3 +150,146 @@ test('student can view assigned media files that match visibility constraints in
     $response->assertDontSee('Wrong Class Video');
     $response->assertDontSee('Draft Video');
 });
+
+test('student can view videos when academic year is stored as ID in studentDetail and string in media file', function () {
+    $academicYear = \App\Models\AcademicYear::firstOrCreate(
+        ['name' => '2026-2027'],
+        ['is_active' => true]
+    );
+
+    $student = User::factory()->create([
+        'role' => 'student',
+        'username' => 'student_ay_id_' . uniqid()
+    ]);
+
+    $yearGroup = YearGroup::firstOrCreate(
+        ['value' => 'Year 6'],
+        ['title' => 'Year 6', 'is_active' => true]
+    );
+
+    $class = Classes::create([
+        'name' => 'Year 6 Class Gold',
+        'group_year' => 'Year 6',
+        'academic_year' => '2026-2027',
+        'is_active' => true,
+    ]);
+    $student->classes()->attach($class->id);
+
+    // Notice academic_year is stored as ID (matching real admin panel creation)
+    $student->studentDetail()->create([
+        'group_year' => 'Year 6',
+        'academic_year' => (string)$academicYear->id,
+        'date_of_birth' => '2014-03-03',
+    ]);
+
+    $course = Course::create([
+        'name' => 'Science Course',
+        'is_active' => true,
+    ]);
+
+    $week = Week::create([
+        'name' => 'Week 1 - Chemistry',
+        'course_id' => $course->id,
+        'due_date' => now()->addDays(7)->format('Y-m-d'),
+    ]);
+
+    $subject = Subject::create([
+        'title' => 'Chemistry',
+        'is_active' => true,
+    ]);
+
+    // Media file stores academic_year as string name ('2026-2027')
+    $media = MediaFile::create([
+        'title' => 'Chemistry Video With AY Name',
+        'type' => 'youtube',
+        'path' => 'https://www.youtube.com/watch?v=chemistry123',
+        'subject_id' => $subject->id,
+        'class_id' => $class->id,
+        'year_group_id' => $yearGroup->id,
+        'academic_year' => '2026-2027',
+        'publication_status' => 'published',
+        'status' => 'completed',
+    ]);
+    $media->courses()->attach($course->id, ['week_id' => $week->id, 'week' => 1]);
+
+    $response = $this->actingAs($student)
+        ->get(route('student.weeklytests', [
+            'course_id' => $course->id,
+            'week' => $week->id
+        ]));
+
+    $response->assertStatus(200);
+    $mediaFiles = $response->viewData('mediaFiles');
+    expect($mediaFiles->pluck('id')->contains($media->id))->toBeTrue();
+    $response->assertSee('Chemistry Video With AY Name');
+});
+
+test('student inherits year group and academic year from assigned class for video visibility', function () {
+    $academicYear = \App\Models\AcademicYear::firstOrCreate(
+        ['name' => '2026-2027'],
+        ['is_active' => true]
+    );
+
+    $yearGroup = YearGroup::firstOrCreate(
+        ['value' => 'Year 7'],
+        ['title' => 'Year 7', 'is_active' => true]
+    );
+
+    $class = Classes::create([
+        'name' => 'Year 7 Blue',
+        'group_year' => 'Year 7',
+        'academic_year' => '2026-2027',
+        'is_active' => true,
+    ]);
+
+    $student = User::factory()->create([
+        'role' => 'student',
+        'username' => 'student_class_inherit_' . uniqid()
+    ]);
+    $student->classes()->attach($class->id);
+
+    // Student detail has empty group_year and academic_year; student relies on assigned class
+    $student->studentDetail()->create([
+        'date_of_birth' => '2013-02-02',
+    ]);
+
+    $course = Course::create([
+        'name' => 'Biology Course',
+        'is_active' => true,
+    ]);
+
+    $week = Week::create([
+        'name' => 'Week 1 - Cell Biology',
+        'course_id' => $course->id,
+        'due_date' => now()->addDays(7)->format('Y-m-d'),
+    ]);
+
+    $subject = Subject::create([
+        'title' => 'Biology',
+        'is_active' => true,
+    ]);
+
+    $media = MediaFile::create([
+        'title' => 'Cell Biology Lecture',
+        'type' => 'youtube',
+        'path' => 'https://www.youtube.com/watch?v=cell1234567',
+        'subject_id' => $subject->id,
+        'class_id' => $class->id,
+        'year_group_id' => $yearGroup->id,
+        'academic_year' => '2026-2027',
+        'publication_status' => 'published',
+        'status' => 'completed',
+    ]);
+    $media->courses()->attach($course->id, ['week_id' => $week->id, 'week' => 1]);
+
+    $response = $this->actingAs($student)
+        ->get(route('student.weeklytests', [
+            'course_id' => $course->id,
+            'week' => $week->id
+        ]));
+
+    $response->assertStatus(200);
+    $mediaFiles = $response->viewData('mediaFiles');
+    expect($mediaFiles->pluck('id')->contains($media->id))->toBeTrue();
+    $response->assertSee('Cell Biology Lecture');
+});
