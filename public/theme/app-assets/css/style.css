@@ -123,33 +123,41 @@ WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BET
 }
 
 .card-icon-container {
-    width: 130px;
-    height: 130px;
-    margin-bottom: 1.8rem;
+    width: 124px;
+    height: 124px;
+    margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 2rem;
-    background: var(--card-light);
+    border-radius: 1.75rem;
+    background: #ffffff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    border: 2px solid var(--card-light);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    padding: 1.5rem;
+    padding: 1.25rem;
+}
+
+.dark-layout .card-icon-container {
+    background: #ffffff;
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
 }
 
 .card-icon-container img {
     width: 100%;
-    height: auto;
+    height: 100%;
     object-fit: contain;
-    transition: transform 0.4s ease;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .dashboard-card:hover .card-icon-container {
-    transform: scale(1.08) rotate(5deg);
-    background: var(--card-gradient);
-    box-shadow: 0 8px 25px var(--card-shadow);
+    transform: translateY(-4px) scale(1.06);
+    box-shadow: 0 12px 28px var(--card-shadow);
+    border-color: var(--card-color);
 }
 
 .dashboard-card:hover .card-icon-container img {
-    filter: brightness(0) invert(1);
+    transform: scale(1.08);
 }
 
 .dashboard-card-title {
