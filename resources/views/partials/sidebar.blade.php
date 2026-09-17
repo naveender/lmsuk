@@ -43,12 +43,12 @@
         --sb-tooltip-text-light: #f8fafc;
 
         /* Dark Theme Tokens */
-        --sb-bg-dark: #0f172a;
-        --sb-border-dark: #1e293b;
+        --sb-bg-dark: #181d36;
+        --sb-border-dark: #2d3748;
         --sb-text-dark: #f8fafc;
         --sb-muted-dark: #94a3b8;
-        --sb-hover-dark: rgba(255, 255, 255, 0.05);
-        --sb-active-dark: rgba(115, 103, 240, 0.18);
+        --sb-hover-dark: rgba(255, 255, 255, 0.06);
+        --sb-active-dark: rgba(115, 103, 240, 0.22);
         --sb-shadow-dark: 0 4px 30px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.1);
         --sb-tooltip-bg-dark: #f8fafc;
         --sb-tooltip-text-dark: #0f172a;
@@ -1171,6 +1171,7 @@
                         aria-expanded="{{ $qBankActive ? 'true' : 'false' }}">
                         <i data-lucide="help-circle"></i>
                         <span class="menu-text">Question Bank</span>
+                        <span class="menu-badge badge-primary mr-1">Bank</span>
                         <i data-lucide="chevron-down" class="submenu-arrow"></i>
                     </div>
                     <ul class="submenu-items">
@@ -1233,6 +1234,7 @@
                         aria-expanded="{{ $papersActive ? 'true' : 'false' }}">
                         <i data-lucide="file-text"></i>
                         <span class="menu-text">Quiz/Test Manager</span>
+                        <span class="menu-badge badge-success mr-1">Tests</span>
                         <i data-lucide="chevron-down" class="submenu-arrow"></i>
                     </div>
                     <ul class="submenu-items">
@@ -1322,6 +1324,7 @@
                     <a href="{{ route('admin.media-files.index') }}" class="menu-link">
                         <i data-lucide="folder"></i>
                         <span class="menu-text">Manage Files</span>
+                        <span class="menu-badge badge-primary">Files</span>
                     </a>
                     <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Manage Files">
                         <i data-lucide="star"></i>
@@ -1359,6 +1362,7 @@
                     <a href="{{ route('admin.announcements.index') }}" class="menu-link">
                         <i data-lucide="megaphone"></i>
                         <span class="menu-text">Manage Announcement</span>
+                        <span class="menu-badge badge-warning">Broadcast</span>
                     </a>
                     <button type="button" class="pin-btn" title="Pin to favorites" aria-label="Pin Manage Announcement">
                         <i data-lucide="star"></i>
@@ -1447,7 +1451,7 @@
 
                 <!-- Global Settings (Submenu) -->
                 @php
-                    $settingsActive = request()->routeIs('admin.system-configs.*');
+                    $settingsActive = request()->routeIs('admin.system-configs.*') || request()->routeIs('logs') || request()->routeIs('settings.*');
                 @endphp
                 <li class="menu-item-wrapper has-submenu {{ $settingsActive ? 'open' : '' }}"
                     data-title="Global Settings" data-tooltip="Global Settings">
@@ -1458,16 +1462,6 @@
                         <i data-lucide="chevron-down" class="submenu-arrow"></i>
                     </div>
                     <ul class="submenu-items">
-                        <li data-title="Tests/Exam Settings" data-route="#" data-icon="sliders">
-                            <a href="#" class="menu-link">
-                                <i data-lucide="sliders"></i>
-                                <span class="menu-text">Tests/Exam Settings</span>
-                            </a>
-                            <button type="button" class="pin-btn" title="Pin to favorites"
-                                aria-label="Pin Tests/Exam Settings">
-                                <i data-lucide="star"></i>
-                            </button>
-                        </li>
                         <li class="{{ request()->routeIs('admin.system-configs.*') ? 'active' : '' }}"
                             data-title="System Configurations" data-route="{{ route('admin.system-configs.index') }}"
                             data-icon="settings">
@@ -1477,6 +1471,30 @@
                             </a>
                             <button type="button" class="pin-btn" title="Pin to favorites"
                                 aria-label="Pin System Configs">
+                                <i data-lucide="star"></i>
+                            </button>
+                        </li>
+                        <li class="{{ request()->routeIs('logs') ? 'active' : '' }}"
+                            data-title="Activity & Audit Logs" data-route="{{ route('logs') }}"
+                            data-icon="file-text">
+                            <a href="{{ route('logs') }}" class="menu-link">
+                                <i data-lucide="file-text"></i>
+                                <span class="menu-text">Activity Logs</span>
+                            </a>
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin Activity Logs">
+                                <i data-lucide="star"></i>
+                            </button>
+                        </li>
+                        <li class="{{ request()->routeIs('settings.*') ? 'active' : '' }}"
+                            data-title="General Settings" data-route="{{ route('settings.index') }}"
+                            data-icon="sliders">
+                            <a href="{{ route('settings.index') }}" class="menu-link">
+                                <i data-lucide="sliders"></i>
+                                <span class="menu-text">General Settings</span>
+                            </a>
+                            <button type="button" class="pin-btn" title="Pin to favorites"
+                                aria-label="Pin General Settings">
                                 <i data-lucide="star"></i>
                             </button>
                         </li>
@@ -1626,14 +1644,19 @@
             document.body.classList.remove('sidebar-open-no-scroll');
         }
 
-        // Capture standard hamburger clicks
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', function (e) {
+        // Export helper functions to window for navbar triggers
+        window.openMobileSidebar = openMobileSidebar;
+        window.closeMobileSidebar = closeMobileSidebar;
+        window.setSidebarCollapsedState = setSidebarCollapsedState;
+
+        // Capture hamburger clicks from both standard and admin navbar
+        document.querySelectorAll('#adminMobileMenuToggle, .menu-toggle').forEach(btn => {
+            btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 openMobileSidebar();
             });
-        }
+        });
 
         // Overlay click closes both mobile and tablet menus
         if (sidebarOverlay) {

@@ -132,7 +132,17 @@ class LessonsController extends Controller
             ];
         }
 
-        return view('student.lessons.video-lessons-category', compact('subjects', 'progressBySubject'));
+        $totalVideos = collect($progressBySubject)->sum('total');
+        $totalCompletedVideos = collect($progressBySubject)->sum('completed');
+        $overallVideoProgress = $totalVideos > 0 ? round(($totalCompletedVideos / $totalVideos) * 100) : 0;
+
+        return view('student.lessons.video-lessons-category', compact(
+            'subjects',
+            'progressBySubject',
+            'totalVideos',
+            'totalCompletedVideos',
+            'overallVideoProgress'
+        ));
     }
 
     /**
