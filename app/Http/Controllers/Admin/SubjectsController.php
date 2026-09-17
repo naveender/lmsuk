@@ -37,7 +37,7 @@ class SubjectsController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255|unique:subjects,title',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'is_active' => 'boolean',
         ]);
 
@@ -62,7 +62,7 @@ class SubjectsController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255', Rule::unique('subjects')->ignore($subject->id)],
             'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'is_active' => 'boolean',
         ]);
 

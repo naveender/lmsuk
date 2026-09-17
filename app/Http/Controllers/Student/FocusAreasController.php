@@ -106,6 +106,7 @@ class FocusAreasController extends Controller
                 }
 
                 $topicRows[] = [
+                    'id'            => $topic->id,
                     'name'          => $topic->name,
                     'available'     => $testsAvailable,
                     'attempted'     => $testsAttempted,
@@ -124,6 +125,18 @@ class FocusAreasController extends Controller
             }
         }
 
-        return view('student.focusareas.index', compact('subjectData', 'threshold', 'averageType'));
+        $totalFocusTopics = collect($subjectData)->sum(fn($s) => count($s['topics']));
+        $allTopics = collect($subjectData)->flatMap(fn($s) => $s['topics']);
+        $criticalCount = $allTopics->filter(fn($t) => ($t['average'] ?? 0) < 50)->count();
+        $moderateCount = $allTopics->filter(fn($t) => ($t['average'] ?? 0) >= 50 && ($t['average'] ?? 0) < $threshold)->count();
+
+        return view('student.focusareas.index', compact(
+            'subjectData',
+            'threshold',
+            'averageType',
+            'totalFocusTopics',
+            'criticalCount',
+            'moderateCount'
+        ));
     }
 }

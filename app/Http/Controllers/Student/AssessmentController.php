@@ -499,7 +499,18 @@ class AssessmentController extends Controller
             return $subject;
         });
 
-        return view('student.assessment.category-test-overview', compact('subjects'));
+        $totalPapers = $subjects->sum('total_papers');
+        $totalCompleted = $subjects->sum('completed_papers_count');
+        $totalPaused = $subjects->sum('paused_papers_count');
+        $overallProgress = $totalPapers > 0 ? round(($totalCompleted / $totalPapers) * 100) : 0;
+
+        return view('student.assessment.category-test-overview', compact(
+            'subjects',
+            'totalPapers',
+            'totalCompleted',
+            'totalPaused',
+            'overallProgress'
+        ));
     }
 
     /**
