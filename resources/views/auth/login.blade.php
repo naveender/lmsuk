@@ -4,9 +4,9 @@
 @push('styles')
     <style>
         /* ============================================
-                                                                                                                           ASPIRE LEARNERS - LOGIN PAGE STYLES
-                                                                                                                           Matches reference design exactly
-                                                                                                                        ============================================ */
+                                                                                                                                               ASPIRE LEARNERS - LOGIN PAGE STYLES
+                                                                                                                                               Matches reference design exactly
+                                                                                                                                            ============================================ */
 
         /* Reset & Base */
         body.blank-page {
@@ -377,7 +377,7 @@
         /* Login Button */
         .login-submit-btn {
             width: 100%;
-            padding: 14px 24px;
+            padding: 12.5px 20px;
             background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
             color: #ffffff;
             border: none;
@@ -427,7 +427,7 @@
         /* Create Account Button */
         .login-create-btn {
             width: 100%;
-            padding: 13px 24px;
+            padding: 12.5px 20px;
             background: transparent;
             color: #2563eb;
             border: 2px solid #2563eb;
@@ -785,11 +785,11 @@
 
                         // Show success alert
                         alertContainer.innerHTML = `
-                                                                                                                                    <div class="alert alert-success d-flex align-items-center mb-2" role="alert" style="font-size: 0.9rem;">
-                                                                                                                                        <i class="feather icon-check-circle mr-50"></i>
-                                                                                                                                        <span>${response.data.message || response.data.status}</span>
-                                                                                                                                    </div>
-                                                                                                                                `;
+                                                                                                                                                        <div class="alert alert-success d-flex align-items-center mb-2" role="alert" style="font-size: 0.9rem;">
+                                                                                                                                                            <i class="feather icon-check-circle mr-50"></i>
+                                                                                                                                                            <span>${response.data.message || response.data.status}</span>
+                                                                                                                                                        </div>
+                                                                                                                                                    `;
 
                         // Reset form
                         form.reset();
@@ -809,11 +809,11 @@
 
                         // Show error alert
                         alertContainer.innerHTML = `
-                                                                                                                                    <div class="alert alert-danger d-flex align-items-center mb-2" role="alert" style="font-size: 0.9rem;">
-                                                                                                                                        <i class="feather icon-alert-circle mr-50"></i>
-                                                                                                                                        <span>${message}</span>
-                                                                                                                                    </div>
-                                                                                                                                `;
+                                                                                                                                                        <div class="alert alert-danger d-flex align-items-center mb-2" role="alert" style="font-size: 0.9rem;">
+                                                                                                                                                            <i class="feather icon-alert-circle mr-50"></i>
+                                                                                                                                                            <span>${message}</span>
+                                                                                                                                                        </div>
+                                                                                                                                                    `;
                     });
             });
 
