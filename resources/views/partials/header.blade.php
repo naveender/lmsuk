@@ -74,39 +74,90 @@
 
                     <!-- User Profile Pill Dropdown -->
                     <div class="dropdown dropdown-user">
-                        <button class="header-user-profile-btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <img class="header-user-avatar" src="{{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="Admin Avatar">
+                        <button class="header-user-profile-btn dropdown-toggle" type="button" id="headerUserProfileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="User Menu">
+                            <div class="header-avatar-wrapper">
+                                <img class="header-user-avatar" src="{{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="Admin Avatar">
+                                <span class="user-status-indicator status-online" title="Online"></span>
+                            </div>
                             <div class="header-user-info d-none d-md-flex">
                                 <span class="header-user-name">{{ $user->name ?? 'Admin User' }}</span>
-                                <span class="header-user-role">Admin</span>
+                                <span class="header-user-role-badge">
+                                    <span class="role-badge-dot"></span>
+                                    <span>Administrator</span>
+                                </span>
                             </div>
-                            <i class="feather icon-chevron-down header-chevron d-none d-md-inline-block"></i>
+                            <div class="header-chevron-wrapper d-none d-md-flex align-items-center justify-content-center">
+                                <i class="feather icon-chevron-down header-chevron"></i>
+                            </div>
                         </button>
-                        <div class="dropdown-menu dropdown-menu-right animated-dropdown shadow-lg border-0" style="min-width: 200px; border-radius: 12px; margin-top: 8px;">
-                            <div class="p-2 border-bottom">
-                                <h6 class="font-weight-bold text-dark mb-25">{{ $user->name ?? 'Admin User' }}</h6>
-                                <span class="font-small-2 text-muted d-block">{{ $user->email ?? 'admin@aspire.com' }}</span>
+                        <div class="dropdown-menu dropdown-menu-right header-user-dropdown-menu animated-dropdown" aria-labelledby="headerUserProfileDropdown">
+                            <!-- Header Card Banner -->
+                            <div class="user-dropdown-header">
+                                <div class="d-flex align-items-center">
+                                    <div class="header-avatar-wrapper mr-75">
+                                        <img class="dropdown-user-avatar" src="{{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="Admin Avatar">
+                                        <span class="user-status-indicator status-online"></span>
+                                    </div>
+                                    <div class="dropdown-user-meta overflow-hidden">
+                                        <div class="d-flex align-items-center">
+                                            <h6 class="dropdown-user-title text-truncate mb-0">{{ $user->name ?? 'Admin User' }}</h6>
+                                            <span class="verified-badge ml-50" title="Verified Administrator">
+                                                <i class="feather icon-check"></i>
+                                            </span>
+                                        </div>
+                                        <span class="dropdown-user-email text-truncate d-block">{{ $user->email ?? 'admin@aspire.com' }}</span>
+                                        <span class="badge badge-pill badge-light-primary font-small-1 font-weight-bold mt-25">
+                                            <i class="feather icon-shield mr-25"></i> Super Admin
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="py-50">
-                                <a class="dropdown-item d-flex align-items-center py-75 px-2 font-small-3" href="{{ route('account.index') }}">
-                                    <i class="feather icon-user mr-1 text-primary"></i>
-                                    <span>My Account</span>
+
+                            <!-- Dropdown Menu Links -->
+                            <div class="user-dropdown-items py-25">
+                                <a class="dropdown-item user-menu-link" href="{{ route('account.index') }}">
+                                    <div class="menu-icon-box icon-box-primary">
+                                        <i class="feather icon-user"></i>
+                                    </div>
+                                    <div class="menu-text-wrap flex-grow-1">
+                                        <span class="menu-item-label">My Account</span>
+                                        <span class="menu-item-desc">Profile & security settings</span>
+                                    </div>
+                                    <i class="feather icon-chevron-right menu-item-arrow"></i>
                                 </a>
-                                <a class="dropdown-item d-flex align-items-center py-75 px-2 font-small-3" href="{{ route('admin.system-configs.index') }}">
-                                    <i class="feather icon-settings mr-1 text-info"></i>
-                                    <span>System Configs</span>
+
+                                <a class="dropdown-item user-menu-link" href="{{ route('admin.system-configs.index') }}">
+                                    <div class="menu-icon-box icon-box-info">
+                                        <i class="feather icon-sliders"></i>
+                                    </div>
+                                    <div class="menu-text-wrap flex-grow-1">
+                                        <span class="menu-item-label">System Configs</span>
+                                        <span class="menu-item-desc">Application preferences</span>
+                                    </div>
+                                    <i class="feather icon-chevron-right menu-item-arrow"></i>
                                 </a>
-                                <a class="dropdown-item d-flex align-items-center py-75 px-2 font-small-3" href="{{ route('logs') }}">
-                                    <i class="feather icon-file-text mr-1 text-warning"></i>
-                                    <span>Activity Logs</span>
+
+                                <a class="dropdown-item user-menu-link" href="{{ route('logs') }}">
+                                    <div class="menu-icon-box icon-box-warning">
+                                        <i class="feather icon-activity"></i>
+                                    </div>
+                                    <div class="menu-text-wrap flex-grow-1">
+                                        <span class="menu-item-label">Activity Logs</span>
+                                        <span class="menu-item-desc">Audit trail & history</span>
+                                    </div>
+                                    <i class="feather icon-chevron-right menu-item-arrow"></i>
                                 </a>
                             </div>
-                            <div class="dropdown-divider my-25"></div>
-                            <div class="p-1">
-                                <form method="POST" action="{{ route('logout') }}">
+
+                            <div class="dropdown-divider my-50"></div>
+
+                            <!-- Logout Action -->
+                            <div class="user-dropdown-footer px-50 pb-25">
+                                <form method="POST" action="{{ route('logout') }}" class="m-0">
                                     @csrf
-                                    <button type="submit" class="btn btn-outline-danger btn-block btn-sm font-weight-bold d-flex align-items-center justify-content-center">
-                                        <i class="feather icon-power mr-50"></i> Log Out
+                                    <button type="submit" class="btn btn-user-logout btn-block d-flex align-items-center justify-content-center">
+                                        <i class="feather icon-power mr-50 font-medium-1"></i>
+                                        <span>Log Out</span>
                                     </button>
                                 </form>
                             </div>
