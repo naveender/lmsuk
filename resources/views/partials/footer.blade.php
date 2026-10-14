@@ -1,10 +1,8 @@
-<footer class="footer footer-static footer-light">
-    <p class="clearfix blue-grey lighten-2 mb-0"><span class="float-md-left d-block d-md-inline-block mt-25">COPYRIGHT ©
-            2026<a class="text-bold-800 grey darken-2" href="https://1.envato.market/pixinvent_portfolio"
-                target="_blank">Naveender,</a>All rights Reserved</span><span
-            class="float-md-right d-none d-md-block">Hand-crafted &amp; Made with<i
-                class="feather icon-heart pink"></i></span>
-        <button class="btn btn-primary btn-icon scroll-top waves-effect waves-light" type="button"><i
-                class="feather icon-arrow-up"></i></button>
-    </p>
+<footer class="admin-theme-footer">
+    <div>
+        COPYRIGHT &copy; {{ date('Y') }} <a href="#">Naveender</a>, All rights Reserved
+    </div>
+    <div>
+        Hand-crafted &amp; Made with <i class="feather icon-heart heart-icon" style="color: var(--theme-danger);"></i>
+    </div>
 </footer>

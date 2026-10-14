@@ -5,31 +5,23 @@
          <div class="content-overlay"></div>
          <div class="header-navbar-shadow"></div>
          <div class="content-wrapper">
-             <div class="content-header row">
-                 <div class="content-header-left col-md-9 col-12 mb-2">
-                     <div class="row breadcrumbs-top">
-                         <div class="col-12">
-                             <h2 class="content-header-title float-left mb-0 font-weight-bold">
-                                 System Logs
-                             </h2>
-                             <div class="breadcrumb-wrapper col-12">
-                                 <ol class="breadcrumb">
-                                     <li class="breadcrumb-item">
-                                         <a href="index.html">Home</a>
-                                     </li>
-                                     <li class="breadcrumb-item">System Logs</li>
-                                 </ol>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-             </div>
-             <div class="content-body">
-                 <div class="row">
-                     <div class="col-12">
-                         <p>Monitor backup operations, user activities, and system events.</p>
-                     </div>
-                 </div>
+            <!-- Page Header / Title & Breadcrumbs -->
+            <div class="admin-page-header">
+                <div class="admin-page-title-wrap">
+                    <div class="admin-title-row">
+                        <h1 class="admin-page-heading">System Logs</h1>
+                        <nav class="admin-breadcrumbs" aria-label="Breadcrumb">
+                            <a href="{{ route('admin.dashboard') }}">Home</a>
+                            <span class="breadcrumb-sep">&raquo;</span>
+                            <span>System</span>
+                            <span class="breadcrumb-sep">&raquo;</span>
+                            <span>Logs</span>
+                        </nav>
+                    </div>
+                    <p class="admin-page-subtitle">Monitor backup operations, user activities, and system events</p>
+                </div>
+            </div>
+            <div class="content-body">
                  <div class="row">
                      <div class="col-lg-3 col-sm-6 col-12">
                          <div class="card">

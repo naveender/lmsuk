@@ -1325,17 +1325,14 @@ body::-webkit-scrollbar-thumb:hover {
 }
 .badge-info {
     background-color: rgba(0, 207, 232, 0.12) !important;
-    color: #00cfe8 !important;
     border: 1px solid rgba(0, 207, 232, 0.2);
 }
 .badge-success {
     background-color: rgba(40, 199, 111, 0.12) !important;
-    color: #28c76f !important;
     border: 1px solid rgba(40, 199, 111, 0.2);
 }
 .badge-warning {
     background-color: rgba(255, 159, 67, 0.12) !important;
-    color: #ff9f43 !important;
     border: 1px solid rgba(255, 159, 67, 0.2);
 }
 
@@ -1709,4 +1706,4 @@ body.dark-layout .menu-badge.badge-warning {
 /* Collapsed Sidebar: Hide Badges */
 body.sidebar-collapsed .main-menu.modern-sidebar .menu-badge {
     display: none !important;
-}
+}

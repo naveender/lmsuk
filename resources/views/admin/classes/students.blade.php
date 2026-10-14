@@ -6,20 +6,26 @@
         <div class="header-navbar-shadow"></div>
         <div class="content-wrapper">
             <!-- Breadcrumbs -->
-            <div class="content-header row">
-                <div class="content-header-left col-md-9 col-12 mb-2">
-                    <div class="row breadcrumbs-top">
-                        <div class="col-12">
-                            <h2 class="content-header-title float-left mb-0 font-weight-bold">Class Members</h2>
-                            <div class="breadcrumb-wrapper col-12">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                                    <li class="breadcrumb-item"><a href="{{ route('admin.classes.index') }}">Classes</a></li>
-                                    <li class="breadcrumb-item active">{{ $class->name }} Students</li>
-                                </ol>
-                            </div>
-                        </div>
+            <!-- Page Header / Title & Breadcrumbs -->
+            <div class="admin-page-header">
+                <div class="admin-page-title-wrap">
+                    <div class="admin-title-row">
+                        <h1 class="admin-page-heading">Class Members: {{ $class->name }}</h1>
+                        <nav class="admin-breadcrumbs" aria-label="Breadcrumb">
+                            <a href="{{ route('admin.dashboard') }}">Home</a>
+                            <span class="breadcrumb-sep">&raquo;</span>
+                            <a href="{{ route('admin.classes.index') }}">Classes</a>
+                            <span class="breadcrumb-sep">&raquo;</span>
+                            <span>Members</span>
+                        </nav>
                     </div>
+                    <p class="admin-page-subtitle">Manage enrolled students and class roster for {{ $class->name }}</p>
+                </div>
+                <div>
+                    <a href="{{ route('admin.classes.index') }}" class="btn btn-admin-secondary">
+                        <i data-lucide="arrow-left" style="width: 17px; height: 17px;"></i>
+                        <span>Back to Classes</span>
+                    </a>
                 </div>
             </div>
 
@@ -131,46 +137,62 @@
                     <!-- RIGHT COLUMN: Add Students to Class -->
                     <div class="col-lg-6 col-12">
                         <!-- Filters Panel -->
-                        <div class="card mb-3">
-                            <div class="card-header collapse-header" data-toggle="collapse" data-target="#available-students-filter">
-                                <h4 class="card-title font-weight-bold">
-                                    <i class="feather icon-filter text-info mr-1"></i> Filter Available Students
-                                </h4>
-                                <div class="heading-elements">
-                                    <i class="feather icon-chevron-down"></i>
-                                </div>
+                        <div class="card theme-card mb-3" id="availFilterCard">
+                            <div class="theme-card-header" style="cursor: pointer;" onclick="toggleFilters('availFilterBody', 'availFilterToggleIcon')">
+                                <h2 class="theme-card-title">
+                                    <i data-lucide="filter"></i>
+                                    <span>Filter Available Students</span>
+                                </h2>
+                                <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters" style="color: #7A8499;">
+                                    <i data-lucide="chevron-up" id="availFilterToggleIcon" style="width: 18px; height: 18px;"></i>
+                                </button>
                             </div>
-                            <div id="available-students-filter" class="card-content collapse show">
-                                <div class="card-body py-1">
-                                    <form method="GET" action="{{ route('admin.classes.students', $class->id) }}" class="row align-items-end g-2">
-                                        <div class="col-md-6 col-12 mb-1">
-                                            <label for="search" class="form-label font-small-3">Search Name / Email</label>
-                                            <input type="text" name="search" id="search" value="{{ request('search') }}" class="form-control form-control-sm" placeholder="Search student...">
+                            <div class="theme-card-body" id="availFilterBody">
+                                <form method="GET" action="{{ route('admin.classes.students', $class->id) }}">
+                                    <div class="row g-2">
+                                        <div class="col-md-6 col-12 mb-2">
+                                            <label for="search" class="filter-label">Search Name / Email</label>
+                                            <div class="filter-input-group">
+                                                <i data-lucide="search" class="filter-icon"></i>
+                                                <input type="text" name="search" id="search" value="{{ request('search') }}" class="form-control" placeholder="Search student...">
+                                            </div>
                                         </div>
-                                        <div class="col-md-3 col-6 mb-1">
-                                            <label for="group_year" class="form-label font-small-3">Group Year</label>
-                                            <select name="group_year" id="group_year" class="form-control form-control-sm">
-                                                <option value="">All</option>
-                                                @foreach ($yearGroups as $yg)
-                                                    <option value="{{ $yg->title }}" {{ request('group_year') == $yg->title ? 'selected' : '' }}>{{ $yg->title }}</option>
-                                                @endforeach
-                                            </select>
+                                        <div class="col-md-3 col-6 mb-2">
+                                            <label for="group_year" class="filter-label">Group Year</label>
+                                            <div class="filter-input-group">
+                                                <i data-lucide="graduation-cap" class="filter-icon"></i>
+                                                <select name="group_year" id="group_year" class="custom-select">
+                                                    <option value="">All</option>
+                                                    @foreach ($yearGroups as $yg)
+                                                        <option value="{{ $yg->title }}" {{ request('group_year') == $yg->title ? 'selected' : '' }}>{{ $yg->title }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div class="col-md-3 col-6 mb-1">
-                                            <label for="academic_year" class="form-label font-small-3">Academic Year</label>
-                                            <select name="academic_year" id="academic_year" class="form-control form-control-sm">
-                                                <option value="">All</option>
-                                                @foreach ($academicYears as $year)
-                                                    <option value="{{ $year->name }}" {{ request('academic_year') == $year->name ? 'selected' : '' }}>{{ $year->name }}</option>
-                                                @endforeach
-                                            </select>
+                                        <div class="col-md-3 col-6 mb-2">
+                                            <label for="academic_year" class="filter-label">Academic Year</label>
+                                            <div class="filter-input-group">
+                                                <i data-lucide="calendar" class="filter-icon"></i>
+                                                <select name="academic_year" id="academic_year" class="custom-select">
+                                                    <option value="">All</option>
+                                                    @foreach ($academicYears as $year)
+                                                        <option value="{{ $year->name }}" {{ request('academic_year') == $year->name ? 'selected' : '' }}>{{ $year->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div class="col-12 d-flex justify-content-end mb-1">
-                                            <a href="{{ route('admin.classes.students', $class->id) }}" class="btn btn-sm btn-secondary mr-1">Reset</a>
-                                            <button type="submit" class="btn btn-sm btn-primary">Apply Filters</button>
-                                        </div>
-                                    </form>
-                                </div>
+                                    </div>
+                                    <div class="filter-actions-bar mt-2">
+                                        <button type="submit" class="btn btn-filter-apply">
+                                            <i data-lucide="filter" style="width: 16px; height: 16px;"></i>
+                                            <span>Apply Filters</span>
+                                        </button>
+                                        <a href="{{ route('admin.classes.students', $class->id) }}" class="btn btn-filter-reset">
+                                            <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
+                                            <span>Reset</span>
+                                        </a>
+                                    </div>
+                                </form>
                             </div>
                         </div>
 

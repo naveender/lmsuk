@@ -63,15 +63,31 @@ class PaperController extends Controller
     /**
      * Remove the specified paper from storage.
      */
-    public function destroy(Paper $paper)
+    public function destroy(Paper $paper, Request $request)
     {
-        // Detach all questions first
-        $paper->questions()->detach();
-        
-        // Delete the paper
-        $paper->delete();
+        try {
+            // Detach all questions and assignments
+            $paper->questions()->detach();
+            $paper->assignments()->delete();
+            $paper->delete();
 
-        return redirect()->route('admin.papers.index')->with('success', 'Paper deleted successfully.');
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Paper deleted successfully.'
+                ]);
+            }
+
+            return redirect()->route('admin.papers.index')->with('success', 'Paper deleted successfully.');
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error deleting paper: ' . $e->getMessage()
+                ], 500);
+            }
+            return redirect()->route('admin.papers.index')->with('error', 'Error deleting paper: ' . $e->getMessage());
+        }
     }
 
     /**

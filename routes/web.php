@@ -70,6 +70,7 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminHomeController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/topics', [TopicController::class, 'index'])->name('topics');
+    Route::get('/admin/topics/{topic}/tree', [TopicController::class, 'tree'])->name('topics.tree');
     Route::get('/admin/add-topic', [TopicController::class, 'add'])->name('add.topic');
     Route::post('/admin/topics', [TopicController::class, 'store'])->name('topics.store');
     Route::get('/admin/topics/{topic}/edit', [TopicController::class, 'edit'])->name('topics.edit');
@@ -242,10 +243,11 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         'index'   => 'admin.media-files.index',
         'create'  => 'admin.media-files.create',
         'store'   => 'admin.media-files.store',
+        'show'    => 'admin.media-files.show',
         'edit'    => 'admin.media-files.edit',
         'update'  => 'admin.media-files.update',
         'destroy' => 'admin.media-files.destroy',
-    ])->except(['show']);
+    ]);
 
     // Course Media Weekly Scheduler
     Route::get('admin/courses/{course}/media', [\App\Http\Controllers\Admin\CourseController::class, 'manageMedia'])->name('admin.courses.media');

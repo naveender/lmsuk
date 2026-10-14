@@ -70,6 +70,13 @@ class AcademicYearController extends Controller
     {
         $academicYear->delete();
 
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Academic Year deleted successfully.'
+            ]);
+        }
+
         return redirect()->route('admin.academic-years.index')->with('success', 'Academic Year deleted successfully.');
     }
 }

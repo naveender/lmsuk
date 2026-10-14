@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Aspire Learners')</title>
     @stack('styles')
     @include('partials.includetop')
@@ -17,7 +18,7 @@
 
 <body
     class="{{ $isAdmin 
-        ? 'vertical-layout vertical-menu-modern ' . $themeLayoutClass . ' 2-columns navbar-floating footer-static' 
+        ? 'vertical-layout vertical-menu-modern ' . $themeLayoutClass . ' 2-columns navbar-sticky footer-static admin-theme-active' 
         : 'horizontal-layout horizontal-menu ' . $themeLayoutClass . ' 2-columns navbar-floating footer-static' }}"
     data-open="{{ $isAdmin ? 'click' : 'hover' }}"
     data-menu="{{ $isAdmin ? 'vertical-menu-modern' : 'horizontal-menu' }}"

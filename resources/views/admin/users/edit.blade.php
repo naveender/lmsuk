@@ -4,22 +4,28 @@
         <div class="content-overlay"></div>
         <div class="header-navbar-shadow"></div>
         <div class="content-wrapper">
-            <div class="content-header row">
-                <div class="content-header-left col-md-9 col-12 mb-2">
-                    <div class="row breadcrumbs-top">
-                        <div class="col-12">
-                            <h2 class="content-header-title float-left mb-0 font-weight-bold">Edit User</h2>
-                            <div class="breadcrumb-wrapper col-12">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                                    <li class="breadcrumb-item"><a href="{{ route('admin.users.index') }}">Users</a></li>
-                                    <li class="breadcrumb-item">Edit</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Page Header / Title & Breadcrumbs -->
+        <div class="admin-page-header">
+            <div class="admin-page-title-wrap">
+                <div class="admin-title-row">
+                    <h1 class="admin-page-heading">Edit User: {{ $user->name }}</h1>
+                    <nav class="admin-breadcrumbs" aria-label="Breadcrumb">
+                        <a href="{{ route('admin.dashboard') }}">Home</a>
+                        <span class="breadcrumb-sep">&raquo;</span>
+                        <a href="{{ route('admin.users.index') }}">Users</a>
+                        <span class="breadcrumb-sep">&raquo;</span>
+                        <span>Edit</span>
+                    </nav>
                 </div>
+                <p class="admin-page-subtitle">Update user profile details, roles, and status</p>
             </div>
+            <div>
+                <a href="{{ route('admin.users.index') }}" class="btn btn-admin-secondary">
+                    <i data-lucide="arrow-left" style="width: 17px; height: 17px;"></i>
+                    <span>Back to Users</span>
+                </a>
+            </div>
+        </div>
             <div class="content-body">
                 <section id="basic-horizontal-layouts">
                     <div class="row match-height">

@@ -28,5 +28,27 @@
 
 <!-- END: Theme JS-->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
+
+    window.toggleFilters = function(bodyId = 'filterBody', iconId = 'filterToggleIcon') {
+        const body = document.getElementById(bodyId);
+        const icon = document.getElementById(iconId);
+        if (!body) return;
+        const isHidden = window.getComputedStyle(body).display === 'none' || body.style.display === 'none';
+        if (isHidden) {
+            body.style.display = 'block';
+            if (icon) icon.style.transform = 'rotate(0deg)';
+        } else {
+            body.style.display = 'none';
+            if (icon) icon.style.transform = 'rotate(180deg)';
+        }
+    };
+</script>
 
 <script src="{{ asset('theme/app-assets/js/script.js') }}"></script>

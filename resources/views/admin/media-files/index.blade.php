@@ -170,42 +170,42 @@
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper">
-        <div class="content-header row">
-            <div class="content-header-left col-md-8 col-12 mb-2">
-                <div class="row breadcrumbs-top">
-                    <div class="col-12">
-                        <h2 class="content-header-title float-left mb-0 font-weight-bold">Manage Files</h2>
-                        <div class="breadcrumb-wrapper col-12">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                                <li class="breadcrumb-item active">Manage Files</li>
-                            </ol>
-                        </div>
-                    </div>
+        <!-- Page Header / Title & Breadcrumbs -->
+        <div class="admin-page-header">
+            <div class="admin-page-title-wrap">
+                <div class="admin-title-row">
+                    <h1 class="admin-page-heading">Video &amp; File Repository</h1>
+                    <nav class="admin-breadcrumbs" aria-label="Breadcrumb">
+                        <a href="{{ route('admin.dashboard') }}">Home</a>
+                        <span class="breadcrumb-sep">&raquo;</span>
+                        <a href="{{ route('admin.media-files.index') }}">Media Files</a>
+                        <span class="breadcrumb-sep">&raquo;</span>
+                        <span>List</span>
+                    </nav>
                 </div>
+                <p class="admin-page-subtitle">Upload, organize, and stream educational video lessons from cloud storage</p>
             </div>
-            <div class="content-header-right col-md-4 col-12 d-md-block d-none">
-                <div class="form-group breadcrum-right text-right d-flex align-items-center justify-content-end">
-                    <div class="btn-group mr-1" role="group" aria-label="Layout toggle">
-                        <button type="button" class="btn btn-outline-primary active" id="btn_layout_grid" title="Grid View">
-                            <i class="feather icon-grid"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-primary" id="btn_layout_table" title="Table View">
-                            <i class="feather icon-list"></i>
-                        </button>
-                    </div>
-                    <a href="{{ route('admin.media-files.create') }}" class="btn btn-primary font-weight-bold">
-                        <i class="feather icon-plus mr-25"></i> Add New Video / File
-                    </a>
+            <div class="page-actions d-flex flex-wrap align-items-center" style="gap: 10px;">
+                <div class="btn-group shadow-sm mr-1" role="group" aria-label="Layout toggle" style="border-radius: 8px; overflow: hidden;">
+                    <button type="button" class="btn btn-outline-primary active" id="btn_layout_grid" title="Grid View" style="padding: 9px 14px;">
+                        <i class="feather icon-grid"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="btn_layout_table" title="Table View" style="padding: 9px 14px;">
+                        <i class="feather icon-list"></i>
+                    </button>
                 </div>
+                <a href="{{ route('admin.media-files.create') }}" class="btn btn-admin-add">
+                    <i data-lucide="plus" style="width: 17px; height: 17px;"></i>
+                    <span>Add Video / File</span>
+                </a>
             </div>
         </div>
 
         <div class="content-body">
             @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <div class="alert-body">
-                    <i class="feather icon-check-circle"></i> {{ session('success') }}
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 8px;">
+                <div class="alert-body d-flex align-items-center">
+                    <i class="feather icon-check-circle mr-1"></i> {{ session('success') }}
                 </div>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -213,22 +213,32 @@
             </div>
             @endif
 
-            <!-- Search and Filter Panel -->
-            <div class="card mb-2">
-                <div class="card-content">
-                    <div class="card-body">
-                        <form action="{{ route('admin.media-files.index') }}" method="GET">
-                            <div class="row">
-                                <div class="col-lg-3 col-md-12 col-12 mb-1 mb-lg-0">
-                                    <fieldset class="form-group position-relative has-icon-left mb-0">
-                                        <input type="text" name="search" class="form-control" placeholder="Search by video title or description..." value="{{ request('search') }}">
-                                        <div class="form-control-position">
-                                            <i class="feather icon-search"></i>
-                                        </div>
-                                    </fieldset>
+            <!-- Filters Section (Matches Students Reference) -->
+            <div class="card theme-card" id="filterCard">
+                <div class="theme-card-header" style="cursor: pointer;" onclick="toggleFilters()">
+                    <h2 class="theme-card-title">
+                        <i data-lucide="filter"></i>
+                        <span>Filters</span>
+                    </h2>
+                    <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters" style="color: #7A8499;">
+                        <i data-lucide="chevron-up" id="filterToggleIcon" style="width: 18px; height: 18px;"></i>
+                    </button>
+                </div>
+                <div class="theme-card-body" id="filterBody">
+                    <form action="{{ route('admin.media-files.index') }}" method="GET">
+                        <div class="row g-3">
+                            <div class="col-xl-3 col-lg-4 col-md-6 col-12 mb-2 mb-xl-0">
+                                <label class="filter-label" for="search">Search Title / Notes</label>
+                                <div class="filter-input-group">
+                                    <i data-lucide="search" class="filter-icon"></i>
+                                    <input type="text" name="search" id="search" class="form-control" placeholder="Search by video title..." value="{{ request('search') }}">
                                 </div>
-                                <div class="col-lg-2 col-md-6 col-12 mb-1 mb-md-0">
-                                    <select name="type" class="form-control">
+                            </div>
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-12 mb-2 mb-xl-0">
+                                <label class="filter-label" for="type">Video Provider</label>
+                                <div class="filter-input-group">
+                                    <i data-lucide="video" class="filter-icon"></i>
+                                    <select name="type" id="type" class="custom-select">
                                         <option value="">All Video Types</option>
                                         <option value="youtube" {{ request('type') == 'youtube' ? 'selected' : '' }}>YouTube Video</option>
                                         <option value="vimeo" {{ request('type') == 'vimeo' ? 'selected' : '' }}>Vimeo Video</option>
@@ -240,37 +250,76 @@
                                         <option value="iframe" {{ request('type') == 'iframe' ? 'selected' : '' }}>Iframe Embed Code</option>
                                     </select>
                                 </div>
-                                <div class="col-lg-2 col-md-6 col-12 mb-1 mb-md-0">
-                                    <select name="disk" class="form-control">
+                            </div>
+                            <div class="col-xl-2 col-lg-4 col-md-6 col-12 mb-2 mb-xl-0">
+                                <label class="filter-label" for="disk">Storage Disk</label>
+                                <div class="filter-input-group">
+                                    <i data-lucide="hard-drive" class="filter-icon"></i>
+                                    <select name="disk" id="disk" class="custom-select">
                                         <option value="">All Storage Disks</option>
                                         <option value="public" {{ request('disk') == 'public' ? 'selected' : '' }}>Local Disk</option>
                                         <option value="wasabi" {{ request('disk') == 'wasabi' ? 'selected' : '' }}>Wasabi Bucket</option>
                                         <option value="s3" {{ request('disk') == 's3' ? 'selected' : '' }}>AWS S3 Bucket</option>
                                     </select>
                                 </div>
-                                <div class="col-lg-2 col-md-6 col-12 mb-1 mb-md-0">
-                                    <select name="subject_id" class="form-control">
+                            </div>
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-12 mb-2 mb-xl-0">
+                                <label class="filter-label" for="subject_id">Subject</label>
+                                <div class="filter-input-group">
+                                    <i data-lucide="book" class="filter-icon"></i>
+                                    <select name="subject_id" id="subject_id" class="custom-select">
                                         <option value="">All Subjects</option>
                                         @foreach($subjects as $subj)
                                             <option value="{{ $subj->id }}" {{ request('subject_id') == $subj->id ? 'selected' : '' }}>{{ $subj->title }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-lg-2 col-md-6 col-12 mb-1 mb-md-0">
-                                    <select name="class_id" class="form-control">
+                            </div>
+                            <div class="col-xl-2 col-lg-6 col-md-6 col-12 mb-2 mb-xl-0">
+                                <label class="filter-label" for="class_id">Class</label>
+                                <div class="filter-input-group">
+                                    <i data-lucide="users" class="filter-icon"></i>
+                                    <select name="class_id" id="class_id" class="custom-select">
                                         <option value="">All Classes</option>
                                         @foreach($classes as $cls)
                                             <option value="{{ $cls->id }}" {{ request('class_id') == $cls->id ? 'selected' : '' }}>{{ $cls->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-lg-1 col-md-12 col-12">
-                                    <button type="submit" class="btn btn-primary btn-block font-weight-bold px-50">
-                                        <i class="feather icon-filter"></i> Apply
-                                    </button>
-                                </div>
                             </div>
-                        </form>
+                        </div>
+                        <div class="filter-actions-bar">
+                            <button type="submit" class="btn btn-filter-apply">
+                                <i data-lucide="filter" style="width: 16px; height: 16px;"></i>
+                                <span>Apply Filters</span>
+                            </button>
+                            <a href="{{ route('admin.media-files.index') }}" class="btn btn-filter-reset">
+                                <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
+                                <span>Reset</span>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Toolbar with Total Badge -->
+            <div class="theme-card mb-3 p-1">
+                <div class="table-header-toolbar border-0 py-0">
+                    <div class="toolbar-left">
+                        <span class="badge-total-count">
+                            <i data-lucide="video"></i>
+                            <strong>{{ $files->total() }}</strong> Total Files
+                        </span>
+                    </div>
+                    <div class="toolbar-right">
+                        @if(request()->anyFilled(['search', 'type', 'disk', 'subject_id', 'class_id']))
+                            <span class="badge badge-light-warning font-small-2">
+                                <i data-lucide="filter" style="width: 12px; height: 12px; vertical-align: middle;"></i> Filtered Media
+                            </span>
+                            <a href="{{ route('admin.media-files.index') }}" class="btn btn-sm btn-outline-secondary ml-1 font-weight-bold" style="border-radius: 6px;">
+                                Clear Filters
+                            </a>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -684,21 +733,33 @@
             urlLink.text(button.data('url'));
         });
 
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
         // Safe delete verification using SweetAlert2
         $('.delete-form').on('submit', function(e) {
             e.preventDefault();
             const form = this;
             
             Swal.fire({
-                title: 'Are you sure?',
+                title: 'Delete Media File?',
                 text: "This will permanently delete the media record and its corresponding storage files!",
-                type: 'warning',
+                icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonColor: '#FA2833',
+                cancelButtonColor: '#6e7d88',
+                confirmButtonText: 'Yes, Delete It',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'btn btn-danger font-weight-bold px-3 py-1',
+                    cancelButton: 'btn btn-secondary font-weight-bold px-3 py-1 mr-1'
+                },
+                buttonsStyling: false
             }).then((result) => {
-                if (result.value) {
+                if (result.isConfirmed || result.value) {
                     form.submit();
                 }
             });

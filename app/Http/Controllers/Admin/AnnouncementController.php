@@ -289,6 +289,13 @@ class AnnouncementController extends Controller
         $announcement->update(['status' => 'deleted']);
         AnnouncementAuditLog::log($announcement->id, 'deleted', 'Announcement deleted.');
 
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Announcement deleted successfully.'
+            ]);
+        }
+
         return redirect()->route('admin.announcements.index')->with('success', 'Announcement deleted successfully.');
     }
 

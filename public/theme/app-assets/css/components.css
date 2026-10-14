@@ -75,7 +75,6 @@ html body .content.app-content .content-area-wrapper .content-wrapper {
 
 html body .content .content-wrapper {
   padding: calc(2.2rem - 0.4rem) 2.2rem 0;
-  margin-top: 6rem;
 }
 
 html body .content .content-wrapper .content-header-title {
@@ -141,7 +140,6 @@ html body.navbar-sticky .app-content .navbar-container .search-input .search-lis
 
 html body.navbar-sticky .app-content .content-wrapper {
   padding: 2.2rem;
-  margin-top: 4.65rem;
 }
 
 html body.navbar-static .navbar-container,

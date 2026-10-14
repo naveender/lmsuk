@@ -11,7 +11,7 @@ class UsersController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query();
+        $query = User::with(['studentDetail.parent', 'parentDetail']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -59,6 +59,20 @@ class UsersController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
 
+    public function show(User $user)
+    {
+        $user->load(['studentDetail', 'parentDetail']);
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'user' => $user
+            ]);
+        }
+
+        return redirect()->route('admin.users.index');
+    }
+
     public function edit(User $user)
     {
         return view('admin.users.edit', compact('user'));
@@ -89,9 +103,27 @@ class UsersController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
     }
 
-    public function destroy(User $user)
+    public function destroy($user)
     {
-        $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+        $targetUser = $user instanceof User ? $user : User::findOrFail($user);
+
+        DB::transaction(function () use ($targetUser) {
+            if ($targetUser->studentDetail) {
+                $targetUser->studentDetail->delete();
+            }
+            if ($targetUser->parentDetail) {
+                $targetUser->parentDetail->delete();
+            }
+            $targetUser->delete();
+        });
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'User soft-deleted successfully.'
+            ]);
+        }
+
+        return redirect()->route('admin.users.index')->with('success', 'User soft-deleted successfully.');
     }
 }

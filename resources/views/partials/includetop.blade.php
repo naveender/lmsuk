@@ -35,3 +35,4 @@
 
 <!-- BEGIN: Custom CSS-->
 <link rel="stylesheet" href="{{ asset('theme/app-assets/css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('theme/app-assets/css/admin-theme.css') }}">

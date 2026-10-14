@@ -218,6 +218,13 @@ class ParentController extends Controller
         }
         $parent->delete();
 
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Parent deleted successfully.'
+            ]);
+        }
+
         return redirect()->route('admin.parents.index')->with('success', 'Parent deleted successfully.');
     }
 }

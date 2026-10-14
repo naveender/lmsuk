@@ -88,6 +88,13 @@ class SubjectsController extends Controller
 
         $subject->delete();
 
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Subject deleted successfully.'
+            ]);
+        }
+
         return redirect()->route('admin.subjects.index')->with('success', 'Subject deleted successfully.');
     }
 }
