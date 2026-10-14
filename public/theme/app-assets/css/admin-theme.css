@@ -256,10 +256,18 @@ body.sidebar-collapsed .main-menu.modern-sidebar {
 }
 
 @media (min-width: 1024px) {
-    body.vertical-layout.vertical-menu-modern:not(.sidebar-collapsed) .app-content {
+    body.vertical-layout.vertical-menu-modern:not(.sidebar-collapsed) .app-content,
+    body.admin-theme-active:not(.sidebar-collapsed) .app-content,
+    body.vertical-layout.vertical-menu-modern:not(.sidebar-collapsed) footer.admin-theme-footer,
+    body.admin-theme-active:not(.sidebar-collapsed) footer.admin-theme-footer,
+    body.vertical-layout.vertical-menu-modern:not(.sidebar-collapsed) footer.footer {
         margin-left: 270px !important;
     }
-    body.vertical-layout.vertical-menu-modern.sidebar-collapsed .app-content {
+    body.vertical-layout.vertical-menu-modern.sidebar-collapsed .app-content,
+    body.admin-theme-active.sidebar-collapsed .app-content,
+    body.vertical-layout.vertical-menu-modern.sidebar-collapsed footer.admin-theme-footer,
+    body.admin-theme-active.sidebar-collapsed footer.admin-theme-footer,
+    body.vertical-layout.vertical-menu-modern.sidebar-collapsed footer.footer {
         margin-left: 80px !important;
     }
 }
@@ -1262,13 +1270,30 @@ body.sidebar-collapsed .modern-sidebar .profile-card {
 
 /* Footer Section */
 footer.admin-theme-footer {
-    padding: 18px 24px;
+    padding: 18px 28px;
     background: transparent;
     display: flex;
     align-items: center;
     justify-content: space-between;
     font-size: 13px;
     color: #7A8499;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 10;
+}
+
+@media (max-width: 1023.98px) {
+    footer.admin-theme-footer {
+        margin-left: 0 !important;
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+}
+
+body.dark-layout footer.admin-theme-footer {
+    color: #828690;
 }
 
 footer.admin-theme-footer a {

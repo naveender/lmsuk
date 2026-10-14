@@ -1,4 +1,4 @@
-<footer class="admin-theme-footer">
+<footer class="admin-theme-footer footer footer-static">
     <div>
         COPYRIGHT &copy; {{ date('Y') }} <a href="#">Naveender</a>, All rights Reserved
     </div>
