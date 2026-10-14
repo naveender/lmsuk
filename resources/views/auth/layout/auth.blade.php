@@ -1,6 +1,4 @@
 <!DOCTYPE html>
-<html lang="en">
-<!DOCTYPE html>
 <html class="loading" lang="en" data-textdirection="ltr">
 <!-- BEGIN: Head-->
 
@@ -11,7 +9,7 @@
     <title>@yield('title', 'Authenticate')</title>
     <link rel="apple-touch-icon" href="{{ asset('theme/app-assets/images/ico/apple-icon-120.png') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('theme/app-assets/images/ico/favicon.ico') }}">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
     <!-- BEGIN: Vendor CSS-->
     <link rel="stylesheet" href="{{ asset('theme/app-assets/vendors/css/vendors.min.css') }}">
     <!-- END: Vendor CSS-->
@@ -31,6 +29,8 @@
     <link rel="stylesheet" href="{{ asset('theme/app-assets/css/core/colors/palette-gradient.css') }}">
     <link rel="stylesheet" href="{{ asset('theme/app-assets/css/pages/authentication.css') }}">
     <!-- END: Page CSS-->
+
+    @stack('styles')
 </head>
 <!-- END: Head-->
 
