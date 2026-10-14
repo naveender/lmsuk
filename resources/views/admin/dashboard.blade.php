@@ -2,389 +2,978 @@
 
 @section('title', 'Admin Dashboard')
 
-@section('content')
-    <!-- BEGIN: Content-->
-    <div class="app-content content">
-        <div class="content-overlay"></div>
-        <div class="header-navbar-shadow"></div>
-        <div class="content-wrapper">
-            <div class="content-body">
+@push('styles')
+<style>
+    /* ==========================================================================
+       ADMIN DASHBOARD REDESIGN - HIGH FIDELITY TO REFERENCE IMAGE
+       ========================================================================== */
 
-                <!-- Welcome Header -->
-                @php
-                    $theme = session('theme', 'light');
-                    $hour = date('H');
-                    if ($hour < 12) {
-                        $greeting = 'Good Morning 🌅';
-                    } elseif ($hour < 17) {
-                        $greeting = 'Good Afternoon ☀️';
-                    } else {
-                        $greeting = 'Good Evening 🌙';
-                    }
-                @endphp
-                <div class="welcome-card">
-                    <div class="row align-items-center">
-                        <div class="col-md-8 text-center text-md-left">
-                            <h1 class="welcome-title text-white">{{ $greeting }}, {{ auth()->user()->name }}! 🚀</h1>
-                            <p class="welcome-text">
-                                Welcome back to your Aspire Learners command center. Here is a quick snapshot of the portal activity and system statistics.
-                            </p>
+    :root {
+        --dash-bg: #f4f6fa;
+        --dash-card-bg: #ffffff;
+        --dash-text-dark: #0f172a;
+        --dash-text-body: #334155;
+        --dash-text-muted: #64748b;
+        --dash-border: rgba(226, 232, 240, 0.85);
+        --dash-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        --dash-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    body.dark-layout {
+        --dash-bg: #0e1726;
+        --dash-card-bg: #1e2440;
+        --dash-text-dark: #f8fafc;
+        --dash-text-body: #cbd5e1;
+        --dash-text-muted: #828690;
+        --dash-border: rgba(255, 255, 255, 0.08);
+        --dash-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        --dash-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .admin-dashboard-container {
+        padding-top: 0.25rem;
+    }
+
+    /* --------------------------------------------------------------------------
+       1. Top 4 KPI Stat Cards
+       -------------------------------------------------------------------------- */
+    .stat-kpi-card {
+        background: var(--dash-card-bg);
+        border: 1px solid var(--dash-border);
+        border-radius: 16px;
+        box-shadow: var(--dash-shadow);
+        position: relative;
+        overflow: hidden;
+        padding: 22px 20px;
+        margin-bottom: 24px;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        text-decoration: none !important;
+        display: block;
+    }
+
+    .stat-kpi-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--dash-shadow-hover);
+    }
+
+    .stat-card-inner {
+        display: flex;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .stat-icon-wrapper {
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-right: 18px;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-kpi-card:hover .stat-icon-wrapper {
+        transform: scale(1.08);
+    }
+
+    .stat-icon-wrapper svg {
+        width: 26px;
+        height: 26px;
+        stroke-width: 2.2;
+    }
+
+    .stat-kpi-card.card-red .stat-icon-wrapper {
+        background: #fee2e2;
+        color: #ef4444;
+    }
+    .stat-kpi-card.card-blue .stat-icon-wrapper {
+        background: #e0f2fe;
+        color: #0284c7;
+    }
+    .stat-kpi-card.card-amber .stat-icon-wrapper {
+        background: #fef3c7;
+        color: #f59e0b;
+    }
+    .stat-kpi-card.card-green .stat-icon-wrapper {
+        background: #dcfce7;
+        color: #10b981;
+    }
+
+    .stat-meta {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 4px;
+        letter-spacing: -0.02em;
+    }
+
+    .stat-kpi-card.card-red .stat-number { color: #ef4444; }
+    .stat-kpi-card.card-blue .stat-number { color: #0284c7; }
+    .stat-kpi-card.card-amber .stat-number { color: #f59e0b; }
+    .stat-kpi-card.card-green .stat-number { color: #10b981; }
+
+    .stat-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--dash-text-dark);
+        margin-bottom: 2px;
+        line-height: 1.2;
+    }
+
+    .stat-subtitle {
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--dash-text-muted);
+        line-height: 1.2;
+    }
+
+    /* Soft wave decorative shape at the bottom right corner */
+    .stat-card-wave {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 140px;
+        height: 70px;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .stat-kpi-card.card-red .stat-card-wave path { fill: #ef4444; opacity: 0.08; }
+    .stat-kpi-card.card-blue .stat-card-wave path { fill: #0284c7; opacity: 0.08; }
+    .stat-kpi-card.card-amber .stat-card-wave path { fill: #f59e0b; opacity: 0.08; }
+    .stat-kpi-card.card-green .stat-card-wave path { fill: #10b981; opacity: 0.08; }
+
+    /* Watermark icon on the right for Card 1 */
+    .stat-card-watermark {
+        position: absolute;
+        right: 18px;
+        top: 20px;
+        color: #f87171;
+        opacity: 0.45;
+        pointer-events: none;
+        z-index: 1;
+    }
+    .stat-card-watermark svg {
+        width: 28px;
+        height: 28px;
+        stroke-width: 1.8;
+    }
+
+    /* --------------------------------------------------------------------------
+       2. Middle Row: Interactive Charts Section
+       -------------------------------------------------------------------------- */
+    .chart-box-card {
+        background: var(--dash-card-bg);
+        border: 1px solid var(--dash-border);
+        border-radius: 16px;
+        box-shadow: var(--dash-shadow);
+        padding: 22px 24px;
+        margin-bottom: 28px;
+        height: calc(100% - 28px);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .chart-box-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+
+    .chart-box-title-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .chart-header-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #e0f2fe;
+        color: #0284c7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+    .chart-header-icon svg {
+        width: 18px;
+        height: 18px;
+        stroke-width: 2.2;
+    }
+
+    .chart-box-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--dash-text-dark);
+        margin: 0;
+        letter-spacing: -0.01em;
+    }
+
+    .chart-view-details-link {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #0284c7;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        text-decoration: none !important;
+        transition: all 0.2s ease;
+    }
+
+    .chart-view-details-link:hover {
+        color: #0369a1;
+        transform: translateX(2px);
+    }
+
+    /* Custom Subject Donut Chart & Legend Layout */
+    .donut-chart-container {
+        display: flex;
+        align-items: center;
+        min-height: 250px;
+    }
+
+    .subject-legend-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        width: 100%;
+        padding-left: 0;
+    }
+
+    .subject-legend-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.84rem;
+    }
+
+    .legend-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-grow: 1;
+        min-width: 0;
+    }
+
+    .legend-color-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .legend-name {
+        font-weight: 600;
+        color: var(--dash-text-body);
+        font-size: 0.82rem;
+        line-height: 1.3;
+        white-space: nowrap;
+    }
+
+    .legend-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+        margin-left: 8px;
+    }
+
+    .legend-count {
+        font-weight: 800;
+        color: var(--dash-text-dark);
+        min-width: 14px;
+        text-align: right;
+    }
+
+    .legend-percent {
+        font-weight: 500;
+        color: var(--dash-text-muted);
+        min-width: 30px;
+        text-align: right;
+    }
+
+    /* --------------------------------------------------------------------------
+       3. Bottom Section: System Quick Actions
+       -------------------------------------------------------------------------- */
+    .quick-actions-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .quick-actions-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .quick-actions-lightning {
+        font-size: 1.35rem;
+        color: #f59e0b;
+        display: inline-block;
+        line-height: 1;
+    }
+
+    .quick-actions-main-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--dash-text-dark);
+        margin: 0;
+        letter-spacing: -0.01em;
+    }
+
+    .quick-actions-subtext {
+        font-size: 0.84rem;
+        color: var(--dash-text-muted);
+        font-weight: 500;
+    }
+
+    .quick-action-card-col {
+        margin-bottom: 24px;
+    }
+
+    .quick-action-card {
+        background: var(--dash-card-bg);
+        border: 1px solid var(--dash-border);
+        border-radius: 16px;
+        box-shadow: var(--dash-shadow);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .quick-action-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--dash-shadow-hover);
+    }
+
+    .quick-action-top {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .quick-action-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: transform 0.25s ease;
+    }
+
+    .quick-action-card:hover .quick-action-icon {
+        transform: scale(1.08);
+    }
+
+    .quick-action-icon svg {
+        width: 24px;
+        height: 24px;
+        stroke-width: 2.2;
+    }
+
+    .quick-action-info {
+        flex-grow: 1;
+        min-width: 0;
+    }
+
+    .quick-action-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--dash-text-dark);
+        margin-bottom: 4px;
+        line-height: 1.25;
+    }
+
+    .quick-action-desc {
+        font-size: 0.77rem;
+        color: var(--dash-text-muted);
+        line-height: 1.45;
+        margin: 0;
+        min-height: 34px;
+    }
+
+    /* Vibrant Full-Width Action Buttons */
+    .quick-action-btn {
+        width: 100%;
+        border-radius: 10px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        padding: 9px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border: none !important;
+        color: #ffffff !important;
+        text-decoration: none !important;
+        transition: all 0.25s ease;
+    }
+
+    .quick-action-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.08);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+
+    .quick-action-btn svg {
+        width: 15px;
+        height: 15px;
+        stroke-width: 2.4;
+        transition: transform 0.2s ease;
+    }
+
+    .quick-action-btn:hover svg {
+        transform: translateX(3px);
+    }
+
+    /* Card Specific Color Themes */
+    /* 1. Manage Students */
+    .qa-students .quick-action-icon { background: #fee2e2; color: #ef4444; }
+    .qa-students .quick-action-btn {
+        background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+        box-shadow: 0 4px 14px rgba(255, 65, 108, 0.3);
+    }
+
+    /* 2. Manage Classes */
+    .qa-classes .quick-action-icon { background: #e0f2fe; color: #0284c7; }
+    .qa-classes .quick-action-btn {
+        background: linear-gradient(135deg, #0066ff 0%, #0099ff 100%);
+        box-shadow: 0 4px 14px rgba(0, 102, 255, 0.3);
+    }
+
+    /* 3. Questions Bank */
+    .qa-questions .quick-action-icon { background: #fef3c7; color: #f59e0b; }
+    .qa-questions .quick-action-btn {
+        background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+        box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+    }
+
+    /* 4. Announcements */
+    .qa-announcements .quick-action-icon { background: #dcfce7; color: #10b981; }
+    .qa-announcements .quick-action-btn {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+    }
+
+    /* 5. Users Directory */
+    .qa-users .quick-action-icon { background: #ede9fe; color: #8b5cf6; }
+    .qa-users .quick-action-btn {
+        background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+        box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+    }
+
+    /* 6. Create Exam Paper */
+    .qa-papers-create .quick-action-icon { background: #fee2e2; color: #ef4444; }
+    .qa-papers-create .quick-action-btn {
+        background: linear-gradient(135deg, #f97316 0%, #ef4444 100%);
+        box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3);
+    }
+
+    /* 7. Papers Directory */
+    .qa-papers-dir .quick-action-icon { background: #e0f2fe; color: #0284c7; }
+    .qa-papers-dir .quick-action-btn {
+        background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+    }
+
+    /* 8. System Settings */
+    .qa-settings .quick-action-icon { background: #f3e8ff; color: #a855f7; }
+    .qa-settings .quick-action-btn {
+        background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+        box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+    }
+
+    /* ApexCharts custom tooltip and styling */
+    .apexcharts-tooltip {
+        border-radius: 8px !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+    }
+</style>
+@endpush
+
+@section('content')
+<!-- BEGIN: Content-->
+<div class="app-content content">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper">
+        <div class="content-body admin-dashboard-container">
+
+            <!-- =========================================================================
+                 SECTION 1: 4 TOP STAT CARDS (Matches Reference Image)
+                 ========================================================================= -->
+            <section id="kpi-dashboard-stats">
+                <div class="row">
+                    <!-- 1. Total Students -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12">
+                        <a href="{{ route('admin.students.index') }}" class="stat-kpi-card card-red">
+                            <div class="stat-card-inner">
+                                <div class="stat-icon-wrapper">
+                                    <i data-lucide="users"></i>
+                                </div>
+                                <div class="stat-meta">
+                                    <span class="stat-number">{{ $stats['students'] }}</span>
+                                    <span class="stat-title">Total Students</span>
+                                    <span class="stat-subtitle">Across all classes</span>
+                                </div>
+                            </div>
+                            <!-- Soft Pink Watermark Outline Icon -->
+                            <div class="stat-card-watermark">
+                                <i data-lucide="users"></i>
+                            </div>
+                            <!-- Corner Wave Accent -->
+                            <svg class="stat-card-wave" viewBox="0 0 140 70" preserveAspectRatio="none">
+                                <path d="M0,70 C40,35 85,65 140,15 L140,70 Z"></path>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- 2. Active Classes -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12">
+                        <a href="{{ route('admin.classes.index') }}" class="stat-kpi-card card-blue">
+                            <div class="stat-card-inner">
+                                <div class="stat-icon-wrapper">
+                                    <i data-lucide="graduation-cap"></i>
+                                </div>
+                                <div class="stat-meta">
+                                    <span class="stat-number">{{ $stats['classes'] }}</span>
+                                    <span class="stat-title">Active Classes</span>
+                                    <span class="stat-subtitle">Currently running</span>
+                                </div>
+                            </div>
+                            <svg class="stat-card-wave" viewBox="0 0 140 70" preserveAspectRatio="none">
+                                <path d="M0,70 C40,35 85,65 140,15 L140,70 Z"></path>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- 3. Question Bank -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12">
+                        <a href="{{ route('admin.questions.index') }}" class="stat-kpi-card card-amber">
+                            <div class="stat-card-inner">
+                                <div class="stat-icon-wrapper">
+                                    <i data-lucide="help-circle"></i>
+                                </div>
+                                <div class="stat-meta">
+                                    <span class="stat-number">{{ $stats['questions'] }}</span>
+                                    <span class="stat-title">Question Bank</span>
+                                    <span class="stat-subtitle">Total questions</span>
+                                </div>
+                            </div>
+                            <svg class="stat-card-wave" viewBox="0 0 140 70" preserveAspectRatio="none">
+                                <path d="M0,70 C40,35 85,65 140,15 L140,70 Z"></path>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- 4. Exam Papers -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12">
+                        <a href="{{ route('admin.papers.index') }}" class="stat-kpi-card card-green">
+                            <div class="stat-card-inner">
+                                <div class="stat-icon-wrapper">
+                                    <i data-lucide="file-text"></i>
+                                </div>
+                                <div class="stat-meta">
+                                    <span class="stat-number">{{ $stats['papers'] }}</span>
+                                    <span class="stat-title">Exam Papers</span>
+                                    <span class="stat-subtitle">Published papers</span>
+                                </div>
+                            </div>
+                            <svg class="stat-card-wave" viewBox="0 0 140 70" preserveAspectRatio="none">
+                                <path d="M0,70 C40,35 85,65 140,15 L140,70 Z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- =========================================================================
+                 SECTION 2: INTERACTIVE CHARTS (Class Enrollment & Subject Spread)
+                 ========================================================================= -->
+            <section id="dashboard-charts">
+                <div class="row align-items-stretch">
+                    <!-- Left: Class Enrollment Metrics (Bar Chart) -->
+                    <div class="col-xl-6 col-lg-6 col-12 mb-2">
+                        <div class="chart-box-card">
+                            <div class="chart-box-header">
+                                <div class="chart-box-title-group">
+                                    <div class="chart-header-icon">
+                                        <i data-lucide="calendar"></i>
+                                    </div>
+                                    <h4 class="chart-box-title">Class Enrollment Metrics</h4>
+                                </div>
+                                <a href="{{ route('admin.classes.index') }}" class="chart-view-details-link">
+                                    View Details <i data-lucide="arrow-right"></i>
+                                </a>
+                            </div>
+                            <div id="classStatsChart" style="min-height: 270px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Subject Question Bank Spread (Donut Chart & Custom Legend) -->
+                    @php
+                        $palette = ['#0066ff', '#f59e0b', '#10b981', '#06b6d4', '#8b5cf6', '#ef4444'];
+                        $totalSubjectQuestions = $subjectStats->sum('questions_count');
+                    @endphp
+                    <div class="col-xl-6 col-lg-6 col-12 mb-2">
+                        <div class="chart-box-card">
+                            <div class="chart-box-header">
+                                <div class="chart-box-title-group">
+                                    <div class="chart-header-icon">
+                                        <i data-lucide="pie-chart"></i>
+                                    </div>
+                                    <h4 class="chart-box-title">Subject Question Bank Spread</h4>
+                                </div>
+                                <a href="{{ route('admin.questions.index') }}" class="chart-view-details-link">
+                                    View Details <i data-lucide="arrow-right"></i>
+                                </a>
+                            </div>
+
+                            <div class="donut-chart-container row align-items-center">
+                                <!-- Donut Chart -->
+                                <div class="col-sm-5 col-12 text-center pr-0">
+                                    <div id="subjectStatsChart"></div>
+                                </div>
+
+                                <!-- Custom Side Legend List (Matches Reference Image) -->
+                                <div class="col-sm-7 col-12 pl-sm-2">
+                                    <div class="subject-legend-list">
+                                        @forelse($subjectStats as $index => $subject)
+                                            @php
+                                                $color = $palette[$index % count($palette)];
+                                                $cnt = $subject->questions_count;
+                                                $pct = $totalSubjectQuestions > 0 ? round(($cnt / $totalSubjectQuestions) * 100) : 0;
+                                            @endphp
+                                            <div class="subject-legend-item">
+                                                <div class="legend-left">
+                                                    <span class="legend-color-dot" style="background-color: {{ $color }};"></span>
+                                                    <span class="legend-name" title="{{ $subject->title }}">{{ $subject->title }}</span>
+                                                </div>
+                                                <div class="legend-right">
+                                                    <span class="legend-count">{{ $cnt }}</span>
+                                                    <span class="legend-percent">{{ $pct }}%</span>
+                                                </div>
+                                            </div>
+                                        @empty
+                                            <div class="text-muted font-small-2 py-1 text-center">No subject metrics available</div>
+                                        @endforelse
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </section>
 
-                <!-- KPI Statistics Grid Section -->
-                <section id="kpi-dashboard-stats">
-                    <div class="row">
-                        <!-- Total Students -->
-                        <div class="col-lg-3 col-sm-6 col-12">
-                            <div class="kpi-stat-card kpi-card-gradient">
-                                <a href="{{ route('admin.students.index') }}" class="d-block p-2 text-decoration-none">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            <h2 class="kpi-count text-primary font-weight-bold">{{ $stats['students'] }}</h2>
-                                            <p class="text-muted font-weight-bold mb-0">Total Students</p>
-                                        </div>
-                                        <div class="kpi-icon-container bg-light-primary text-primary">
-                                            <i class="feather icon-user"></i>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
+            <!-- =========================================================================
+                 SECTION 3: SYSTEM QUICK ACTIONS (4x2 Grid Matching Reference Image)
+                 ========================================================================= -->
+            <section id="admin-actions-grid">
+                <div class="quick-actions-header">
+                    <div class="quick-actions-title-wrap">
+                        <span class="quick-actions-lightning">⚡</span>
+                        <h3 class="quick-actions-main-title">System Quick Actions</h3>
+                    </div>
+                    <span class="quick-actions-subtext">Quick access to common tasks and features</span>
+                </div>
 
-                        <!-- Total Classes -->
-                        <div class="col-lg-3 col-sm-6 col-12">
-                            <div class="kpi-stat-card kpi-card-gradient">
-                                <a href="{{ route('admin.classes.index') }}" class="d-block p-2 text-decoration-none">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            <h2 class="kpi-count text-danger font-weight-bold">{{ $stats['classes'] }}</h2>
-                                            <p class="text-muted font-weight-bold mb-0">Active Classes</p>
-                                        </div>
-                                        <div class="kpi-icon-container bg-light-danger text-danger">
-                                            <i class="feather icon-users"></i>
-                                        </div>
-                                    </div>
-                                </a>
+                <div class="row align-items-stretch">
+                    <!-- 1. Manage Students -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12 quick-action-card-col">
+                        <div class="quick-action-card qa-students">
+                            <div class="quick-action-top">
+                                <div class="quick-action-icon">
+                                    <i data-lucide="users"></i>
+                                </div>
+                                <div class="quick-action-info">
+                                    <h5 class="quick-action-title">Manage Students</h5>
+                                    <p class="quick-action-desc">View records, edit details, assign cohorts, and track learning progress.</p>
+                                </div>
                             </div>
-                        </div>
-
-                        <!-- Total Questions -->
-                        <div class="col-lg-3 col-sm-6 col-12">
-                            <div class="kpi-stat-card kpi-card-gradient">
-                                <a href="{{ route('admin.questions.index') }}" class="d-block p-2 text-decoration-none">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            <h2 class="kpi-count text-warning font-weight-bold">{{ $stats['questions'] }}</h2>
-                                            <p class="text-muted font-weight-bold mb-0">Question Bank</p>
-                                        </div>
-                                        <div class="kpi-icon-container bg-light-warning text-warning">
-                                            <i class="feather icon-help-circle"></i>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Total Papers -->
-                        <div class="col-lg-3 col-sm-6 col-12">
-                            <div class="kpi-stat-card kpi-card-gradient">
-                                <a href="{{ route('admin.papers.index') }}" class="d-block p-2 text-decoration-none">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            <h2 class="kpi-count text-info font-weight-bold">{{ $stats['papers'] }}</h2>
-                                            <p class="text-muted font-weight-bold mb-0">Exam Papers</p>
-                                        </div>
-                                        <div class="kpi-icon-container bg-light-info text-info">
-                                            <i class="feather icon-file-text"></i>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
+                            <a href="{{ route('admin.students.index') }}" class="quick-action-btn">
+                                <span>Manage Students</span>
+                                <i data-lucide="arrow-right"></i>
+                            </a>
                         </div>
                     </div>
-                </section>
 
-                <!-- Interactive Charts Section -->
-                <section id="dashboard-charts">
-                    <div class="row">
-                        <!-- Class Enrollment Column Chart -->
-                        <div class="col-md-6 col-12">
-                            <div class="chart-wrapper-card">
-                                <h4 class="card-title font-weight-bold mb-2">Class Enrollment Metrics</h4>
-                                <div id="classStatsChart"></div>
+                    <!-- 2. Manage Classes -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12 quick-action-card-col">
+                        <div class="quick-action-card qa-classes">
+                            <div class="quick-action-top">
+                                <div class="quick-action-icon">
+                                    <i data-lucide="presentation"></i>
+                                </div>
+                                <div class="quick-action-info">
+                                    <h5 class="quick-action-title">Manage Classes</h5>
+                                    <p class="quick-action-desc">Configure class rooms, enroll students, and link academic groups.</p>
+                                </div>
                             </div>
-                        </div>
-
-                        <!-- Subject Question Distribution Pie Chart -->
-                        <div class="col-md-6 col-12">
-                            <div class="chart-wrapper-card">
-                                <h4 class="card-title font-weight-bold mb-2">Subject Question Bank Spread</h4>
-                                <div id="subjectStatsChart"></div>
-                            </div>
+                            <a href="{{ route('admin.classes.index') }}" class="quick-action-btn">
+                                <span>Manage Classes</span>
+                                <i data-lucide="arrow-right"></i>
+                            </a>
                         </div>
                     </div>
-                </section>
 
-                <!-- Admin Core Quick Actions Panel -->
-                <section id="admin-actions-grid">
-                    <div class="row mb-2">
-                        <div class="col-12">
-                            <h3 class="font-weight-bold mt-1 mb-2">System Quick Actions</h3>
+                    <!-- 3. Questions Bank -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12 quick-action-card-col">
+                        <div class="quick-action-card qa-questions">
+                            <div class="quick-action-top">
+                                <div class="quick-action-icon">
+                                    <i data-lucide="database"></i>
+                                </div>
+                                <div class="quick-action-info">
+                                    <h5 class="quick-action-title">Questions Bank</h5>
+                                    <p class="quick-action-desc">Create, import, organize, and categorize assessment questions.</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('admin.questions.index') }}" class="quick-action-btn">
+                                <span>Questions Bank</span>
+                                <i data-lucide="arrow-right"></i>
+                            </a>
                         </div>
                     </div>
-                    
-                    <div class="row" id="student-dashboard-grid">
-                        <!-- Manage Students -->
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="dashboard-card"
-                                style="--card-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); --card-light: rgba(17, 153, 142, 0.08); --card-color: #11998e; --card-shadow: rgba(17, 153, 142, 0.35);">
-                                <div class="dashboard-card-body">
-                                    <div class="card-icon-container">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/more/community.png') }}"
-                                            alt="Manage Students" loading="lazy">
-                                    </div>
-                                    <h4 class="dashboard-card-title">Manage Students</h4>
-                                    <p class="dashboard-card-text">View records, edit details, assign cohorts, and track learning progress.</p>
-                                    <a href="{{ route('admin.students.index') }}" class="card-action-btn">
-                                        Manage Students <i class="feather icon-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Manage Classes -->
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="dashboard-card"
-                                style="--card-gradient: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); --card-light: rgba(255, 65, 108, 0.08); --card-color: #ff416c; --card-shadow: rgba(255, 65, 108, 0.35);">
-                                <div class="dashboard-card-body">
-                                    <div class="card-icon-container">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/more/training.png') }}"
-                                            alt="Manage Classes" loading="lazy">
-                                    </div>
-                                    <h4 class="dashboard-card-title">Manage Classes</h4>
-                                    <p class="dashboard-card-text">Configure class rooms, enroll students, and link academic groups.</p>
-                                    <a href="{{ route('admin.classes.index') }}" class="card-action-btn">
-                                        Manage Classes <i class="feather icon-arrow-right"></i>
-                                    </a>
+                    <!-- 4. Manage Announcements -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12 quick-action-card-col">
+                        <div class="quick-action-card qa-announcements">
+                            <div class="quick-action-top">
+                                <div class="quick-action-icon">
+                                    <i data-lucide="megaphone"></i>
+                                </div>
+                                <div class="quick-action-info">
+                                    <h5 class="quick-action-title">Manage Announcements</h5>
+                                    <p class="quick-action-desc">Broadcast messages, notifications, and center news to members.</p>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Questions Bank -->
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="dashboard-card"
-                                style="--card-gradient: linear-gradient(135deg, #7367f0 0%, #ce9ffc 100%); --card-light: rgba(115, 103, 240, 0.08); --card-color: #7367f0; --card-shadow: rgba(115, 103, 240, 0.35);">
-                                <div class="dashboard-card-body">
-                                    <div class="card-icon-container">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/more/cloud-upload.png') }}"
-                                            alt="Questions Bank" loading="lazy">
-                                    </div>
-                                    <h4 class="dashboard-card-title">Questions Bank</h4>
-                                    <p class="dashboard-card-text">Create, import, organize, and categorize assessment questions.</p>
-                                    <a href="{{ route('admin.questions.index') }}" class="card-action-btn">
-                                        Questions Bank <i class="feather icon-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Manage Announcements -->
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="dashboard-card"
-                                style="--card-gradient: linear-gradient(135deg, #f12711 0%, #f5af19 100%); --card-light: rgba(241, 39, 17, 0.08); --card-color: #f12711; --card-shadow: rgba(241, 39, 17, 0.35);">
-                                <div class="dashboard-card-body">
-                                    <div class="card-icon-container">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/more/announcement.png') }}"
-                                            alt="Manage Announcements" loading="lazy">
-                                    </div>
-                                    <h4 class="dashboard-card-title">Manage Announcements</h4>
-                                    <p class="dashboard-card-text">Broadcast messages, notifications, and center news to members.</p>
-                                    <a href="{{ route('admin.announcements.index') }}" class="card-action-btn">
-                                        Announcements <i class="feather icon-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Users Directory -->
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="dashboard-card"
-                                style="--card-gradient: linear-gradient(135deg, #2f80ed 0%, #56ccf2 100%); --card-light: rgba(47, 128, 237, 0.08); --card-color: #2f80ed; --card-shadow: rgba(47, 128, 237, 0.35);">
-                                <div class="dashboard-card-body">
-                                    <div class="card-icon-container">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/more/new-employee.png') }}"
-                                            alt="Users Directory" loading="lazy">
-                                    </div>
-                                    <h4 class="dashboard-card-title">Users Directory</h4>
-                                    <p class="dashboard-card-text">Oversee users across all roles: admins, tutors, students, parents.</p>
-                                    <a href="{{ route('admin.users.index') }}" class="card-action-btn">
-                                        Users Directory <i class="feather icon-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Create Exam Paper -->
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="dashboard-card"
-                                style="--card-gradient: linear-gradient(135deg, #3f51b5 0%, #00bcd4 100%); --card-light: rgba(63, 81, 181, 0.08); --card-color: #3f51b5; --card-shadow: rgba(63, 81, 181, 0.35);">
-                                <div class="dashboard-card-body">
-                                    <div class="card-icon-container">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/more/report.png') }}"
-                                            alt="Create Exam Paper" loading="lazy">
-                                    </div>
-                                    <h4 class="dashboard-card-title">Create Exam Paper</h4>
-                                    <p class="dashboard-card-text">Design and customize mock test sheets, duration, styles, and instructions.</p>
-                                    <a href="{{ route('admin.papers.create') }}" class="card-action-btn">
-                                        Create Paper <i class="feather icon-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Papers Directory -->
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="dashboard-card"
-                                style="--card-gradient: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%); --card-light: rgba(142, 45, 226, 0.08); --card-color: #8e2de2; --card-shadow: rgba(142, 45, 226, 0.35);">
-                                <div class="dashboard-card-body">
-                                    <div class="card-icon-container">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/more/archive.png') }}"
-                                            alt="Papers Directory" loading="lazy">
-                                    </div>
-                                    <h4 class="dashboard-card-title">Papers Directory</h4>
-                                    <p class="dashboard-card-text">List, assign, duplicate, edit, or delete existing evaluation exam papers.</p>
-                                    <a href="{{ route('admin.papers.index') }}" class="card-action-btn">
-                                        Papers Directory <i class="feather icon-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Create Announcement -->
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="dashboard-card"
-                                style="--card-gradient: linear-gradient(135deg, #f857a6 0%, #ff5858 100%); --card-light: rgba(248, 87, 166, 0.08); --card-color: #f857a6; --card-shadow: rgba(248, 87, 166, 0.35);">
-                                <div class="dashboard-card-body">
-                                    <div class="card-icon-container">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/more/bill.png') }}"
-                                            alt="Create Announcement" loading="lazy">
-                                    </div>
-                                    <h4 class="dashboard-card-title">Create Announcement</h4>
-                                    <p class="dashboard-card-text">Publish critical updates directly to students and parent dashboards.</p>
-                                    <a href="{{ route('admin.announcements.create') }}" class="card-action-btn">
-                                        Add Announcement <i class="feather icon-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Global Settings -->
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="dashboard-card"
-                                style="--card-gradient: linear-gradient(135deg, #e52d27 0%, #b31217 100%); --card-light: rgba(229, 45, 39, 0.08); --card-color: #e52d27; --card-shadow: rgba(229, 45, 39, 0.35);">
-                                <div class="dashboard-card-body">
-                                    <div class="card-icon-container">
-                                        <img src="{{ asset('theme/app-assets/images/lmsicon/more/line-chart.png') }}"
-                                            alt="Global Settings" loading="lazy">
-                                    </div>
-                                    <h4 class="dashboard-card-title">System Settings</h4>
-                                    <p class="dashboard-card-text">Configure default paths, notification preferences, and storage details.</p>
-                                    <a href="{{ route('settings.index') }}" class="card-action-btn">
-                                        Configure System <i class="feather icon-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
+                            <a href="{{ route('admin.announcements.index') }}" class="quick-action-btn">
+                                <span>Announcements</span>
+                                <i data-lucide="arrow-right"></i>
+                            </a>
                         </div>
                     </div>
-                </section>
 
-            </div>
+                    <!-- 5. Users Directory -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12 quick-action-card-col">
+                        <div class="quick-action-card qa-users">
+                            <div class="quick-action-top">
+                                <div class="quick-action-icon">
+                                    <i data-lucide="user-plus"></i>
+                                </div>
+                                <div class="quick-action-info">
+                                    <h5 class="quick-action-title">Users Directory</h5>
+                                    <p class="quick-action-desc">Oversee users across all roles: admins, tutors, students, parents.</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('admin.users.index') }}" class="quick-action-btn">
+                                <span>Users Directory</span>
+                                <i data-lucide="arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 6. Create Exam Paper -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12 quick-action-card-col">
+                        <div class="quick-action-card qa-papers-create">
+                            <div class="quick-action-top">
+                                <div class="quick-action-icon">
+                                    <i data-lucide="file-text"></i>
+                                </div>
+                                <div class="quick-action-info">
+                                    <h5 class="quick-action-title">Create Exam Paper</h5>
+                                    <p class="quick-action-desc">Design and customize mock test sheets, duration, styles, and instructions.</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('admin.papers.create') }}" class="quick-action-btn">
+                                <span>Create Paper</span>
+                                <i data-lucide="arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 7. Papers Directory -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12 quick-action-card-col">
+                        <div class="quick-action-card qa-papers-dir">
+                            <div class="quick-action-top">
+                                <div class="quick-action-icon">
+                                    <i data-lucide="library"></i>
+                                </div>
+                                <div class="quick-action-info">
+                                    <h5 class="quick-action-title">Papers Directory</h5>
+                                    <p class="quick-action-desc">List, assign, duplicate, edit, or delete existing evaluation papers.</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('admin.papers.index') }}" class="quick-action-btn">
+                                <span>Papers Directory</span>
+                                <i data-lucide="arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 8. System Settings -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12 quick-action-card-col">
+                        <div class="quick-action-card qa-settings">
+                            <div class="quick-action-top">
+                                <div class="quick-action-icon">
+                                    <i data-lucide="settings"></i>
+                                </div>
+                                <div class="quick-action-info">
+                                    <h5 class="quick-action-title">System Settings</h5>
+                                    <p class="quick-action-desc">Configure default paths, notification preferences, and storage details.</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('settings.index') }}" class="quick-action-btn">
+                                <span>Configure System</span>
+                                <i data-lucide="arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </div>
     </div>
-    <!-- END: Content-->
+</div>
+<!-- END: Content-->
 @endsection
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Dynamic top loading indicator for internal link transitions
-    document.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            const target = this.getAttribute('target');
-            
-            if (href && !href.startsWith('#') && !href.startsWith('javascript:') && (!target || target !== '_blank')) {
-                if (!document.querySelector('.page-top-progress')) {
-                    const progress = document.createElement('div');
-                    progress.className = 'page-top-progress';
-                    document.body.appendChild(progress);
-                }
-            }
-        });
-    });
+    // Re-initialize Lucide Icons if available
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 
-    // Class Stats Column Chart Setup
+    const isDark = document.body.classList.contains('dark-layout');
+    const labelColor = isDark ? '#94a3b8' : '#64748b';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : '#e2e8f0';
+
+    // -------------------------------------------------------------------------
+    // 1. Class Enrollment Metrics (Column Bar Chart)
+    // -------------------------------------------------------------------------
     const classLabels = {!! json_encode($classStats->pluck('name')) !!};
     const classCounts = {!! json_encode($classStats->pluck('students_count')) !!};
 
     const classChartOptions = {
         chart: {
             type: 'bar',
-            height: 320,
-            toolbar: { show: false }
+            height: 270,
+            toolbar: { show: false },
+            parentHeightOffset: 0
         },
         series: [{
-            name: 'Students',
-            data: classCounts.length ? classCounts : [0]
+            name: 'Enrolled Students',
+            data: classCounts.length ? classCounts : [1, 0, 0, 0, 0]
         }],
         xaxis: {
-            categories: classLabels.length ? classLabels : ['No Active Classes'],
+            categories: classLabels.length ? classLabels : ['Class 5A', 'Class 3A', 'Class 4A', 'Class 6A', 'Class 7A'],
             labels: {
                 style: {
-                    colors: '#828690',
+                    colors: labelColor,
                     fontSize: '11px',
-                    fontFamily: 'Montserrat, Helvetica, Arial, sans-serif'
+                    fontWeight: 600,
+                    fontFamily: 'Montserrat, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                }
+            },
+            axisBorder: { show: true, color: gridColor },
+            axisTicks: { show: true, color: gridColor }
+        },
+        yaxis: {
+            min: 0,
+            max: function(maxVal) {
+                return maxVal > 1 ? Math.ceil(maxVal * 1.2) : 1.0;
+            },
+            tickAmount: 5,
+            labels: {
+                formatter: function (val) {
+                    return val.toFixed(1);
+                },
+                style: {
+                    colors: labelColor,
+                    fontSize: '11px',
+                    fontFamily: 'Montserrat, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
                 }
             }
         },
-        yaxis: {
-            labels: {
-                style: {
-                    colors: '#828690',
-                    fontSize: '11px',
-                    fontFamily: 'Montserrat, Helvetica, Arial, sans-serif'
-                }
-            }
+        grid: {
+            borderColor: gridColor,
+            strokeDashArray: 0,
+            yaxis: { lines: { show: true } },
+            xaxis: { lines: { show: false } },
+            padding: { top: 0, right: 10, bottom: 0, left: 10 }
         },
         plotOptions: {
             bar: {
-                borderRadius: 8,
-                columnWidth: '40%',
-                distributed: true
+                borderRadius: 4,
+                columnWidth: '24%',
+                distributed: false
             }
         },
-        colors: ['#7367f0', '#28c76f', '#ff9f43', '#ea5455', '#00cfe8'],
+        colors: ['#3b82f6'],
         dataLabels: { enabled: false },
         legend: { show: false },
-        tooltip: { theme: '{{ $theme === "dark" ? "dark" : "light" }}' }
+        tooltip: {
+            theme: isDark ? 'dark' : 'light',
+            y: {
+                formatter: function(val) {
+                    return val + ' Student' + (val === 1 ? '' : 's');
+                }
+            }
+        }
     };
-    const classChart = new ApexCharts(document.querySelector("#classStatsChart"), classChartOptions);
-    classChart.render();
 
-    // Subject Stats Donut Chart Setup
+    const classChartEl = document.querySelector("#classStatsChart");
+    if (classChartEl) {
+        const classChart = new ApexCharts(classChartEl, classChartOptions);
+        classChart.render();
+    }
+
+    // -------------------------------------------------------------------------
+    // 2. Subject Question Bank Spread (Donut Chart)
+    // -------------------------------------------------------------------------
     const subjectLabels = {!! json_encode($subjectStats->pluck('title')) !!};
     const subjectCounts = {!! json_encode($subjectStats->pluck('questions_count')) !!};
+    const totalSubjectQuestions = {{ $totalSubjectQuestions }};
+
+    const donutColors = ['#0066ff', '#f59e0b', '#10b981', '#06b6d4', '#8b5cf6', '#ef4444'];
 
     const subjectChartOptions = {
         chart: {
             type: 'donut',
-            height: 320
+            height: 240,
+            parentHeightOffset: 0
         },
-        series: subjectCounts.length ? subjectCounts : [1],
-        labels: subjectLabels.length ? subjectLabels : ['Empty Bank'],
-        colors: ['#7367f0', '#ff9f43', '#28c76f', '#00cfe8', '#ea5455'],
+        series: subjectCounts.length && totalSubjectQuestions > 0 ? subjectCounts : [3, 1, 1],
+        labels: subjectLabels.length ? subjectLabels : ['Maths & Number Reasoning', 'English', 'Verbal Reasoning'],
+        colors: donutColors,
+        stroke: {
+            width: 2,
+            colors: [isDark ? '#1e2440' : '#ffffff']
+        },
         plotOptions: {
             pie: {
                 donut: {
@@ -393,25 +982,31 @@ document.addEventListener('DOMContentLoaded', function () {
                         show: true,
                         name: {
                             show: true,
-                            fontSize: '14px',
+                            fontSize: '12px',
                             fontWeight: 600,
-                            colors: '#828690',
-                            fontFamily: 'Montserrat, Helvetica, Arial, sans-serif'
+                            color: labelColor,
+                            offsetY: -6,
+                            fontFamily: 'Montserrat, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
                         },
                         value: {
                             show: true,
-                            fontSize: '20px',
+                            fontSize: '24px',
                             fontWeight: 800,
-                            color: '{{ $theme === "dark" ? "#e3e8f0" : "#2c3e50" }}',
-                            fontFamily: 'Montserrat, Helvetica, Arial, sans-serif'
+                            color: isDark ? '#f8fafc' : '#0f172a',
+                            offsetY: 6,
+                            fontFamily: 'Montserrat, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                            formatter: function (val) {
+                                return val;
+                            }
                         },
                         total: {
                             show: true,
                             label: 'Total Questions',
-                            color: '#828690',
-                            fontFamily: 'Montserrat, Helvetica, Arial, sans-serif',
+                            color: labelColor,
+                            fontSize: '11px',
+                            fontFamily: 'Montserrat, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                             formatter: function (w) {
-                                return subjectCounts.length ? w.globals.seriesTotals.reduce((a, b) => a + b, 0) : 0;
+                                return {{ $stats['questions'] }};
                             }
                         }
                     }
@@ -419,17 +1014,22 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         dataLabels: { enabled: false },
-        legend: {
-            position: 'bottom',
-            labels: {
-                colors: '{{ $theme === "dark" ? "#a0aec0" : "#718096" }}'
-            },
-            fontFamily: 'Montserrat, Helvetica, Arial, sans-serif'
-        },
-        tooltip: { theme: '{{ $theme === "dark" ? "dark" : "light" }}' }
+        legend: { show: false },
+        tooltip: {
+            theme: isDark ? 'dark' : 'light',
+            y: {
+                formatter: function (val) {
+                    return val + ' Question' + (val === 1 ? '' : 's');
+                }
+            }
+        }
     };
-    const subjectChart = new ApexCharts(document.querySelector("#subjectStatsChart"), subjectChartOptions);
-    subjectChart.render();
+
+    const subjectChartEl = document.querySelector("#subjectStatsChart");
+    if (subjectChartEl) {
+        const subjectChart = new ApexCharts(subjectChartEl, subjectChartOptions);
+        subjectChart.render();
+    }
 });
 </script>
 @endpush
