@@ -2664,4 +2664,316 @@ body.dark-layout .horizontal-menu-wrapper .header-navbar .navbar-container .drop
     color: #FFFFFF !important;
 }
 
+/* ==========================================================================
+   APPLE-STYLE BLUR OVERLAY & LOGOUT MODAL
+   ========================================================================== */
+.sidebar-profile-section {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+}
+
+.sidebar-profile-section:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+.apple-logout-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(18px) saturate(190%);
+    -webkit-backdrop-filter: blur(18px) saturate(190%);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s;
+}
+
+.apple-logout-modal-backdrop.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.apple-logout-card {
+    position: relative;
+    width: 100%;
+    max-width: 410px;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 24px;
+    box-shadow: 0 30px 65px -12px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    padding: 30px 24px 22px;
+    text-align: center;
+    transform: scale(0.92) translateY(16px);
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease;
+}
+
+.apple-logout-modal-backdrop.is-visible .apple-logout-card {
+    transform: scale(1) translateY(0);
+}
+
+/* Close Button (Apple circular blur button) */
+.apple-modal-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.06);
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none !important;
+}
+
+.apple-modal-close-btn:hover {
+    background: rgba(0, 0, 0, 0.12);
+    color: #0F172A;
+    transform: scale(1.08);
+}
+
+/* Avatar Halo */
+.apple-avatar-halo {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 16px;
+    display: inline-block;
+}
+
+.apple-modal-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 8px 24px -4px rgba(6, 48, 128, 0.25);
+    border: 3.5px solid #FFFFFF;
+}
+
+.apple-avatar-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--theme-danger, #FA2833);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 2px 8px rgba(250, 40, 51, 0.35);
+}
+
+.apple-modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0F172A;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+}
+
+.apple-modal-desc {
+    font-size: 13.5px;
+    color: #64748B;
+    line-height: 1.45;
+    margin: 0 0 18px;
+}
+
+/* User Identity Chip */
+.apple-user-identity-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(6, 48, 128, 0.04);
+    border: 1px solid rgba(6, 48, 128, 0.08);
+    border-radius: 14px;
+    padding: 8px 12px;
+    margin-bottom: 22px;
+    text-align: left;
+}
+
+.apple-chip-avatar {
+    flex-shrink: 0;
+}
+
+.apple-chip-meta {
+    flex-grow: 1;
+    overflow: hidden;
+    line-height: 1.25;
+}
+
+.apple-chip-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0F172A;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.apple-chip-email {
+    font-size: 11.5px;
+    color: #7A8499;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.apple-chip-badge {
+    font-size: 10.5px;
+    font-weight: 600;
+    background: rgba(36, 119, 249, 0.1);
+    color: var(--theme-primary-bright, #2477F9);
+    padding: 2.5px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.1px;
+}
+
+/* Actions Bar */
+.apple-modal-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.apple-btn-cancel {
+    flex: 1;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.04);
+    color: #334155;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none !important;
+}
+
+.apple-btn-cancel:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: #0F172A;
+    transform: translateY(-1px);
+}
+
+.apple-btn-logout {
+    width: 100%;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: var(--theme-danger, #FA2833);
+    color: #FFFFFF;
+    font-size: 13.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(250, 40, 51, 0.32);
+    transition: all 0.2s ease;
+    outline: none !important;
+}
+
+.apple-btn-logout:hover {
+    background: #E0202A;
+    box-shadow: 0 6px 18px rgba(250, 40, 51, 0.42);
+    transform: translateY(-1px);
+}
+
+.apple-btn-logout:active {
+    transform: scale(0.98);
+}
+
+/* Dark Layout Support for Apple Modal */
+body.dark-layout .apple-logout-modal-backdrop {
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+}
+
+body.dark-layout .apple-logout-card {
+    background: rgba(30, 41, 59, 0.88);
+    backdrop-filter: blur(36px) saturate(200%);
+    -webkit-backdrop-filter: blur(36px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 30px 65px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+body.dark-layout .apple-modal-close-btn {
+    background: rgba(255, 255, 255, 0.08);
+    color: #94A3B8;
+}
+
+body.dark-layout .apple-modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #F8FAFC;
+}
+
+body.dark-layout .apple-modal-avatar {
+    border-color: #1E293B;
+}
+
+body.dark-layout .apple-avatar-badge {
+    border-color: #1E293B;
+}
+
+body.dark-layout .apple-modal-title {
+    color: #F8FAFC;
+}
+
+body.dark-layout .apple-modal-desc {
+    color: #94A3B8;
+}
+
+body.dark-layout .apple-user-identity-chip {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-layout .apple-chip-name {
+    color: #F8FAFC;
+}
+
+body.dark-layout .apple-chip-email {
+    color: #94A3B8;
+}
+
+body.dark-layout .apple-chip-badge {
+    background: rgba(36, 119, 249, 0.2);
+    color: #93C5FD;
+}
+
+body.dark-layout .apple-btn-cancel {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.08);
+    color: #E2E8F0;
+}
+
+body.dark-layout .apple-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: #FFFFFF;
+}
+
+
 

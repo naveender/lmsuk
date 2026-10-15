@@ -329,8 +329,8 @@
     </div>
 
     <!-- User Profile Section at Bottom (Matches Reference) -->
-    <div class="sidebar-profile-section">
-        <div class="profile-card" id="profileCard" tabindex="0">
+    <div class="sidebar-profile-section" id="sidebarProfileSection" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" title="Click to Sign Out">
+        <div class="profile-card" id="profileCard">
             <img src="{{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="Admin Avatar"
                 class="profile-avatar">
             <div class="profile-info">
@@ -341,6 +341,58 @@
         </div>
     </div>
 
+</div>
+
+<!-- Apple-Style Logout Confirmation Modal with Glassmorphism & Blur Overlay -->
+<div class="apple-logout-modal-backdrop" id="appleLogoutModal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="apple-logout-card" role="document">
+        
+        <!-- Apple Close Pill Button -->
+        <button type="button" class="apple-modal-close-btn" id="closeAppleLogoutBtn" aria-label="Close dialog">
+            <i data-lucide="x" style="width: 15px; height: 15px;"></i>
+        </button>
+
+        <!-- Top Profile Avatar Pill with Danger Badge -->
+        <div class="apple-modal-avatar-area">
+            <div class="apple-avatar-halo">
+                <img src="{{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="User Avatar" class="apple-modal-avatar">
+                <div class="apple-avatar-badge">
+                    <i data-lucide="log-out" style="width: 13px; height: 13px;"></i>
+                </div>
+            </div>
+            <h5 class="apple-modal-title">Sign Out?</h5>
+            <p class="apple-modal-desc">
+                Are you sure you want to log out of <strong>Aspire Learners</strong>? You will need to sign back in to continue your session.
+            </p>
+        </div>
+
+        <!-- User Identity Chip -->
+        <div class="apple-user-identity-chip">
+            <div class="apple-chip-avatar">
+                <img src="{{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="Avatar" width="32" height="32" style="border-radius: 50%; object-fit: cover;">
+            </div>
+            <div class="apple-chip-meta">
+                <span class="apple-chip-name">{{ auth()->user()->name ?? 'Admin User' }}</span>
+                <span class="apple-chip-email">{{ auth()->user()->email ?? 'admin@aspire.com' }}</span>
+            </div>
+            <span class="apple-chip-badge">Admin</span>
+        </div>
+
+        <!-- Apple Action Buttons -->
+        <div class="apple-modal-actions">
+            <button type="button" class="apple-btn-cancel" id="cancelAppleLogoutBtn">
+                <span>Cancel</span>
+            </button>
+            <form method="POST" action="{{ route('logout') }}" class="m-0 flex-grow-1">
+                @csrf
+                <button type="submit" class="apple-btn-logout" id="confirmAppleLogoutBtn">
+                    <i data-lucide="log-out" style="width: 15px; height: 15px;"></i>
+                    <span>Log Out</span>
+                </button>
+            </form>
+        </div>
+
+    </div>
 </div>
 
 <!-- Modern Sidebar Interactions Script -->
@@ -489,5 +541,84 @@
                 sidebarOverlay.classList.remove('visible');
             });
         }
+
+        // --- Apple-Style Logout Modal Interaction ---
+        const profileSection = document.getElementById('sidebarProfileSection') || profileCard;
+        const appleLogoutModal = document.getElementById('appleLogoutModal');
+        const closeAppleLogoutBtn = document.getElementById('closeAppleLogoutBtn');
+        const cancelAppleLogoutBtn = document.getElementById('cancelAppleLogoutBtn');
+
+        function openLogoutModal() {
+            if (!appleLogoutModal) return;
+            appleLogoutModal.classList.add('is-visible');
+            appleLogoutModal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            if (profileSection) {
+                profileSection.setAttribute('aria-expanded', 'true');
+            }
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            // Auto focus cancel button for accessibility
+            setTimeout(() => {
+                if (cancelAppleLogoutBtn) cancelAppleLogoutBtn.focus();
+            }, 50);
+        }
+
+        function closeLogoutModal() {
+            if (!appleLogoutModal) return;
+            appleLogoutModal.classList.remove('is-visible');
+            appleLogoutModal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            if (profileSection) {
+                profileSection.setAttribute('aria-expanded', 'false');
+                profileSection.focus();
+            }
+        }
+
+        if (profileSection) {
+            profileSection.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openLogoutModal();
+            });
+
+            // Keyboard support (Enter / Space)
+            profileSection.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openLogoutModal();
+                }
+            });
+        }
+
+        if (closeAppleLogoutBtn) {
+            closeAppleLogoutBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                closeLogoutModal();
+            });
+        }
+
+        if (cancelAppleLogoutBtn) {
+            cancelAppleLogoutBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                closeLogoutModal();
+            });
+        }
+
+        if (appleLogoutModal) {
+            appleLogoutModal.addEventListener('click', function (e) {
+                // If user clicks the backdrop overlay outside the card
+                if (e.target === appleLogoutModal) {
+                    closeLogoutModal();
+                }
+            });
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && appleLogoutModal && appleLogoutModal.classList.contains('is-visible')) {
+                closeLogoutModal();
+            }
+        });
     });
 </script>
