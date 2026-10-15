@@ -35,7 +35,7 @@
     --theme-success: #1EB564;
     --theme-success-light: #EAF8F0;
 
-    --theme-purple: #7367F0;
+    --theme-purple: #2477F9;
     --theme-purple-light: #F3EBFC;
 
     /* Deep Navy Sidebar System (as in reference image) */
@@ -1338,7 +1338,7 @@ body.sidebar-collapsed .modern-sidebar .profile-card {
 /* Modern Clean Table */
 .theme-table {
     width: 100%;
-    min-width: 1080px;
+    /* min-width: 1080px; */
     margin-bottom: 0;
     border-collapse: separate;
     border-spacing: 0;

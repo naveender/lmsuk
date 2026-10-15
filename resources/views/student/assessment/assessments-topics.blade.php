@@ -7,7 +7,7 @@
         <div class="content-overlay"></div>
         <div class="header-navbar-shadow"></div>
         <div class="content-wrapper">
-            
+
             <!-- Breadcrumbs -->
             <div class="content-header row">
                 <div class="content-header-left col-md-9 col-12 mb-2">
@@ -16,8 +16,10 @@
                             <h2 class="content-header-title float-left mb-0">{{ $subject->title }}</h2>
                             <div class="breadcrumb-wrapper col-12">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{ route('student.dashboard') }}">Dashboard</a></li>
-                                    <li class="breadcrumb-item"><a href="{{ route('student.assessments') }}">Assessments</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ route('student.dashboard') }}">Dashboard</a>
+                                    </li>
+                                    <li class="breadcrumb-item"><a href="{{ route('student.assessments') }}">Assessments</a>
+                                    </li>
                                     <li class="breadcrumb-item active">Topics</li>
                                 </ol>
                             </div>
@@ -30,10 +32,12 @@
                 <!-- Search & Filters Card -->
                 <div class="card mb-4 shadow-sm border-0">
                     <div class="card-body">
-                        <form method="GET" action="{{ route('student.assessments.topics', $subject->id) }}" class="row align-items-center">
+                        <form method="GET" action="{{ route('student.assessments.topics', $subject->id) }}"
+                            class="row align-items-center">
                             <div class="col-md-8 col-sm-12 mb-2 mb-md-0">
                                 <div class="position-relative has-icon-left">
-                                    <input type="text" name="topic_name" class="form-control" placeholder="Search topics by name..." value="{{ request('topic_name') }}">
+                                    <input type="text" name="topic_name" class="form-control"
+                                        placeholder="Search topics by name..." value="{{ request('topic_name') }}">
                                     <div class="form-control-position">
                                         <i class="feather icon-search"></i>
                                     </div>
@@ -44,7 +48,8 @@
                                     <i class="feather icon-filter mr-1"></i> Filter
                                 </button>
                                 @if(request()->filled('topic_name'))
-                                    <a href="{{ route('student.assessments.topics', $subject->id) }}" class="btn btn-outline-danger flex-grow-1 flex-md-grow-0">
+                                    <a href="{{ route('student.assessments.topics', $subject->id) }}"
+                                        class="btn btn-outline-danger flex-grow-1 flex-md-grow-0">
                                         Clear
                                     </a>
                                 @endif
@@ -95,7 +100,8 @@
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
-                                                    <span class="badge badge-pill badge-warning px-3 py-1 font-medium-1 text-white">
+                                                    <span
+                                                        class="badge badge-pill badge-warning px-3 py-1 font-medium-1 text-white">
                                                         {{ $topic->medium_count }}
                                                     </span>
                                                 </td>
@@ -105,7 +111,8 @@
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
-                                                    <a href="{{ route('student.topics.subtopics', $topic->id) }}" class="btn btn-sm btn-primary px-3 py-1">
+                                                    <a href="{{ route('student.topics.subtopics', $topic->id) }}"
+                                                        class="btn btn-sm btn-primary px-3 py-1">
                                                         Go To Tests <i class="feather icon-chevron-right ml-1"></i>
                                                     </a>
                                                 </td>
@@ -116,7 +123,8 @@
                                                     <div class="my-2">
                                                         <i class="feather icon-info font-large-2 text-warning mb-2"></i>
                                                         <h5>No Topics Found</h5>
-                                                        <p class="mb-0">We couldn't find any topics matching your search or configuration.</p>
+                                                        <p class="mb-0">We couldn't find any topics matching your search or
+                                                            configuration.</p>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -142,18 +150,23 @@
     <style>
         .badge-light-primary {
             background-color: rgba(115, 103, 240, 0.1);
-            color: #7367f0 !important;
+            color: #2477F9 !important;
         }
+
         .badge-light-success {
             background-color: rgba(40, 199, 111, 0.1);
             color: #28c76f !important;
         }
+
         .font-medium-1 {
             font-size: 0.95rem;
         }
-        .table th, .table td {
+
+        .table th,
+        .table td {
             vertical-align: middle;
         }
+
         .thead-light th {
             background-color: #f8f9fa;
             border-bottom: 2px solid #dee2e6;

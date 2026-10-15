@@ -17,7 +17,13 @@ class AnnouncementController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Announcement::query()->with(['academicYear', 'targets', 'views']);
+        $query = Announcement::query()->with([
+            'academicYear',
+            'targets.classModel',
+            'targets.yearGroup',
+            'targets.user',
+            'views',
+        ]);
 
         // Search by keyword
         if ($request->filled('search')) {
@@ -34,19 +40,50 @@ class AnnouncementController extends Controller
             $query->where('academic_year_id', $request->academic_year_id);
         }
 
-        // Filter by Recipient Type
+        // Filter by Recipient Type / Scope
         if ($request->filled('recipient_type')) {
-            $query->whereHas('targets', function ($t) use ($request) {
-                $t->where('target_type', $request->recipient_type);
-            });
+            if ($request->recipient_type === 'none') {
+                $query->doesntHave('targets');
+            } else {
+                $query->whereHas('targets', function ($t) use ($request) {
+                    $t->where('target_type', $request->recipient_type);
+                });
+            }
         }
 
-        // Filter by Date Range
-        if ($request->filled('start_date')) {
-            $query->whereDate('show_from', '>=', $request->start_date);
+        // Filter by Date Range (Single date_range field or start_date / end_date)
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+
+        if ($request->filled('date_range')) {
+            $rangeParts = preg_split('/\s+(to|-)\s+/i', trim($request->date_range));
+            if (!empty($rangeParts[0])) {
+                $startDate = trim($rangeParts[0]);
+            }
+            if (!empty($rangeParts[1])) {
+                $endDate = trim($rangeParts[1]);
+            } else {
+                $endDate = $startDate;
+            }
         }
-        if ($request->filled('end_date')) {
-            $query->whereDate('show_from', '<=', $request->end_date);
+
+        if ($startDate) {
+            $query->where(function ($q) use ($startDate) {
+                $q->whereDate('show_from', '>=', $startDate)
+                    ->orWhere(function ($sq) use ($startDate) {
+                        $sq->whereNull('show_from')
+                            ->whereDate('created_at', '>=', $startDate);
+                    });
+            });
+        }
+        if ($endDate) {
+            $query->where(function ($q) use ($endDate) {
+                $q->whereDate('show_from', '<=', $endDate)
+                    ->orWhere(function ($sq) use ($endDate) {
+                        $sq->whereNull('show_from')
+                            ->whereDate('created_at', '<=', $endDate);
+                    });
+            });
         }
 
         // Filter by computed status

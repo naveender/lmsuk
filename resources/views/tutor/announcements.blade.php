@@ -6,7 +6,7 @@
     <style>
         .announcement-card {
             border-radius: 14px;
-            box-shadow: 0 4px 18px 0 rgba(0,0,0,0.04);
+            box-shadow: 0 4px 18px 0 rgba(0, 0, 0, 0.04);
             border: 1px solid #e2e8f0;
             background-color: #fff;
             position: relative;
@@ -14,21 +14,25 @@
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             margin-bottom: 24px;
         }
+
         .announcement-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 24px -10px rgba(0,0,0,0.12), 0 4px 16px -10px rgba(0,0,0,0.06);
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.12), 0 4px 16px -10px rgba(0, 0, 0, 0.06);
             border-color: #cbd5e1;
         }
+
         .priority-border-high {
             border-left: 6px solid #ea5455;
         }
+
         .priority-border-medium {
             border-left: 6px solid #ff9f43;
         }
+
         .priority-border-low {
             border-left: 6px solid #82868b;
         }
-        
+
         /* Glowing Pulsing Unread Indicator */
         .unread-indicator-pulse {
             width: 8px;
@@ -39,15 +43,18 @@
             box-shadow: 0 0 0 0 rgba(40, 199, 111, 0.7);
             animation: indicatorPulse 1.6s infinite;
         }
+
         @keyframes indicatorPulse {
             0% {
                 transform: scale(0.95);
                 box-shadow: 0 0 0 0 rgba(40, 199, 111, 0.7);
             }
+
             70% {
                 transform: scale(1);
                 box-shadow: 0 0 0 6px rgba(40, 199, 111, 0);
             }
+
             100% {
                 transform: scale(0.95);
                 box-shadow: 0 0 0 0 rgba(40, 199, 111, 0);
@@ -61,11 +68,12 @@
             gap: 10px;
             margin-bottom: 12px;
         }
+
         .preview-avatar {
             width: 38px;
             height: 38px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #7367f0 0%, #ce9ffc 100%);
+            background: linear-gradient(135deg, #2477F9 0%, #ce9ffc 100%);
             color: white;
             display: flex;
             align-items: center;
@@ -74,11 +82,13 @@
             font-size: 13px;
             box-shadow: 0 4px 10px rgba(115, 103, 240, 0.2);
         }
+
         .preview-author-info {
             display: flex;
             flex-direction: column;
             text-align: left;
         }
+
         .preview-author-name {
             font-size: 13px;
             font-weight: 600;
@@ -87,6 +97,7 @@
             align-items: center;
             gap: 4px;
         }
+
         .preview-author-name i {
             font-size: 11px;
             color: #3b82f6;
@@ -94,6 +105,7 @@
             border-radius: 50%;
             padding: 2px;
         }
+
         .preview-meta-date {
             font-size: 11px;
             color: #64748b;
@@ -107,6 +119,7 @@
             display: inline-flex;
             border: 1px solid #e2e8f0;
         }
+
         .segmented-toggle .btn {
             border-radius: 30px !important;
             border: none !important;
@@ -121,15 +134,18 @@
             align-items: center;
             gap: 6px;
         }
+
         .segmented-toggle .btn.active {
             background: #ffffff !important;
-            color: #7367f0 !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.06) !important;
+            color: #2477F9 !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06) !important;
         }
+
         .search-wrapper {
             position: relative;
             max-width: 320px;
         }
+
         .search-wrapper i.search-icon {
             position: absolute;
             left: 12px;
@@ -138,6 +154,7 @@
             color: #94a3b8;
             font-size: 14px;
         }
+
         .search-wrapper i.clear-icon {
             position: absolute;
             right: 12px;
@@ -149,9 +166,11 @@
             display: none;
             transition: color 0.2s;
         }
+
         .search-wrapper i.clear-icon:hover {
             color: #64748b;
         }
+
         .search-input {
             padding: 8px 16px 8px 36px;
             border-radius: 30px;
@@ -160,8 +179,9 @@
             width: 100%;
             transition: all 0.2s;
         }
+
         .search-input:focus {
-            border-color: #7367f0;
+            border-color: #2477F9;
             box-shadow: 0 0 0 3px rgba(115, 103, 240, 0.15);
             outline: none;
         }
@@ -177,6 +197,7 @@
             margin-top: 10px;
             transition: all 0.2s;
         }
+
         .attachment-pill:hover {
             background-color: #ffe8e8;
             text-decoration: none !important;
@@ -190,6 +211,7 @@
             transition: transform 0.2s;
             cursor: zoom-in;
         }
+
         .media-preview-container img:hover {
             transform: scale(1.02);
         }
@@ -202,9 +224,11 @@
             font-weight: 600;
             transition: all 0.2s;
         }
+
         .read-notice-btn i {
             transition: transform 0.2s;
         }
+
         .read-notice-btn:hover i {
             transform: translateX(4px);
         }
@@ -217,6 +241,7 @@
             overflow: hidden;
             border: 1px solid #cbd5e1;
         }
+
         .browser-header {
             background: #f1f5f9;
             height: 40px;
@@ -226,26 +251,38 @@
             border-bottom: 1px solid #e2e8f0;
             position: relative;
         }
+
         .browser-buttons {
             display: flex;
             gap: 6px;
         }
+
         .browser-button {
             width: 10px;
             height: 10px;
             border-radius: 50%;
             display: inline-block;
         }
-        .browser-button.close { background: #ff5f56; }
-        .browser-button.minimize { background: #ffbd2e; }
-        .browser-button.maximize { background: #27c93f; }
-        
+
+        .browser-button.close {
+            background: #ff5f56;
+        }
+
+        .browser-button.minimize {
+            background: #ffbd2e;
+        }
+
+        .browser-button.maximize {
+            background: #27c93f;
+        }
+
         .browser-tabs {
             margin-left: 20px;
             display: flex;
             align-items: flex-end;
             height: 100%;
         }
+
         .browser-tab {
             background: #ffffff;
             padding: 4px 12px 6px;
@@ -260,6 +297,7 @@
             gap: 4px;
             height: 26px;
         }
+
         .browser-address-bar {
             flex: 1;
             background: #ffffff;
@@ -274,6 +312,7 @@
             color: #64748b;
             max-width: 320px;
         }
+
         .browser-address-bar i {
             font-size: 9px;
             margin-right: 4px;
@@ -312,7 +351,8 @@
                     <div class="col-md-5 col-12 d-flex justify-content-md-end justify-content-start align-items-center">
                         <div class="search-wrapper">
                             <i class="feather icon-search search-icon"></i>
-                            <input type="text" class="search-input" id="announcement-search" placeholder="Search notices...">
+                            <input type="text" class="search-input" id="announcement-search"
+                                placeholder="Search notices...">
                             <i class="feather icon-x clear-icon" id="search-clear"></i>
                         </div>
                     </div>
@@ -326,11 +366,13 @@
                             </button>
                             <button type="button" class="btn" data-filter="unread">
                                 <i class="feather icon-mail"></i> Unread
-                                <span class="badge badge-pill badge-light-success font-small-1 ml-25 unread-count-badge">0</span>
+                                <span
+                                    class="badge badge-pill badge-light-success font-small-1 ml-25 unread-count-badge">0</span>
                             </button>
                             <button type="button" class="btn" data-filter="high">
                                 <i class="feather icon-alert-triangle"></i> High Priority
-                                <span class="badge badge-pill badge-light-danger font-small-1 ml-25 high-count-badge">0</span>
+                                <span
+                                    class="badge badge-pill badge-light-danger font-small-1 ml-25 high-count-badge">0</span>
                             </button>
                             <button type="button" class="btn" data-filter="media">
                                 <i class="feather icon-paperclip"></i> Attachments
@@ -346,54 +388,72 @@
                             @php
                                 $isRead = in_array($announcement->id, $viewedIds);
                             @endphp
-                            <div class="card announcement-card priority-border-{{ $announcement->priority }}" 
-                                 id="announcement-{{ $announcement->id }}"
-                                 data-priority="{{ $announcement->priority }}"
-                                 data-read="{{ $isRead ? 'true' : 'false' }}"
-                                 data-media="{{ $announcement->media ? 'true' : 'false' }}">
-                                
+                            <div class="card announcement-card priority-border-{{ $announcement->priority }}"
+                                id="announcement-{{ $announcement->id }}" data-priority="{{ $announcement->priority }}"
+                                data-read="{{ $isRead ? 'true' : 'false' }}"
+                                data-media="{{ $announcement->media ? 'true' : 'false' }}">
+
                                 <div class="card-body p-2">
                                     <div class="preview-header-profile">
                                         <div class="preview-avatar">AD</div>
                                         <div class="preview-author-info">
-                                            <span class="preview-author-name">System Administrator <i class="feather icon-check-circle" style="font-size: 11px; color: #3b82f6;"></i></span>
-                                            <span class="preview-meta-date"><i class="feather icon-calendar"></i> {{ $announcement->show_from ? $announcement->show_from->format('M d, Y H:i') : $announcement->created_at->format('M d, Y H:i') }}</span>
+                                            <span class="preview-author-name">System Administrator <i
+                                                    class="feather icon-check-circle"
+                                                    style="font-size: 11px; color: #3b82f6;"></i></span>
+                                            <span class="preview-meta-date"><i class="feather icon-calendar"></i>
+                                                {{ $announcement->show_from ? $announcement->show_from->format('M d, Y H:i') : $announcement->created_at->format('M d, Y H:i') }}</span>
                                         </div>
                                         <div class="ml-auto d-flex align-items-center">
                                             @if(!$isRead)
-                                                <span class="badge badge-pill badge-light-success mr-50 new-badge-pill" id="unread-pill-{{ $announcement->id }}" style="font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px;">
+                                                <span class="badge badge-pill badge-light-success mr-50 new-badge-pill"
+                                                    id="unread-pill-{{ $announcement->id }}"
+                                                    style="font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px;">
                                                     <span class="unread-indicator-pulse mr-25"></span> New
                                                 </span>
                                             @endif
                                             @if($announcement->priority === 'high')
-                                                <span class="badge badge-light-danger text-uppercase font-weight-bold mr-50" style="font-size: 9px; padding: 3px 6px; border-radius: 12px;">High Priority</span>
+                                                <span class="badge badge-light-danger text-uppercase font-weight-bold mr-50"
+                                                    style="font-size: 9px; padding: 3px 6px; border-radius: 12px;">High
+                                                    Priority</span>
                                             @elseif($announcement->priority === 'medium')
-                                                <span class="badge badge-light-warning text-uppercase font-weight-bold mr-50" style="font-size: 9px; padding: 3px 6px; border-radius: 12px;">Featured</span>
+                                                <span class="badge badge-light-warning text-uppercase font-weight-bold mr-50"
+                                                    style="font-size: 9px; padding: 3px 6px; border-radius: 12px;">Featured</span>
                                             @endif
-                                            <span class="badge badge-pill badge-light-secondary read-badge {{ !$isRead ? 'd-none' : '' }}" id="read-badge-{{ $announcement->id }}" style="font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px;">
+                                            <span
+                                                class="badge badge-pill badge-light-secondary read-badge {{ !$isRead ? 'd-none' : '' }}"
+                                                id="read-badge-{{ $announcement->id }}"
+                                                style="font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px;">
                                                 <i class="feather icon-check"></i> Read
                                             </span>
                                         </div>
                                     </div>
-                                    
-                                    <h4 class="announcement-title mb-50 font-weight-bold text-dark" style="text-align: left;">{{ $announcement->title }}</h4>
-                                    
+
+                                    <h4 class="announcement-title mb-50 font-weight-bold text-dark" style="text-align: left;">
+                                        {{ $announcement->title }}</h4>
+
                                     @if($announcement->type == 3 && $announcement->description)
-                                        <p class="text-secondary font-italic font-small-3 mb-1" style="border-left: 2px solid #00cfe8; padding-left: 8px; text-align: left;">{{ $announcement->description }}</p>
+                                        <p class="text-secondary font-italic font-small-3 mb-1"
+                                            style="border-left: 2px solid #00cfe8; padding-left: 8px; text-align: left;">
+                                            {{ $announcement->description }}</p>
                                     @endif
 
                                     @if($announcement->type == 1 || $announcement->type == 3)
-                                        <p class="card-text text-secondary font-small-3 text-announcement-content" style="white-space: pre-wrap; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-align: left;">{{ $announcement->content }}</p>
+                                        <p class="card-text text-secondary font-small-3 text-announcement-content"
+                                            style="white-space: pre-wrap; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-align: left;">
+                                            {{ $announcement->content }}</p>
                                     @endif
 
                                     @if($announcement->media)
                                         <div class="media-preview-container my-1 text-left">
                                             @if(preg_match('/\.(jpeg|jpg|gif|png)/i', $announcement->media))
-                                                <img src="{{ asset('storage/' . $announcement->media) }}" class="img-fluid rounded shadow-sm" alt="Media content" style="max-height: 140px;">
+                                                <img src="{{ asset('storage/' . $announcement->media) }}"
+                                                    class="img-fluid rounded shadow-sm" alt="Media content" style="max-height: 140px;">
                                             @else
-                                                <a href="{{ asset('storage/' . $announcement->media) }}" target="_blank" class="attachment-pill">
+                                                <a href="{{ asset('storage/' . $announcement->media) }}" target="_blank"
+                                                    class="attachment-pill">
                                                     <i class="feather icon-file-text font-medium-3 text-danger mr-50"></i>
-                                                    <span class="font-small-3 font-weight-bold text-dark mr-50 text-truncate" style="max-width: 250px;">{{ basename($announcement->media) }}</span>
+                                                    <span class="font-small-3 font-weight-bold text-dark mr-50 text-truncate"
+                                                        style="max-width: 250px;">{{ basename($announcement->media) }}</span>
                                                     <i class="feather icon-download-cloud font-medium-1 text-muted"></i>
                                                 </a>
                                             @endif
@@ -401,17 +461,15 @@
                                     @endif
 
                                     <div class="mt-1 text-right">
-                                        <button class="btn btn-outline-primary btn-sm read-notice-btn view-announcement-btn" 
-                                                data-id="{{ $announcement->id }}"
-                                                data-title="{{ $announcement->title }}"
-                                                data-content="{{ $announcement->content }}"
-                                                data-desc="{{ $announcement->description }}"
-                                                data-type="{{ $announcement->type }}"
-                                                data-priority="{{ $announcement->priority }}"
-                                                data-media="{{ $announcement->media ? asset('storage/' . $announcement->media) : '' }}"
-                                                data-media-name="{{ basename($announcement->media) }}"
-                                                data-date="{{ $announcement->show_from ? $announcement->show_from->format('M d, Y H:i') : $announcement->created_at->format('M d, Y H:i') }}"
-                                                data-view-url="{{ route('tutor.announcements.view', $announcement->id) }}">
+                                        <button class="btn btn-outline-primary btn-sm read-notice-btn view-announcement-btn"
+                                            data-id="{{ $announcement->id }}" data-title="{{ $announcement->title }}"
+                                            data-content="{{ $announcement->content }}"
+                                            data-desc="{{ $announcement->description }}" data-type="{{ $announcement->type }}"
+                                            data-priority="{{ $announcement->priority }}"
+                                            data-media="{{ $announcement->media ? asset('storage/' . $announcement->media) : '' }}"
+                                            data-media-name="{{ basename($announcement->media) }}"
+                                            data-date="{{ $announcement->show_from ? $announcement->show_from->format('M d, Y H:i') : $announcement->created_at->format('M d, Y H:i') }}"
+                                            data-view-url="{{ route('tutor.announcements.view', $announcement->id) }}">
                                             Read Notice <i class="feather icon-arrow-right"></i>
                                         </button>
                                     </div>
@@ -428,9 +486,11 @@
                         @endforelse
 
                         <!-- Empty state placeholder for DOM filters -->
-                        <div class="card p-3 text-center empty-state-card" id="empty-state-placeholder" style="display:none; border-radius: 14px;">
+                        <div class="card p-3 text-center empty-state-card" id="empty-state-placeholder"
+                            style="display:none; border-radius: 14px;">
                             <div class="card-body py-3">
-                                <i class="feather icon-bell-off font-large-3 text-muted mb-2 d-inline-block" style="opacity: 0.6;"></i>
+                                <i class="feather icon-bell-off font-large-3 text-muted mb-2 d-inline-block"
+                                    style="opacity: 0.6;"></i>
                                 <h4 class="font-weight-bold text-dark">All Caught Up!</h4>
                                 <p class="text-secondary mb-0">No academy announcements match your selected filter.</p>
                             </div>
@@ -444,14 +504,18 @@
     <!-- END: Content-->
 
     <!-- Detail Modal -->
-    <div class="modal fade" id="announcementDetailModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal fade" id="announcementDetailModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content" style="border-radius: 16px; overflow: hidden; border: none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
-                <div class="modal-header bg-dark text-white d-flex align-items-center justify-content-between" style="padding: 1rem 1.5rem; border-bottom: 1px solid #2e3545;">
+            <div class="modal-content"
+                style="border-radius: 16px; overflow: hidden; border: none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+                <div class="modal-header bg-dark text-white d-flex align-items-center justify-content-between"
+                    style="padding: 1rem 1.5rem; border-bottom: 1px solid #2e3545;">
                     <h5 class="modal-title text-white mb-0 d-flex align-items-center font-weight-bold" id="modalLabel">
                         <i class="feather icon-book-open mr-50 text-primary font-medium-3"></i> Academy Notice Details
                     </h5>
-                    <button type="button" class="close text-white ml-auto" data-dismiss="modal" aria-label="Close" style="opacity: 0.8; outline: none; margin-left: auto;">
+                    <button type="button" class="close text-white ml-auto" data-dismiss="modal" aria-label="Close"
+                        style="opacity: 0.8; outline: none; margin-left: auto;">
                         <span aria-hidden="true" style="font-size: 1.5rem;">&times;</span>
                     </button>
                 </div>
@@ -476,44 +540,60 @@
                                 </div>
                             </div>
                             <div class="p-2" style="background: #ffffff;">
-                                <div class="card preview-card" id="detail-priority-card" style="margin-bottom: 0; box-shadow: none; border-radius: 0; border: none;">
+                                <div class="card preview-card" id="detail-priority-card"
+                                    style="margin-bottom: 0; box-shadow: none; border-radius: 0; border: none;">
                                     <div class="card-body p-0">
                                         <div class="preview-header-profile">
                                             <div class="preview-avatar">AD</div>
                                             <div class="preview-author-info">
-                                                <span class="preview-author-name">System Administrator <i class="feather icon-check-circle" style="font-size: 11px; color: #3b82f6;"></i></span>
-                                                <span class="preview-meta-date" id="detail-date-text"><i class="feather icon-calendar"></i> Just now</span>
+                                                <span class="preview-author-name">System Administrator <i
+                                                        class="feather icon-check-circle"
+                                                        style="font-size: 11px; color: #3b82f6;"></i></span>
+                                                <span class="preview-meta-date" id="detail-date-text"><i
+                                                        class="feather icon-calendar"></i> Just now</span>
                                             </div>
                                             <div class="ml-auto">
-                                                <span class="preview-badge-priority" id="detail-priority-badge">MEDIUM PRIORITY</span>
+                                                <span class="preview-badge-priority" id="detail-priority-badge">MEDIUM
+                                                    PRIORITY</span>
                                             </div>
                                         </div>
 
-                                        <h3 id="detail-title" class="font-weight-bold text-dark mb-1" style="font-size: 1.5rem; text-align: left;">Title</h3>
-                                        
-                                        <div id="detail-desc-container" class="alert alert-info py-75 px-1 mb-1 font-italic" style="display:none; border-left: 4px solid #00cfe8; background-color: #f0fbfc; text-align: left;">
+                                        <h3 id="detail-title" class="font-weight-bold text-dark mb-1"
+                                            style="font-size: 1.5rem; text-align: left;">Title</h3>
+
+                                        <div id="detail-desc-container" class="alert alert-info py-75 px-1 mb-1 font-italic"
+                                            style="display:none; border-left: 4px solid #00cfe8; background-color: #f0fbfc; text-align: left;">
                                             <p class="mb-0" id="detail-desc" style="font-size: 0.9rem; color: #00cfe8;"></p>
                                         </div>
 
-                                        <div id="detail-content" class="text-secondary mb-2" style="white-space: pre-wrap; font-size: 1rem; line-height: 1.6; text-align: left;">
+                                        <div id="detail-content" class="text-secondary mb-2"
+                                            style="white-space: pre-wrap; font-size: 1rem; line-height: 1.6; text-align: left;">
                                             Content
                                         </div>
 
                                         <div id="detail-media-container" class="mt-2 text-center" style="display:none;">
-                                            <div class="border rounded p-2 bg-white d-flex align-items-center justify-content-center">
+                                            <div
+                                                class="border rounded p-2 bg-white d-flex align-items-center justify-content-center">
                                                 <div id="detail-image-box" style="display:none;" class="w-100">
                                                     <a href="" id="detail-img-link" target="_blank">
-                                                        <img src="" id="detail-img" class="img-fluid rounded shadow-sm" style="max-height: 350px; object-fit: contain;">
+                                                        <img src="" id="detail-img" class="img-fluid rounded shadow-sm"
+                                                            style="max-height: 350px; object-fit: contain;">
                                                     </a>
                                                 </div>
                                                 <div id="detail-file-box" style="display:none;" class="w-100">
-                                                    <div class="d-flex align-items-center p-1 border rounded bg-light-danger" style="border-color: #ffcbd1 !important;">
-                                                        <i class="feather icon-file-text font-large-1 text-danger mr-75"></i>
+                                                    <div class="d-flex align-items-center p-1 border rounded bg-light-danger"
+                                                        style="border-color: #ffcbd1 !important;">
+                                                        <i
+                                                            class="feather icon-file-text font-large-1 text-danger mr-75"></i>
                                                         <div style="flex: 1; text-align: left;">
-                                                            <div id="detail-file-name" class="font-weight-bold text-dark text-truncate" style="max-width: 280px; font-size: 0.9rem;">document.pdf</div>
+                                                            <div id="detail-file-name"
+                                                                class="font-weight-bold text-dark text-truncate"
+                                                                style="max-width: 280px; font-size: 0.9rem;">document.pdf
+                                                            </div>
                                                             <small class="text-muted">PDF Document</small>
                                                         </div>
-                                                        <a href="" id="detail-file-download" class="btn btn-sm btn-danger ml-1" target="_blank">
+                                                        <a href="" id="detail-file-download"
+                                                            class="btn btn-sm btn-danger ml-1" target="_blank">
                                                             <i class="feather icon-download"></i> Download
                                                         </a>
                                                     </div>
@@ -536,7 +616,7 @@
 
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Stats updates
             function updateBadges() {
                 const unreadCount = $('.announcement-card[data-read="false"]').length;
@@ -554,12 +634,12 @@
                 let visibleCount = 0;
                 const query = currentSearch.toLowerCase().trim();
 
-                $('.announcement-card').each(function() {
+                $('.announcement-card').each(function () {
                     const card = $(this);
                     const title = (card.find('.announcement-title').text() || '').toLowerCase();
                     const desc = (card.find('.font-italic').text() || '').toLowerCase();
                     const content = (card.find('.text-announcement-content').text() || '').toLowerCase();
-                    
+
                     const isRead = card.attr('data-read') === 'true';
                     const isHigh = card.attr('data-priority') === 'high';
                     const hasMedia = card.attr('data-media') === 'true';
@@ -594,7 +674,7 @@
             }
 
             // Filter button clicks
-            $('.segmented-toggle .btn').on('click', function() {
+            $('.segmented-toggle .btn').on('click', function () {
                 $('.segmented-toggle .btn').removeClass('active');
                 $(this).addClass('active');
                 currentFilter = $(this).data('filter');
@@ -605,7 +685,7 @@
             const searchInput = $('#announcement-search');
             const clearIcon = $('#search-clear');
 
-            searchInput.on('input', function() {
+            searchInput.on('input', function () {
                 currentSearch = $(this).val();
                 if (currentSearch) {
                     clearIcon.show();
@@ -615,7 +695,7 @@
                 applyFilters();
             });
 
-            clearIcon.on('click', function() {
+            clearIcon.on('click', function () {
                 searchInput.val('');
                 currentSearch = '';
                 clearIcon.hide();
@@ -623,7 +703,7 @@
             });
 
             // Read Notice details modal trigger
-            $('.view-announcement-btn').on('click', function() {
+            $('.view-announcement-btn').on('click', function () {
                 const id = $(this).data('id');
                 const title = $(this).data('title');
                 const content = $(this).data('content');
@@ -638,7 +718,7 @@
                 // Populate modal
                 $('#detail-title').text(title);
                 $('#detail-date-text').html('<i class="feather icon-calendar"></i> ' + date);
-                
+
                 // Priority badges
                 const pBadge = $('#detail-priority-badge');
                 pBadge.text(priority.toUpperCase() + ' PRIORITY');

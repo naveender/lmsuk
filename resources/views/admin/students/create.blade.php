@@ -4,28 +4,28 @@
         <div class="content-overlay"></div>
         <div class="header-navbar-shadow"></div>
         <div class="content-wrapper">
-        <!-- Page Header / Title & Breadcrumbs -->
-        <div class="admin-page-header">
-            <div class="admin-page-title-wrap">
-                <div class="admin-title-row">
-                    <h1 class="admin-page-heading">Add Student</h1>
-                    <nav class="admin-breadcrumbs" aria-label="Breadcrumb">
-                        <a href="{{ route('admin.dashboard') }}">Home</a>
-                        <span class="breadcrumb-sep">&raquo;</span>
-                        <a href="{{ route('admin.students.index') }}">Students</a>
-                        <span class="breadcrumb-sep">&raquo;</span>
-                        <span>Add</span>
-                    </nav>
+            <!-- Page Header / Title & Breadcrumbs -->
+            <div class="admin-page-header">
+                <div class="admin-page-title-wrap">
+                    <div class="admin-title-row">
+                        <h1 class="admin-page-heading">Add Student</h1>
+                        <nav class="admin-breadcrumbs" aria-label="Breadcrumb">
+                            <a href="{{ route('admin.dashboard') }}">Home</a>
+                            <span class="breadcrumb-sep">&raquo;</span>
+                            <a href="{{ route('admin.students.index') }}">Students</a>
+                            <span class="breadcrumb-sep">&raquo;</span>
+                            <span>Add</span>
+                        </nav>
+                    </div>
+                    <p class="admin-page-subtitle">Register and enroll a new student in the academy</p>
                 </div>
-                <p class="admin-page-subtitle">Register and enroll a new student in the academy</p>
+                <div>
+                    <a href="{{ route('admin.students.index') }}" class="btn btn-admin-secondary">
+                        <i data-lucide="arrow-left" style="width: 17px; height: 17px;"></i>
+                        <span>Back to Students</span>
+                    </a>
+                </div>
             </div>
-            <div>
-                <a href="{{ route('admin.students.index') }}" class="btn btn-admin-secondary">
-                    <i data-lucide="arrow-left" style="width: 17px; height: 17px;"></i>
-                    <span>Back to Students</span>
-                </a>
-            </div>
-        </div>
             <div class="content-body">
 
                 @if ($errors->any())
@@ -55,9 +55,9 @@
                                             <div class="form-group">
                                                 <div class="controls">
                                                     <label>Fullname</label>
-                                                    <input type="text" id="name" class="form-control"
-                                                        name="name" value="{{ old('name') }}"
-                                                        placeholder="Enter Student Fullname" required>
+                                                    <input type="text" id="name" class="form-control" name="name"
+                                                        value="{{ old('name') }}" placeholder="Enter Student Fullname"
+                                                        required>
                                                 </div>
                                             </div>
                                         </div>
@@ -65,10 +65,9 @@
                                             <div class="form-group">
                                                 <div class="controls">
                                                     <label>Username</label>
-                                                    <input type="text" id="username" class="form-control"
-                                                        name="username" value="{{ old('username') }}"
-                                                        placeholder="Enter Username" autocomplete="off"
-                                                        required>
+                                                    <input type="text" id="username" class="form-control" name="username"
+                                                        value="{{ old('username') }}" placeholder="Enter Username"
+                                                        autocomplete="off" required>
                                                     <small class="text-muted">Username must be unique.
                                                         Suggested: <a href="javascript:void(0)"
                                                             id="suggest_username"></a></small>
@@ -79,9 +78,9 @@
                                             <div class="form-group">
                                                 <div class="controls">
                                                     <label>Email</label>
-                                                    <input type="email" id="email" class="form-control"
-                                                        name="email" value="{{ old('email') }}"
-                                                        placeholder="Enter Student Email" required>
+                                                    <input type="email" id="email" class="form-control" name="email"
+                                                        value="{{ old('email') }}" placeholder="Enter Student Email"
+                                                        required>
                                                 </div>
                                             </div>
                                         </div>
@@ -89,9 +88,8 @@
                                             <div class="form-group">
                                                 <div class="controls">
                                                     <label>Password</label>
-                                                    <input type="password" id="password"
-                                                        class="form-control" name="password"
-                                                        placeholder="Enter Student Password"
+                                                    <input type="password" id="password" class="form-control"
+                                                        name="password" placeholder="Enter Student Password"
                                                         autocomplete="new-password" required>
                                                 </div>
                                             </div>
@@ -101,16 +99,16 @@
                                                 <div class="controls">
                                                     <label>Date of Birth (DOB)</label>
                                                     <input type="date" class="form-control birthdate-picker"
-                                                        id="date_of_birth" value="{{ old('date_of_birth') }}"
-                                                        required placeholder="Date of Birth (DOB)"
-                                                        name="date_of_birth">
+                                                        id="date_of_birth" value="{{ old('date_of_birth') }}" required
+                                                        placeholder="Date of Birth (DOB)" name="date_of_birth">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-12 col-sm-6">
                                             <div class="form-group">
                                                 <label>Group Year</label>
-                                                <select class="form-control" name="group_year" id="student_group_year" required>
+                                                <select class="form-control" name="group_year" id="student_group_year"
+                                                    required>
                                                     <option value="">--Select Group Year--</option>
                                                     @foreach ($yearGroups as $year)
                                                         <option value="{{ $year->value }}" {{ old('group_year') == $year->value ? 'selected' : '' }}>
@@ -123,7 +121,8 @@
                                         <div class="col-12 col-sm-6">
                                             <div class="form-group">
                                                 <label>Academic Year</label>
-                                                <select class="form-control" name="academic_year" id="student_academic_year" required>
+                                                <select class="form-control" name="academic_year" id="student_academic_year"
+                                                    required>
                                                     <option value="">--Select Academic Year--</option>
                                                     @foreach ($academicYears as $year)
                                                         <option value="{{ $year->id }}" {{ old('academic_year') == $year->id ? 'selected' : '' }}>
@@ -146,9 +145,9 @@
                                                         <option value="{{ $class->id }}"
                                                             data-group-year="{{ $class->group_year }}"
                                                             data-academic-year-id="{{ $ayId }}"
-                                                            data-academic-year-name="{{ $class->academic_year }}"
-                                                            {{ old('class_id') == $class->id ? 'selected' : '' }}>
-                                                            {{ $class->name }} ({{ $class->group_year }} &bull; {{ $class->academic_year }})
+                                                            data-academic-year-name="{{ $class->academic_year }}" {{ old('class_id') == $class->id ? 'selected' : '' }}>
+                                                            {{ $class->name }} ({{ $class->group_year }} &bull;
+                                                            {{ $class->academic_year }})
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -159,8 +158,7 @@
                                             <div class="form-group">
                                                 <div class="controls">
                                                     <label>Region</label>
-                                                    <input type="text" class="form-control" name="region"
-                                                        required
+                                                    <input type="text" class="form-control" name="region" required
                                                         placeholder="Geographic region or campus the student belongs to..."
                                                         value="{{ old('region') }}">
                                                 </div>
@@ -170,8 +168,7 @@
                                             <div class="form-group">
                                                 <div class="controls">
                                                     <label>Student Phone Number</label>
-                                                    <input type="text" class="form-control"
-                                                        name="student_phone"
+                                                    <input type="text" class="form-control" name="student_phone"
                                                         value="{{ old('student_phone') }}"
                                                         placeholder="Direct contact number of the student, if available...(optional)">
                                                 </div>
@@ -184,9 +181,7 @@
                                                     <li class="d-inline-block mr-2">
                                                         <fieldset>
                                                             <div class="vs-radio-con">
-                                                                <input type="radio" name="gender"
-                                                                    {{ old('gender', 'male') == 'male' ? 'checked' : '' }}
-                                                                    value="male">
+                                                                <input type="radio" name="gender" {{ old('gender', 'male') == 'male' ? 'checked' : '' }} value="male">
                                                                 <span class="vs-radio">
                                                                     <span class="vs-radio--border"></span>
                                                                     <span class="vs-radio--circle"></span>
@@ -198,9 +193,7 @@
                                                     <li class="d-inline-block mr-2">
                                                         <fieldset>
                                                             <div class="vs-radio-con">
-                                                                <input type="radio" name="gender"
-                                                                    {{ old('gender') == 'female' ? 'checked' : '' }}
-                                                                    value="female">
+                                                                <input type="radio" name="gender" {{ old('gender') == 'female' ? 'checked' : '' }} value="female">
                                                                 <span class="vs-radio">
                                                                     <span class="vs-radio--border"></span>
                                                                     <span class="vs-radio--circle"></span>
@@ -212,9 +205,7 @@
                                                     <li class="d-inline-block mr-2">
                                                         <fieldset>
                                                             <div class="vs-radio-con">
-                                                                <input type="radio" name="gender"
-                                                                    {{ old('gender') == 'other' ? 'checked' : '' }}
-                                                                    value="other">
+                                                                <input type="radio" name="gender" {{ old('gender') == 'other' ? 'checked' : '' }} value="other">
                                                                 <span class="vs-radio">
                                                                     <span class="vs-radio--border"></span>
                                                                     <span class="vs-radio--circle"></span>
@@ -246,8 +237,8 @@
                                             </button>
                                         </li>
                                         <li>
-                                            <button type="button" class="btn btn-sm parent-mode-btn" id="btn-existing-parent"
-                                                onclick="setParentMode('existing')">
+                                            <button type="button" class="btn btn-sm parent-mode-btn"
+                                                id="btn-existing-parent" onclick="setParentMode('existing')">
                                                 <i class="feather icon-link"></i> Select Existing Parent
                                             </button>
                                         </li>
@@ -298,8 +289,7 @@
                                                     <div class="controls">
                                                         <label>Parent Password <span class="text-danger">*</span></label>
                                                         <input type="password" id="parent_password" class="form-control"
-                                                            name="parent_password"
-                                                            placeholder="Parent login password"
+                                                            name="parent_password" placeholder="Parent login password"
                                                             autocomplete="new-password">
                                                     </div>
                                                 </div>
@@ -307,7 +297,8 @@
                                             <div class="col-12 col-sm-6">
                                                 <div class="form-group">
                                                     <div class="controls">
-                                                        <label>Relation to Student <span class="text-danger">*</span></label>
+                                                        <label>Relation to Student <span
+                                                                class="text-danger">*</span></label>
                                                         <select class="form-control" name="parent_relation">
                                                             <option value="Father" {{ old('parent_relation') == 'Father' ? 'selected' : '' }}>Father</option>
                                                             <option value="Mother" {{ old('parent_relation') == 'Mother' ? 'selected' : '' }}>Mother</option>
@@ -320,8 +311,8 @@
                                                 <div class="form-group">
                                                     <div class="controls">
                                                         <label>Parent Phone <span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control"
-                                                            name="parent_phone" value="{{ old('parent_phone') }}"
+                                                        <input type="text" class="form-control" name="parent_phone"
+                                                            value="{{ old('parent_phone') }}"
                                                             placeholder="Primary contact number">
                                                     </div>
                                                 </div>
@@ -331,7 +322,8 @@
                                                     <div class="controls">
                                                         <label>Alternate Phone</label>
                                                         <input type="text" class="form-control"
-                                                            name="parent_alternate_phone" value="{{ old('parent_alternate_phone') }}"
+                                                            name="parent_alternate_phone"
+                                                            value="{{ old('parent_alternate_phone') }}"
                                                             placeholder="Secondary contact number (optional)">
                                                     </div>
                                                 </div>
@@ -341,7 +333,8 @@
                                                     <div class="controls">
                                                         <label>Emergency Contact</label>
                                                         <input type="text" class="form-control"
-                                                            name="parent_emergency_contact" value="{{ old('parent_emergency_contact') }}"
+                                                            name="parent_emergency_contact"
+                                                            value="{{ old('parent_emergency_contact') }}"
                                                             placeholder="Emergency contact number (optional)">
                                                     </div>
                                                 </div>
@@ -359,8 +352,7 @@
                                                         <select class="form-control" name="parent_id" id="parent_id_select">
                                                             <option value="">-- Select an Existing Parent --</option>
                                                             @foreach ($parents as $parent)
-                                                                <option value="{{ $parent->id }}"
-                                                                    {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
+                                                                <option value="{{ $parent->id }}" {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
                                                                     {{ $parent->name }} ({{ $parent->email }})
                                                                 </option>
                                                             @endforeach
@@ -370,7 +362,8 @@
                                             </div>
                                             <div class="col-12 col-sm-4 d-flex align-items-end mb-1">
                                                 @if($parents->isEmpty())
-                                                    <p class="text-muted mb-0"><i class="feather icon-alert-triangle"></i> No parents exist yet. Use "Create New Parent" instead.</p>
+                                                    <p class="text-muted mb-0"><i class="feather icon-alert-triangle"></i> No
+                                                        parents exist yet. Use "Create New Parent" instead.</p>
                                                 @endif
                                             </div>
                                         </div>
@@ -400,31 +393,34 @@
         .parent-mode-btn {
             transition: all 0.2s ease;
         }
+
         .parent-mode-btn.active-mode {
-            background-color: #7367f0;
+            background-color: #2477F9;
             color: #fff;
-            border-color: #7367f0;
+            border-color: #2477F9;
         }
+
         .parent-mode-btn:not(.active-mode) {
             background-color: #f8f8f8;
             color: #626262;
             border-color: #ddd;
         }
+
         .parent-mode-btn:not(.active-mode):hover {
             background-color: #e8e6fc;
-            color: #7367f0;
-            border-color: #7367f0;
+            color: #2477F9;
+            border-color: #2477F9;
         }
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // === Student username suggestion ===
             const nameInput = document.getElementById('name');
             const usernameInput = document.getElementById('username');
             const suggestBtn = document.getElementById('suggest_username');
 
-            nameInput.addEventListener('input', function() {
+            nameInput.addEventListener('input', function () {
                 if (nameInput.value) {
                     let baseName = nameInput.value.toLowerCase().replace(/[^a-z0-9]/g, '');
                     if (baseName.length > 0) {
@@ -438,7 +434,7 @@
                 }
             });
 
-            suggestBtn.addEventListener('click', function(e) {
+            suggestBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 if (suggestBtn.textContent) {
                     usernameInput.value = suggestBtn.textContent;
@@ -450,7 +446,7 @@
             const parentUsernameInput = document.getElementById('parent_username');
             const parentSuggestBtn = document.getElementById('suggest_parent_username');
 
-            parentNameInput.addEventListener('input', function() {
+            parentNameInput.addEventListener('input', function () {
                 if (parentNameInput.value) {
                     let baseName = parentNameInput.value.toLowerCase().replace(/[^a-z0-9]/g, '');
                     if (baseName.length > 0) {
@@ -464,7 +460,7 @@
                 }
             });
 
-            parentSuggestBtn.addEventListener('click', function(e) {
+            parentSuggestBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 if (parentSuggestBtn.textContent) {
                     parentUsernameInput.value = parentSuggestBtn.textContent;

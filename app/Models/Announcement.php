@@ -63,6 +63,102 @@ class Announcement extends Model
         return 'Active';
     }
 
+    public function getRecipientScopeSummariesAttribute()
+    {
+        $summaries = [];
+        $targets = $this->targets;
+
+        if ($targets->contains('target_type', 'all_active_students')) {
+            $summaries[] = [
+                'type' => 'all_active_students',
+                'label' => 'All Students',
+                'icon' => 'users',
+                'badge_bg' => 'rgba(36, 119, 249, 0.1)',
+                'badge_color' => 'var(--theme-primary-bright, #2477F9)',
+                'tooltip' => 'All students active within last 12 months',
+            ];
+        }
+
+        if ($targets->contains('target_type', 'all_tutors')) {
+            $summaries[] = [
+                'type' => 'all_tutors',
+                'label' => 'All Tutors',
+                'icon' => 'user-check',
+                'badge_bg' => 'rgba(115, 103, 240, 0.12)',
+                'badge_color' => '#2477F9',
+                'tooltip' => 'All registered tutors',
+            ];
+        }
+
+        $classTargets = $targets->where('target_type', 'class');
+        if ($classTargets->isNotEmpty()) {
+            $classNames = $classTargets->map(function ($t) {
+                return $t->classModel ? $t->classModel->name : ('Class #' . $t->target_id);
+            })->filter()->values();
+
+            $count = $classTargets->count();
+            $label = $count === 1 ? ($classNames->first() ?? '1 Class') : ($count . ' Classes');
+
+            $summaries[] = [
+                'type' => 'class',
+                'label' => $label,
+                'icon' => 'book-open',
+                'badge_bg' => 'rgba(40, 199, 111, 0.12)',
+                'badge_color' => '#28C76F',
+                'tooltip' => $classNames->implode(', '),
+            ];
+        }
+
+        $yearGroupTargets = $targets->where('target_type', 'year_group');
+        if ($yearGroupTargets->isNotEmpty()) {
+            $ygNames = $yearGroupTargets->map(function ($t) {
+                return $t->yearGroup ? $t->yearGroup->title : ('Year Group #' . $t->target_id);
+            })->filter()->values();
+
+            $count = $yearGroupTargets->count();
+            $label = $count === 1 ? ($ygNames->first() ?? '1 Year Group') : ($count . ' Year Groups');
+
+            $summaries[] = [
+                'type' => 'year_group',
+                'label' => $label,
+                'icon' => 'layers',
+                'badge_bg' => 'rgba(255, 159, 67, 0.15)',
+                'badge_color' => '#B26A00',
+                'tooltip' => $ygNames->implode(', '),
+            ];
+        }
+
+        $userTargets = $targets->where('target_type', 'user');
+        if ($userTargets->isNotEmpty()) {
+            $userNames = $userTargets->map(function ($t) {
+                return $t->user ? $t->user->name : ('User #' . $t->target_id);
+            })->filter()->values();
+
+            $count = $userTargets->count();
+            $label = $count === 1 ? ($userNames->first() ?? '1 User') : ($count . ' Users');
+
+            $summaries[] = [
+                'type' => 'user',
+                'label' => $label,
+                'icon' => 'user',
+                'badge_bg' => 'rgba(0, 181, 216, 0.12)',
+                'badge_color' => '#0096B4',
+                'tooltip' => $userNames->implode(', '),
+            ];
+        }
+
+        return $summaries;
+    }
+
+    public function getRecipientScopeTextAttribute()
+    {
+        $summaries = $this->recipient_scope_summaries;
+        if (empty($summaries)) {
+            return 'No Recipients';
+        }
+        return collect($summaries)->pluck('label')->implode(', ');
+    }
+
     public function getEligibleRecipientsQuery()
     {
         $targets = $this->targets;

@@ -5,7 +5,7 @@
             href="{{ asset('theme/app-assets/vendors/css/forms/select/select2.min.css') }}">
         <style>
             .file-upload-dropzone {
-                border: 2px dashed #7367F0;
+                border: 2px dashed #2477F9;
                 border-radius: 12px;
                 padding: 30px 20px;
                 text-align: center;
@@ -14,27 +14,42 @@
                 transition: all 0.25s ease;
                 position: relative;
             }
+
             .file-upload-dropzone:hover {
                 background: #f1f5f9;
                 border-color: #5e50ee;
                 transform: translateY(-2px);
             }
+
             .file-preview-card {
                 border: 1px solid #e2e8f0;
                 border-radius: 10px;
                 padding: 14px 18px;
                 background: #ffffff;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
             }
+
             .format-badge {
                 font-size: 0.75rem;
                 padding: 4px 10px;
                 border-radius: 6px;
                 font-weight: 600;
             }
-            .badge-docx { background: #e0f2fe; color: #0369a1; }
-            .badge-pdf { background: #fee2e2; color: #b91c1c; }
-            .badge-txt { background: #f1f5f9; color: #475569; }
+
+            .badge-docx {
+                background: #e0f2fe;
+                color: #0369a1;
+            }
+
+            .badge-pdf {
+                background: #fee2e2;
+                color: #b91c1c;
+            }
+
+            .badge-txt {
+                background: #f1f5f9;
+                color: #475569;
+            }
         </style>
     @endpush
 
@@ -52,9 +67,10 @@
                     <div class="card-body pt-2">
                         <!-- Homework Title -->
                         <div class="form-group mb-2">
-                            <label for="title" class="font-weight-bold text-dark">Homework Title <span class="text-danger">*</span></label>
-                            <input type="text" id="title" class="form-control form-control-lg" placeholder="e.g. Week 3 - Algebra Fundamentals Practice"
-                                wire:model.defer="title">
+                            <label for="title" class="font-weight-bold text-dark">Homework Title <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="title" class="form-control form-control-lg"
+                                placeholder="e.g. Week 3 - Algebra Fundamentals Practice" wire:model.defer="title">
                             @error('title') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
                         </div>
 
@@ -110,7 +126,8 @@
                             <!-- Subject selection -->
                             <div class="col-md-4">
                                 <div class="form-group mb-2">
-                                    <label for="subject_id" class="font-weight-bold text-dark">Subject <span class="text-danger">*</span></label>
+                                    <label for="subject_id" class="font-weight-bold text-dark">Subject <span
+                                            class="text-danger">*</span></label>
                                     <div wire:ignore x-data="{
                                         value: @entangle('subject_id').live,
                                         init() {
@@ -145,7 +162,8 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    @error('subject_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                    @error('subject_id') <span class="text-danger font-small-3">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -198,7 +216,8 @@
                                             <option value="">-- Select Topic --</option>
                                         </select>
                                     </div>
-                                    @error('topic_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                    @error('topic_id') <span class="text-danger font-small-3">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -251,7 +270,8 @@
                                             <option value="">-- Select Subtopic --</option>
                                         </select>
                                     </div>
-                                    @error('subtopic_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                    @error('subtopic_id') <span class="text-danger font-small-3">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -261,42 +281,48 @@
                             <!-- Class selection -->
                             <div class="col-md-4">
                                 <div class="form-group mb-2">
-                                    <label for="class_id" class="font-weight-bold text-dark">Class <span class="text-danger">*</span></label>
+                                    <label for="class_id" class="font-weight-bold text-dark">Class <span
+                                            class="text-danger">*</span></label>
                                     <select id="class_id" class="form-control" wire:model.defer="class_id">
                                         <option value="">-- Select Class --</option>
                                         @foreach($classes as $cls)
                                             <option value="{{ $cls->id }}">{{ $cls->name }}</option>
                                         @endforeach
                                     </select>
-                                    @error('class_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                    @error('class_id') <span class="text-danger font-small-3">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
 
                             <!-- Year Group selection -->
                             <div class="col-md-4">
                                 <div class="form-group mb-2">
-                                    <label for="year_group_id" class="font-weight-bold text-dark">Group Year <span class="text-danger">*</span></label>
+                                    <label for="year_group_id" class="font-weight-bold text-dark">Group Year <span
+                                            class="text-danger">*</span></label>
                                     <select id="year_group_id" class="form-control" wire:model.defer="year_group_id">
                                         <option value="">-- Select Group Year --</option>
                                         @foreach($yearGroups as $yg)
                                             <option value="{{ $yg->id }}">{{ $yg->title }} ({{ $yg->value }})</option>
                                         @endforeach
                                     </select>
-                                    @error('year_group_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                    @error('year_group_id') <span class="text-danger font-small-3">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
 
                             <!-- Academic Year selection -->
                             <div class="col-md-4">
                                 <div class="form-group mb-2">
-                                    <label for="academic_year" class="font-weight-bold text-dark">Academic Year <span class="text-danger">*</span></label>
+                                    <label for="academic_year" class="font-weight-bold text-dark">Academic Year <span
+                                            class="text-danger">*</span></label>
                                     <select id="academic_year" class="form-control" wire:model.defer="academic_year">
                                         <option value="">-- Select Academic Year --</option>
                                         @foreach($academicYears as $year)
                                             <option value="{{ $year->name }}">{{ $year->name }}</option>
                                         @endforeach
                                     </select>
-                                    @error('academic_year') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                    @error('academic_year') <span class="text-danger font-small-3">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -305,14 +331,17 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group mb-2">
-                                    <label for="user_id" class="font-weight-bold text-dark">Assigned Tutor / Admin <span class="text-danger">*</span></label>
+                                    <label for="user_id" class="font-weight-bold text-dark">Assigned Tutor / Admin <span
+                                            class="text-danger">*</span></label>
                                     <select id="user_id" class="form-control" wire:model.defer="user_id">
                                         <option value="">-- Select Creator --</option>
                                         @foreach($tutors as $tutor)
-                                            <option value="{{ $tutor->id }}">{{ $tutor->name }} ({{ ucfirst($tutor->role) }})</option>
+                                            <option value="{{ $tutor->id }}">{{ $tutor->name }}
+                                                ({{ ucfirst($tutor->role) }})</option>
                                         @endforeach
                                     </select>
-                                    @error('user_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                    @error('user_id') <span class="text-danger font-small-3">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -332,7 +361,8 @@
                                 <div class="custom-control custom-checkbox">
                                     <input type="checkbox" class="custom-control-input" id="create_new_course"
                                         wire:model.live="create_new_course">
-                                    <label class="custom-control-label font-weight-bold cursor-pointer text-dark" for="create_new_course">
+                                    <label class="custom-control-label font-weight-bold cursor-pointer text-dark"
+                                        for="create_new_course">
                                         Create a new course instantly
                                     </label>
                                 </div>
@@ -341,23 +371,27 @@
                             @if($create_new_course)
                                 <div class="col-md-12">
                                     <div class="form-group mb-2">
-                                        <label for="new_course_name" class="font-weight-bold text-dark">New Course Name <span class="text-danger">*</span></label>
+                                        <label for="new_course_name" class="font-weight-bold text-dark">New Course Name
+                                            <span class="text-danger">*</span></label>
                                         <input type="text" id="new_course_name" class="form-control"
                                             placeholder="Enter new course name..." wire:model.defer="new_course_name">
-                                        @error('new_course_name') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                        @error('new_course_name') <span
+                                        class="text-danger font-small-3">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
                             @else
                                 <div class="col-md-12">
                                     <div class="form-group mb-2">
-                                        <label for="course_id" class="font-weight-bold text-dark">Assign to Existing Course</label>
+                                        <label for="course_id" class="font-weight-bold text-dark">Assign to Existing
+                                            Course</label>
                                         <select id="course_id" class="form-control" wire:model.live="course_id">
                                             <option value="">-- Do Not Assign --</option>
                                             @foreach($coursesList as $courseItem)
                                                 <option value="{{ $courseItem->id }}">{{ $courseItem->name }}</option>
                                             @endforeach
                                         </select>
-                                        @error('course_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                        @error('course_id') <span class="text-danger font-small-3">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
                             @endif
@@ -366,22 +400,24 @@
                                 <div class="col-md-12">
                                     <div class="card bg-light border p-2 mb-0">
                                         <h6 class="font-weight-bold mb-1 text-dark">Week Settings</h6>
-                                        
+
                                         @if(!$create_new_course)
                                             <div class="form-group mb-2">
                                                 <label class="font-weight-bold text-dark d-block">Week Selection Mode</label>
                                                 <div class="d-flex align-items-center">
                                                     <div class="custom-control custom-radio mr-3">
-                                                        <input type="radio" class="custom-control-input" id="week_mode_existing" value="existing"
-                                                            wire:model.live="week_mode">
-                                                        <label class="custom-control-label font-weight-bold cursor-pointer" for="week_mode_existing">
+                                                        <input type="radio" class="custom-control-input" id="week_mode_existing"
+                                                            value="existing" wire:model.live="week_mode">
+                                                        <label class="custom-control-label font-weight-bold cursor-pointer"
+                                                            for="week_mode_existing">
                                                             Choose Existing Week
                                                         </label>
                                                     </div>
                                                     <div class="custom-control custom-radio">
-                                                        <input type="radio" class="custom-control-input" id="week_mode_new" value="new"
-                                                            wire:model.live="week_mode">
-                                                        <label class="custom-control-label font-weight-bold cursor-pointer" for="week_mode_new">
+                                                        <input type="radio" class="custom-control-input" id="week_mode_new"
+                                                            value="new" wire:model.live="week_mode">
+                                                        <label class="custom-control-label font-weight-bold cursor-pointer"
+                                                            for="week_mode_new">
                                                             Create New Week
                                                         </label>
                                                     </div>
@@ -391,32 +427,42 @@
 
                                         @if($week_mode === 'existing' && !$create_new_course)
                                             <div class="form-group mb-0">
-                                                <label for="selected_week_id" class="font-weight-bold text-dark">Select Week <span class="text-danger">*</span></label>
-                                                <select id="selected_week_id" class="form-control" wire:model.defer="selected_week_id">
+                                                <label for="selected_week_id" class="font-weight-bold text-dark">Select Week
+                                                    <span class="text-danger">*</span></label>
+                                                <select id="selected_week_id" class="form-control"
+                                                    wire:model.defer="selected_week_id">
                                                     <option value="">-- Choose Week --</option>
                                                     @foreach($courseWeeks as $cWeek)
                                                         <option value="{{ $cWeek['id'] }}">
-                                                            {{ $cWeek['name'] }} @if($cWeek['due_date']) (Due: {{ \Carbon\Carbon::parse($cWeek['due_date'])->format('d M Y') }}) @endif
+                                                            {{ $cWeek['name'] }} @if($cWeek['due_date']) (Due:
+                                                            {{ \Carbon\Carbon::parse($cWeek['due_date'])->format('d M Y') }}) @endif
                                                         </option>
                                                     @endforeach
                                                 </select>
-                                                @error('selected_week_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                                @error('selected_week_id') <span
+                                                class="text-danger font-small-3">{{ $message }}</span> @enderror
                                             </div>
                                         @else
                                             <div class="row">
                                                 <div class="col-md-8">
                                                     <div class="form-group mb-2">
-                                                        <label for="new_week_name" class="font-weight-bold text-dark">Week Name / Title <span class="text-danger">*</span></label>
-                                                        <input type="text" id="new_week_name" class="form-control" placeholder="e.g. Week 1 - Intro to Geometry"
+                                                        <label for="new_week_name" class="font-weight-bold text-dark">Week Name
+                                                            / Title <span class="text-danger">*</span></label>
+                                                        <input type="text" id="new_week_name" class="form-control"
+                                                            placeholder="e.g. Week 1 - Intro to Geometry"
                                                             wire:model.defer="new_week_name">
-                                                        @error('new_week_name') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                                        @error('new_week_name') <span
+                                                        class="text-danger font-small-3">{{ $message }}</span> @enderror
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group mb-2">
-                                                        <label for="new_week_due_date" class="font-weight-bold text-dark">Due Date</label>
-                                                        <input type="date" id="new_week_due_date" class="form-control" wire:model.defer="new_week_due_date">
-                                                        @error('new_week_due_date') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                                        <label for="new_week_due_date" class="font-weight-bold text-dark">Due
+                                                            Date</label>
+                                                        <input type="date" id="new_week_due_date" class="form-control"
+                                                            wire:model.defer="new_week_due_date">
+                                                        @error('new_week_due_date') <span
+                                                        class="text-danger font-small-3">{{ $message }}</span> @enderror
                                                     </div>
                                                 </div>
                                             </div>
@@ -443,14 +489,17 @@
                             Upload your homework document for students. Supported formats:
                         </p>
                         <div class="d-flex align-items-center mb-2">
-                            <span class="format-badge badge-docx mr-1"><i class="feather icon-file-text mr-25"></i>DOCX / DOC</span>
+                            <span class="format-badge badge-docx mr-1"><i class="feather icon-file-text mr-25"></i>DOCX
+                                / DOC</span>
                             <span class="format-badge badge-pdf mr-1"><i class="feather icon-file mr-25"></i>PDF</span>
                             <span class="format-badge badge-txt"><i class="feather icon-align-left mr-25"></i>TXT</span>
                         </div>
 
                         <!-- Dropzone input container -->
-                        <div class="file-upload-dropzone" onclick="document.getElementById('homeworkFileInput').click()">
-                            <input type="file" id="homeworkFileInput" class="d-none" wire:model="file" accept=".docx,.doc,.pdf,.txt">
+                        <div class="file-upload-dropzone"
+                            onclick="document.getElementById('homeworkFileInput').click()">
+                            <input type="file" id="homeworkFileInput" class="d-none" wire:model="file"
+                                accept=".docx,.doc,.pdf,.txt">
                             <i class="feather icon-upload-cloud text-primary" style="font-size: 38px;"></i>
                             <h6 class="font-weight-bold mt-1 mb-25 text-dark">Click to select or drop file here</h6>
                             <span class="text-muted font-small-2">Maximum file size: 25 MB</span>
@@ -471,13 +520,15 @@
                                             <i class="feather icon-file-text"></i>
                                         </div>
                                         <div class="overflow-hidden">
-                                            <h6 class="mb-0 text-truncate font-weight-bold text-dark" style="max-width: 170px;" title="{{ $file->getClientOriginalName() }}">
+                                            <h6 class="mb-0 text-truncate font-weight-bold text-dark"
+                                                style="max-width: 170px;" title="{{ $file->getClientOriginalName() }}">
                                                 {{ $file->getClientOriginalName() }}
                                             </h6>
                                             <span class="badge badge-primary font-small-1 text-uppercase">New Upload</span>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-outline-danger btn-sm p-50" wire:click="$set('file', null)" title="Remove selected file">
+                                    <button type="button" class="btn btn-outline-danger btn-sm p-50"
+                                        wire:click="$set('file', null)" title="Remove selected file">
                                         <i class="feather icon-x"></i>
                                     </button>
                                 </div>
@@ -490,19 +541,23 @@
                                             <i class="feather icon-file-text"></i>
                                         </div>
                                         <div class="overflow-hidden">
-                                            <h6 class="mb-0 text-truncate font-weight-bold text-dark" style="max-width: 170px;" title="{{ $existing_file_name }}">
+                                            <h6 class="mb-0 text-truncate font-weight-bold text-dark"
+                                                style="max-width: 170px;" title="{{ $existing_file_name }}">
                                                 {{ $existing_file_name }}
                                             </h6>
-                                            <span class="text-muted font-small-2">{{ $existing_file_size }} • {{ strtoupper($existing_file_type) }}</span>
+                                            <span class="text-muted font-small-2">{{ $existing_file_size }} •
+                                                {{ strtoupper($existing_file_type) }}</span>
                                         </div>
                                     </div>
                                     <div class="btn-group">
                                         @if($homeworkId)
-                                            <a href="{{ route('admin.homeworks.download', $homeworkId) }}" class="btn btn-outline-primary btn-sm p-50 mr-50" title="Download current file">
+                                            <a href="{{ route('admin.homeworks.download', $homeworkId) }}"
+                                                class="btn btn-outline-primary btn-sm p-50 mr-50" title="Download current file">
                                                 <i class="feather icon-download"></i>
                                             </a>
                                         @endif
-                                        <button type="button" class="btn btn-outline-danger btn-sm p-50" wire:click="removeExistingFile" title="Remove attached file">
+                                        <button type="button" class="btn btn-outline-danger btn-sm p-50"
+                                            wire:click="removeExistingFile" title="Remove attached file">
                                             <i class="feather icon-trash-2"></i>
                                         </button>
                                     </div>
@@ -529,16 +584,21 @@
                         <div class="form-group mb-2">
                             <label class="font-weight-bold text-dark d-block mb-50">Homework Status</label>
                             <div class="custom-control custom-switch custom-control-inline">
-                                <input type="checkbox" class="custom-control-input" id="is_active" wire:model.live="is_active" value="1">
-                                <label class="custom-control-label font-weight-bold cursor-pointer {{ $is_active ? 'text-success' : 'text-danger' }}" for="is_active">
+                                <input type="checkbox" class="custom-control-input" id="is_active"
+                                    wire:model.live="is_active" value="1">
+                                <label
+                                    class="custom-control-label font-weight-bold cursor-pointer {{ $is_active ? 'text-success' : 'text-danger' }}"
+                                    for="is_active">
                                     {{ $is_active ? 'Active' : 'Inactive' }}
                                 </label>
                             </div>
                             <small class="form-text text-muted mt-50">
                                 @if($is_active)
-                                    <span class="text-success"><i class="feather icon-check-circle mr-25"></i>Active: Visible on student side to matching Class, Group Year & Academic Year.</span>
+                                    <span class="text-success"><i class="feather icon-check-circle mr-25"></i>Active:
+                                        Visible on student side to matching Class, Group Year & Academic Year.</span>
                                 @else
-                                    <span class="text-danger"><i class="feather icon-eye-off mr-25"></i>Inactive: Hidden from student side.</span>
+                                    <span class="text-danger"><i class="feather icon-eye-off mr-25"></i>Inactive: Hidden
+                                        from student side.</span>
                                 @endif
                             </small>
                         </div>
@@ -547,7 +607,8 @@
 
                         <button type="submit" class="btn btn-primary btn-block btn-lg font-weight-bold shadow mb-1">
                             <span wire:loading.remove wire:target="save">
-                                <i class="feather icon-check mr-50"></i>{{ $isEdit ? 'Update Homework' : 'Create Homework' }}
+                                <i
+                                    class="feather icon-check mr-50"></i>{{ $isEdit ? 'Update Homework' : 'Create Homework' }}
                             </span>
                             <span wire:loading wire:target="save">
                                 <span class="spinner-border spinner-border-sm mr-50" role="status"></span>Saving...

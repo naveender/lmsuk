@@ -89,7 +89,8 @@
                                         </div>
                                         <div class="col-4">
                                             <div class="font-weight-bold font-medium-3 text-success-light">
-                                                {{ $completedPapersCount }}</div>
+                                                {{ $completedPapersCount }}
+                                            </div>
                                             <div class="font-small-2 text-light-opacity">Done</div>
                                         </div>
                                     </div>
@@ -100,20 +101,24 @@
                 </div>
 
                 @php
-                    $activeTab = (request()->filled('attempt_paper_name') || request()->filled('attempt_subtopic_id') || request()->filled('attempt_status') || request()->has('attempts_page')) 
-                        ? 'attempts' 
+                    $activeTab = (request()->filled('attempt_paper_name') || request()->filled('attempt_subtopic_id') || request()->filled('attempt_status') || request()->has('attempts_page'))
+                        ? 'attempts'
                         : 'papers';
                 @endphp
 
                 <!-- Navigation Tabs -->
                 <ul class="nav nav-tabs modern-tabs mb-4" id="assessmentTabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link {{ $activeTab === 'papers' ? 'active' : '' }}" id="papers-tab" data-toggle="tab" href="#papers-content" role="tab" aria-controls="papers-content" aria-selected="{{ $activeTab === 'papers' ? 'true' : 'false' }}">
+                        <a class="nav-link {{ $activeTab === 'papers' ? 'active' : '' }}" id="papers-tab" data-toggle="tab"
+                            href="#papers-content" role="tab" aria-controls="papers-content"
+                            aria-selected="{{ $activeTab === 'papers' ? 'true' : 'false' }}">
                             <i class="feather icon-book-open mr-2"></i> Practice Papers
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ $activeTab === 'attempts' ? 'active' : '' }}" id="attempts-tab" data-toggle="tab" href="#attempts-content" role="tab" aria-controls="attempts-content" aria-selected="{{ $activeTab === 'attempts' ? 'true' : 'false' }}">
+                        <a class="nav-link {{ $activeTab === 'attempts' ? 'active' : '' }}" id="attempts-tab"
+                            data-toggle="tab" href="#attempts-content" role="tab" aria-controls="attempts-content"
+                            aria-selected="{{ $activeTab === 'attempts' ? 'true' : 'false' }}">
                             <i class="feather icon-clock mr-2"></i> Attempt History & Results
                             @if($attempts->total() > 0)
                                 <span class="badge badge-pill badge-primary ml-2">{{ $attempts->total() }}</span>
@@ -125,512 +130,558 @@
                 <!-- Tab Contents -->
                 <div class="tab-content modern-tab-content" id="assessmentTabsContent">
                     <!-- Practice Papers Tab Pane -->
-                    <div class="tab-pane fade {{ $activeTab === 'papers' ? 'show active' : '' }}" id="papers-content" role="tabpanel" aria-labelledby="papers-tab">
+                    <div class="tab-pane fade {{ $activeTab === 'papers' ? 'show active' : '' }}" id="papers-content"
+                        role="tabpanel" aria-labelledby="papers-tab">
 
                         <!-- Search & Filters -->
                         <div class="card search-filter-card mb-4 shadow-sm border-0">
-                    <div class="card-body p-3">
-                        <form method="GET" action="{{ route('student.topics.subtopics', $topic->id) }}"
-                            class="row align-items-end">
-                            @foreach(request()->except(['subtopic_name', 'paper_name', 'page']) as $key => $value)
-                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                            @endforeach
-                            <div class="col-md-5 col-sm-12 mb-3 mb-md-0">
-                                <label for="subtopic_name" class="filter-label"><i
-                                        class="feather icon-layers mr-1"></i>Filter by Subtopic</label>
-                                <div class="custom-select-wrapper">
-                                    <select name="subtopic_name" id="subtopic_name" class="form-control select-modern">
-                                        <option value="">-- All Subtopics --</option>
-                                        @foreach($allSubtopics as $sub)
-                                            <option value="{{ $sub->name }}" {{ request('subtopic_name') == $sub->name ? 'selected' : '' }}>
-                                                {{ $sub->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <i class="feather icon-chevron-down select-chevron"></i>
-                                </div>
-                            </div>
-                            <div class="col-md-5 col-sm-12 mb-3 mb-md-0">
-                                <label for="paper_name" class="filter-label"><i
-                                        class="feather icon-file-text mr-1"></i>Search Paper Name</label>
-                                <div class="position-relative has-icon-left">
-                                    <input type="text" name="paper_name" id="paper_name" class="form-control input-modern"
-                                        placeholder="Search papers..." value="{{ request('paper_name') }}">
-                                    <div class="form-control-position">
-                                        <i class="feather icon-search text-muted"></i>
+                            <div class="card-body p-3">
+                                <form method="GET" action="{{ route('student.topics.subtopics', $topic->id) }}"
+                                    class="row align-items-end">
+                                    @foreach(request()->except(['subtopic_name', 'paper_name', 'page']) as $key => $value)
+                                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                    @endforeach
+                                    <div class="col-md-5 col-sm-12 mb-3 mb-md-0">
+                                        <label for="subtopic_name" class="filter-label"><i
+                                                class="feather icon-layers mr-1"></i>Filter by Subtopic</label>
+                                        <div class="custom-select-wrapper">
+                                            <select name="subtopic_name" id="subtopic_name"
+                                                class="form-control select-modern">
+                                                <option value="">-- All Subtopics --</option>
+                                                @foreach($allSubtopics as $sub)
+                                                    <option value="{{ $sub->name }}" {{ request('subtopic_name') == $sub->name ? 'selected' : '' }}>
+                                                        {{ $sub->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <i class="feather icon-chevron-down select-chevron"></i>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2 col-sm-12 d-flex">
-                                <button type="submit" class="btn btn-primary btn-modern mr-2 flex-grow-1">
-                                    <i class="feather icon-filter mr-1"></i> Filter
-                                </button>
-                                @if(request()->filled('subtopic_name') || request()->filled('paper_name'))
-                                    @php
-                                        $clearMainParams = request()->except(['subtopic_name', 'paper_name', 'page']);
-                                    @endphp
-                                    <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearMainParams) }}"
-                                        class="btn btn-outline-danger btn-modern-danger" title="Clear Filters">
-                                        <i class="feather icon-x"></i>
-                                    </a>
-                                @endif
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Subtopics List -->
-                <div class="subtopics-list">
-                    @forelse($subtopics as $subtopic)
-                        @php
-                            $subtopicPapersCount = $subtopic->papers->count();
-                            $subtopicCompletedCount = $subtopic->papers->where('completed_attempts_count', '>', 0)->count();
-                            $subtopicProgress = $subtopicPapersCount > 0 ? round(($subtopicCompletedCount / $subtopicPapersCount) * 100) : 0;
-                        @endphp
-                        <div class="subtopic-card card shadow-sm border-0 mb-3 overflow-hidden">
-                            <!-- Accordion Header -->
-                            <div class="subtopic-header d-flex justify-content-between align-items-center py-3 px-4 clickable"
-                                data-toggle="collapse" data-target="#collapseSubtopic{{ $subtopic->id }}" aria-expanded="true"
-                                aria-controls="collapseSubtopic{{ $subtopic->id }}">
-                                <div class="d-flex align-items-center">
-                                    <div class="subtopic-bullet mr-3"></div>
-                                    <div>
-                                        <h5 class="mb-1 text-dark font-weight-bold subtopic-title">{{ $subtopic->name }}</h5>
-                                        <div class="d-flex align-items-center text-muted font-small-3 flex-wrap">
-                                            <span class="mr-2">Completed {{ $subtopicCompletedCount }} of
-                                                {{ $subtopicPapersCount }} papers</span>
-                                            <div class="subtopic-mini-progress d-none d-sm-block">
-                                                <div class="subtopic-mini-bar" style="width: {{ $subtopicProgress }}%"></div>
+                                    <div class="col-md-5 col-sm-12 mb-3 mb-md-0">
+                                        <label for="paper_name" class="filter-label"><i
+                                                class="feather icon-file-text mr-1"></i>Search Paper Name</label>
+                                        <div class="position-relative has-icon-left">
+                                            <input type="text" name="paper_name" id="paper_name"
+                                                class="form-control input-modern" placeholder="Search papers..."
+                                                value="{{ request('paper_name') }}">
+                                            <div class="form-control-position">
+                                                <i class="feather icon-search text-muted"></i>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <span class="badge badge-square badge-info badge-papers-count mr-3">
-                                        {{ $subtopicPapersCount }}
-                                        {{ \Illuminate\Support\Str::plural('Paper', $subtopicPapersCount) }}
-                                    </span>
-                                    <div class="chevron-box">
-                                        <i class="feather icon-chevron-down collapse-icon"></i>
+                                    <div class="col-md-2 col-sm-12 d-flex">
+                                        <button type="submit" class="btn btn-primary btn-modern mr-2 flex-grow-1">
+                                            <i class="feather icon-filter mr-1"></i> Filter
+                                        </button>
+                                        @if(request()->filled('subtopic_name') || request()->filled('paper_name'))
+                                            @php
+                                                $clearMainParams = request()->except(['subtopic_name', 'paper_name', 'page']);
+                                            @endphp
+                                            <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearMainParams) }}"
+                                                class="btn btn-outline-danger btn-modern-danger" title="Clear Filters">
+                                                <i class="feather icon-x"></i>
+                                            </a>
+                                        @endif
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Accordion Content -->
-                            <div id="collapseSubtopic{{ $subtopic->id }}" class="collapse show">
-                                <div class="card-body p-0 border-top-light">
-                                    @forelse($subtopic->papers as $paper)
-                                        <div
-                                            class="paper-row border-bottom p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-
-                                            <!-- Paper Info -->
-                                            <div class="mb-3 mb-md-0 max-width-70">
-                                                <div class="d-flex align-items-center flex-wrap mb-2">
-                                                    <h6 class="mb-0 font-weight-bold text-dark paper-title mr-3">{{ $paper->title }}
-                                                    </h6>
-
-                                                    @php
-                                                        $difficultyColors = [
-                                                            'easy' => 'badge-soft-success',
-                                                            'medium' => 'badge-soft-warning',
-                                                            'hard' => 'badge-soft-danger'
-                                                        ];
-                                                        $diffColor = $difficultyColors[$paper->difficulty] ?? 'badge-soft-secondary';
-                                                    @endphp
-                                                    <span class="badge badge-pill {{ $diffColor }} text-capitalize mr-2">
-                                                        <span class="badge-dot mr-1"></span>{{ $paper->difficulty }}
-                                                    </span>
-
-                                                    @if($paper->active_attempt)
-                                                        @if($paper->active_attempt->status == 'paused')
-                                                            <span class="badge badge-pill badge-soft-paused pulse-warning mr-2">
-                                                                <span class="badge-dot mr-1"></span>Paused
-                                                            </span>
-                                                        @else
-                                                            <span class="badge badge-pill badge-soft-progress pulse-info mr-2">
-                                                                <span class="badge-dot mr-1"></span>In Progress
-                                                            </span>
-                                                        @endif
-                                                    @endif
-                                                </div>
-
-                                                <div class="d-flex align-items-center text-muted font-small-3 flex-wrap paper-meta">
-                                                    <span class="mr-4"><i
-                                                            class="feather icon-help-circle text-primary mr-1"></i><strong>{{ $paper->questions_count ?? $paper->questions()->count() }}</strong>
-                                                        Questions</span>
-                                                    <span class="mr-4"><i
-                                                            class="feather icon-clock text-success mr-1"></i><strong>{{ $paper->total_time ? $paper->total_time . ' mins' : 'Unlimited' }}</strong>
-                                                        Duration</span>
-                                                    <span><i
-                                                            class="feather icon-check-square text-info mr-1"></i><strong>{{ $paper->completed_attempts_count }}</strong>
-                                                        Completed</span>
-                                                </div>
-                                            </div>
-
-                                            <!-- Paper Action Buttons -->
-                                            <div class="d-flex align-items-center paper-actions">
-                                                <!-- Action form -->
-                                                <form action="{{ route('student.papers.start', $paper->id) }}" method="POST"
-                                                    class="mb-0 mr-2">
-                                                    @csrf
-                                                    @if($paper->active_attempt)
-                                                        @if($paper->active_attempt->status == 'paused')
-                                                            <button type="submit"
-                                                                class="btn btn-warning text-white btn-sm px-4 font-weight-bold btn-resume btn-resume-paused">
-                                                                Resume <i class="feather icon-play ml-1"></i>
-                                                            </button>
-                                                        @else
-                                                            <button type="submit"
-                                                                class="btn btn-info btn-sm px-4 font-weight-bold btn-resume btn-resume-in-progress">
-                                                                Resume <i class="feather icon-play ml-1"></i>
-                                                            </button>
-                                                        @endif
-                                                    @else
-                                                        <button type="button"
-                                                            class="btn btn-primary btn-sm px-4 font-weight-bold btn-start btn-start-trigger"
-                                                            data-paper-id="{{ $paper->id }}"
-                                                            data-paper-title="{{ $paper->title }}"
-                                                            data-paper-questions="{{ $paper->questions_count ?? $paper->questions()->count() }}"
-                                                            data-paper-time="{{ $paper->total_time ? $paper->total_time . ' mins' : 'Unlimited' }}"
-                                                            data-paper-difficulty="{{ strtolower($paper->difficulty) }}"
-                                                            data-paper-instruction="{!! e($paper->instruction ?? 'No specific instructions provided. Answer all questions to the best of your ability.') !!}"
-                                                            data-action-url="{{ route('student.papers.start', $paper->id) }}">
-                                                            Start <i class="feather icon-arrow-right ml-1"></i>
-                                                        </button>
-                                                    @endif
-                                                </form>
-                                            </div>
-                                        </div>
-                                    @empty
-                                        <div class="p-5 text-center text-muted empty-state-subtopic">
-                                            <div class="empty-icon-box mb-3">
-                                                <i class="feather icon-file font-large-1 text-warning"></i>
-                                            </div>
-                                            <h6 class="font-weight-bold text-dark mb-1">No Papers Available</h6>
-                                            <p class="mb-0 font-small-3">There are no practice papers available for this subtopic
-                                                currently.</p>
-                                        </div>
-                                    @endforelse
-                                </div>
+                                </form>
                             </div>
                         </div>
-                    @empty
-                        <div class="card shadow-sm border-0 p-5 text-center text-muted empty-state-main">
-                            <div class="empty-state-illustrate mb-3">
-                                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                                    class="text-warning animated-svg">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                                </svg>
-                            </div>
-                            <h4 class="font-weight-bold text-dark mb-2">No Subtopics Found</h4>
-                            <p class="mb-4">No subtopics matched your filter or are configured for this topic.</p>
-                            @if(request()->filled('subtopic_name') || request()->filled('paper_name'))
-                                <div>
-                                    <a href="{{ route('student.topics.subtopics', $topic->id) }}"
-                                        class="btn btn-primary btn-modern px-4 py-2">
-                                        <i class="feather icon-rotate-ccw mr-1"></i> Clear Filters
-                                    </a>
-                                </div>
-                            @endif
-                        </div>
-                    @endforelse
-                </div> <!-- subtopics-list -->
 
-            </div> <!-- Practice Papers Tab Pane -->
+                        <!-- Subtopics List -->
+                        <div class="subtopics-list">
+                            @forelse($subtopics as $subtopic)
+                                @php
+                                    $subtopicPapersCount = $subtopic->papers->count();
+                                    $subtopicCompletedCount = $subtopic->papers->where('completed_attempts_count', '>', 0)->count();
+                                    $subtopicProgress = $subtopicPapersCount > 0 ? round(($subtopicCompletedCount / $subtopicPapersCount) * 100) : 0;
+                                @endphp
+                                <div class="subtopic-card card shadow-sm border-0 mb-3 overflow-hidden">
+                                    <!-- Accordion Header -->
+                                    <div class="subtopic-header d-flex justify-content-between align-items-center py-3 px-4 clickable"
+                                        data-toggle="collapse" data-target="#collapseSubtopic{{ $subtopic->id }}"
+                                        aria-expanded="true" aria-controls="collapseSubtopic{{ $subtopic->id }}">
+                                        <div class="d-flex align-items-center">
+                                            <div class="subtopic-bullet mr-3"></div>
+                                            <div>
+                                                <h5 class="mb-1 text-dark font-weight-bold subtopic-title">{{ $subtopic->name }}
+                                                </h5>
+                                                <div class="d-flex align-items-center text-muted font-small-3 flex-wrap">
+                                                    <span class="mr-2">Completed {{ $subtopicCompletedCount }} of
+                                                        {{ $subtopicPapersCount }} papers</span>
+                                                    <div class="subtopic-mini-progress d-none d-sm-block">
+                                                        <div class="subtopic-mini-bar" style="width: {{ $subtopicProgress }}%">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge badge-square badge-info badge-papers-count mr-3">
+                                                {{ $subtopicPapersCount }}
+                                                {{ \Illuminate\Support\Str::plural('Paper', $subtopicPapersCount) }}
+                                            </span>
+                                            <div class="chevron-box">
+                                                <i class="feather icon-chevron-down collapse-icon"></i>
+                                            </div>
+                                        </div>
+                                    </div>
 
-            <!-- Attempt History & Results Tab Pane -->
-            <div class="tab-pane fade {{ $activeTab === 'attempts' ? 'show active' : '' }}" id="attempts-content" role="tabpanel" aria-labelledby="attempts-tab">
-                <div class="card attempt-history-card shadow-sm border-0 overflow-hidden">
-                    <div class="card-body p-4">
-                        
-                        <!-- Attempt Filters -->
-                        <form method="GET" action="{{ route('student.topics.subtopics', $topic->id) }}" class="mb-4">
-                            @foreach(request()->except(['attempt_paper_name', 'attempt_subtopic_id', 'attempt_status', 'attempts_page']) as $key => $value)
-                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                            @endforeach
-                            <div class="row align-items-end">
-                                <div class="col-md-4 col-sm-12 mb-3 mb-md-0">
-                                    <label for="attempt_paper_name" class="filter-label"><i class="feather icon-file-text mr-1"></i>Search Paper Name</label>
-                                    <div class="position-relative has-icon-left">
-                                        <input type="text" name="attempt_paper_name" id="attempt_paper_name" class="form-control input-modern"
-                                            placeholder="Search attempts..." value="{{ request('attempt_paper_name') }}">
-                                        <div class="form-control-position">
-                                            <i class="feather icon-search text-muted"></i>
+                                    <!-- Accordion Content -->
+                                    <div id="collapseSubtopic{{ $subtopic->id }}" class="collapse show">
+                                        <div class="card-body p-0 border-top-light">
+                                            @forelse($subtopic->papers as $paper)
+                                                <div
+                                                    class="paper-row border-bottom p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+
+                                                    <!-- Paper Info -->
+                                                    <div class="mb-3 mb-md-0 max-width-70">
+                                                        <div class="d-flex align-items-center flex-wrap mb-2">
+                                                            <h6 class="mb-0 font-weight-bold text-dark paper-title mr-3">
+                                                                {{ $paper->title }}
+                                                            </h6>
+
+                                                            @php
+                                                                $difficultyColors = [
+                                                                    'easy' => 'badge-soft-success',
+                                                                    'medium' => 'badge-soft-warning',
+                                                                    'hard' => 'badge-soft-danger'
+                                                                ];
+                                                                $diffColor = $difficultyColors[$paper->difficulty] ?? 'badge-soft-secondary';
+                                                            @endphp
+                                                            <span class="badge badge-pill {{ $diffColor }} text-capitalize mr-2">
+                                                                <span class="badge-dot mr-1"></span>{{ $paper->difficulty }}
+                                                            </span>
+
+                                                            @if($paper->active_attempt)
+                                                                @if($paper->active_attempt->status == 'paused')
+                                                                    <span class="badge badge-pill badge-soft-paused pulse-warning mr-2">
+                                                                        <span class="badge-dot mr-1"></span>Paused
+                                                                    </span>
+                                                                @else
+                                                                    <span class="badge badge-pill badge-soft-progress pulse-info mr-2">
+                                                                        <span class="badge-dot mr-1"></span>In Progress
+                                                                    </span>
+                                                                @endif
+                                                            @endif
+                                                        </div>
+
+                                                        <div
+                                                            class="d-flex align-items-center text-muted font-small-3 flex-wrap paper-meta">
+                                                            <span class="mr-4"><i
+                                                                    class="feather icon-help-circle text-primary mr-1"></i><strong>{{ $paper->questions_count ?? $paper->questions()->count() }}</strong>
+                                                                Questions</span>
+                                                            <span class="mr-4"><i
+                                                                    class="feather icon-clock text-success mr-1"></i><strong>{{ $paper->total_time ? $paper->total_time . ' mins' : 'Unlimited' }}</strong>
+                                                                Duration</span>
+                                                            <span><i
+                                                                    class="feather icon-check-square text-info mr-1"></i><strong>{{ $paper->completed_attempts_count }}</strong>
+                                                                Completed</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Paper Action Buttons -->
+                                                    <div class="d-flex align-items-center paper-actions">
+                                                        <!-- Action form -->
+                                                        <form action="{{ route('student.papers.start', $paper->id) }}" method="POST"
+                                                            class="mb-0 mr-2">
+                                                            @csrf
+                                                            @if($paper->active_attempt)
+                                                                @if($paper->active_attempt->status == 'paused')
+                                                                    <button type="submit"
+                                                                        class="btn btn-warning text-white btn-sm px-4 font-weight-bold btn-resume btn-resume-paused">
+                                                                        Resume <i class="feather icon-play ml-1"></i>
+                                                                    </button>
+                                                                @else
+                                                                    <button type="submit"
+                                                                        class="btn btn-info btn-sm px-4 font-weight-bold btn-resume btn-resume-in-progress">
+                                                                        Resume <i class="feather icon-play ml-1"></i>
+                                                                    </button>
+                                                                @endif
+                                                            @else
+                                                                <button type="button"
+                                                                    class="btn btn-primary btn-sm px-4 font-weight-bold btn-start btn-start-trigger"
+                                                                    data-paper-id="{{ $paper->id }}"
+                                                                    data-paper-title="{{ $paper->title }}"
+                                                                    data-paper-questions="{{ $paper->questions_count ?? $paper->questions()->count() }}"
+                                                                    data-paper-time="{{ $paper->total_time ? $paper->total_time . ' mins' : 'Unlimited' }}"
+                                                                    data-paper-difficulty="{{ strtolower($paper->difficulty) }}"
+                                                                    data-paper-instruction="{!! e($paper->instruction ?? 'No specific instructions provided. Answer all questions to the best of your ability.') !!}"
+                                                                    data-action-url="{{ route('student.papers.start', $paper->id) }}">
+                                                                    Start <i class="feather icon-arrow-right ml-1"></i>
+                                                                </button>
+                                                            @endif
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            @empty
+                                                <div class="p-5 text-center text-muted empty-state-subtopic">
+                                                    <div class="empty-icon-box mb-3">
+                                                        <i class="feather icon-file font-large-1 text-warning"></i>
+                                                    </div>
+                                                    <h6 class="font-weight-bold text-dark mb-1">No Papers Available</h6>
+                                                    <p class="mb-0 font-small-3">There are no practice papers available for this
+                                                        subtopic
+                                                        currently.</p>
+                                                </div>
+                                            @endforelse
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-3 col-sm-12 mb-3 mb-md-0">
-                                    <label for="attempt_subtopic_id" class="filter-label"><i class="feather icon-layers mr-1"></i>Filter by Subtopic</label>
-                                    <div class="custom-select-wrapper">
-                                        <select name="attempt_subtopic_id" id="attempt_subtopic_id" class="form-control select-modern">
-                                            <option value="">-- All Subtopics --</option>
-                                            @foreach($allSubtopics as $sub)
-                                                <option value="{{ $sub->id }}" {{ request('attempt_subtopic_id') == $sub->id ? 'selected' : '' }}>
-                                                    {{ $sub->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <i class="feather icon-chevron-down select-chevron"></i>
+                            @empty
+                                <div class="card shadow-sm border-0 p-5 text-center text-muted empty-state-main">
+                                    <div class="empty-state-illustrate mb-3">
+                                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                                            class="text-warning animated-svg">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                        </svg>
                                     </div>
-                                </div>
-                                <div class="col-md-3 col-sm-12 mb-3 mb-md-0">
-                                    <label for="attempt_status" class="filter-label"><i class="feather icon-activity mr-1"></i>Filter by Status</label>
-                                    <div class="custom-select-wrapper">
-                                        <select name="attempt_status" id="attempt_status" class="form-control select-modern">
-                                            <option value="">-- All Statuses --</option>
-                                            <option value="completed" {{ request('attempt_status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                                            <option value="in_progress" {{ request('attempt_status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                                            <option value="paused" {{ request('attempt_status') == 'paused' ? 'selected' : '' }}>Paused</option>
-                                        </select>
-                                        <i class="feather icon-chevron-down select-chevron"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-2 col-sm-12 d-flex">
-                                    <button type="submit" class="btn btn-primary btn-modern mr-2 flex-grow-1">
-                                        <i class="feather icon-filter mr-1"></i> Filter
-                                    </button>
-                                    @if(request()->filled('attempt_paper_name') || request()->filled('attempt_subtopic_id') || request()->filled('attempt_status'))
-                                        @php
-                                            $clearParams = request()->except(['attempt_paper_name', 'attempt_subtopic_id', 'attempt_status', 'attempts_page']);
-                                        @endphp
-                                        <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearParams) }}"
-                                            class="btn btn-outline-danger btn-modern-danger" title="Clear Attempt Filters">
-                                            <i class="feather icon-x"></i>
-                                        </a>
+                                    <h4 class="font-weight-bold text-dark mb-2">No Subtopics Found</h4>
+                                    <p class="mb-4">No subtopics matched your filter or are configured for this topic.</p>
+                                    @if(request()->filled('subtopic_name') || request()->filled('paper_name'))
+                                        <div>
+                                            <a href="{{ route('student.topics.subtopics', $topic->id) }}"
+                                                class="btn btn-primary btn-modern px-4 py-2">
+                                                <i class="feather icon-rotate-ccw mr-1"></i> Clear Filters
+                                            </a>
+                                        </div>
                                     @endif
                                 </div>
-                            </div>
-                        </form>
+                            @endforelse
+                        </div> <!-- subtopics-list -->
 
-                        @if($attempts->isNotEmpty())
-                            <!-- Mobile View cards for Past Attempts -->
-                            <div class="d-block d-md-none">
-                                @foreach($attempts as $attempt)
-                                    @php
-                                        $pct = $attempt->max_score > 0 ? round(($attempt->score / $attempt->max_score) * 100) : 0;
-                                        $pctColor = $pct >= 80 ? 'text-success' : ($pct >= 50 ? 'text-warning' : 'text-danger');
-                                    @endphp
-                                    <div class="history-mobile-card mb-3 p-3 rounded shadow-xs bg-white border border-light">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div class="max-width-70">
-                                                <h6 class="font-weight-bold text-dark mb-1">{{ $attempt->paper->title }}</h6>
-                                                <span class="badge badge-soft-secondary text-capitalize font-small-2">
-                                                    {{ $attempt->paper->subtopic->name ?? 'N/A' }}
-                                                </span>
-                                            </div>
-                                            <span>
-                                                @if($attempt->status == 'completed')
-                                                    <span class="badge badge-pill badge-soft-success">Completed</span>
-                                                @elseif($attempt->status == 'paused')
-                                                    <span class="badge badge-pill badge-soft-warning">Paused</span>
-                                                @else
-                                                    <span class="badge badge-pill badge-soft-info">In Progress</span>
-                                                @endif
-                                            </span>
-                                        </div>
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="font-small-3 font-weight-bold text-muted">
-                                                <i class="feather icon-calendar mr-1"></i>{{ $attempt->created_at->format('d M Y, h:i A') }}
-                                            </span>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-6">
-                                                <span class="font-small-3 text-muted">Score:</span>
-                                                <div class="font-weight-bold text-dark">{{ $attempt->score }} / {{ $attempt->max_score }}</div>
-                                            </div>
-                                            <div class="col-6 text-right">
-                                                <span class="font-small-3 text-muted">Accuracy:</span>
-                                                <div class="font-weight-bold {{ $pctColor }}">{{ $pct }}%</div>
+                    </div> <!-- Practice Papers Tab Pane -->
+
+                    <!-- Attempt History & Results Tab Pane -->
+                    <div class="tab-pane fade {{ $activeTab === 'attempts' ? 'show active' : '' }}" id="attempts-content"
+                        role="tabpanel" aria-labelledby="attempts-tab">
+                        <div class="card attempt-history-card shadow-sm border-0 overflow-hidden">
+                            <div class="card-body p-4">
+
+                                <!-- Attempt Filters -->
+                                <form method="GET" action="{{ route('student.topics.subtopics', $topic->id) }}"
+                                    class="mb-4">
+                                    @foreach(request()->except(['attempt_paper_name', 'attempt_subtopic_id', 'attempt_status', 'attempts_page']) as $key => $value)
+                                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                    @endforeach
+                                    <div class="row align-items-end">
+                                        <div class="col-md-4 col-sm-12 mb-3 mb-md-0">
+                                            <label for="attempt_paper_name" class="filter-label"><i
+                                                    class="feather icon-file-text mr-1"></i>Search Paper Name</label>
+                                            <div class="position-relative has-icon-left">
+                                                <input type="text" name="attempt_paper_name" id="attempt_paper_name"
+                                                    class="form-control input-modern" placeholder="Search attempts..."
+                                                    value="{{ request('attempt_paper_name') }}">
+                                                <div class="form-control-position">
+                                                    <i class="feather icon-search text-muted"></i>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                                            <span class="font-small-3 text-muted"><i class="feather icon-clock mr-1"></i>
+                                        <div class="col-md-3 col-sm-12 mb-3 mb-md-0">
+                                            <label for="attempt_subtopic_id" class="filter-label"><i
+                                                    class="feather icon-layers mr-1"></i>Filter by Subtopic</label>
+                                            <div class="custom-select-wrapper">
+                                                <select name="attempt_subtopic_id" id="attempt_subtopic_id"
+                                                    class="form-control select-modern">
+                                                    <option value="">-- All Subtopics --</option>
+                                                    @foreach($allSubtopics as $sub)
+                                                        <option value="{{ $sub->id }}" {{ request('attempt_subtopic_id') == $sub->id ? 'selected' : '' }}>
+                                                            {{ $sub->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <i class="feather icon-chevron-down select-chevron"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-12 mb-3 mb-md-0">
+                                            <label for="attempt_status" class="filter-label"><i
+                                                    class="feather icon-activity mr-1"></i>Filter by Status</label>
+                                            <div class="custom-select-wrapper">
+                                                <select name="attempt_status" id="attempt_status"
+                                                    class="form-control select-modern">
+                                                    <option value="">-- All Statuses --</option>
+                                                    <option value="completed" {{ request('attempt_status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                                                    <option value="in_progress" {{ request('attempt_status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                                    <option value="paused" {{ request('attempt_status') == 'paused' ? 'selected' : '' }}>Paused</option>
+                                                </select>
+                                                <i class="feather icon-chevron-down select-chevron"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-sm-12 d-flex">
+                                            <button type="submit" class="btn btn-primary btn-modern mr-2 flex-grow-1">
+                                                <i class="feather icon-filter mr-1"></i> Filter
+                                            </button>
+                                            @if(request()->filled('attempt_paper_name') || request()->filled('attempt_subtopic_id') || request()->filled('attempt_status'))
                                                 @php
-                                                    $h = floor($attempt->time_spent / 3600);
-                                                    $m = floor(($attempt->time_spent / 60) % 60);
-                                                    $s = $attempt->time_spent % 60;
-                                                    $spent = ($h > 0 ? $h . 'h ' : '') . ($m > 0 || $h > 0 ? $m . 'm ' : '') . $s . 's';
+                                                    $clearParams = request()->except(['attempt_paper_name', 'attempt_subtopic_id', 'attempt_status', 'attempts_page']);
                                                 @endphp
-                                                {{ $spent }}
-                                            </span>
-                                            @if($attempt->status == 'completed')
-                                                <a href="{{ route('student.attempts.result', $attempt->id) }}"
-                                                    class="btn btn-sm btn-outline-primary py-1 px-3">
-                                                    Result <i class="feather icon-arrow-right ml-1"></i>
-                                                </a>
-                                            @else
-                                                <a href="{{ route('student.attempts.take', $attempt->id) }}"
-                                                    class="btn btn-sm btn-outline-info py-1 px-3">
-                                                    Resume <i class="feather icon-play ml-1"></i>
+                                                <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearParams) }}"
+                                                    class="btn btn-outline-danger btn-modern-danger"
+                                                    title="Clear Attempt Filters">
+                                                    <i class="feather icon-x"></i>
                                                 </a>
                                             @endif
                                         </div>
                                     </div>
-                                @endforeach
-                            </div>
+                                </form>
 
-                            <!-- Desktop table view -->
-                            <div class="table-responsive d-none d-md-block shadow-xs rounded bg-white overflow-hidden border">
-                                <table class="table table-sm table-modern mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Paper</th>
-                                            <th>Subtopic</th>
-                                            <th>Attempt Date</th>
-                                            <th>Status</th>
-                                            <th class="text-center">Score Details</th>
-                                            <th class="text-center">Accuracy Progress</th>
-                                            <th class="text-center">Time Spent</th>
-                                            <th class="text-center">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                                @if($attempts->isNotEmpty())
+                                    <!-- Mobile View cards for Past Attempts -->
+                                    <div class="d-block d-md-none">
                                         @foreach($attempts as $attempt)
                                             @php
                                                 $pct = $attempt->max_score > 0 ? round(($attempt->score / $attempt->max_score) * 100) : 0;
-                                                $pctBg = $pct >= 80 ? 'bg-success' : ($pct >= 50 ? 'bg-warning' : 'bg-danger');
                                                 $pctColor = $pct >= 80 ? 'text-success' : ($pct >= 50 ? 'text-warning' : 'text-danger');
                                             @endphp
-                                            <tr>
-                                                <td class="align-middle py-3 px-3 font-weight-bold text-dark">
-                                                    {{ $attempt->paper->title }}
-                                                </td>
-                                                <td class="align-middle text-muted">
-                                                    {{ $attempt->paper->subtopic->name ?? 'N/A' }}
-                                                </td>
-                                                <td class="align-middle">
-                                                    <i class="feather icon-calendar text-muted mr-1"></i>{{ $attempt->created_at->format('d M Y, h:i A') }}
-                                                </td>
-                                                <td class="align-middle">
-                                                    @if($attempt->status == 'completed')
-                                                        <span class="badge badge-pill badge-soft-success">Completed</span>
-                                                    @elseif($attempt->status == 'paused')
-                                                        <span class="badge badge-pill badge-soft-warning">Paused</span>
-                                                    @else
-                                                        <span class="badge badge-pill badge-soft-info">In Progress</span>
-                                                    @endif
-                                                </td>
-                                                <td class="text-center align-middle text-dark font-weight-bold">
-                                                    {{ $attempt->score }} <span class="text-muted font-weight-normal">/ {{ $attempt->max_score }}</span>
-                                                </td>
-                                                <td class="align-middle">
-                                                    <div class="d-flex align-items-center justify-content-center">
-                                                        <span class="font-weight-bold {{ $pctColor }} mr-3" style="min-width: 35px;">{{ $pct }}%</span>
-                                                        <div class="progress progress-sm w-50 mb-0 shadow-xs">
-                                                            <div class="progress-bar {{ $pctBg }}" role="progressbar" style="width: {{ $pct }}%"
-                                                                aria-valuenow="{{ $pct }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                                        </div>
+                                            <div
+                                                class="history-mobile-card mb-3 p-3 rounded shadow-xs bg-white border border-light">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <div class="max-width-70">
+                                                        <h6 class="font-weight-bold text-dark mb-1">{{ $attempt->paper->title }}
+                                                        </h6>
+                                                        <span class="badge badge-soft-secondary text-capitalize font-small-2">
+                                                            {{ $attempt->paper->subtopic->name ?? 'N/A' }}
+                                                        </span>
                                                     </div>
-                                                </td>
-                                                <td class="text-center align-middle text-dark font-weight-medium">
-                                                    <i class="feather icon-clock text-muted mr-1"></i>
-                                                    @php
-                                                        $h = floor($attempt->time_spent / 3600);
-                                                        $m = floor(($attempt->time_spent / 60) % 60);
-                                                        $s = $attempt->time_spent % 60;
-                                                        $spent = ($h > 0 ? $h . 'h ' : '') . ($m > 0 || $h > 0 ? $m . 'm ' : '') . $s . 's';
-                                                    @endphp
-                                                    {{ $spent }}
-                                                </td>
-                                                <td class="text-center align-middle">
+                                                    <span>
+                                                        @if($attempt->status == 'completed')
+                                                            <span class="badge badge-pill badge-soft-success">Completed</span>
+                                                        @elseif($attempt->status == 'paused')
+                                                            <span class="badge badge-pill badge-soft-warning">Paused</span>
+                                                        @else
+                                                            <span class="badge badge-pill badge-soft-info">In Progress</span>
+                                                        @endif
+                                                    </span>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="font-small-3 font-weight-bold text-muted">
+                                                        <i
+                                                            class="feather icon-calendar mr-1"></i>{{ $attempt->created_at->format('d M Y, h:i A') }}
+                                                    </span>
+                                                </div>
+                                                <div class="row mb-2">
+                                                    <div class="col-6">
+                                                        <span class="font-small-3 text-muted">Score:</span>
+                                                        <div class="font-weight-bold text-dark">{{ $attempt->score }} /
+                                                            {{ $attempt->max_score }}</div>
+                                                    </div>
+                                                    <div class="col-6 text-right">
+                                                        <span class="font-small-3 text-muted">Accuracy:</span>
+                                                        <div class="font-weight-bold {{ $pctColor }}">{{ $pct }}%</div>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                                    <span class="font-small-3 text-muted"><i class="feather icon-clock mr-1"></i>
+                                                        @php
+                                                            $h = floor($attempt->time_spent / 3600);
+                                                            $m = floor(($attempt->time_spent / 60) % 60);
+                                                            $s = $attempt->time_spent % 60;
+                                                            $spent = ($h > 0 ? $h . 'h ' : '') . ($m > 0 || $h > 0 ? $m . 'm ' : '') . $s . 's';
+                                                        @endphp
+                                                        {{ $spent }}
+                                                    </span>
                                                     @if($attempt->status == 'completed')
                                                         <a href="{{ route('student.attempts.result', $attempt->id) }}"
-                                                            class="btn btn-sm btn-outline-primary py-1 px-3 font-weight-bold btn-history-action">
-                                                            View Result
+                                                            class="btn btn-sm btn-outline-primary py-1 px-3">
+                                                            Result <i class="feather icon-arrow-right ml-1"></i>
                                                         </a>
                                                     @else
                                                         <a href="{{ route('student.attempts.take', $attempt->id) }}"
-                                                            class="btn btn-sm btn-outline-info py-1 px-3 font-weight-bold btn-history-action">
-                                                            Resume
+                                                            class="btn btn-sm btn-outline-info py-1 px-3">
+                                                            Resume <i class="feather icon-play ml-1"></i>
                                                         </a>
                                                     @endif
-                                                </td>
-                                            </tr>
+                                                </div>
+                                            </div>
                                         @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+                                    </div>
 
-                            <!-- Pagination -->
-                            <div class="d-flex justify-content-center mt-4">
-                                {{ $attempts->links() }}
-                            </div>
-                        @else
-                            <div class="p-5 text-center text-muted empty-state-subtopic">
-                                <div class="empty-icon-box mb-3">
-                                    <i class="feather icon-file font-large-1 text-warning"></i>
-                                </div>
-                                <h6 class="font-weight-bold text-dark mb-1">No Attempt History Available</h6>
-                                <p class="mb-0 font-small-3">
-                                    @if(request()->filled('attempt_paper_name') || request()->filled('attempt_subtopic_id') || request()->filled('attempt_status'))
-                                        No attempts matched your filters.
-                                    @else
-                                        You have not attempted any papers for this topic yet.
-                                    @endif
-                                </p>
-                            </div>
-                        @endif
-                    </div> <!-- card-body -->
-                </div> <!-- card -->
-            </div> <!-- Attempt History Tab Pane -->
-        </div> <!-- Tab Contents -->
+                                    <!-- Desktop table view -->
+                                    <div
+                                        class="table-responsive d-none d-md-block shadow-xs rounded bg-white overflow-hidden border">
+                                        <table class="table table-sm table-modern mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Paper</th>
+                                                    <th>Subtopic</th>
+                                                    <th>Attempt Date</th>
+                                                    <th>Status</th>
+                                                    <th class="text-center">Score Details</th>
+                                                    <th class="text-center">Accuracy Progress</th>
+                                                    <th class="text-center">Time Spent</th>
+                                                    <th class="text-center">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($attempts as $attempt)
+                                                    @php
+                                                        $pct = $attempt->max_score > 0 ? round(($attempt->score / $attempt->max_score) * 100) : 0;
+                                                        $pctBg = $pct >= 80 ? 'bg-success' : ($pct >= 50 ? 'bg-warning' : 'bg-danger');
+                                                        $pctColor = $pct >= 80 ? 'text-success' : ($pct >= 50 ? 'text-warning' : 'text-danger');
+                                                    @endphp
+                                                    <tr>
+                                                        <td class="align-middle py-3 px-3 font-weight-bold text-dark">
+                                                            {{ $attempt->paper->title }}
+                                                        </td>
+                                                        <td class="align-middle text-muted">
+                                                            {{ $attempt->paper->subtopic->name ?? 'N/A' }}
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            <i
+                                                                class="feather icon-calendar text-muted mr-1"></i>{{ $attempt->created_at->format('d M Y, h:i A') }}
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            @if($attempt->status == 'completed')
+                                                                <span class="badge badge-pill badge-soft-success">Completed</span>
+                                                            @elseif($attempt->status == 'paused')
+                                                                <span class="badge badge-pill badge-soft-warning">Paused</span>
+                                                            @else
+                                                                <span class="badge badge-pill badge-soft-info">In Progress</span>
+                                                            @endif
+                                                        </td>
+                                                        <td class="text-center align-middle text-dark font-weight-bold">
+                                                            {{ $attempt->score }} <span class="text-muted font-weight-normal">/
+                                                                {{ $attempt->max_score }}</span>
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            <div class="d-flex align-items-center justify-content-center">
+                                                                <span class="font-weight-bold {{ $pctColor }} mr-3"
+                                                                    style="min-width: 35px;">{{ $pct }}%</span>
+                                                                <div class="progress progress-sm w-50 mb-0 shadow-xs">
+                                                                    <div class="progress-bar {{ $pctBg }}" role="progressbar"
+                                                                        style="width: {{ $pct }}%" aria-valuenow="{{ $pct }}"
+                                                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center align-middle text-dark font-weight-medium">
+                                                            <i class="feather icon-clock text-muted mr-1"></i>
+                                                            @php
+                                                                $h = floor($attempt->time_spent / 3600);
+                                                                $m = floor(($attempt->time_spent / 60) % 60);
+                                                                $s = $attempt->time_spent % 60;
+                                                                $spent = ($h > 0 ? $h . 'h ' : '') . ($m > 0 || $h > 0 ? $m . 'm ' : '') . $s . 's';
+                                                            @endphp
+                                                            {{ $spent }}
+                                                        </td>
+                                                        <td class="text-center align-middle">
+                                                            @if($attempt->status == 'completed')
+                                                                <a href="{{ route('student.attempts.result', $attempt->id) }}"
+                                                                    class="btn btn-sm btn-outline-primary py-1 px-3 font-weight-bold btn-history-action">
+                                                                    View Result
+                                                                </a>
+                                                            @else
+                                                                <a href="{{ route('student.attempts.take', $attempt->id) }}"
+                                                                    class="btn btn-sm btn-outline-info py-1 px-3 font-weight-bold btn-history-action">
+                                                                    Resume
+                                                                </a>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-    </div>
+                                    <!-- Pagination -->
+                                    <div class="d-flex justify-content-center mt-4">
+                                        {{ $attempts->links() }}
+                                    </div>
+                                @else
+                                    <div class="p-5 text-center text-muted empty-state-subtopic">
+                                        <div class="empty-icon-box mb-3">
+                                            <i class="feather icon-file font-large-1 text-warning"></i>
+                                        </div>
+                                        <h6 class="font-weight-bold text-dark mb-1">No Attempt History Available</h6>
+                                        <p class="mb-0 font-small-3">
+                                            @if(request()->filled('attempt_paper_name') || request()->filled('attempt_subtopic_id') || request()->filled('attempt_status'))
+                                                No attempts matched your filters.
+                                            @else
+                                                You have not attempted any papers for this topic yet.
+                                            @endif
+                                        </p>
+                                    </div>
+                                @endif
+                            </div> <!-- card-body -->
+                        </div> <!-- card -->
+                    </div> <!-- Attempt History Tab Pane -->
+                </div> <!-- Tab Contents -->
+
+            </div>
         </div>
     </div>
 
     <!-- Instructions Modal -->
-    <div class="modal fade" id="instructionsModal" tabindex="-1" role="dialog" aria-labelledby="instructionsModalLabel" aria-hidden="true">
+    <div class="modal fade" id="instructionsModal" tabindex="-1" role="dialog" aria-labelledby="instructionsModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content border-0 shadow-lg instructions-modal-content">
                 <!-- Header Banner -->
-                <div class="modal-header text-white px-4 py-3" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 0;">
+                <div class="modal-header text-white px-4 py-3"
+                    style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 0;">
                     <div class="d-flex align-items-center">
-                        <div class="header-icon-box mr-3" style="width: 40px; height: 40px; background-color: rgba(255, 255, 255, 0.1); border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;">
+                        <div class="header-icon-box mr-3"
+                            style="width: 40px; height: 40px; background-color: rgba(255, 255, 255, 0.1); border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;">
                             <i class="feather icon-file-text text-white font-medium-3"></i>
                         </div>
                         <div>
-                            <h5 class="modal-title text-white font-weight-bold" id="instructionsModalLabel" style="font-size: 1.15rem; letter-spacing: 0.3px; line-height: 1.2;">Exam Readiness Review</h5>
-                            <span class="text-light opacity-75 font-small-2" style="display: block; margin-top: 2px;">Please read the instructions carefully before starting.</span>
+                            <h5 class="modal-title text-white font-weight-bold" id="instructionsModalLabel"
+                                style="font-size: 1.15rem; letter-spacing: 0.3px; line-height: 1.2;">Exam Readiness Review
+                            </h5>
+                            <span class="text-light opacity-75 font-small-2" style="display: block; margin-top: 2px;">Please
+                                read the instructions carefully before starting.</span>
                         </div>
                     </div>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" style="opacity: 0.8; outline: none; margin-top: -5px;">
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"
+                        style="opacity: 0.8; outline: none; margin-top: -5px;">
                         <span aria-hidden="true" style="font-size: 1.6rem;">&times;</span>
                     </button>
                 </div>
                 <form id="modal-start-form" method="POST" action="">
                     @csrf
                     <div class="modal-body modal-body-custom p-4">
-                        
+
                         <!-- Paper Card Summary -->
                         <div class="paper-summary-card p-4 mb-4">
-                            <h3 class="font-weight-extrabold mb-3" id="modal-paper-title" style="font-size: 1.5rem; line-height: 1.3;">Paper Title</h3>
-                            
+                            <h3 class="font-weight-extrabold mb-3" id="modal-paper-title"
+                                style="font-size: 1.5rem; line-height: 1.3;">Paper Title</h3>
+
                             <div class="d-flex align-items-center flex-wrap" style="gap: 12px; margin-top: 15px;">
                                 <div class="stat-pill-modern d-flex align-items-center px-3 py-2" style="gap: 8px;">
-                                    <i class="feather icon-help-circle text-primary" style="font-size: 1.15rem; margin-top: 2px;"></i>
+                                    <i class="feather icon-help-circle text-primary"
+                                        style="font-size: 1.15rem; margin-top: 2px;"></i>
                                     <div>
-                                        <div class="text-muted font-small-1 text-uppercase font-weight-bold" style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Questions</div>
-                                        <span class="font-weight-bold text-dark font-small-3 modal-stat-value" id="modal-paper-questions" style="font-size: 0.85rem;">0</span>
+                                        <div class="text-muted font-small-1 text-uppercase font-weight-bold"
+                                            style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Questions
+                                        </div>
+                                        <span class="font-weight-bold text-dark font-small-3 modal-stat-value"
+                                            id="modal-paper-questions" style="font-size: 0.85rem;">0</span>
                                     </div>
                                 </div>
 
                                 <div class="stat-pill-modern d-flex align-items-center px-3 py-2" style="gap: 8px;">
-                                    <i class="feather icon-clock text-success" style="font-size: 1.15rem; margin-top: 2px;"></i>
+                                    <i class="feather icon-clock text-success"
+                                        style="font-size: 1.15rem; margin-top: 2px;"></i>
                                     <div>
-                                        <div class="text-muted font-small-1 text-uppercase font-weight-bold" style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Duration</div>
-                                        <span class="font-weight-bold text-dark font-small-3 modal-stat-value" id="modal-paper-time" style="font-size: 0.85rem;">0 mins</span>
+                                        <div class="text-muted font-small-1 text-uppercase font-weight-bold"
+                                            style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Duration
+                                        </div>
+                                        <span class="font-weight-bold text-dark font-small-3 modal-stat-value"
+                                            id="modal-paper-time" style="font-size: 0.85rem;">0 mins</span>
                                     </div>
                                 </div>
 
                                 <div class="stat-pill-modern d-flex align-items-center px-3 py-2" style="gap: 8px;">
-                                    <i class="feather icon-award text-warning" id="modal-paper-difficulty-icon" style="font-size: 1.15rem; margin-top: 2px;"></i>
+                                    <i class="feather icon-award text-warning" id="modal-paper-difficulty-icon"
+                                        style="font-size: 1.15rem; margin-top: 2px;"></i>
                                     <div>
-                                        <div class="text-muted font-small-1 text-uppercase font-weight-bold" style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Difficulty</div>
-                                        <span class="font-weight-bold text-dark font-small-3 modal-stat-value" id="modal-paper-difficulty" style="font-size: 0.85rem;">Medium</span>
+                                        <div class="text-muted font-small-1 text-uppercase font-weight-bold"
+                                            style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Difficulty
+                                        </div>
+                                        <span class="font-weight-bold text-dark font-small-3 modal-stat-value"
+                                            id="modal-paper-difficulty" style="font-size: 0.85rem;">Medium</span>
                                     </div>
                                 </div>
                             </div>
@@ -638,8 +689,10 @@
 
                         <!-- Instructions Header -->
                         <div class="d-flex align-items-center mb-3">
-                            <div style="width: 4px; height: 16px; background-color: #7367f0; border-radius: 2px;" class="mr-2"></div>
-                            <h5 class="font-weight-extrabold mb-0 instructions-heading" style="font-size: 1.1rem; letter-spacing: -0.2px;">Guidelines & Instructions</h5>
+                            <div style="width: 4px; height: 16px; background-color: #2477F9; border-radius: 2px;"
+                                class="mr-2"></div>
+                            <h5 class="font-weight-extrabold mb-0 instructions-heading"
+                                style="font-size: 1.1rem; letter-spacing: -0.2px;">Guidelines & Instructions</h5>
                         </div>
 
                         <!-- Instruction Rich Text container -->
@@ -648,18 +701,24 @@
                         </div>
 
                         <!-- Crucial Notice Box -->
-                        <div class="alert alert-warning d-flex align-items-start border-0 p-3 mb-0 modal-notice-box" style="gap: 12px;">
+                        <div class="alert alert-warning d-flex align-items-start border-0 p-3 mb-0 modal-notice-box"
+                            style="gap: 12px;">
                             <i class="feather icon-alert-triangle text-warning font-medium-3 mt-1"></i>
                             <div>
-                                <h6 class="font-weight-bold text-warning mb-1" style="font-size: 0.9rem;">Important Notice</h6>
-                                <p class="text-muted font-small-3 mb-0 modal-notice-text" style="line-height: 1.4;">Starting the test initiates a timer that cannot be paused. Ensure you have a stable internet connection and are in a quiet environment before proceeding.</p>
+                                <h6 class="font-weight-bold text-warning mb-1" style="font-size: 0.9rem;">Important Notice
+                                </h6>
+                                <p class="text-muted font-small-3 mb-0 modal-notice-text" style="line-height: 1.4;">Starting
+                                    the test initiates a timer that cannot be paused. Ensure you have a stable internet
+                                    connection and are in a quiet environment before proceeding.</p>
                             </div>
                         </div>
 
                     </div>
                     <div class="modal-footer d-flex justify-content-between p-3">
-                        <button type="button" class="btn btn-outline-secondary px-4 py-2 font-weight-bold" data-dismiss="modal" style="border-radius: 8px; font-size: 0.9rem;">Cancel</button>
-                        <button type="submit" class="btn btn-primary px-4 py-2 font-weight-bold d-flex align-items-center" style="background: linear-gradient(135deg, #7367f0 0%, #4f46e5 100%) !important; border: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(115, 103, 240, 0.2); font-size: 0.9rem;">
+                        <button type="button" class="btn btn-outline-secondary px-4 py-2 font-weight-bold"
+                            data-dismiss="modal" style="border-radius: 8px; font-size: 0.9rem;">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-4 py-2 font-weight-bold d-flex align-items-center"
+                            style="background: linear-gradient(135deg, #2477F9 0%, #4f46e5 100%) !important; border: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(115, 103, 240, 0.2); font-size: 0.9rem;">
                             Start Test Now <i class="feather icon-play-circle ml-2 font-medium-1"></i>
                         </button>
                     </div>
@@ -702,7 +761,7 @@
         }
 
         .modern-tabs .nav-link:hover {
-            color: #7367f0 !important;
+            color: #2477F9 !important;
             background-color: rgba(115, 103, 240, 0.04) !important;
         }
 
@@ -711,7 +770,7 @@
         }
 
         .modern-tabs .nav-link.active {
-            color: #7367f0 !important;
+            color: #2477F9 !important;
             font-weight: 800;
         }
 
@@ -722,7 +781,7 @@
             left: 0;
             width: 100%;
             height: 3px;
-            background: linear-gradient(90deg, #7367f0 0%, #4f46e5 100%);
+            background: linear-gradient(90deg, #2477F9 0%, #4f46e5 100%);
             border-radius: 3px 3px 0 0;
             transform: scaleX(0);
             transition: transform 0.25s ease-in-out;
@@ -746,9 +805,9 @@
         }
 
         .paper-summary-card {
-            background: #ffffff; 
-            border: 1px solid #e2e8f0; 
-            border-radius: 16px; 
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
         }
 
@@ -757,8 +816,8 @@
         }
 
         .stat-pill-modern {
-            background-color: #f1f5f9; 
-            border-radius: 10px; 
+            background-color: #f1f5f9;
+            border-radius: 10px;
             border: 1px solid #e2e8f0;
         }
 
@@ -774,11 +833,11 @@
             font-size: 0.95rem;
             color: #334155;
             line-height: 1.7;
-            background-color: #ffffff; 
-            border: 1px solid #e2e8f0; 
-            max-height: 300px; 
-            overflow-y: auto; 
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.01);
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.01);
         }
 
         .rich-text-container p {
@@ -789,11 +848,11 @@
             margin-bottom: 0;
         }
 
-        .rich-text-container h1, 
-        .rich-text-container h2, 
-        .rich-text-container h3, 
-        .rich-text-container h4, 
-        .rich-text-container h5, 
+        .rich-text-container h1,
+        .rich-text-container h2,
+        .rich-text-container h3,
+        .rich-text-container h4,
+        .rich-text-container h5,
         .rich-text-container h6 {
             color: #0f172a;
             font-weight: 700;
@@ -802,11 +861,19 @@
             line-height: 1.3;
         }
 
-        .rich-text-container h1 { font-size: 1.5rem; }
-        .rich-text-container h2 { font-size: 1.3rem; }
-        .rich-text-container h3 { font-size: 1.15rem; }
+        .rich-text-container h1 {
+            font-size: 1.5rem;
+        }
 
-        .rich-text-container ul, 
+        .rich-text-container h2 {
+            font-size: 1.3rem;
+        }
+
+        .rich-text-container h3 {
+            font-size: 1.15rem;
+        }
+
+        .rich-text-container ul,
         .rich-text-container ol {
             padding-left: 1.5rem;
             margin-bottom: 1rem;
@@ -817,7 +884,7 @@
         }
 
         .rich-text-container blockquote {
-            border-left: 4px solid #7367f0;
+            border-left: 4px solid #2477F9;
             padding: 0.5rem 1rem;
             background-color: #f8fafc;
             color: #475569;
@@ -832,8 +899,8 @@
         }
 
         .modal-notice-box {
-            background-color: #fff9e6; 
-            border-radius: 12px; 
+            background-color: #fff9e6;
+            border-radius: 12px;
             border-left: 4px solid #ffc107 !important;
         }
 
@@ -845,14 +912,17 @@
         .rich-text-container::-webkit-scrollbar {
             width: 8px;
         }
+
         .rich-text-container::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 4px;
         }
+
         .rich-text-container::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 4px;
         }
+
         .rich-text-container::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
@@ -962,7 +1032,7 @@
         }
 
         .breadcrumb-modern-item a {
-            color: #7367f0;
+            color: #2477F9;
             transition: color 0.15s ease-in-out;
         }
 
@@ -978,7 +1048,7 @@
         /* Hero Topic Card Style */
         .topic-hero-card {
             border-radius: 16px;
-            background: linear-gradient(135deg, #7367f0 0%, #4f46e5 100%);
+            background: linear-gradient(135deg, #2477F9 0%, #4f46e5 100%);
             position: relative;
             box-shadow: 0 8px 30px rgba(115, 103, 240, 0.25) !important;
             margin-top: 10px;
@@ -1107,7 +1177,7 @@
         }
 
         .filter-label i {
-            color: #7367f0;
+            color: #2477F9;
             font-size: 0.95rem;
         }
 
@@ -1137,7 +1207,7 @@
         }
 
         .select-modern:focus {
-            border-color: #7367f0 !important;
+            border-color: #2477F9 !important;
             box-shadow: 0 3px 8px rgba(115, 103, 240, 0.15) !important;
         }
 
@@ -1166,7 +1236,7 @@
         }
 
         .input-modern:focus {
-            border-color: #7367f0 !important;
+            border-color: #2477F9 !important;
             box-shadow: 0 3px 8px rgba(115, 103, 240, 0.15) !important;
         }
 
@@ -1174,7 +1244,7 @@
             height: 42px;
             border-radius: 8px !important;
             font-weight: 600;
-            background: linear-gradient(135deg, #7367f0 0%, #4f46e5 100%) !important;
+            background: linear-gradient(135deg, #2477F9 0%, #4f46e5 100%) !important;
             border: none !important;
             transition: all 0.2s ease-in-out !important;
             box-shadow: 0 4px 12px rgba(115, 103, 240, 0.2) !important;
@@ -1250,7 +1320,7 @@
         .subtopic-bullet {
             width: 5px;
             height: 24px;
-            background: linear-gradient(180deg, #7367f0 0%, #4f46e5 100%);
+            background: linear-gradient(180deg, #2477F9 0%, #4f46e5 100%);
             border-radius: 3px;
         }
 
@@ -1281,7 +1351,7 @@
 
         .collapse-icon {
             transition: transform 0.25s ease-in-out;
-            color: #7367f0;
+            color: #2477F9;
             font-weight: bold;
         }
 
@@ -1555,7 +1625,7 @@
             border-radius: 30px !important;
             padding: 8px 24px !important;
             font-size: 0.85rem !important;
-            background: linear-gradient(135deg, #7367f0 0%, #4f46e5 100%) !important;
+            background: linear-gradient(135deg, #2477F9 0%, #4f46e5 100%) !important;
             border: none !important;
             display: inline-flex;
             align-items: center;
@@ -1590,7 +1660,7 @@
             justify-content: center;
             border-radius: 50% !important;
             border: 1px solid rgba(115, 103, 240, 0.15) !important;
-            color: #7367f0 !important;
+            color: #2477F9 !important;
             background-color: rgba(115, 103, 240, 0.04) !important;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -1609,8 +1679,8 @@
 
         .btn-history:hover {
             transform: translateY(-2px);
-            border-color: #7367f0 !important;
-            background-color: #7367f0 !important;
+            border-color: #2477F9 !important;
+            background-color: #2477F9 !important;
             color: #ffffff !important;
             box-shadow: 0 4px 12px rgba(115, 103, 240, 0.25) !important;
         }
@@ -1805,43 +1875,43 @@
 @endpush
 
 @push('scripts')
-<script>
-    $(document).ready(function() {
-        $(document).on('click', '.btn-start-trigger', function() {
-            var button = $(this);
-            var paperTitle = button.data('paper-title');
-            var questionsCount = button.data('paper-questions');
-            var totalTime = button.data('paper-time');
-            var difficulty = button.data('paper-difficulty') || 'medium';
-            var instruction = button.attr('data-paper-instruction');
-            var actionUrl = button.data('action-url');
+    <script>
+        $(document).ready(function () {
+            $(document).on('click', '.btn-start-trigger', function () {
+                var button = $(this);
+                var paperTitle = button.data('paper-title');
+                var questionsCount = button.data('paper-questions');
+                var totalTime = button.data('paper-time');
+                var difficulty = button.data('paper-difficulty') || 'medium';
+                var instruction = button.attr('data-paper-instruction');
+                var actionUrl = button.data('action-url');
 
-            // Update Modal Form Action
-            $('#modal-start-form').attr('action', actionUrl);
+                // Update Modal Form Action
+                $('#modal-start-form').attr('action', actionUrl);
 
-            // Update Modal Title
-            $('#modal-paper-title').text(paperTitle);
+                // Update Modal Title
+                $('#modal-paper-title').text(paperTitle);
 
-            // Update Stats
-            $('#modal-paper-questions').text(questionsCount);
-            $('#modal-paper-time').text(totalTime);
+                // Update Stats
+                $('#modal-paper-questions').text(questionsCount);
+                $('#modal-paper-time').text(totalTime);
 
-            // Update Difficulty Text & Icon color dynamically
-            var difficultyColor = '#b06000'; // medium
-            if (difficulty === 'easy') {
-                difficultyColor = '#137333'; // green
-            } else if (difficulty === 'hard') {
-                difficultyColor = '#c5221f'; // red
-            }
-            $('#modal-paper-difficulty').css('color', difficultyColor).text(difficulty.charAt(0).toUpperCase() + difficulty.slice(1));
-            $('#modal-paper-difficulty-icon').css('color', difficultyColor);
+                // Update Difficulty Text & Icon color dynamically
+                var difficultyColor = '#b06000'; // medium
+                if (difficulty === 'easy') {
+                    difficultyColor = '#137333'; // green
+                } else if (difficulty === 'hard') {
+                    difficultyColor = '#c5221f'; // red
+                }
+                $('#modal-paper-difficulty').css('color', difficultyColor).text(difficulty.charAt(0).toUpperCase() + difficulty.slice(1));
+                $('#modal-paper-difficulty-icon').css('color', difficultyColor);
 
-            // Update Instruction Content
-            $('#modal-paper-instruction').html(instruction);
+                // Update Instruction Content
+                $('#modal-paper-instruction').html(instruction);
 
-            // Show the modal
-            $('#instructionsModal').modal('show');
+                // Show the modal
+                $('#instructionsModal').modal('show');
+            });
         });
-    });
-</script>
+    </script>
 @endpush

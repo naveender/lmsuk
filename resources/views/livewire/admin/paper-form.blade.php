@@ -76,7 +76,7 @@
 
             .paper-type-tile:focus-within {
                 outline: none;
-                border-color: #7367F0;
+                border-color: #2477F9;
                 box-shadow: 0 0 0 3px rgba(115, 103, 240, 0.25);
             }
 
@@ -114,10 +114,12 @@
                 background-color: rgba(255, 159, 67, 0.05);
                 box-shadow: 0 8px 20px -6px rgba(255, 159, 67, 0.25);
             }
+
             .paper-type-tile.type-test.active .icon-wrapper {
                 background-color: #FF9F43;
                 color: #ffffff !important;
             }
+
             .paper-type-tile.type-test.active .tile-title {
                 color: #FF9F43;
             }
@@ -128,26 +130,30 @@
                 background-color: rgba(40, 199, 111, 0.05);
                 box-shadow: 0 8px 20px -6px rgba(40, 199, 111, 0.25);
             }
+
             .paper-type-tile.type-exam.active .icon-wrapper {
                 background-color: #28C76F;
                 color: #ffffff !important;
             }
+
             .paper-type-tile.type-exam.active .tile-title {
                 color: #28C76F;
             }
 
             /* Quiz: Primary Theme */
             .paper-type-tile.type-quiz.active {
-                border-color: #7367F0;
+                border-color: #2477F9;
                 background-color: rgba(115, 103, 240, 0.05);
                 box-shadow: 0 8px 20px -6px rgba(115, 103, 240, 0.25);
             }
+
             .paper-type-tile.type-quiz.active .icon-wrapper {
-                background-color: #7367F0;
+                background-color: #2477F9;
                 color: #ffffff !important;
             }
+
             .paper-type-tile.type-quiz.active .tile-title {
-                color: #7367F0;
+                color: #2477F9;
             }
 
 
@@ -174,9 +180,18 @@
                 opacity: 1;
                 transform: scale(1);
             }
-            .paper-type-tile.type-test.active .check-badge { background: #FF9F43; }
-            .paper-type-tile.type-exam.active .check-badge { background: #28C76F; }
-            .paper-type-tile.type-quiz.active .check-badge { background: #7367F0; }
+
+            .paper-type-tile.type-test.active .check-badge {
+                background: #FF9F43;
+            }
+
+            .paper-type-tile.type-exam.active .check-badge {
+                background: #28C76F;
+            }
+
+            .paper-type-tile.type-quiz.active .check-badge {
+                background: #2477F9;
+            }
         </style>
     @endpush
 
@@ -198,8 +213,10 @@
                                     class="text-danger">*</span></label>
                             <div class="paper-type-grid">
                                 <!-- Test Card -->
-                                <label class="paper-type-tile type-test {{ $type === 'test' ? 'active' : '' }}" for="type_test">
-                                    <input type="radio" class="sr-only" id="type_test" value="test" wire:model.live="type">
+                                <label class="paper-type-tile type-test {{ $type === 'test' ? 'active' : '' }}"
+                                    for="type_test">
+                                    <input type="radio" class="sr-only" id="type_test" value="test"
+                                        wire:model.live="type">
                                     <div class="check-badge">
                                         <i class="feather icon-check"></i>
                                     </div>
@@ -211,8 +228,10 @@
                                 </label>
 
                                 <!-- Exam Card -->
-                                <label class="paper-type-tile type-exam {{ $type === 'exam' ? 'active' : '' }}" for="type_exam">
-                                    <input type="radio" class="sr-only" id="type_exam" value="exam" wire:model.live="type">
+                                <label class="paper-type-tile type-exam {{ $type === 'exam' ? 'active' : '' }}"
+                                    for="type_exam">
+                                    <input type="radio" class="sr-only" id="type_exam" value="exam"
+                                        wire:model.live="type">
                                     <div class="check-badge">
                                         <i class="feather icon-check"></i>
                                     </div>
@@ -224,8 +243,10 @@
                                 </label>
 
                                 <!-- Quiz Card -->
-                                <label class="paper-type-tile type-quiz {{ $type === 'quiz' ? 'active' : '' }}" for="type_quiz">
-                                    <input type="radio" class="sr-only" id="type_quiz" value="quiz" wire:model.live="type">
+                                <label class="paper-type-tile type-quiz {{ $type === 'quiz' ? 'active' : '' }}"
+                                    for="type_quiz">
+                                    <input type="radio" class="sr-only" id="type_quiz" value="quiz"
+                                        wire:model.live="type">
                                     <div class="check-badge">
                                         <i class="feather icon-check"></i>
                                     </div>
@@ -614,22 +635,24 @@
                                 <div class="col-md-12">
                                     <div class="card bg-light border p-2 mb-2">
                                         <h6 class="font-weight-bold mb-1 text-dark">Week Settings</h6>
-                                        
+
                                         @if(!$create_new_course)
                                             <div class="form-group mb-2">
                                                 <label class="font-weight-bold text-dark d-block">Week Selection Mode</label>
                                                 <div class="d-flex align-items-center">
                                                     <div class="custom-control custom-radio mr-3">
-                                                        <input type="radio" class="custom-control-input" id="week_mode_existing" value="existing"
-                                                            wire:model.live="week_mode">
-                                                        <label class="custom-control-label font-weight-bold cursor-pointer" for="week_mode_existing">
+                                                        <input type="radio" class="custom-control-input" id="week_mode_existing"
+                                                            value="existing" wire:model.live="week_mode">
+                                                        <label class="custom-control-label font-weight-bold cursor-pointer"
+                                                            for="week_mode_existing">
                                                             Choose Existing Week
                                                         </label>
                                                     </div>
                                                     <div class="custom-control custom-radio">
-                                                        <input type="radio" class="custom-control-input" id="week_mode_new" value="new"
-                                                            wire:model.live="week_mode">
-                                                        <label class="custom-control-label font-weight-bold cursor-pointer" for="week_mode_new">
+                                                        <input type="radio" class="custom-control-input" id="week_mode_new"
+                                                            value="new" wire:model.live="week_mode">
+                                                        <label class="custom-control-label font-weight-bold cursor-pointer"
+                                                            for="week_mode_new">
                                                             Create New Week
                                                         </label>
                                                     </div>
@@ -639,32 +662,42 @@
 
                                         @if($week_mode === 'existing' && !$create_new_course)
                                             <div class="form-group mb-0">
-                                                <label for="selected_week_id" class="font-weight-bold text-dark">Select Week <span class="text-danger">*</span></label>
-                                                <select id="selected_week_id" class="form-control" wire:model.defer="selected_week_id">
+                                                <label for="selected_week_id" class="font-weight-bold text-dark">Select Week
+                                                    <span class="text-danger">*</span></label>
+                                                <select id="selected_week_id" class="form-control"
+                                                    wire:model.defer="selected_week_id">
                                                     <option value="">-- Choose Week --</option>
                                                     @foreach($courseWeeks as $cWeek)
                                                         <option value="{{ $cWeek['id'] }}">
-                                                            {{ $cWeek['name'] }} @if($cWeek['due_date']) (Due: {{ \Carbon\Carbon::parse($cWeek['due_date'])->format('d M Y') }}) @endif
+                                                            {{ $cWeek['name'] }} @if($cWeek['due_date']) (Due:
+                                                            {{ \Carbon\Carbon::parse($cWeek['due_date'])->format('d M Y') }}) @endif
                                                         </option>
                                                     @endforeach
                                                 </select>
-                                                @error('selected_week_id') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                                @error('selected_week_id') <span
+                                                class="text-danger font-small-3">{{ $message }}</span> @enderror
                                             </div>
                                         @else
                                             <div class="row">
                                                 <div class="col-md-8">
                                                     <div class="form-group mb-2">
-                                                        <label for="new_week_name" class="font-weight-bold text-dark">Week Name / Title <span class="text-danger">*</span></label>
-                                                        <input type="text" id="new_week_name" class="form-control" placeholder="e.g. Week 21 - Rational Numbers"
+                                                        <label for="new_week_name" class="font-weight-bold text-dark">Week Name
+                                                            / Title <span class="text-danger">*</span></label>
+                                                        <input type="text" id="new_week_name" class="form-control"
+                                                            placeholder="e.g. Week 21 - Rational Numbers"
                                                             wire:model.defer="new_week_name">
-                                                        @error('new_week_name') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                                        @error('new_week_name') <span
+                                                        class="text-danger font-small-3">{{ $message }}</span> @enderror
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group mb-2">
-                                                        <label for="new_week_due_date" class="font-weight-bold text-dark">Due Date</label>
-                                                        <input type="date" id="new_week_due_date" class="form-control" wire:model.defer="new_week_due_date">
-                                                        @error('new_week_due_date') <span class="text-danger font-small-3">{{ $message }}</span> @enderror
+                                                        <label for="new_week_due_date" class="font-weight-bold text-dark">Due
+                                                            Date</label>
+                                                        <input type="date" id="new_week_due_date" class="form-control"
+                                                            wire:model.defer="new_week_due_date">
+                                                        @error('new_week_due_date') <span
+                                                        class="text-danger font-small-3">{{ $message }}</span> @enderror
                                                     </div>
                                                 </div>
                                             </div>
@@ -769,7 +802,7 @@
             </div>
 
             <!-- Selected Questions List -->
-            <div class="card shadow-sm mt-2 border-left-3" style="border-left-color: #7367F0;">
+            <div class="card shadow-sm mt-2 border-left-3" style="border-left-color: #2477F9;">
                 <div class="card-header bg-white border-bottom py-2 d-flex justify-content-between align-items-center">
                     <h4 class="card-title font-weight-bold text-primary mb-0">
                         <i class="feather icon-check-square mr-50"></i>Selected Questions
@@ -791,7 +824,7 @@
                             <div class="list-group">
                                 @foreach($selectedQuestions as $index => $question)
                                     <div class="list-group-item list-group-item-action d-flex align-items-center justify-content-between py-1 mb-50 rounded shadow-sm border-left-3"
-                                        style="border-left-color: #7367F0; transition: all 0.2s ease;"
+                                        style="border-left-color: #2477F9; transition: all 0.2s ease;"
                                         wire:key="selected-{{ $question->id }}">
                                         <!-- Question Details -->
                                         <div class="d-flex align-items-center flex-grow-1 mr-2" style="min-width: 0;">

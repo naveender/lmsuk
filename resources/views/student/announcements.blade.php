@@ -145,9 +145,17 @@
         }
 
         @keyframes urgentIconPulse {
-            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.5); }
-            70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.5);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(244, 63, 94, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+            }
         }
 
         .urgent-title {
@@ -241,7 +249,7 @@
 
         .dark-layout .announcement-search-control:focus {
             background-color: #1e2440;
-            border-color: #7367f0;
+            border-color: #2477F9;
         }
 
         .clear-search-btn {
@@ -307,9 +315,9 @@
         }
 
         .dark-layout .filter-pill.active {
-            background: #7367f0;
+            background: #2477F9;
             color: #ffffff;
-            border-color: #7367f0;
+            border-color: #2477F9;
             box-shadow: 0 4px 14px rgba(115, 103, 240, 0.4);
         }
 
@@ -441,9 +449,20 @@
         }
 
         @keyframes pulseGlow {
-            0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { transform: scale(1.15); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-            100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+            0% {
+                transform: scale(0.9);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+
+            70% {
+                transform: scale(1.15);
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                transform: scale(0.9);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
         }
 
         .badge-priority-high {
@@ -862,7 +881,7 @@
         <div class="header-navbar-shadow"></div>
         <div class="content-wrapper">
             <div class="content-body">
-                
+
                 @php
                     $unreadAnnouncements = $announcements->whereNotIn('id', $viewedIds);
                     $unreadCount = $unreadAnnouncements->count();
@@ -883,7 +902,8 @@
                                 </div>
                                 <h1 class="announcements-hero-title">Academy Announcements</h1>
                                 <p class="announcements-hero-subtitle mb-0">
-                                    Stay informed on term schedules, mock tests, revision reminders, and important messages from your tutors and staff.
+                                    Stay informed on term schedules, mock tests, revision reminders, and important messages
+                                    from your tutors and staff.
                                 </p>
                             </div>
 
@@ -894,7 +914,8 @@
                                         <span class="hero-stat-lbl">Total Notices</span>
                                     </div>
                                     <div class="hero-stat-box">
-                                        <span class="hero-stat-num text-success d-flex align-items-center justify-content-center">
+                                        <span
+                                            class="hero-stat-num text-success d-flex align-items-center justify-content-center">
                                             @if($unreadCount > 0)
                                                 <span class="pulse-dot mr-50"></span>
                                             @endif
@@ -917,7 +938,8 @@
                 </div>
 
                 <!-- Urgent Attention Alert Banner -->
-                <div class="urgent-alert-banner mb-3 {{ $unreadHighPriorityCount > 0 ? '' : 'd-none' }}" id="urgentAttentionBanner">
+                <div class="urgent-alert-banner mb-3 {{ $unreadHighPriorityCount > 0 ? '' : 'd-none' }}"
+                    id="urgentAttentionBanner">
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                         <div class="d-flex align-items-center">
                             <div class="urgent-pulse-icon mr-1">
@@ -926,7 +948,8 @@
                             <div>
                                 <h5 class="urgent-title mb-25">Action Required: Urgent Notice</h5>
                                 <p class="urgent-subtitle mb-0">
-                                    You have <strong id="urgent-unread-count">{{ $unreadHighPriorityCount }}</strong> high-priority notice(s) requiring your immediate attention.
+                                    You have <strong id="urgent-unread-count">{{ $unreadHighPriorityCount }}</strong>
+                                    high-priority notice(s) requiring your immediate attention.
                                 </p>
                             </div>
                         </div>
@@ -941,24 +964,29 @@
                     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between p-1 p-md-2">
                         <div class="search-input-group flex-grow-1 mr-md-2 mb-1 mb-md-0 position-relative">
                             <i class="feather icon-search search-icon"></i>
-                            <input type="text" id="announcement-search" class="form-control announcement-search-control" placeholder="Search notices by title, keyword, or content..." autocomplete="off">
+                            <input type="text" id="announcement-search" class="form-control announcement-search-control"
+                                placeholder="Search notices by title, keyword, or content..." autocomplete="off">
                             <button type="button" id="search-clear" class="clear-search-btn d-none" title="Clear search">
                                 <i class="feather icon-x"></i>
                             </button>
                         </div>
-                        
+
                         <div class="filter-pills-wrapper d-flex align-items-center flex-wrap">
                             <button type="button" class="filter-pill active" data-filter="all">
-                                <i class="feather icon-grid mr-25"></i> All (<span id="count-all">{{ $announcements->count() }}</span>)
+                                <i class="feather icon-grid mr-25"></i> All (<span
+                                    id="count-all">{{ $announcements->count() }}</span>)
                             </button>
                             <button type="button" class="filter-pill" data-filter="unread">
-                                <i class="feather icon-mail mr-25"></i> Unread (<span id="count-unread">{{ $unreadCount }}</span>)
+                                <i class="feather icon-mail mr-25"></i> Unread (<span
+                                    id="count-unread">{{ $unreadCount }}</span>)
                             </button>
                             <button type="button" class="filter-pill" data-filter="high">
-                                <i class="feather icon-alert-triangle mr-25"></i> High Priority (<span id="count-high">{{ $highCount }}</span>)
+                                <i class="feather icon-alert-triangle mr-25"></i> High Priority (<span
+                                    id="count-high">{{ $highCount }}</span>)
                             </button>
                             <button type="button" class="filter-pill" data-filter="media">
-                                <i class="feather icon-paperclip mr-25"></i> Attachments (<span id="count-media">{{ $mediaCount }}</span>)
+                                <i class="feather icon-paperclip mr-25"></i> Attachments (<span
+                                    id="count-media">{{ $mediaCount }}</span>)
                             </button>
                         </div>
                     </div>
@@ -975,13 +1003,11 @@
                                 $dateObj = $announcement->show_from ?: $announcement->created_at;
                             @endphp
 
-                            <div class="card announcement-card {{ $priorityClass }}" 
-                                 id="announcement-{{ $announcement->id }}"
-                                 data-id="{{ $announcement->id }}"
-                                 data-priority="{{ $announcement->priority ?? 'low' }}"
-                                 data-read="{{ $isRead ? 'true' : 'false' }}"
-                                 data-media="{{ !empty($announcement->media) ? 'true' : 'false' }}">
-                                
+                            <div class="card announcement-card {{ $priorityClass }}" id="announcement-{{ $announcement->id }}"
+                                data-id="{{ $announcement->id }}" data-priority="{{ $announcement->priority ?? 'low' }}"
+                                data-read="{{ $isRead ? 'true' : 'false' }}"
+                                data-media="{{ !empty($announcement->media) ? 'true' : 'false' }}">
+
                                 <div class="card-body p-2 p-md-3">
                                     <!-- Card Header: Author Profile & Status Badges -->
                                     <div class="card-author-row justify-content-between flex-wrap">
@@ -991,11 +1017,12 @@
                                             </div>
                                             <div class="author-meta ml-1">
                                                 <span class="author-name">
-                                                    Academy Administration 
-                                                    <i class="feather icon-check-circle verified-badge" title="Official Notice"></i>
+                                                    Academy Administration
+                                                    <i class="feather icon-check-circle verified-badge"
+                                                        title="Official Notice"></i>
                                                 </span>
                                                 <span class="author-date">
-                                                    <i class="feather icon-calendar mr-25"></i> 
+                                                    <i class="feather icon-calendar mr-25"></i>
                                                     {{ $dateObj ? $dateObj->format('M d, Y · h:i A') : 'Recent' }}
                                                     @if($dateObj)
                                                         <span class="mx-25">·</span>
@@ -1026,7 +1053,8 @@
                                                 </span>
                                             @endif
 
-                                            <span class="badge-read {{ !$isRead ? 'd-none' : '' }}" id="read-badge-{{ $announcement->id }}">
+                                            <span class="badge-read {{ !$isRead ? 'd-none' : '' }}"
+                                                id="read-badge-{{ $announcement->id }}">
                                                 <i class="feather icon-check mr-25"></i> Read
                                             </span>
                                         </div>
@@ -1052,13 +1080,12 @@
                                         <div class="media-preview-box text-left">
                                             @if(preg_match('/\.(jpeg|jpg|gif|png|webp|svg)/i', $announcement->media))
                                                 <div class="d-inline-block position-relative">
-                                                    <img src="{{ asset('storage/' . $announcement->media) }}" 
-                                                         class="announcement-thumbnail-img" 
-                                                         alt="Notice image" 
-                                                         loading="lazy">
+                                                    <img src="{{ asset('storage/' . $announcement->media) }}"
+                                                        class="announcement-thumbnail-img" alt="Notice image" loading="lazy">
                                                 </div>
                                             @else
-                                                <a href="{{ asset('storage/' . $announcement->media) }}" target="_blank" class="file-attachment-card">
+                                                <a href="{{ asset('storage/' . $announcement->media) }}" target="_blank"
+                                                    class="file-attachment-card">
                                                     <i class="feather icon-file-text file-attachment-icon"></i>
                                                     <div class="text-left">
                                                         <div class="file-name-text">{{ basename($announcement->media) }}</div>
@@ -1075,17 +1102,15 @@
                                         <div class="font-small-2 text-muted">
                                             <i class="feather icon-bookmark mr-25"></i> Aspire Learners Academy Bulletin
                                         </div>
-                                        <button type="button" 
-                                                class="btn-read-notice view-announcement-btn"
-                                                data-id="{{ $announcement->id }}"
-                                                data-title="{{ $announcement->title }}"
-                                                data-content="{{ $announcement->content }}"
-                                                data-desc="{{ $announcement->description }}"
-                                                data-priority="{{ $announcement->priority ?? 'low' }}"
-                                                data-media="{{ !empty($announcement->media) ? asset('storage/' . $announcement->media) : '' }}"
-                                                data-media-name="{{ basename($announcement->media ?? '') }}"
-                                                data-date="{{ $dateObj ? $dateObj->format('M d, Y · h:i A') : 'Recent' }}"
-                                                data-view-url="{{ route('student.announcements.view', $announcement->id) }}">
+                                        <button type="button" class="btn-read-notice view-announcement-btn"
+                                            data-id="{{ $announcement->id }}" data-title="{{ $announcement->title }}"
+                                            data-content="{{ $announcement->content }}"
+                                            data-desc="{{ $announcement->description }}"
+                                            data-priority="{{ $announcement->priority ?? 'low' }}"
+                                            data-media="{{ !empty($announcement->media) ? asset('storage/' . $announcement->media) : '' }}"
+                                            data-media-name="{{ basename($announcement->media ?? '') }}"
+                                            data-date="{{ $dateObj ? $dateObj->format('M d, Y · h:i A') : 'Recent' }}"
+                                            data-view-url="{{ route('student.announcements.view', $announcement->id) }}">
                                             <span>Read Full Notice</span>
                                             <i class="feather icon-arrow-right"></i>
                                         </button>
@@ -1099,7 +1124,8 @@
                                     <i class="feather icon-bell-off"></i>
                                 </div>
                                 <h4 class="font-weight-bold">No announcements published</h4>
-                                <p class="text-muted">There are currently no active announcements or bulletins for your cohort.</p>
+                                <p class="text-muted">There are currently no active announcements or bulletins for your cohort.
+                                </p>
                             </div>
                         @endforelse
 
@@ -1109,7 +1135,8 @@
                                 <i class="feather icon-search"></i>
                             </div>
                             <h4 class="font-weight-bold">No matching announcements</h4>
-                            <p class="text-muted">We couldn't find any notices matching your selected filter or search keywords.</p>
+                            <p class="text-muted">We couldn't find any notices matching your selected filter or search
+                                keywords.</p>
                             <button type="button" class="btn btn-primary mt-1" id="reset-filters-btn">
                                 <i class="feather icon-refresh-cw mr-50"></i> Reset Filters
                             </button>
@@ -1129,24 +1156,24 @@
                                     <span>Spotlight Notice</span>
                                 </div>
                                 <div class="sidebar-body text-left">
-                                    <span class="badge badge-pill badge-light-{{ $spotlightNotice->priority === 'high' ? 'danger' : 'primary' }} mb-50 font-small-1 font-weight-bold text-uppercase">
+                                    <span
+                                        class="badge badge-pill badge-light-{{ $spotlightNotice->priority === 'high' ? 'danger' : 'primary' }} mb-50 font-small-1 font-weight-bold text-uppercase">
                                         {{ $spotlightNotice->priority === 'high' ? 'High Priority' : 'Featured Bulletin' }}
                                     </span>
-                                    <h5 class="font-weight-bold text-dark mb-50">{{ Str::limit($spotlightNotice->title, 55) }}</h5>
+                                    <h5 class="font-weight-bold text-dark mb-50">{{ Str::limit($spotlightNotice->title, 55) }}
+                                    </h5>
                                     <p class="text-muted font-small-3 mb-1">
                                         {{ Str::limit($spotlightNotice->description ?: $spotlightNotice->content, 90) }}
                                     </p>
-                                    <button type="button" 
-                                            class="btn btn-outline-primary btn-sm btn-block view-announcement-btn"
-                                            data-id="{{ $spotlightNotice->id }}"
-                                            data-title="{{ $spotlightNotice->title }}"
-                                            data-content="{{ $spotlightNotice->content }}"
-                                            data-desc="{{ $spotlightNotice->description }}"
-                                            data-priority="{{ $spotlightNotice->priority ?? 'low' }}"
-                                            data-media="{{ !empty($spotlightNotice->media) ? asset('storage/' . $spotlightNotice->media) : '' }}"
-                                            data-media-name="{{ basename($spotlightNotice->media ?? '') }}"
-                                            data-date="{{ $spotlightNotice->created_at ? $spotlightNotice->created_at->format('M d, Y · h:i A') : 'Recent' }}"
-                                            data-view-url="{{ route('student.announcements.view', $spotlightNotice->id) }}">
+                                    <button type="button" class="btn btn-outline-primary btn-sm btn-block view-announcement-btn"
+                                        data-id="{{ $spotlightNotice->id }}" data-title="{{ $spotlightNotice->title }}"
+                                        data-content="{{ $spotlightNotice->content }}"
+                                        data-desc="{{ $spotlightNotice->description }}"
+                                        data-priority="{{ $spotlightNotice->priority ?? 'low' }}"
+                                        data-media="{{ !empty($spotlightNotice->media) ? asset('storage/' . $spotlightNotice->media) : '' }}"
+                                        data-media-name="{{ basename($spotlightNotice->media ?? '') }}"
+                                        data-date="{{ $spotlightNotice->created_at ? $spotlightNotice->created_at->format('M d, Y · h:i A') : 'Recent' }}"
+                                        data-view-url="{{ route('student.announcements.view', $spotlightNotice->id) }}">
                                         Read Spotlight <i class="feather icon-arrow-right ml-25"></i>
                                     </button>
                                 </div>
@@ -1166,7 +1193,8 @@
                                     </div>
                                     <div>
                                         <h6 class="legend-title">High Priority</h6>
-                                        <p class="legend-desc">Requires immediate action, exam timetable dates, or critical portal alerts.</p>
+                                        <p class="legend-desc">Requires immediate action, exam timetable dates, or critical
+                                            portal alerts.</p>
                                     </div>
                                 </div>
 
@@ -1176,7 +1204,8 @@
                                     </div>
                                     <div>
                                         <h6 class="legend-title">Featured Updates</h6>
-                                        <p class="legend-desc">Course homework updates, mock test releases, and tutor reminders.</p>
+                                        <p class="legend-desc">Course homework updates, mock test releases, and tutor
+                                            reminders.</p>
                                     </div>
                                 </div>
 
@@ -1186,7 +1215,8 @@
                                     </div>
                                     <div>
                                         <h6 class="legend-title">General Bulletin</h6>
-                                        <p class="legend-desc">Weekly study tips, term calendars, and general student community news.</p>
+                                        <p class="legend-desc">Weekly study tips, term calendars, and general student
+                                            community news.</p>
                                     </div>
                                 </div>
                             </div>
@@ -1221,7 +1251,8 @@
     <!-- END: Content-->
 
     <!-- Redesigned Executive Notice Details Modal -->
-    <div class="modal fade" id="announcementDetailModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal fade" id="announcementDetailModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content announcement-modal-content">
                 <div class="announcement-modal-header">
@@ -1229,11 +1260,12 @@
                         <i class="feather icon-book-open text-primary"></i>
                         <span>Notice Details</span>
                     </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" style="opacity: 0.85; outline: none;">
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"
+                        style="opacity: 0.85; outline: none;">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                
+
                 <div class="modal-body p-2 p-md-3 text-left">
                     <!-- Author & Meta Info Row -->
                     <div class="modal-author-strip">
@@ -1243,7 +1275,7 @@
                             </div>
                             <div class="author-meta ml-1">
                                 <span class="author-name">
-                                    Academy Administration 
+                                    Academy Administration
                                     <i class="feather icon-check-circle verified-badge"></i>
                                 </span>
                                 <span class="author-date" id="detail-date-text">
@@ -1258,7 +1290,8 @@
                     </div>
 
                     <!-- Notice Title -->
-                    <h2 id="detail-title" class="announcement-title font-weight-bold mb-1" style="font-size: 1.45rem;">Title</h2>
+                    <h2 id="detail-title" class="announcement-title font-weight-bold mb-1" style="font-size: 1.45rem;">Title
+                    </h2>
 
                     <!-- Description Callout (if available) -->
                     <div id="detail-desc-container" class="announcement-desc-callout mb-2" style="display:none;">
@@ -1284,15 +1317,18 @@
 
                         <!-- Document Download Box -->
                         <div id="detail-file-box" style="display:none;">
-                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 p-1 border rounded bg-white">
+                            <div
+                                class="d-flex align-items-center justify-content-between flex-wrap gap-2 p-1 border rounded bg-white">
                                 <div class="d-flex align-items-center">
                                     <i class="feather icon-file-text font-large-1 text-danger mr-1"></i>
                                     <div class="text-left">
-                                        <div id="detail-file-name" class="font-weight-bold text-dark text-truncate" style="max-width: 320px;">document.pdf</div>
+                                        <div id="detail-file-name" class="font-weight-bold text-dark text-truncate"
+                                            style="max-width: 320px;">document.pdf</div>
                                         <small class="text-muted">Official Document Attachment</small>
                                     </div>
                                 </div>
-                                <a href="" id="detail-file-download" class="btn btn-danger btn-sm font-weight-bold" target="_blank" download>
+                                <a href="" id="detail-file-download" class="btn btn-danger btn-sm font-weight-bold"
+                                    target="_blank" download>
                                     <i class="feather icon-download mr-50"></i> Download Document
                                 </a>
                             </div>
@@ -1300,7 +1336,8 @@
                     </div>
                 </div>
 
-                <div class="modal-footer d-flex align-items-center justify-content-between" style="background: #f8fafc; border-top: 1px solid #e2e8f0;">
+                <div class="modal-footer d-flex align-items-center justify-content-between"
+                    style="background: #f8fafc; border-top: 1px solid #e2e8f0;">
                     <div class="text-success font-small-3 font-weight-bold d-flex align-items-center">
                         <i class="feather icon-check-circle mr-50 font-medium-1"></i> Status: Viewed
                     </div>
@@ -1313,7 +1350,7 @@
 
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             var searchInput = document.getElementById('announcement-search');
             var clearIcon = document.getElementById('search-clear');
             var filterPills = document.querySelectorAll('.filter-pill');
@@ -1333,7 +1370,7 @@
                 var media = 0;
                 var unreadHigh = 0;
 
-                cards.forEach(function(card) {
+                cards.forEach(function (card) {
                     var isRead = card.getAttribute('data-read') === 'true';
                     var isHigh = card.getAttribute('data-priority') === 'high';
                     var hasMedia = card.getAttribute('data-media') === 'true';
@@ -1387,11 +1424,11 @@
                     }
                 }
 
-                cards.forEach(function(card) {
+                cards.forEach(function (card) {
                     var title = (card.querySelector('.announcement-title')?.textContent || '').toLowerCase();
                     var desc = (card.querySelector('.announcement-desc-callout')?.textContent || '').toLowerCase();
                     var content = (card.querySelector('.announcement-body-snippet')?.textContent || '').toLowerCase();
-                    
+
                     var isRead = card.getAttribute('data-read') === 'true';
                     var isHigh = card.getAttribute('data-priority') === 'high';
                     var hasMedia = card.getAttribute('data-media') === 'true';
@@ -1425,14 +1462,14 @@
 
             // Search Event Listeners
             if (searchInput) {
-                searchInput.addEventListener('input', function() {
+                searchInput.addEventListener('input', function () {
                     currentSearch = this.value;
                     applyFilters();
                 });
             }
 
             if (clearIcon) {
-                clearIcon.addEventListener('click', function() {
+                clearIcon.addEventListener('click', function () {
                     if (searchInput) searchInput.value = '';
                     currentSearch = '';
                     applyFilters();
@@ -1441,9 +1478,9 @@
             }
 
             // Filter Pills Click Handlers
-            filterPills.forEach(function(pill) {
-                pill.addEventListener('click', function() {
-                    filterPills.forEach(function(p) { p.classList.remove('active'); });
+            filterPills.forEach(function (pill) {
+                pill.addEventListener('click', function () {
+                    filterPills.forEach(function (p) { p.classList.remove('active'); });
                     this.classList.add('active');
                     currentFilter = this.getAttribute('data-filter');
                     applyFilters();
@@ -1452,8 +1489,8 @@
 
             // Urgent Banner Button Click
             if (filterUrgentBtn) {
-                filterUrgentBtn.addEventListener('click', function() {
-                    filterPills.forEach(function(p) {
+                filterUrgentBtn.addEventListener('click', function () {
+                    filterPills.forEach(function (p) {
                         if (p.getAttribute('data-filter') === 'high') {
                             p.classList.add('active');
                         } else {
@@ -1468,11 +1505,11 @@
 
             // Reset Filters Click
             if (resetBtn) {
-                resetBtn.addEventListener('click', function() {
+                resetBtn.addEventListener('click', function () {
                     if (searchInput) searchInput.value = '';
                     currentSearch = '';
                     currentFilter = 'all';
-                    filterPills.forEach(function(p) {
+                    filterPills.forEach(function (p) {
                         if (p.getAttribute('data-filter') === 'all') {
                             p.classList.add('active');
                         } else {
@@ -1484,7 +1521,7 @@
             }
 
             // View Notice Modal Event
-            $(document).on('click', '.view-announcement-btn', function() {
+            $(document).on('click', '.view-announcement-btn', function () {
                 var btn = $(this);
                 var id = btn.data('id');
                 var title = btn.data('title') || '';
@@ -1559,7 +1596,7 @@
                     var isRead = targetCard.getAttribute('data-read') === 'true';
                     if (!isRead) {
                         axios.post(viewUrl)
-                            .then(function(response) {
+                            .then(function (response) {
                                 if (response.data && response.data.success) {
                                     targetCard.setAttribute('data-read', 'true');
                                     var unreadPill = document.getElementById('unread-pill-' + id);
@@ -1569,7 +1606,7 @@
                                     updateLiveCounters();
                                 }
                             })
-                            .catch(function(err) {
+                            .catch(function (err) {
                                 console.warn('Could not record announcement view:', err);
                             });
                     }

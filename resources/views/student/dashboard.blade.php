@@ -29,7 +29,8 @@
                 <div class="welcome-card shadow-lg">
                     <div class="row align-items-center">
                         <div class="col-lg-8 col-md-7 text-center text-md-left">
-                            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start mb-1 hero-badges-wrap">
+                            <div
+                                class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start mb-1 hero-badges-wrap">
                                 <span class="hero-badge mr-1 mb-50">
                                     <i class="feather icon-calendar mr-50"></i> {{ now()->format('l, j F Y') }}
                                 </span>
@@ -72,16 +73,19 @@
                                 </div>
                                 <div>
                                     <div class="d-flex align-items-center">
-                                        <span class="badge badge-danger text-uppercase font-weight-bold mr-1">Urgent Notice</span>
+                                        <span class="badge badge-danger text-uppercase font-weight-bold mr-1">Urgent
+                                            Notice</span>
                                         <h5 class="alert-heading font-weight-bold mb-0 text-danger">Action Required</h5>
                                     </div>
                                     <p class="mb-0 font-small-3 text-secondary mt-25">
-                                        You have <strong>{{ $unreadHighPriority->count() }}</strong> new urgent announcement(s). Please read them immediately.
+                                        You have <strong>{{ $unreadHighPriority->count() }}</strong> new urgent announcement(s).
+                                        Please read them immediately.
                                     </p>
                                 </div>
                             </div>
                             <div class="ml-auto">
-                                <a href="{{ route('student.announcements') }}" class="btn btn-danger btn-sm text-uppercase font-weight-bold px-2 py-75 shadow-sm">
+                                <a href="{{ route('student.announcements') }}"
+                                    class="btn btn-danger btn-sm text-uppercase font-weight-bold px-2 py-75 shadow-sm">
                                     View Notices <i class="feather icon-arrow-right ml-50"></i>
                                 </a>
                             </div>
@@ -96,7 +100,8 @@
                 <div class="d-flex align-items-center justify-content-between mb-2 mt-1">
                     <div>
                         <h3 class="font-weight-bold mb-0 text-dark learning-hub-title">Learning Hub</h3>
-                        <p class="text-muted font-small-3 mb-0">Select a module below to access your learning materials and tools</p>
+                        <p class="text-muted font-small-3 mb-0">Select a module below to access your learning materials and
+                            tools</p>
                     </div>
                 </div>
 
@@ -115,7 +120,8 @@
                                             alt="Lessons illustration" loading="lazy">
                                     </div>
                                     <h4 class="dashboard-card-title">Lessons</h4>
-                                    <p class="dashboard-card-text">Checkout video lessons to strengthen and enhance your learning experience.</p>
+                                    <p class="dashboard-card-text">Checkout video lessons to strengthen and enhance your
+                                        learning experience.</p>
                                     <a href="{{ route('student.videolessonscategories') }}" class="card-action-btn">
                                         <span>Watch Now</span> <i class="feather icon-arrow-right"></i>
                                     </a>
@@ -134,7 +140,8 @@
                                             alt="Analytics illustration" loading="lazy">
                                     </div>
                                     <h4 class="dashboard-card-title">Analytics</h4>
-                                    <p class="dashboard-card-text">View your comprehensive performance metrics, strengths, and historical analytics.</p>
+                                    <p class="dashboard-card-text">View your comprehensive performance metrics, strengths,
+                                        and historical analytics.</p>
                                     <a href="{{ route('student.analytics') }}" class="card-action-btn">
                                         <span>View Details</span> <i class="feather icon-arrow-right"></i>
                                     </a>
@@ -145,7 +152,7 @@
                         <!-- Assessment -->
                         <div class="col-xl-4 col-md-6 col-12">
                             <div class="dashboard-card"
-                                style="--card-gradient: linear-gradient(135deg, #7367f0 0%, #ce9ffc 100%); --card-light: rgba(115, 103, 240, 0.08); --card-color: #7367f0; --card-shadow: rgba(115, 103, 240, 0.35);">
+                                style="--card-gradient: linear-gradient(135deg, #2477F9 0%, #ce9ffc 100%); --card-light: rgba(115, 103, 240, 0.08); --card-color: #2477F9; --card-shadow: rgba(115, 103, 240, 0.35);">
                                 <div class="dashboard-card-body">
                                     <span class="card-tag-pill">Quizzes &amp; Mocks</span>
                                     <div class="card-icon-container">
@@ -153,7 +160,8 @@
                                             alt="Assessment illustration" loading="lazy">
                                     </div>
                                     <h4 class="dashboard-card-title">Assessment</h4>
-                                    <p class="dashboard-card-text">Take tests, quizzes, and assigned mock exams to evaluate your curriculum progress.</p>
+                                    <p class="dashboard-card-text">Take tests, quizzes, and assigned mock exams to evaluate
+                                        your curriculum progress.</p>
                                     <a href="{{ route('student.assessments') }}" class="card-action-btn">
                                         <span>Start Assessment</span> <i class="feather icon-arrow-right"></i>
                                     </a>
@@ -172,7 +180,8 @@
                                             alt="Focus Areas illustration" loading="lazy">
                                     </div>
                                     <h4 class="dashboard-card-title">Focus Areas</h4>
-                                    <p class="dashboard-card-text">Review and focus on your weaker topics and core skills needing extra practice.</p>
+                                    <p class="dashboard-card-text">Review and focus on your weaker topics and core skills
+                                        needing extra practice.</p>
                                     <a href="{{ route('student.focusareas') }}" class="card-action-btn">
                                         <span>View Focus Areas</span> <i class="feather icon-arrow-right"></i>
                                     </a>
@@ -191,7 +200,8 @@
                                             alt="Announcements illustration" loading="lazy">
                                     </div>
                                     <h4 class="dashboard-card-title">Announcements</h4>
-                                    <p class="dashboard-card-text">Stay updated with the latest news, notices, and portal notifications from center admin.</p>
+                                    <p class="dashboard-card-text">Stay updated with the latest news, notices, and portal
+                                        notifications from center admin.</p>
                                     <a href="{{ route('student.announcements') }}" class="card-action-btn">
                                         <span>View Notifications</span> <i class="feather icon-arrow-right"></i>
                                     </a>
@@ -210,7 +220,8 @@
                                             alt="Center Test Scores illustration" loading="lazy">
                                     </div>
                                     <h4 class="dashboard-card-title">Center Test Scores</h4>
-                                    <p class="dashboard-card-text">Monitor your offline performance and track reports from center test mock sessions.</p>
+                                    <p class="dashboard-card-text">Monitor your offline performance and track reports from
+                                        center test mock sessions.</p>
                                     <a href="{{ route('student.centretestscores') }}" class="card-action-btn">
                                         <span>View Scores</span> <i class="feather icon-arrow-right"></i>
                                     </a>
@@ -231,13 +242,16 @@
                                         <i class="feather icon-clock mr-50"></i> Weekly Homework &amp; Mocks
                                     </span>
                                 </div>
-                                <h4 class="font-weight-bold text-dark mb-50 spotlight-title">Need to practice this week's scheduled papers?</h4>
+                                <h4 class="font-weight-bold text-dark mb-50 spotlight-title">Need to practice this week's
+                                    scheduled papers?</h4>
                                 <p class="text-muted font-medium-1 mb-0 spotlight-desc">
-                                    Access all assigned weekly tests, download offline homework sheets, and check your test deadlines in one place.
+                                    Access all assigned weekly tests, download offline homework sheets, and check your test
+                                    deadlines in one place.
                                 </p>
                             </div>
                             <div class="col-lg-4 col-md-5 text-center text-md-right">
-                                <a href="{{ route('student.weeklytests') }}" class="btn btn-primary px-3 py-1 font-weight-bold shadow spotlight-btn">
+                                <a href="{{ route('student.weeklytests') }}"
+                                    class="btn btn-primary px-3 py-1 font-weight-bold shadow spotlight-btn">
                                     <span>Go to Weekly Tests</span>
                                     <i class="feather icon-arrow-right ml-50"></i>
                                 </a>
@@ -285,7 +299,7 @@
 
         .btn-hero-shortcut:hover {
             background: #ffffff;
-            color: #7367f0 !important;
+            color: #2477F9 !important;
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
         }
@@ -367,7 +381,7 @@
             left: 0;
             width: 5px;
             height: 100%;
-            background: linear-gradient(180deg, #7367f0 0%, #ce9ffc 100%);
+            background: linear-gradient(180deg, #2477F9 0%, #ce9ffc 100%);
         }
 
         .dark-layout .spotlight-banner {
@@ -394,9 +408,17 @@
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.18); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.18);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         .pulsing-icon {
