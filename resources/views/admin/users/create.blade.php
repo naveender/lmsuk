@@ -218,6 +218,11 @@
         border-radius: 9999px;
         cursor: pointer;
         transition: all 0.2s ease;
+        user-select: none;
+    }
+
+    .username-suggest-badge * {
+        pointer-events: none;
     }
 
     .username-suggest-badge:hover {
@@ -1015,7 +1020,7 @@
                                                 <span>Account Password <span class="label-req">*</span></span>
                                                 <button type="button" class="btn-generate-pw" id="generatePasswordBtn">
                                                     <i data-lucide="key-round" style="width: 13px; height: 13px;"></i>
-                                                    <span>Generate Strong Password</span>
+                                                    <span id="genBtnText">Generate Strong Password</span>
                                                 </button>
                                             </div>
                                             <div class="premium-input-group">
@@ -1091,8 +1096,8 @@
                                 {{-- Hidden Native Select for Seamless Form Compatibility --}}
                                 <select name="role" id="role" class="d-none" required>
                                     <option value="student" {{ old('role', 'student') == 'student' ? 'selected' : '' }}>Student</option>
-                                    <option value="parent" {{ old('role') == 'parent' ? 'selected' : '' }}>Parent</option>
-                                    <option value="tutor" {{ old('role') == 'tutor' ? 'selected' : '' }}>Tutor</option>
+                                    <option value="parent" {{ old('role', 'parent') == 'parent' ? 'selected' : '' }}>Parent</option>
+                                    <option value="tutor" {{ old('role', 'tutor') == 'tutor' ? 'selected' : '' }}>Tutor</option>
                                     <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                                 </select>
 
@@ -1321,6 +1326,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Password Elements
     const generatePwBtn = document.getElementById('generatePasswordBtn');
+    const genBtnText = document.getElementById('genBtnText');
     const togglePwBtn = document.getElementById('togglePasswordBtn');
     const togglePwIcon = document.getElementById('togglePasswordIcon');
     const pwStrengthLabel = document.getElementById('pwStrengthLabel');
@@ -1430,10 +1436,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Username Suggestion Actions
-    suggestBadge.addEventListener('click', function () {
-        if (suggestedText.textContent) {
-            usernameInput.value = suggestedText.textContent;
-            usernameInput.dispatchEvent(new Event('input'));
+    suggestBadge.addEventListener('click', function (e) {
+        e.preventDefault();
+        const text = suggestedText.textContent || this.innerText;
+        if (text) {
+            usernameInput.value = text.trim();
+            usernameInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
     });
 
@@ -1458,7 +1466,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Password Show / Hide
-    togglePwBtn.addEventListener('click', function () {
+    togglePwBtn.addEventListener('click', function (e) {
+        e.preventDefault();
         const isPassword = passwordInput.getAttribute('type') === 'password';
         passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
         
@@ -1472,14 +1481,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Strong Password Generator
-    generatePwBtn.addEventListener('click', function () {
+    generatePwBtn.addEventListener('click', function (e) {
+        e.preventDefault();
         const uppercase = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
         const lowercase = 'abcdefghijkmnopqrstuvwxyz';
         const numbers = '23456789';
         const symbols = '!@#$%^&*';
         
         let pw = '';
-        // Guarantee at least one of each
         pw += uppercase[Math.floor(Math.random() * uppercase.length)];
         pw += lowercase[Math.floor(Math.random() * lowercase.length)];
         pw += numbers[Math.floor(Math.random() * numbers.length)];
@@ -1490,7 +1499,6 @@ document.addEventListener('DOMContentLoaded', function () {
             pw += allChars[Math.floor(Math.random() * allChars.length)];
         }
         
-        // Shuffle password
         pw = pw.split('').sort(() => 0.5 - Math.random()).join('');
         
         passwordInput.value = pw;
@@ -1498,7 +1506,18 @@ document.addEventListener('DOMContentLoaded', function () {
         togglePwIcon.setAttribute('data-lucide', 'eye-off');
         if (typeof lucide !== 'undefined') lucide.createIcons();
         
-        passwordInput.dispatchEvent(new Event('input'));
+        passwordInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+        // Button feedback
+        const originalText = genBtnText.textContent;
+        genBtnText.textContent = 'Password Generated!';
+        generatePwBtn.style.borderColor = '#10B981';
+        generatePwBtn.style.color = '#10B981';
+        setTimeout(() => {
+            genBtnText.textContent = originalText;
+            generatePwBtn.style.borderColor = '';
+            generatePwBtn.style.color = '';
+        }, 1800);
     });
 
     // Password Strength Evaluator
