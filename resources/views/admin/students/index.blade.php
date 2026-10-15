@@ -176,6 +176,49 @@
                 </div>
 
                 <div class="table-actions-toolbar">
+                    <!-- Column Visibility Selector Dropdown -->
+                    <div class="dropdown d-inline-block" id="columnVisibilityDropdownWrapper">
+                        <button type="button" class="btn btn-action-columns dropdown-toggle" id="columnVisibilityBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Customize visible columns">
+                            <i data-lucide="columns-3" style="width: 14px; height: 14px;"></i>
+                            <span>Columns</span>
+                            <span class="badge badge-pill badge-light-primary font-small-1 font-weight-bold ml-50" id="columnCountBadge">9/10</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right column-visibility-menu shadow-lg border-0 animated-dropdown" aria-labelledby="columnVisibilityBtn" style="min-width: 290px; padding: 0; border-radius: 12px; margin-top: 8px;">
+                            
+                            <!-- Header with Quick Action Buttons -->
+                            <div class="column-visibility-header d-flex align-items-center justify-content-between px-2 py-1 border-bottom">
+                                <div>
+                                    <h6 class="font-weight-bold mb-0 text-dark font-small-3">Table Columns</h6>
+                                    <small class="text-muted font-small-1" id="columnVisSubtitle">Toggle columns to display</small>
+                                </div>
+                                <div class="d-flex align-items-center" style="gap: 6px;">
+                                    <button type="button" class="btn btn-xs btn-link p-0 text-primary font-weight-bold font-small-1" id="btnShowAllColumns">Show All</button>
+                                    <span class="text-muted font-small-1">&bull;</span>
+                                    <button type="button" class="btn btn-xs btn-link p-0 text-muted font-small-1" id="btnResetColumns">Reset</button>
+                                </div>
+                            </div>
+
+                            <!-- Search Filter for Columns in Big Table -->
+                            <div class="px-2 py-1 border-bottom" style="background: rgba(0,0,0,0.015);">
+                                <div class="position-relative">
+                                    <input type="text" id="columnSearchInput" class="form-control form-control-sm" placeholder="Filter column list..." style="height: 32px; font-size: 12px; padding-left: 28px; border-radius: 6px;">
+                                    <i data-lucide="search" style="width: 13px; height: 13px; position: absolute; left: 9px; top: 9px; color: #94A3B8; pointer-events: none;"></i>
+                                </div>
+                            </div>
+
+                            <!-- Scrollable Column Options List -->
+                            <div class="column-visibility-list" id="columnVisibilityList" style="max-height: 290px; overflow-y: auto; padding: 6px 8px;">
+                                <!-- Column items dynamically rendered by JS -->
+                            </div>
+
+                            <!-- Footer with live active count -->
+                            <div class="column-visibility-footer px-2 py-75 border-top d-flex align-items-center justify-content-between font-small-1 text-muted" style="background: rgba(0,0,0,0.015);">
+                                <span id="columnFooterCount">9 of 10 visible</span>
+                                <span class="badge badge-light-secondary font-small-1">Auto-saved</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <button type="button" class="btn btn-action-export" onclick="window.print()" title="Export list">
                         <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
                         <span>Export</span>
@@ -204,22 +247,22 @@
 
             <!-- Table Container -->
             <div class="table-responsive">
-                <table class="table theme-table">
+                <table class="table theme-table" id="studentsTable">
                     <thead>
                         <tr>
                             <th style="width: 36px; text-align: center;">
                                 <input type="checkbox" class="custom-theme-checkbox" id="selectAllCheckbox" title="Select All">
                             </th>
-                            <th style="width: 40px;">#</th>
-                            <th>STUDENT ID</th>
-                            <th>STUDENT NAME</th>
-                            <th>YEAR / CLASS</th>
-                            <th>PARENT / GUARDIAN</th>
-                            <th>EMAIL</th>
-                            <th>PHONE</th>
-                            <th>STATUS</th>
-                            <th>PROGRESS</th>
-                            <th style="text-align: center;">ACTIONS</th>
+                            <th style="width: 40px;" data-col="index">#</th>
+                            <th data-col="student_id">STUDENT ID</th>
+                            <th data-col="student_name">STUDENT NAME</th>
+                            <th data-col="year_class">YEAR / CLASS</th>
+                            <th data-col="parent">PARENT / GUARDIAN</th>
+                            <th data-col="email">EMAIL</th>
+                            <th data-col="phone">PHONE</th>
+                            <th data-col="status">STATUS</th>
+                            <th data-col="progress" style="display: none;">PROGRESS</th>
+                            <th style="text-align: center;" data-col="actions">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -296,20 +339,20 @@
                                 <td style="text-align: center;">
                                     <input type="checkbox" class="custom-theme-checkbox row-checkbox" value="{{ $student->id }}">
                                 </td>
-                                <td class="text-muted font-weight-bold">{{ $students->firstItem() + $index }}</td>
-                                <td>
+                                <td class="font-weight-bold" data-col="index">{{ $students->firstItem() + $index }}</td>
+                                <td data-col="student_id">
                                     <span class="student-id-badge">{{ $studentIdCode }}</span>
                                 </td>
-                                <td>
+                                <td data-col="student_name">
                                     <div class="student-profile-cell">
                                         <img src="{{ $avatarUrl }}" alt="{{ $student->name }}" class="student-avatar-img" onerror="this.src='{{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}'">
                                         <span class="student-name-text">{{ $student->name }}</span>
                                     </div>
                                 </td>
-                                <td>
-                                    <span class="text-muted">{{ $yearGroupStr }} / {{ $classNameStr }}</span>
+                                <td data-col="year_class">
+                                    <span>{{ $yearGroupStr }} / {{ $classNameStr }}</span>
                                 </td>
-                                <td>
+                                <td data-col="parent">
                                     @if($parentObj)
                                         <a href="{{ route('admin.parents.show', $parentObj->id) }}" class="parent-link">
                                             <i data-lucide="user" style="width: 14px; height: 14px;"></i>
@@ -328,13 +371,13 @@
                                         </div>
                                     @endif
                                 </td>
-                                <td>
-                                    <span class="text-muted">{{ $student->email }}</span>
+                                <td data-col="email">
+                                    <span>{{ $student->email }}</span>
                                 </td>
-                                <td>
-                                    <span class="text-muted">{{ $phoneStr }}</span>
+                                <td data-col="phone">
+                                    <span>{{ $phoneStr }}</span>
                                 </td>
-                                <td>
+                                <td data-col="status">
                                     @if($rowStatus === 'Active')
                                         <span class="status-pill status-active">
                                             <span class="status-dot"></span> Active
@@ -349,7 +392,7 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td>
+                                <td data-col="progress" style="display: none;">
                                     <div class="progress-cell-wrap">
                                         <div class="table-progress-bar">
                                             <div class="table-progress-fill {{ $fillClass }}" style="width: {{ $rowProgress }}%;"></div>
@@ -357,7 +400,7 @@
                                         <span class="progress-text">{{ $rowProgress }}%</span>
                                     </div>
                                 </td>
-                                <td style="text-align: center;">
+                                <td style="text-align: center;" data-col="actions">
                                     <div class="action-icon-group">
                                         <!-- View in Modal Button -->
                                         <button type="button" class="btn-table-action action-view" title="View Student Info"
@@ -380,7 +423,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="11" class="text-center py-4 text-muted">
+                                <td id="emptyStudentsCol" colspan="10" class="text-center py-4">
                                     <i data-lucide="users" style="width: 40px; height: 40px; opacity: 0.3; margin-bottom: 8px;"></i>
                                     <p class="mb-0">No students found matching your criteria.</p>
                                 </td>
@@ -478,20 +521,20 @@
                     </h6>
                     <div class="row">
                         <div class="col-md-4 col-12 mb-1">
-                            <small class="text-muted d-block">Year Group</small>
+                            <small class="d-block">Year Group</small>
                             <strong class="text-dark font-small-3" id="mYearGroup">Year 7</strong>
                         </div>
                         <div class="col-md-4 col-12 mb-1">
-                            <small class="text-muted d-block">Class / Cohort</small>
+                            <small class="d-block">Class / Cohort</small>
                             <strong class="text-dark font-small-3" id="mClass">7A</strong>
                         </div>
                         <div class="col-md-4 col-12 mb-1">
-                            <small class="text-muted d-block">Academic Year</small>
+                            <small class="d-block">Academic Year</small>
                             <strong class="text-dark font-small-3" id="mAcademicYear">2026-2027</strong>
                         </div>
                         <div class="col-12 mt-50">
                             <div class="d-flex align-items-center justify-content-between mb-25">
-                                <small class="text-muted font-weight-bold">Learning Progress</small>
+                                <small class="font-weight-bold">Learning Progress</small>
                                 <strong class="font-small-2 text-primary" id="mProgressText">85%</strong>
                             </div>
                             <div class="progress" style="height: 8px; border-radius: 10px; background: #EDF2F7;">
@@ -508,19 +551,19 @@
                     </h6>
                     <div class="row">
                         <div class="col-md-6 col-12 mb-1">
-                            <small class="text-muted d-block">Email Address</small>
+                            <small class="d-block">Email Address</small>
                             <span class="text-dark font-weight-bold font-small-3" id="mEmail">student@test.com</span>
                         </div>
                         <div class="col-md-6 col-12 mb-1">
-                            <small class="text-muted d-block">Phone Number</small>
+                            <small class="d-block">Phone Number</small>
                             <span class="text-dark font-weight-bold font-small-3" id="mPhone">07123 456789</span>
                         </div>
                         <div class="col-md-4 col-12 mb-1">
-                            <small class="text-muted d-block">Username</small>
+                            <small class="d-block">Username</small>
                             <span class="text-dark font-weight-bold font-small-3" id="mUsername">jwilson</span>
                         </div>
                         <div class="col-md-4 col-12 mb-1">
-                            <small class="text-muted d-block">Date of Birth</small>
+                            <small class="d-block">Date of Birth</small>
                             <span class="text-dark font-weight-bold font-small-3" id="mDob">15 May 2014</span>
                         </div>
                         <div class="col-md-4 col-12 mb-1">
@@ -528,11 +571,11 @@
                             <span class="text-dark font-weight-bold font-small-3" id="mGender">Male</span>
                         </div>
                         <div class="col-md-6 col-12">
-                            <small class="text-muted d-block">Region / Location</small>
+                            <small class="d-block">Region / Location</small>
                             <span class="text-dark font-weight-bold font-small-3" id="mRegion">London</span>
                         </div>
                         <div class="col-md-6 col-12">
-                            <small class="text-muted d-block">Enrolled Date</small>
+                            <small class="d-block">Enrolled Date</small>
                             <span class="text-dark font-weight-bold font-small-3" id="mJoined">14 Oct 2026</span>
                         </div>
                     </div>
@@ -548,19 +591,19 @@
                     <div id="mParentAssignedBlock">
                         <div class="row">
                             <div class="col-md-6 col-12 mb-1">
-                                <small class="text-muted d-block">Parent / Guardian Name</small>
+                                <small class="d-block">Parent / Guardian Name</small>
                                 <strong class="text-primary font-small-3" id="mParentName">Parent User</strong>
                             </div>
                             <div class="col-md-6 col-12 mb-1">
-                                <small class="text-muted d-block">Relationship</small>
+                                <small class="d-block">Relationship</small>
                                 <span class="badge badge-light-primary font-weight-bold" id="mParentRelation">Guardian</span>
                             </div>
                             <div class="col-md-6 col-12 mb-1">
-                                <small class="text-muted d-block">Parent Email</small>
+                                <small class="d-block">Parent Email</small>
                                 <span class="text-dark font-small-3" id="mParentEmail">parent@test.com</span>
                             </div>
                             <div class="col-md-6 col-12 mb-1">
-                                <small class="text-muted d-block">Parent Phone</small>
+                                <small class="d-block">Parent Phone</small>
                                 <span class="text-dark font-small-3" id="mParentPhone">07987654321</span>
                             </div>
                         </div>
@@ -768,5 +811,209 @@
         document.body.appendChild(form);
         form.submit();
     }
+
+    /* ==========================================================================
+       COLUMN VISIBILITY MANAGER (Enterprise Big Tables)
+       ========================================================================== */
+    document.addEventListener('DOMContentLoaded', function() {
+        const STORAGE_KEY = 'lms_students_table_col_vis_v2';
+        
+        const columnDefs = [
+            { key: 'index', label: '# (Row Number)', icon: 'hash', default: true },
+            { key: 'student_id', label: 'Student ID', icon: 'tag', default: true },
+            { key: 'student_name', label: 'Student Name', icon: 'user', default: true },
+            { key: 'year_class', label: 'Year / Class', icon: 'graduation-cap', default: true },
+            { key: 'parent', label: 'Parent / Guardian', icon: 'users', default: true },
+            { key: 'email', label: 'Email Address', icon: 'mail', default: true },
+            { key: 'phone', label: 'Phone Number', icon: 'phone', default: true },
+            { key: 'status', label: 'Status Pill', icon: 'shield', default: true },
+            { key: 'progress', label: 'Progress Bar', icon: 'bar-chart-2', default: false },
+            { key: 'actions', label: 'Action Buttons', icon: 'more-horizontal', default: true },
+        ];
+
+        const listContainer = document.getElementById('columnVisibilityList');
+        const badgeCount = document.getElementById('columnCountBadge');
+        const footerCount = document.getElementById('columnFooterCount');
+        const searchInput = document.getElementById('columnSearchInput');
+        const btnShowAll = document.getElementById('btnShowAllColumns');
+        const btnReset = document.getElementById('btnResetColumns');
+        const dropdownMenu = document.querySelector('.column-visibility-menu');
+        const emptyCol = document.getElementById('emptyStudentsCol');
+
+        if (!listContainer) return;
+
+        // Prevent dropdown from closing when clicking inside
+        if (dropdownMenu) {
+            dropdownMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+
+        // Load saved state or default
+        let state = {};
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                state = JSON.parse(saved);
+            }
+        } catch (e) {
+            state = {};
+        }
+
+        // Initialize state defaults for any missing columns
+        columnDefs.forEach(col => {
+            if (state[col.key] === undefined) {
+                state[col.key] = col.default;
+            }
+        });
+
+        // Save state to localStorage
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {}
+        }
+
+        // Update single column visibility on the DOM
+        function applyColumnVisibility(key, isVisible) {
+            const table = document.getElementById('studentsTable');
+            if (!table) return;
+
+            // Update all th and td with data-col matching key
+            const cells = table.querySelectorAll(`[data-col="${key}"]`);
+            cells.forEach(cell => {
+                cell.style.display = isVisible ? '' : 'none';
+            });
+        }
+
+        // Update counts and empty state colspan
+        function updateSummary() {
+            const total = columnDefs.length;
+            const visibleCount = columnDefs.filter(col => state[col.key]).length;
+
+            if (badgeCount) {
+                badgeCount.textContent = `${visibleCount}/${total}`;
+                if (visibleCount < total) {
+                    badgeCount.className = 'badge badge-pill badge-primary font-small-1 font-weight-bold ml-50';
+                } else {
+                    badgeCount.className = 'badge badge-pill badge-light-primary font-small-1 font-weight-bold ml-50';
+                }
+            }
+
+            if (footerCount) {
+                footerCount.textContent = `${visibleCount} of ${total} visible`;
+            }
+
+            // Update empty row colspan: 1 (checkbox) + visible count
+            if (emptyCol) {
+                emptyCol.colSpan = visibleCount + 1;
+            }
+        }
+
+        // Render checklist in dropdown
+        function renderChecklist() {
+            listContainer.innerHTML = '';
+            
+            columnDefs.forEach(col => {
+                const isVisible = !!state[col.key];
+
+                const itemWrap = document.createElement('div');
+                itemWrap.className = 'column-vis-item-wrap mb-25';
+                itemWrap.setAttribute('data-col-key', col.key);
+                itemWrap.setAttribute('data-col-label', col.label.toLowerCase());
+
+                itemWrap.innerHTML = `
+                    <label class="column-vis-item d-flex align-items-center justify-content-between px-1 py-50 mb-0 rounded" style="cursor: pointer;">
+                        <div class="d-flex align-items-center" style="gap: 8px;">
+                            <input type="checkbox" class="custom-theme-checkbox col-vis-toggle-checkbox" data-target-col="${col.key}" ${isVisible ? 'checked' : ''}>
+                            <i data-lucide="${col.icon}" style="width: 14px; height: 14px; opacity: 0.7;"></i>
+                            <span class="column-name-text font-small-2 font-weight-500">${col.label}</span>
+                        </div>
+                        <span class="badge badge-pill ${isVisible ? 'badge-light-primary' : 'badge-light-secondary'} font-small-1 col-pill-status">
+                            ${isVisible ? 'Visible' : 'Hidden'}
+                        </span>
+                    </label>
+                `;
+
+                // Handle checkbox change
+                const checkbox = itemWrap.querySelector('.col-vis-toggle-checkbox');
+                const pill = itemWrap.querySelector('.col-pill-status');
+
+                checkbox.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    state[col.key] = isChecked;
+                    applyColumnVisibility(col.key, isChecked);
+                    
+                    if (pill) {
+                        pill.textContent = isChecked ? 'Visible' : 'Hidden';
+                        pill.className = `badge badge-pill ${isChecked ? 'badge-light-primary' : 'badge-light-secondary'} font-small-1 col-pill-status`;
+                    }
+                    
+                    saveState();
+                    updateSummary();
+                });
+
+                listContainer.appendChild(itemWrap);
+            });
+
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        // Apply all columns to table initially
+        function applyAll() {
+            columnDefs.forEach(col => {
+                applyColumnVisibility(col.key, !!state[col.key]);
+            });
+            updateSummary();
+        }
+
+        // Show All Action
+        if (btnShowAll) {
+            btnShowAll.addEventListener('click', function(e) {
+                e.preventDefault();
+                columnDefs.forEach(col => {
+                    state[col.key] = true;
+                });
+                saveState();
+                renderChecklist();
+                applyAll();
+            });
+        }
+
+        // Reset to Default Action
+        if (btnReset) {
+            btnReset.addEventListener('click', function(e) {
+                e.preventDefault();
+                columnDefs.forEach(col => {
+                    state[col.key] = col.default;
+                });
+                saveState();
+                renderChecklist();
+                applyAll();
+            });
+        }
+
+        // Search Filter inside column list
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim().toLowerCase();
+                const items = listContainer.querySelectorAll('.column-vis-item-wrap');
+                items.forEach(item => {
+                    const label = item.getAttribute('data-col-label') || '';
+                    if (!query || label.includes(query)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Initial setup
+        renderChecklist();
+        applyAll();
+    });
 </script>
 @endsection

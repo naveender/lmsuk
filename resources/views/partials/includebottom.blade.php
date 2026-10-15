@@ -51,4 +51,5 @@
     };
 </script>
 
+<script src="{{ asset('theme/app-assets/js/scripts/theme-switcher.js') }}"></script>
 <script src="{{ asset('theme/app-assets/js/script.js') }}"></script>

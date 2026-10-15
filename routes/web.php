@@ -296,4 +296,4 @@ Route::middleware(['auth', 'verified', 'role:tutor'])->group(function () {
     Route::post('/tutor/announcements/{announcement}/view', [\App\Http\Controllers\Tutor\AnnouncementsController::class, 'view'])->name('tutor.announcements.view');
 });
 
-Route::get('/change-theme', [HomeController::class, 'toggleTheme'])->name('change.theme');
+Route::match(['get', 'post'], '/change-theme', [HomeController::class, 'toggleTheme'])->name('change.theme');

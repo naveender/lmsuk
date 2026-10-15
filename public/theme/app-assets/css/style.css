@@ -1237,13 +1237,13 @@ body::-webkit-scrollbar-thumb:hover {
 }
 .table tbody tr td:first-child {
     border-left: 1px solid transparent;
-    border-top-left-radius: 1rem;
-    border-bottom-left-radius: 1rem;
+    /* border-top-left-radius: 1rem;
+    border-bottom-left-radius: 1rem; */
 }
 .table tbody tr td:last-child {
     border-right: 1px solid transparent;
-    border-top-right-radius: 1rem;
-    border-bottom-right-radius: 1rem;
+    /* border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem; */
 }
 .table-hover-animation tbody tr:hover {
     transform: translateY(-3px) scale(1.006);

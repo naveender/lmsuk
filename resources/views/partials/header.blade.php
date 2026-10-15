@@ -1,7 +1,10 @@
 <!-- BEGIN: Header-->
 @php
     $isAdmin = auth()->check() && auth()->user()->isAdmin();
-    $theme = session('theme', 'light');
+    $theme = session('theme', request()->cookie('theme', 'light'));
+    if (!in_array($theme, ['light', 'dark'])) {
+        $theme = 'light';
+    }
     $user = auth()->user();
 @endphp
 
@@ -19,13 +22,23 @@
                         <i class="feather icon-menu"></i>
                     </button>
                     <a href="{{ route('admin.dashboard') }}" class="admin-header-brand-logo d-none d-sm-flex align-items-center">
-                        <img src="{{ asset('theme/app-assets/images/logo/Aspire-Learner-Horizontal-Full-Logo.png') }}" alt="Aspire Learners" height="38">
+                        <img src="{{ asset('theme/app-assets/images/logo/Aspire-Learner-Horizontal-Full-Logo.png') }}" alt="Aspire Learners" class="brand-logo-light" height="38">
+                        <img src="{{ asset('theme/app-assets/images/logo/Aspire-Learner-horizontal-white-Full-Logo.png') }}" alt="Aspire Learners" class="brand-logo-dark" height="38">
                     </a>
                 </div>
 
-                <!-- Right Section: Notification Bell & User Profile (Matches Reference Image) -->
-                <div class="navbar-right-area d-flex align-items-center" style="gap: 16px;">
+                <!-- Right Section: Theme Switcher, Notification Bell & User Profile -->
+                <div class="navbar-right-area d-flex align-items-center" style="gap: 14px;">
                     
+                    <!-- Modern Enterprise Theme Switcher -->
+                    <button class="header-icon-badge-btn theme-toggle-btn" type="button" id="adminThemeToggleBtn" 
+                            data-theme="{{ $theme }}" 
+                            title="Switch to {{ $theme === 'dark' ? 'Light' : 'Dark' }} mode" 
+                            aria-label="Toggle theme appearance">
+                        <i class="feather icon-moon theme-icon-light" style="{{ $theme === 'dark' ? 'display: none;' : '' }}"></i>
+                        <i class="feather icon-sun theme-icon-dark" style="{{ $theme === 'dark' ? '' : 'display: none;' }}"></i>
+                    </button>
+
                     <!-- Notification Bell with Red Badge '3' -->
                     <div class="dropdown">
                         <button class="header-icon-badge-btn" type="button" id="adminNotificationsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Notifications">
@@ -147,6 +160,17 @@
                                     </div>
                                     <i class="feather icon-chevron-right menu-item-arrow"></i>
                                 </a>
+
+                                <a class="dropdown-item user-menu-link theme-toggle-menu-item" href="{{ route('change.theme') }}" id="adminThemeDropdownToggle">
+                                    <div class="menu-icon-box icon-box-primary" style="background: rgba(36, 119, 249, 0.12); color: var(--theme-primary-bright);">
+                                        <i class="feather icon-{{ $theme === 'dark' ? 'sun' : 'moon' }}" id="adminThemeDropdownIcon"></i>
+                                    </div>
+                                    <div class="menu-text-wrap flex-grow-1">
+                                        <span class="menu-item-label" id="adminThemeDropdownLabel">{{ $theme === 'dark' ? 'Light Mode' : 'Dark Mode' }}</span>
+                                        <span class="menu-item-desc">Switch interface appearance</span>
+                                    </div>
+                                    <span class="badge badge-pill badge-light-primary font-small-1 font-weight-bold" id="adminThemeCurrentBadge">{{ ucfirst($theme) }}</span>
+                                </a>
                             </div>
 
                             <div class="dropdown-divider my-50"></div>
@@ -246,7 +270,8 @@
         <div class="navbar-header d-xl-block d-none">
             <ul class="nav navbar-nav flex-row">
                 <li class="nav-item"><a class="navbar-brand" href="/" style="padding: 15px 0;">
-                        <img src="{{ asset('theme/app-assets/images/logo/Aspire-Learner-Horizontal-Full-Logo.png') }}" alt="Aspire Learner Logo" style="max-width: 160px; height: auto; object-fit: contain;">
+                        <img src="{{ asset('theme/app-assets/images/logo/Aspire-Learner-Horizontal-Full-Logo.png') }}" alt="Aspire Learner Logo" class="brand-logo-light" style="max-width: 160px; height: auto; object-fit: contain;">
+                        <img src="{{ asset('theme/app-assets/images/logo/Aspire-Learner-horizontal-white-Full-Logo.png') }}" alt="Aspire Learner Logo" class="brand-logo-dark" style="max-width: 160px; height: auto; object-fit: contain;">
                     </a></li>
             </ul>
         </div>
@@ -260,7 +285,18 @@
                                         class="ficon feather icon-menu"></i></a></li>
                         </ul>
                     </div>
-                    <ul class="nav navbar-nav float-right">
+                    <ul class="nav navbar-nav float-right d-flex align-items-center">
+                        <!-- Theme Toggle Button -->
+                        <li class="nav-item mr-1">
+                            <button class="header-icon-badge-btn theme-toggle-btn" type="button" id="nonAdminThemeToggleBtn" 
+                                    data-theme="{{ $theme }}" 
+                                    title="Switch to {{ $theme === 'dark' ? 'Light' : 'Dark' }} mode" 
+                                    aria-label="Toggle theme appearance">
+                                <i class="feather icon-moon theme-icon-light" style="{{ $theme === 'dark' ? 'display: none;' : '' }}"></i>
+                                <i class="feather icon-sun theme-icon-dark" style="{{ $theme === 'dark' ? '' : 'display: none;' }}"></i>
+                            </button>
+                        </li>
+
                         <li class="dropdown dropdown-user nav-item">
                             <a class="dropdown-toggle nav-link dropdown-user-link" href="#" data-toggle="dropdown">
                                 <div class="user-nav d-sm-flex d-none"><span
@@ -270,22 +306,23 @@
                                         src={{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}
                                         alt="avatar" height="40" width="40"></span>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right">
+                            <div class="dropdown-menu dropdown-menu-right shadow-lg border-0" style="border-radius: 12px;">
                                 <a class="dropdown-item" href="{{ route('account.index') }}"><i
-                                        class="feather icon-user"></i>
+                                        class="feather icon-user mr-50"></i>
                                     My Account</a>
                                 <a class="dropdown-item" href="{{ route('settings.index') }}"><i
-                                        class="feather icon-settings"></i>
+                                        class="feather icon-settings mr-50"></i>
                                     Settings</a>
-                                <a class="dropdown-item" href="{{ route('change.theme') }}" id="themeToggleBtn"><i
-                                        class="feather icon-{{ $theme === 'dark' ? 'sun' : 'moon' }}"></i>
-                                    Enable {{ $theme === 'dark' ? 'Light' : 'Dark' }} Mode</a>
+                                <a class="dropdown-item theme-toggle-menu-item" href="{{ route('change.theme') }}" id="nonAdminThemeDropdownToggle">
+                                    <i class="feather icon-{{ $theme === 'dark' ? 'sun' : 'moon' }} mr-50" id="nonAdminThemeDropdownIcon"></i>
+                                    <span id="nonAdminThemeDropdownLabel">{{ $theme === 'dark' ? 'Light Mode' : 'Dark Mode' }}</span>
+                                </a>
                                 <div class="dropdown-divider"></div>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit" class="dropdown-item btn mb-1 btn-block waves-effect waves-light"
                                         style="width:100%">
-                                        <i class="feather icon-power"></i> Logout
+                                        <i class="feather icon-power mr-50"></i> Logout
                                     </button>
                                 </form>
                             </div>
