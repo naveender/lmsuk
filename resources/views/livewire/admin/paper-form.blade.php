@@ -574,7 +574,7 @@
                                             <label class="custom-control-label cursor-pointer"
                                                 for="question_pooling"></label>
                                         </div>
-                                        <span class="font-small-3 text-muted">
+                                        <span class="font-small-3">
                                             Distribute questions across attempts. Users see different questions, no
                                             repeats.
                                         </span>
@@ -809,15 +809,15 @@
                         <span
                             class="badge badge-primary badge-pill ml-50 font-small-3">{{ count($selectedQuestionIds) }}</span>
                     </h4>
-                    <span class="text-muted font-small-3">Total Marks: <strong
+                    <span class="font-small-3">Total Marks: <strong
                             class="text-primary font-medium-1">{{ count($selectedQuestionIds) * ($default_marks ?: 1) }}</strong></span>
                 </div>
                 <div class="card-content">
                     <div class="card-body px-1 py-2">
                         @if($selectedQuestions->isEmpty())
                             <div class="text-center py-3">
-                                <i class="feather icon-info text-muted font-large-2"></i>
-                                <p class="text-muted mt-1 mb-0">No questions added yet. Use the selector panel on the right
+                                <i class="feather icon-info font-large-2"></i>
+                                <p class="mt-1 mb-0">No questions added yet. Use the selector panel on the right
                                     side to add questions easily.</p>
                             </div>
                         @else
@@ -837,7 +837,7 @@
                                                     title="{{ $question->title }}">
                                                     {{ $question->title }}
                                                 </h6>
-                                                <div class="d-flex flex-wrap align-items-center font-small-3 text-muted">
+                                                <div class="d-flex flex-wrap align-items-center font-small-3">
                                                     <span class="badge badge-light-primary py-25 px-50 mr-50">
                                                         {{ $questionTypes[$question->type] ?? $question->type }}
                                                     </span>
@@ -930,7 +930,7 @@
                                         placeholder="Type text to search instantly..."
                                         wire:model.live.debounce.300ms="search">
                                     <div class="form-control-position" style="top: 0; right: 0;">
-                                        <i class="feather icon-search text-muted"></i>
+                                        <i class="feather icon-search"></i>
                                     </div>
                                 </div>
                                 @if($search && strlen($search) < 3)
@@ -945,7 +945,7 @@
                             <div class="col-md-6 mb-1">
                                 <div class="form-group mb-0">
                                     <label
-                                        class="font-small-2 font-weight-bold text-muted text-uppercase">Subject</label>
+                                        class="font-small-2 font-weight-bold text-uppercase">Subject</label>
                                     <select class="form-control form-control-sm border-info"
                                         wire:model.live="filterSubject">
                                         <option value="">All Subjects</option>
@@ -959,7 +959,7 @@
                             <!-- Topic (cascades) -->
                             <div class="col-md-6 mb-1">
                                 <div class="form-group mb-0">
-                                    <label class="font-small-2 font-weight-bold text-muted text-uppercase">Topic</label>
+                                    <label class="font-small-2 font-weight-bold text-uppercase">Topic</label>
                                     <select
                                         class="form-control form-control-sm @if(!empty($filterTopics)) border-info @endif"
                                         wire:model.live="filterTopic" @if(empty($filterTopics)) disabled
@@ -976,7 +976,7 @@
                             <div class="col-md-6 mb-1">
                                 <div class="form-group mb-0">
                                     <label
-                                        class="font-small-2 font-weight-bold text-muted text-uppercase">Sub-Topic</label>
+                                        class="font-small-2 font-weight-bold text-uppercase">Sub-Topic</label>
                                     <select
                                         class="form-control form-control-sm @if(!empty($filterSubtopics)) border-info @endif"
                                         wire:model.live="filterSubtopic" @if(empty($filterSubtopics)) disabled
@@ -993,7 +993,7 @@
                             <div class="col-md-6 mb-1">
                                 <div class="form-group mb-0">
                                     <label
-                                        class="font-small-2 font-weight-bold text-muted text-uppercase">Difficulty</label>
+                                        class="font-small-2 font-weight-bold text-uppercase">Difficulty</label>
                                     <select class="form-control form-control-sm" wire:model.live="filterDifficulty">
                                         <option value="">All Difficulties</option>
                                         @foreach($difficulties as $key => $lbl)
@@ -1006,7 +1006,7 @@
                             <!-- Type -->
                             <div class="col-md-12 mb-1">
                                 <div class="form-group mb-0">
-                                    <label class="font-small-2 font-weight-bold text-muted text-uppercase">Question
+                                    <label class="font-small-2 font-weight-bold text-uppercase">Question
                                         Type</label>
                                     <select class="form-control form-control-sm" wire:model.live="filterType">
                                         <option value="">All Types</option>
@@ -1043,7 +1043,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-muted font-small-3 font-weight-bold">
+                            <span class="font-small-3 font-weight-bold">
                                 Displaying <strong class="text-info">{{ count($availableQuestions) }}</strong> matching
                                 questions
                             </span>
@@ -1051,9 +1051,9 @@
 
                         @if($availableQuestions->isEmpty())
                             <div class="text-center py-4 border rounded bg-white">
-                                <i class="feather icon-slash text-muted font-large-2 d-block mb-1"></i>
-                                <h6 class="text-muted font-weight-bold mb-25">No questions matched filters</h6>
-                                <p class="text-muted font-small-3 px-1 mb-0">Try typing a different keyword or resetting
+                                <i class="feather icon-slash font-large-2 d-block mb-1"></i>
+                                <h6 class="font-weight-bold mb-25">No questions matched filters</h6>
+                                <p class="font-small-3 px-1 mb-0">Try typing a different keyword or resetting
                                     filters.</p>
                             </div>
                         @else
@@ -1094,7 +1094,7 @@
 
                                         <!-- Badges & Preview Toggle -->
                                         <div
-                                            class="d-flex flex-wrap align-items-center justify-content-between font-small-2 text-muted mt-25">
+                                            class="d-flex flex-wrap align-items-center justify-content-between font-small-2 mt-25">
                                             <div class="d-flex flex-wrap align-items-center">
                                                 <span class="badge badge-pill badge-light-primary mr-50 px-50 py-25">
                                                     {{ $questionTypes[$q->type] ?? $q->type }}
@@ -1157,20 +1157,20 @@
 
                                             @if($q->metadata)
                                                 @if(isset($q->metadata['matching_pairs']))
-                                                    <div class="font-weight-bold text-muted mb-50 border-bottom pb-25">Matching Pairs:
+                                                    <div class="font-weight-bold mb-50 border-bottom pb-25">Matching Pairs:
                                                     </div>
                                                     <ul class="list-unstyled mb-0 pl-50">
                                                         @foreach($q->metadata['matching_pairs'] as $pair)
                                                             <li class="d-flex align-items-center mb-25 py-25 text-secondary">
                                                                 <span class="badge badge-light-primary mr-50">{{ $pair['left'] }}</span>
-                                                                <i class="feather icon-arrow-right mr-50 font-small-2 text-muted"></i>
+                                                                <i class="feather icon-arrow-right mr-50 font-small-2"></i>
                                                                 <span class="badge badge-light-success">{{ $pair['right'] }}</span>
                                                             </li>
                                                         @endforeach
                                                     </ul>
                                                 @endif
                                                 @if(isset($q->metadata['blank_answers']))
-                                                    <div class="font-weight-bold text-muted mb-50 border-bottom pb-25">Blank Answers:
+                                                    <div class="font-weight-bold mb-50 border-bottom pb-25">Blank Answers:
                                                     </div>
                                                     <div class="d-flex flex-wrap pl-50">
                                                         @foreach($q->metadata['blank_answers'] as $blankIdx => $ans)

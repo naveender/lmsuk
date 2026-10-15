@@ -68,7 +68,7 @@
                                                     <input type="text" id="username" class="form-control" name="username"
                                                         value="{{ old('username') }}" placeholder="Enter Username"
                                                         autocomplete="off" required>
-                                                    <small class="text-muted">Username must be unique.
+                                                    <small>Username must be unique.
                                                         Suggested: <a href="javascript:void(0)"
                                                             id="suggest_username"></a></small>
                                                 </div>
@@ -151,7 +151,7 @@
                                                         </option>
                                                     @endforeach
                                                 </select>
-                                                <small class="text-muted">Optionally assign this student to a class.</small>
+                                                <small>Optionally assign this student to a class.</small>
                                             </div>
                                         </div>
                                         <div class="col-12 col-sm-6">
@@ -268,7 +268,7 @@
                                                         <input type="text" id="parent_username" class="form-control"
                                                             name="parent_username" value="{{ old('parent_username') }}"
                                                             placeholder="Enter parent username" autocomplete="off">
-                                                        <small class="text-muted">Username must be unique.
+                                                        <small>Username must be unique.
                                                             Suggested: <a href="javascript:void(0)"
                                                                 id="suggest_parent_username"></a></small>
                                                     </div>
@@ -362,7 +362,7 @@
                                             </div>
                                             <div class="col-12 col-sm-4 d-flex align-items-end mb-1">
                                                 @if($parents->isEmpty())
-                                                    <p class="text-muted mb-0"><i class="feather icon-alert-triangle"></i> No
+                                                    <p class="mb-0"><i class="feather icon-alert-triangle"></i> No
                                                         parents exist yet. Use "Create New Parent" instead.</p>
                                                 @endif
                                             </div>

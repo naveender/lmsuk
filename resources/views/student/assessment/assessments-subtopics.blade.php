@@ -165,7 +165,7 @@
                                                 class="form-control input-modern" placeholder="Search papers..."
                                                 value="{{ request('paper_name') }}">
                                             <div class="form-control-position">
-                                                <i class="feather icon-search text-muted"></i>
+                                                <i class="feather icon-search"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -205,7 +205,7 @@
                                             <div>
                                                 <h5 class="mb-1 text-dark font-weight-bold subtopic-title">{{ $subtopic->name }}
                                                 </h5>
-                                                <div class="d-flex align-items-center text-muted font-small-3 flex-wrap">
+                                                <div class="d-flex align-items-center font-small-3 flex-wrap">
                                                     <span class="mr-2">Completed {{ $subtopicCompletedCount }} of
                                                         {{ $subtopicPapersCount }} papers</span>
                                                     <div class="subtopic-mini-progress d-none d-sm-block">
@@ -266,7 +266,7 @@
                                                         </div>
 
                                                         <div
-                                                            class="d-flex align-items-center text-muted font-small-3 flex-wrap paper-meta">
+                                                            class="d-flex align-items-center font-small-3 flex-wrap paper-meta">
                                                             <span class="mr-4"><i
                                                                     class="feather icon-help-circle text-primary mr-1"></i><strong>{{ $paper->questions_count ?? $paper->questions()->count() }}</strong>
                                                                 Questions</span>
@@ -314,7 +314,7 @@
                                                     </div>
                                                 </div>
                                             @empty
-                                                <div class="p-5 text-center text-muted empty-state-subtopic">
+                                                <div class="p-5 text-center empty-state-subtopic">
                                                     <div class="empty-icon-box mb-3">
                                                         <i class="feather icon-file font-large-1 text-warning"></i>
                                                     </div>
@@ -328,7 +328,7 @@
                                     </div>
                                 </div>
                             @empty
-                                <div class="card shadow-sm border-0 p-5 text-center text-muted empty-state-main">
+                                <div class="card shadow-sm border-0 p-5 text-center empty-state-main">
                                     <div class="empty-state-illustrate mb-3">
                                         <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
@@ -375,7 +375,7 @@
                                                     class="form-control input-modern" placeholder="Search attempts..."
                                                     value="{{ request('attempt_paper_name') }}">
                                                 <div class="form-control-position">
-                                                    <i class="feather icon-search text-muted"></i>
+                                                    <i class="feather icon-search"></i>
                                                 </div>
                                             </div>
                                         </div>
@@ -456,24 +456,24 @@
                                                     </span>
                                                 </div>
                                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <span class="font-small-3 font-weight-bold text-muted">
+                                                    <span class="font-small-3 font-weight-bold">
                                                         <i
                                                             class="feather icon-calendar mr-1"></i>{{ $attempt->created_at->format('d M Y, h:i A') }}
                                                     </span>
                                                 </div>
                                                 <div class="row mb-2">
                                                     <div class="col-6">
-                                                        <span class="font-small-3 text-muted">Score:</span>
+                                                        <span class="font-small-3">Score:</span>
                                                         <div class="font-weight-bold text-dark">{{ $attempt->score }} /
                                                             {{ $attempt->max_score }}</div>
                                                     </div>
                                                     <div class="col-6 text-right">
-                                                        <span class="font-small-3 text-muted">Accuracy:</span>
+                                                        <span class="font-small-3">Accuracy:</span>
                                                         <div class="font-weight-bold {{ $pctColor }}">{{ $pct }}%</div>
                                                     </div>
                                                 </div>
                                                 <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                                                    <span class="font-small-3 text-muted"><i class="feather icon-clock mr-1"></i>
+                                                    <span class="font-small-3"><i class="feather icon-clock mr-1"></i>
                                                         @php
                                                             $h = floor($attempt->time_spent / 3600);
                                                             $m = floor(($attempt->time_spent / 60) % 60);
@@ -525,12 +525,12 @@
                                                         <td class="align-middle py-3 px-3 font-weight-bold text-dark">
                                                             {{ $attempt->paper->title }}
                                                         </td>
-                                                        <td class="align-middle text-muted">
+                                                        <td class="align-middle">
                                                             {{ $attempt->paper->subtopic->name ?? 'N/A' }}
                                                         </td>
                                                         <td class="align-middle">
                                                             <i
-                                                                class="feather icon-calendar text-muted mr-1"></i>{{ $attempt->created_at->format('d M Y, h:i A') }}
+                                                                class="feather icon-calendar mr-1"></i>{{ $attempt->created_at->format('d M Y, h:i A') }}
                                                         </td>
                                                         <td class="align-middle">
                                                             @if($attempt->status == 'completed')
@@ -542,7 +542,7 @@
                                                             @endif
                                                         </td>
                                                         <td class="text-center align-middle text-dark font-weight-bold">
-                                                            {{ $attempt->score }} <span class="text-muted font-weight-normal">/
+                                                            {{ $attempt->score }} <span class="font-weight-normal">/
                                                                 {{ $attempt->max_score }}</span>
                                                         </td>
                                                         <td class="align-middle">
@@ -557,7 +557,7 @@
                                                             </div>
                                                         </td>
                                                         <td class="text-center align-middle text-dark font-weight-medium">
-                                                            <i class="feather icon-clock text-muted mr-1"></i>
+                                                            <i class="feather icon-clock mr-1"></i>
                                                             @php
                                                                 $h = floor($attempt->time_spent / 3600);
                                                                 $m = floor(($attempt->time_spent / 60) % 60);
@@ -590,7 +590,7 @@
                                         {{ $attempts->links() }}
                                     </div>
                                 @else
-                                    <div class="p-5 text-center text-muted empty-state-subtopic">
+                                    <div class="p-5 text-center empty-state-subtopic">
                                         <div class="empty-icon-box mb-3">
                                             <i class="feather icon-file font-large-1 text-warning"></i>
                                         </div>
@@ -653,7 +653,7 @@
                                     <i class="feather icon-help-circle text-primary"
                                         style="font-size: 1.15rem; margin-top: 2px;"></i>
                                     <div>
-                                        <div class="text-muted font-small-1 text-uppercase font-weight-bold"
+                                        <div class="font-small-1 text-uppercase font-weight-bold"
                                             style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Questions
                                         </div>
                                         <span class="font-weight-bold text-dark font-small-3 modal-stat-value"
@@ -665,7 +665,7 @@
                                     <i class="feather icon-clock text-success"
                                         style="font-size: 1.15rem; margin-top: 2px;"></i>
                                     <div>
-                                        <div class="text-muted font-small-1 text-uppercase font-weight-bold"
+                                        <div class="font-small-1 text-uppercase font-weight-bold"
                                             style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Duration
                                         </div>
                                         <span class="font-weight-bold text-dark font-small-3 modal-stat-value"
@@ -677,7 +677,7 @@
                                     <i class="feather icon-award text-warning" id="modal-paper-difficulty-icon"
                                         style="font-size: 1.15rem; margin-top: 2px;"></i>
                                     <div>
-                                        <div class="text-muted font-small-1 text-uppercase font-weight-bold"
+                                        <div class="font-small-1 text-uppercase font-weight-bold"
                                             style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Difficulty
                                         </div>
                                         <span class="font-weight-bold text-dark font-small-3 modal-stat-value"
@@ -707,7 +707,7 @@
                             <div>
                                 <h6 class="font-weight-bold text-warning mb-1" style="font-size: 0.9rem;">Important Notice
                                 </h6>
-                                <p class="text-muted font-small-3 mb-0 modal-notice-text" style="line-height: 1.4;">Starting
+                                <p class="font-small-3 mb-0 modal-notice-text" style="line-height: 1.4;">Starting
                                     the test initiates a timer that cannot be paused. Ensure you have a stable internet
                                     connection and are in a quiet environment before proceeding.</p>
                             </div>

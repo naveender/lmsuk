@@ -365,7 +365,7 @@
                     <i data-lucide="filter"></i>
                     <span>Filters</span>
                 </h2>
-                <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters" style="color: #7A8499;">
+                <button type="button" class="btn btn-link p-0" aria-label="Toggle filters" style="color: #7A8499;">
                     <i data-lucide="chevron-up" id="paperFilterToggleIcon" style="width: 18px; height: 18px;"></i>
                 </button>
             </div>
@@ -489,7 +489,7 @@
                                                                     ({{ $scope }}: {{ $mode }})</span>
                                                             @endif
                                                         </span>
-                                                        <span class="text-muted font-small-2">
+                                                        <span class="font-small-2">
                                                             By: {{ $paper->user->name ?? 'System' }} | Acad Year:
                                                             {{ $paper->academic_year ?? 'N/A' }}
                                                         </span>
@@ -505,13 +505,13 @@
                                                             </span>
                                                         @endif
                                                     </td>
-                                                    <td class="align-middle font-weight-bold text-muted">
+                                                    <td class="align-middle font-weight-bold">
                                                         {{ $paper->subject->title ?? '—' }}
                                                     </td>
                                                     <td class="align-middle">
                                                         <span
                                                             class="text-dark d-block font-weight-bold">{{ $paper->class->name ?? '—' }}</span>
-                                                        <span class="text-muted font-small-2">Difficulty:
+                                                        <span class="font-small-2">Difficulty:
                                                             {{ ucfirst($paper->difficulty ?? 'medium') }}</span>
                                                     </td>
                                                     <td class="align-middle text-center">
@@ -551,7 +551,7 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="9" class="text-center py-3 text-muted">
+                                                    <td colspan="9" class="text-center py-3">
                                                         <i class="feather icon-info font-large-1 d-block mb-50"></i>
                                                         No exam or test papers found matching the search criteria.
                                                     </td>
@@ -610,7 +610,7 @@
                             <div class="spinner-border text-primary" style="width: 2.75rem; height: 2.75rem;" role="status">
                                 <span class="sr-only">Loading...</span>
                             </div>
-                            <p class="mt-2 text-muted font-weight-bold">Retrieving assignment configuration...</p>
+                            <p class="mt-2 font-weight-bold">Retrieving assignment configuration...</p>
                         </div>
 
                         <!-- Modal Form Content -->
@@ -657,7 +657,7 @@
                                         <button type="button" class="assign-btn-toggle btn-toggle-all" data-action="clear" data-target="classes">Clear All</button>
                                     </div>
                                 </div>
-                                <div class="no-matches-found text-muted text-center py-3" style="display: none;">
+                                <div class="no-matches-found text-center py-3" style="display: none;">
                                     <i class="feather icon-alert-circle mr-1"></i> No matching classes found
                                 </div>
                                 <div class="assign-card-grid">
@@ -691,7 +691,7 @@
                                         <button type="button" class="assign-btn-toggle btn-toggle-all" data-action="clear" data-target="sessions">Clear All</button>
                                     </div>
                                 </div>
-                                <div class="no-matches-found text-muted text-center py-3" style="display: none;">
+                                <div class="no-matches-found text-center py-3" style="display: none;">
                                     <i class="feather icon-alert-circle mr-1"></i> No matching sessions found
                                 </div>
                                 <div class="assign-card-grid">
@@ -725,7 +725,7 @@
                                         <button type="button" class="assign-btn-toggle btn-toggle-all" data-action="clear" data-target="group_years">Clear All</button>
                                     </div>
                                 </div>
-                                <div class="no-matches-found text-muted text-center py-3" style="display: none;">
+                                <div class="no-matches-found text-center py-3" style="display: none;">
                                     <i class="feather icon-alert-circle mr-1"></i> No matching group years found
                                 </div>
                                 <div class="assign-card-grid">
@@ -759,7 +759,7 @@
                                         <button type="button" class="assign-btn-toggle btn-toggle-all" data-action="clear" data-target="students">Clear All</button>
                                     </div>
                                 </div>
-                                <div class="no-matches-found text-muted text-center py-3" style="display: none;">
+                                <div class="no-matches-found text-center py-3" style="display: none;">
                                     <i class="feather icon-alert-circle mr-1"></i> No matching students found
                                 </div>
                                 <div class="assign-card-grid">
@@ -1111,7 +1111,7 @@
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         title: 'Delete Paper?',
-                        html: `Are you sure you want to delete <strong>"${paperTitle}"</strong>?<br><small class="text-muted">This will soft-delete the paper and remove its assembled question links.</small>`,
+                        html: `Are you sure you want to delete <strong>"${paperTitle}"</strong>?<br><small>This will soft-delete the paper and remove its assembled question links.</small>`,
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#FA2833',

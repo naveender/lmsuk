@@ -230,7 +230,7 @@
                                                     <label for="media_duration" class="font-weight-bold">Duration</label>
                                                     <input type="text" id="media_duration" class="form-control"
                                                         placeholder="e.g. 15:30">
-                                                    <small class="text-muted">Format: MM:SS or HH:MM:SS</small>
+                                                    <small>Format: MM:SS or HH:MM:SS</small>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-12">
@@ -260,7 +260,7 @@
                                                 <div>
                                                     <input type="file" id="thumbnailFileInput"
                                                         class="form-control-file mb-50" accept="image/*">
-                                                    <small class="text-muted">JPG, PNG, WEBP (Max 2MB). Ideal size: 16:9
+                                                    <small>JPG, PNG, WEBP (Max 2MB). Ideal size: 16:9
                                                         ratio.</small>
                                                     <input type="hidden" id="shared_thumbnail_path" value="">
                                                 </div>
@@ -274,7 +274,7 @@
                                             <div class="card-body">
                                                 <h5 class="text-primary font-weight-bold mb-1"><i
                                                         class="feather icon-award"></i> Course & Weekly Scheduling</h5>
-                                                <p class="text-muted small">Optionally assign this video resource directly
+                                                <p class="small">Optionally assign this video resource directly
                                                     to a course and schedule it for a specific week.</p>
 
                                                 <!-- Step 1: Assignment Card Selector -->
@@ -459,7 +459,7 @@
                                                         Source path</label>
                                                     <input type="text" name="path" id="media_path" class="form-control"
                                                         placeholder="" required>
-                                                    <small class="text-muted" id="pathHelpText"></small>
+                                                    <small id="pathHelpText"></small>
                                                 </div>
 
                                                 <div class="d-flex justify-content-end pt-1">
@@ -489,7 +489,7 @@
                                                     <i class="feather icon-upload-cloud text-primary"
                                                         style="font-size: 3rem;"></i>
                                                     <h5 class="mt-1 font-weight-bold">Click to browse or drop file here</h5>
-                                                    <p class="text-muted">Supports MP4, WebM, AVI, MOV up to 1GB</p>
+                                                    <p>Supports MP4, WebM, AVI, MOV up to 1GB</p>
                                                     <input type="file" id="videoFileInput" style="display: none;"
                                                         accept="video/*">
                                                 </div>
@@ -508,7 +508,7 @@
                                                         id="progressBarValue" role="progressbar" aria-valuenow="0"
                                                         aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
                                                 </div>
-                                                <div class="d-flex justify-content-between text-muted mb-1 small">
+                                                <div class="d-flex justify-content-between mb-1 small">
                                                     <span id="lblProgressSize">0 MB / 0 MB</span>
                                                     <span id="lblProgressSpeed">0 KB/s</span>
                                                     <span id="lblProgressEta">ETA: --</span>

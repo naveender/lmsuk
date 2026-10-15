@@ -64,7 +64,7 @@
                                         style="width: 85%; border-radius: 8px; background: linear-gradient(90deg, #2477F9, #00cfe8);"
                                         aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
-                                <div class="d-flex justify-content-between text-muted font-small-2">
+                                <div class="d-flex justify-content-between font-small-2">
                                     <span class="text-light-50"><i class="feather icon-check text-success mr-25"></i> Core
                                         Telemetry</span>
                                     <span class="text-light-50"><i class="feather icon-check text-success mr-25"></i>
@@ -191,7 +191,7 @@
                     <h4 class="font-weight-bold text-dark mb-50">
                         <i class="feather icon-layers text-primary mr-50"></i> What You'll Be Able to Do
                     </h4>
-                    <p class="text-muted mb-2">Here is a sneak peek of the upcoming analytics suite designed for your
+                    <p class="mb-2">Here is a sneak peek of the upcoming analytics suite designed for your
                         success.</p>
                 </div>
 
@@ -204,7 +204,7 @@
                                     <i class="feather icon-trending-up font-medium-4"></i>
                                 </div>
                                 <h5 class="font-weight-bold text-dark mb-1">Mastery Heatmap</h5>
-                                <p class="text-muted font-small-3 mb-0">
+                                <p class="font-small-3 mb-0">
                                     Visualize topic-by-topic comprehension across Maths, English, and Reasoning to spot
                                     strengths and focus targets instantly.
                                 </p>
@@ -220,7 +220,7 @@
                                     <i class="feather icon-clock font-medium-4"></i>
                                 </div>
                                 <h5 class="font-weight-bold text-dark mb-1">Pacing &amp; Speed</h5>
-                                <p class="text-muted font-small-3 mb-0">
+                                <p class="font-small-3 mb-0">
                                     Measure exact time spent per question and identify pacing bottlenecks to maximize
                                     efficiency during timed exams.
                                 </p>
@@ -236,7 +236,7 @@
                                     <i class="feather icon-award font-medium-4"></i>
                                 </div>
                                 <h5 class="font-weight-bold text-dark mb-1">Cohort Benchmarks</h5>
-                                <p class="text-muted font-small-3 mb-0">
+                                <p class="font-small-3 mb-0">
                                     Compare test percentile standings anonymously against your class and year group averages
                                     to gauge exam readiness.
                                 </p>
@@ -252,7 +252,7 @@
                                     <i class="feather icon-zap font-medium-4"></i>
                                 </div>
                                 <h5 class="font-weight-bold text-dark mb-1">AI Exam Forecaster</h5>
-                                <p class="text-muted font-small-3 mb-0">
+                                <p class="font-small-3 mb-0">
                                     Smart projection models predicting your likelihood of scoring top grades based on recent
                                     test consistency and growth.
                                 </p>

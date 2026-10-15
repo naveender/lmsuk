@@ -191,7 +191,7 @@
                             <h4 class="card-title font-weight-bold">How to Import Questions</h4>
                         </div>
                         <div class="card-body">
-                            <p class="card-text text-muted">
+                            <p class="card-text">
                                 Follow these quick steps to upload and import questions in bulk. Supported formats: <strong>CSV, DOCX (Templates 1, 2 & 3)</strong>.
                             </p>
                             
@@ -201,7 +201,7 @@
                                 </div>
                                 <div>
                                     <h5 class="font-weight-bold mb-0">Prepare Your Categories & Template</h5>
-                                    <p class="text-muted">For CSV, use our sample template. For DOCX, you can choose from three template formats: paragraph-based with markers (Template 1), paragraph-based with metadata tags (Template 2), or table-based (Template 3). Select a Subject/Topic from the dropdowns to categorize the imported questions.</p>
+                                    <p>For CSV, use our sample template. For DOCX, you can choose from three template formats: paragraph-based with markers (Template 1), paragraph-based with metadata tags (Template 2), or table-based (Template 3). Select a Subject/Topic from the dropdowns to categorize the imported questions.</p>
                                     <div class="mb-1">
                                         <a href="{{ route('admin.questions.import-sample') }}" class="btn btn-outline-primary btn-sm mb-50 mr-50">
                                             <i class="feather icon-download mr-50"></i> Download Sample CSV Template
@@ -225,7 +225,7 @@
                                 </div>
                                 <div>
                                     <h5 class="font-weight-bold mb-0">Prepare Your Question Data</h5>
-                                    <p class="text-muted mb-0">Define fields like <strong>title</strong>, <strong>type</strong>, <strong>subject</strong>, and options. Missing subjects or topics will be automatically created on the fly!</p>
+                                    <p class="mb-0">Define fields like <strong>title</strong>, <strong>type</strong>, <strong>subject</strong>, and options. Missing subjects or topics will be automatically created on the fly!</p>
                                 </div>
                             </div>
 
@@ -235,7 +235,7 @@
                                 </div>
                                 <div>
                                     <h5 class="font-weight-bold mb-0">Upload and Process</h5>
-                                    <p class="text-muted mb-0">Drag and drop your final CSV. The parser handles your data in small safe chunks to avoid server limits or timeouts.</p>
+                                    <p class="mb-0">Drag and drop your final CSV. The parser handles your data in small safe chunks to avoid server limits or timeouts.</p>
                                 </div>
                             </div>
                         </div>
@@ -277,7 +277,7 @@
                                     <i class="feather icon-upload-cloud"></i>
                                 </div>
                                 <h5 class="font-weight-bold">Drag and drop your CSV or DOCX file here</h5>
-                                <p class="text-muted">or click to browse from your computer</p>
+                                <p>or click to browse from your computer</p>
                                 <div class="badge badge-light-secondary mt-1">Maximum file size: 10MB</div>
                             </div>
                         </div>
@@ -298,7 +298,7 @@
                                 <i class="feather icon-file text-primary font-large-1 mr-1"></i>
                                 <div class="overflow-hidden">
                                     <h6 class="font-weight-bold mb-0 text-truncate" id="import-file-name">questions.csv</h6>
-                                    <small class="text-muted" id="import-file-size">0 KB</small>
+                                    <small id="import-file-size">0 KB</small>
                                 </div>
                             </div>
 
@@ -316,15 +316,15 @@
                             <div class="row text-center mt-2">
                                 <div class="col-4 border-right">
                                     <h4 class="font-weight-bold text-dark mb-0" id="stat-total">0</h4>
-                                    <small class="text-muted">Total Questions</small>
+                                    <small>Total Questions</small>
                                 </div>
                                 <div class="col-4 border-right">
                                     <h4 class="font-weight-bold text-success mb-0" id="stat-success">0</h4>
-                                    <small class="text-muted">Imported</small>
+                                    <small>Imported</small>
                                 </div>
                                 <div class="col-4">
                                     <h4 class="font-weight-bold text-danger mb-0" id="stat-failed">0</h4>
-                                    <small class="text-muted">Failed</small>
+                                    <small>Failed</small>
                                 </div>
                             </div>
 
@@ -394,7 +394,7 @@
                             <span class="badge badge-danger" id="log-errors-count">0 Errors</span>
                         </div>
                         <div class="card-body">
-                            <p class="text-muted">If some questions fail, check their exact row numbers below to fix and re-import them. Other valid questions will still be imported successfully.</p>
+                            <p>If some questions fail, check their exact row numbers below to fix and re-import them. Other valid questions will still be imported successfully.</p>
                             <div class="log-container" id="log-container">
                                 <!-- Log rows dynamically injected -->
                             </div>
@@ -726,7 +726,7 @@
                             rowEl.className = 'log-row';
                             rowEl.innerHTML = `
                                 <span class="log-badge log-warning">Row ${warn.row}</span>
-                                <span class="text-muted">${warn.message}</span>
+                                <span>${warn.message}</span>
                             `;
                             logContainer.appendChild(rowEl);
                         });

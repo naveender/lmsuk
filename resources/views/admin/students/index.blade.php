@@ -54,7 +54,7 @@
                     <i data-lucide="filter"></i>
                     <span>Filters</span>
                 </h2>
-                <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters" style="color: #7A8499;">
+                <button type="button" class="btn btn-link p-0" aria-label="Toggle filters" style="color: #7A8499;">
                     <i data-lucide="chevron-up" id="filterToggleIcon" style="width: 18px; height: 18px;"></i>
                 </button>
             </div>
@@ -189,12 +189,12 @@
                             <div class="column-visibility-header d-flex align-items-center justify-content-between px-2 py-1 border-bottom">
                                 <div>
                                     <h6 class="font-weight-bold mb-0 text-dark font-small-3">Table Columns</h6>
-                                    <small class="text-muted font-small-1" id="columnVisSubtitle">Toggle columns to display</small>
+                                    <small class="font-small-1" id="columnVisSubtitle">Toggle columns to display</small>
                                 </div>
                                 <div class="d-flex align-items-center" style="gap: 6px;">
                                     <button type="button" class="btn btn-xs btn-link p-0 text-primary font-weight-bold font-small-1" id="btnShowAllColumns">Show All</button>
-                                    <span class="text-muted font-small-1">&bull;</span>
-                                    <button type="button" class="btn btn-xs btn-link p-0 text-muted font-small-1" id="btnResetColumns">Reset</button>
+                                    <span class="font-small-1">&bull;</span>
+                                    <button type="button" class="btn btn-xs btn-link p-0 font-small-1" id="btnResetColumns">Reset</button>
                                 </div>
                             </div>
 
@@ -212,7 +212,7 @@
                             </div>
 
                             <!-- Footer with live active count -->
-                            <div class="column-visibility-footer px-2 py-75 border-top d-flex align-items-center justify-content-between font-small-1 text-muted" style="background: rgba(0,0,0,0.015);">
+                            <div class="column-visibility-footer px-2 py-75 border-top d-flex align-items-center justify-content-between font-small-1" style="background: rgba(0,0,0,0.015);">
                                 <span id="columnFooterCount">9 of 10 visible</span>
                                 <span class="badge badge-light-secondary font-small-1">Auto-saved</span>
                             </div>
@@ -567,7 +567,7 @@
                             <span class="text-dark font-weight-bold font-small-3" id="mDob">15 May 2014</span>
                         </div>
                         <div class="col-md-4 col-12 mb-1">
-                            <small class="text-muted d-block">Gender</small>
+                            <small class="d-block">Gender</small>
                             <span class="text-dark font-weight-bold font-small-3" id="mGender">Male</span>
                         </div>
                         <div class="col-md-6 col-12">
@@ -725,7 +725,7 @@
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 title: 'Delete Student?',
-                html: `Are you sure you want to delete <strong>${studentName}</strong>?<br><small class="text-muted">This student will be soft-deleted and removed from the active list.</small>`,
+                html: `Are you sure you want to delete <strong>${studentName}</strong>?<br><small>This student will be soft-deleted and removed from the active list.</small>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#FA2833',

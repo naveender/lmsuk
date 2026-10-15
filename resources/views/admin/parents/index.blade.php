@@ -58,7 +58,7 @@
                     <i data-lucide="filter"></i>
                     <span>Filters</span>
                 </h2>
-                <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters" style="color: #7A8499;">
+                <button type="button" class="btn btn-link p-0" aria-label="Toggle filters" style="color: #7A8499;">
                     <i data-lucide="chevron-up" id="parentFilterToggleIcon" style="width: 18px; height: 18px;"></i>
                 </button>
             </div>
@@ -159,21 +159,21 @@
                                 <td style="text-align: center;">
                                     <input type="checkbox" class="custom-theme-checkbox row-checkbox" value="{{ $parent->id }}">
                                 </td>
-                                <td class="text-muted font-weight-bold">{{ $parents->firstItem() + $index }}</td>
+                                <td class="font-weight-bold">{{ $parents->firstItem() + $index }}</td>
                                 <td>
                                     <div class="student-profile-cell">
                                         <img src="{{ $avatarUrl }}" alt="{{ $parent->name }}" class="student-avatar-img" onerror="this.src='{{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}'">
                                         <div class="d-flex flex-column">
                                             <span class="student-name-text">{{ $parent->name }}</span>
-                                            <small class="text-muted" style="font-size: 11px;">{{ $parent->username }}</small>
+                                            <small style="font-size: 11px;">{{ $parent->username }}</small>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="text-muted">{{ $parent->email }}</span>
+                                    <span>{{ $parent->email }}</span>
                                 </td>
                                 <td>
-                                    <span class="text-muted">{{ $parent->parentDetail->phone ?? 'Not Available' }}</span>
+                                    <span>{{ $parent->parentDetail->phone ?? 'Not Available' }}</span>
                                 </td>
                                 <td>
                                     <span class="badge" style="background: rgba(6, 48, 128, 0.08); color: var(--theme-primary); font-weight: 600; border-radius: 6px; padding: 5px 10px;">
@@ -192,7 +192,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="text-muted">{{ $parent->created_at ? $parent->created_at->format('d M Y') : 'N/A' }}</span>
+                                    <span>{{ $parent->created_at ? $parent->created_at->format('d M Y') : 'N/A' }}</span>
                                 </td>
                                 <td style="text-align: center;">
                                     <div class="action-icon-group">
@@ -216,7 +216,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center py-4 text-muted">
+                                <td colspan="9" class="text-center py-4">
                                     <i data-lucide="users" style="width: 40px; height: 40px; opacity: 0.3; margin-bottom: 8px;"></i>
                                     <p class="mb-0">No parents found matching your criteria.</p>
                                 </td>
@@ -273,7 +273,7 @@
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 title: 'Delete Parent?',
-                html: `Are you sure you want to delete <strong>${parentName}</strong>?<br><small class="text-muted">All linked students will become unassigned.</small>`,
+                html: `Are you sure you want to delete <strong>${parentName}</strong>?<br><small>All linked students will become unassigned.</small>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#FA2833',

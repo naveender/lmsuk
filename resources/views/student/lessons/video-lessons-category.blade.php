@@ -885,7 +885,7 @@
                                                     <div class="subject-progress-fill" style="width: {{ $percent }}%"></div>
                                                 </div>
                                                 <div
-                                                    class="d-flex justify-content-between align-items-center mt-50 font-small-2 text-muted">
+                                                    class="d-flex justify-content-between align-items-center mt-50 font-small-2">
                                                     <span>{{ $completedLessons }} of {{ $totalLessons }} Watched</span>
                                                     <span>
                                                         <i class="feather icon-shield text-primary mr-25"></i> Seek-Proof
@@ -920,7 +920,7 @@
                     <!-- No Results Box for Search/Filter -->
                     <div id="noSearchResultsBox" class="text-center py-5 d-none">
                         <div class="empty-state-box">
-                            <div class="empty-state-icon text-muted">
+                            <div class="empty-state-icon">
                                 <i class="feather icon-search"></i>
                             </div>
                             <h4 class="empty-state-title">No matching video subjects found</h4>

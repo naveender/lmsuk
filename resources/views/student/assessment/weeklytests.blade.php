@@ -131,12 +131,12 @@
                             <div class="metric-item border-right">
                                 <span class="metric-label">Tracked Runtime</span>
                                 <span
-                                    class="metric-value text-muted font-small-3 font-weight-normal mt-1">{{ $metrics['runtime'] }}</span>
+                                    class="metric-value font-small-3 font-weight-normal mt-1">{{ $metrics['runtime'] }}</span>
                             </div>
                             <div class="metric-item border-right">
                                 <span class="metric-label">Exam System Metrics</span>
                                 <span
-                                    class="metric-value text-muted font-small-3 font-weight-normal mt-1">{{ $metrics['overdue_late'] }}</span>
+                                    class="metric-value font-small-3 font-weight-normal mt-1">{{ $metrics['overdue_late'] }}</span>
                             </div>
                             <div class="metric-item">
                                 <span class="metric-label text-danger">Final Deadline</span>
@@ -247,7 +247,7 @@
                                                         <div class="flex-grow-1 min-width-0">
                                                             <h6 class="text-truncate font-small-3 font-weight-bold mb-0 text-dark">
                                                                 {{ $video->title }}</h6>
-                                                            <small class="text-muted font-small-1">
+                                                            <small class="font-small-1">
                                                                 @if($video->duration)
                                                                     <i class="feather icon-clock mr-25"></i>{{ $video->duration }}
                                                                 @else
@@ -288,7 +288,7 @@
                                         <i class="feather icon-info mr-1" style="font-size: 1.5rem;"></i>
                                         <div>
                                             <h6 class="alert-heading font-weight-bold mb-25">No Video Lectures Scheduled</h6>
-                                            <span class="font-small-3 text-muted">There are no core video lecture streams
+                                            <span class="font-small-3">There are no core video lecture streams
                                                 assigned to this course/week schedule.</span>
                                         </div>
                                     </div>
@@ -357,18 +357,18 @@
                                                     <td>
                                                         <div class="font-weight-bold text-dark module-title">{{ $paper->title }}
                                                         </div>
-                                                        <div class="text-muted font-small-1 mt-0">Subject: <span
+                                                        <div class="font-small-1 mt-0">Subject: <span
                                                                 class="text-secondary font-weight-bold">{{ $paper->subject->title ?? 'N/A' }}</span>
                                                         </div>
                                                     </td>
-                                                    <td class="text-center font-weight-bold text-muted font-small-2">
+                                                    <td class="text-center font-weight-bold font-small-2">
                                                         @if($paper->total_time > 0)
                                                             {{ $paper->total_time }}m 00s
                                                         @else
                                                             No Limit
                                                         @endif
                                                     </td>
-                                                    <td class="text-center text-muted font-small-2">
+                                                    <td class="text-center font-small-2">
                                                         @if($paper->attempt_status === 'completed')
                                                             {{ $paper->completed_at }}
                                                         @else
@@ -390,7 +390,7 @@
                                                         @elseif($paper->attempt_status === 'paused')
                                                             <span class="text-warning">Paused</span>
                                                         @else
-                                                            <span class="text-muted">Pending</span>
+                                                            <span>Pending</span>
                                                         @endif
                                                     </td>
                                                     <td style="text-align: right;">
@@ -417,7 +417,7 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="6" class="text-center text-muted py-5">
+                                                    <td colspan="6" class="text-center py-5">
                                                         <div class="my-3">
                                                             <i
                                                                 class="feather icon-award font-large-3 text-warning mb-2 animate-bounce"></i>
@@ -487,12 +487,12 @@
                                                         <div class="font-weight-bold text-dark module-title mb-25">
                                                             {{ $homework->title }}</div>
                                                         @if($homework->description)
-                                                            <div class="text-muted font-small-2"
+                                                            <div class="font-small-2"
                                                                 style="max-width: 500px; line-height: 1.4;">
                                                                 {{ \Illuminate\Support\Str::limit(strip_tags($homework->description), 130) }}
                                                             </div>
                                                         @else
-                                                            <span class="text-muted font-small-1 font-italic">No additional
+                                                            <span class="font-small-1 font-italic">No additional
                                                                 instructions</span>
                                                         @endif
                                                     </td>
@@ -518,7 +518,7 @@
                                                             @endif
                                                         </div>
                                                         @if($homework->class || $homework->yearGroup || $homework->academic_year)
-                                                            <div class="text-muted font-small-1 d-flex flex-wrap align-items-center"
+                                                            <div class="font-small-1 d-flex flex-wrap align-items-center"
                                                                 style="gap: 10px;">
                                                                 @if($homework->class)
                                                                     <span><i
@@ -540,12 +540,12 @@
                                                             <div class="font-weight-bold font-small-2 text-dark">
                                                                 {{ \Carbon\Carbon::parse($selectedWeekDueDate)->format('d M Y') }}
                                                             </div>
-                                                            <small class="text-muted font-small-1 font-weight-semibold">
+                                                            <small class="font-small-1 font-weight-semibold">
                                                                 {{ \Carbon\Carbon::parse($selectedWeekDueDate)->format('h:i A') }}
                                                             </small>
                                                         @else
                                                             <span
-                                                                class="text-muted font-small-2 font-weight-semibold">{{ $selectedWeekName ?? 'Week Schedule' }}</span>
+                                                                class="font-small-2 font-weight-semibold">{{ $selectedWeekName ?? 'Week Schedule' }}</span>
                                                         @endif
                                                     </td>
                                                     <td style="text-align: right;">
@@ -557,7 +557,7 @@
                                                                     <i class="feather icon-download mr-50"></i> Download
                                                                 </a>
                                                                 <div
-                                                                    class="text-muted font-small-1 mt-25 d-inline-flex align-items-center">
+                                                                    class="font-small-1 mt-25 d-inline-flex align-items-center">
                                                                     <span
                                                                         class="badge badge-light-secondary font-small-1 mr-50 text-uppercase font-weight-bold">
                                                                         {{ $homework->file_type ?? 'FILE' }}
@@ -576,7 +576,7 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="5" class="text-center text-muted py-5">
+                                                    <td colspan="5" class="text-center py-5">
                                                         <div class="my-2">
                                                             <i class="feather icon-book-open font-large-3 text-secondary mb-1 d-block"
                                                                 style="opacity: 0.35;"></i>

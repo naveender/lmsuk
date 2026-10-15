@@ -248,7 +248,7 @@
                             <i data-lucide="filter"></i>
                             <span>Filters</span>
                         </h2>
-                        <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters"
+                        <button type="button" class="btn btn-link p-0" aria-label="Toggle filters"
                             style="color: #7A8499;">
                             <i data-lucide="chevron-up" id="filterToggleIcon" style="width: 18px; height: 18px;"></i>
                         </button>
@@ -448,7 +448,7 @@
                                                 {{ $file->title }}
                                             </h5>
                                         </div>
-                                        <p class="card-text text-muted text-truncate mb-1"
+                                        <p class="card-text text-truncate mb-1"
                                             style="-webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; white-space: normal; height: 38px;">
                                             {{ $file->description ?? 'No description provided.' }}
                                         </p>
@@ -469,7 +469,7 @@
                                                     class="badge badge-pill badge-light-primary font-small-1 mb-25">{{ $file->class->name }}</span>
                                             @endif
                                         </div>
-                                        <small class="text-muted"><i class="feather icon-calendar"></i>
+                                        <small><i class="feather icon-calendar"></i>
                                             {{ $file->created_at->format('M d, Y') }}</small>
                                     </div>
 
@@ -505,9 +505,9 @@
                         </div>
                     @empty
                         <div class="col-12 text-center py-5">
-                            <i class="feather icon-folder-open text-muted mb-1" style="font-size: 5rem;"></i>
-                            <h4 class="text-muted">No media files found</h4>
-                            <p class="text-muted">Upload a video or link an external source to get started.</p>
+                            <i class="feather icon-folder-open mb-1" style="font-size: 5rem;"></i>
+                            <h4>No media files found</h4>
+                            <p>Upload a video or link an external source to get started.</p>
                             <a href="{{ route('admin.media-files.create') }}" class="btn btn-primary font-weight-bold">
                                 <i class="feather icon-plus"></i> Add New Video / File
                             </a>
@@ -600,10 +600,10 @@
                                             <td>
                                                 <div class="font-weight-bold text-dark mb-25">{{ $file->title }}</div>
                                                 @if($file->file_size)
-                                                    <small class="text-muted mr-50"><i class="feather icon-hard-drive"></i>
+                                                    <small class="mr-50"><i class="feather icon-hard-drive"></i>
                                                         {{ round($file->file_size / (1024 * 1024), 2) }} MB</small>
                                                 @endif
-                                                <small class="text-muted d-block text-truncate"
+                                                <small class="d-block text-truncate"
                                                     style="max-width: 250px;">{{ $file->description ?? 'No description provided' }}</small>
                                             </td>
                                             <!-- Type -->
@@ -616,7 +616,7 @@
                                                     <span class="badge badge-pill badge-light-secondary"><i
                                                             class="feather icon-clock"></i> {{ $file->duration }}</span>
                                                 @else
-                                                    <span class="text-muted">N/A</span>
+                                                    <span>N/A</span>
                                                 @endif
                                             </td>
                                             <!-- Subject -->
@@ -625,7 +625,7 @@
                                                     <span
                                                         class="badge badge-pill badge-light-info">{{ $file->subject->title }}</span>
                                                 @else
-                                                    <span class="text-muted">N/A</span>
+                                                    <span>N/A</span>
                                                 @endif
                                             </td>
                                             <!-- Class -->
@@ -634,7 +634,7 @@
                                                     <span
                                                         class="badge badge-pill badge-light-primary">{{ $file->class->name }}</span>
                                                 @else
-                                                    <span class="text-muted">N/A</span>
+                                                    <span>N/A</span>
                                                 @endif
                                             </td>
                                             <!-- Status -->
@@ -647,7 +647,7 @@
                                             </td>
                                             <!-- Created At -->
                                             <td>
-                                                <small class="text-muted"><i class="feather icon-calendar"></i>
+                                                <small><i class="feather icon-calendar"></i>
                                                     {{ $file->created_at->format('M d, Y') }}</small>
                                             </td>
                                             <!-- Actions -->
@@ -683,9 +683,9 @@
                                     @empty
                                         <tr>
                                             <td colspan="9" class="text-center py-3">
-                                                <i class="feather icon-folder-open text-muted mb-1"
+                                                <i class="feather icon-folder-open mb-1"
                                                     style="font-size: 3rem;"></i>
-                                                <h5 class="text-muted">No media files found</h5>
+                                                <h5>No media files found</h5>
                                             </td>
                                         </tr>
                                     @endforelse

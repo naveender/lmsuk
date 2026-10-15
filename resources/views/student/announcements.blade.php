@@ -1026,7 +1026,7 @@
                                                     {{ $dateObj ? $dateObj->format('M d, Y · h:i A') : 'Recent' }}
                                                     @if($dateObj)
                                                         <span class="mx-25">·</span>
-                                                        <span class="text-muted font-italic">{{ $dateObj->diffForHumans() }}</span>
+                                                        <span class="font-italic">{{ $dateObj->diffForHumans() }}</span>
                                                     @endif
                                                 </span>
                                             </div>
@@ -1089,7 +1089,7 @@
                                                     <i class="feather icon-file-text file-attachment-icon"></i>
                                                     <div class="text-left">
                                                         <div class="file-name-text">{{ basename($announcement->media) }}</div>
-                                                        <small class="text-muted">Click to Download Attachment</small>
+                                                        <small>Click to Download Attachment</small>
                                                     </div>
                                                     <i class="feather icon-download-cloud ml-1"></i>
                                                 </a>
@@ -1099,7 +1099,7 @@
 
                                     <!-- Card Action Footer -->
                                     <div class="d-flex align-items-center justify-content-between pt-1 border-top mt-2">
-                                        <div class="font-small-2 text-muted">
+                                        <div class="font-small-2">
                                             <i class="feather icon-bookmark mr-25"></i> Aspire Learners Academy Bulletin
                                         </div>
                                         <button type="button" class="btn-read-notice view-announcement-btn"
@@ -1124,18 +1124,18 @@
                                     <i class="feather icon-bell-off"></i>
                                 </div>
                                 <h4 class="font-weight-bold">No announcements published</h4>
-                                <p class="text-muted">There are currently no active announcements or bulletins for your cohort.
+                                <p>There are currently no active announcements or bulletins for your cohort.
                                 </p>
                             </div>
                         @endforelse
 
                         <!-- No Results Placeholder for Filters / Search -->
                         <div class="empty-state-card py-5 d-none" id="empty-state-placeholder">
-                            <div class="empty-state-icon text-muted">
+                            <div class="empty-state-icon">
                                 <i class="feather icon-search"></i>
                             </div>
                             <h4 class="font-weight-bold">No matching announcements</h4>
-                            <p class="text-muted">We couldn't find any notices matching your selected filter or search
+                            <p>We couldn't find any notices matching your selected filter or search
                                 keywords.</p>
                             <button type="button" class="btn btn-primary mt-1" id="reset-filters-btn">
                                 <i class="feather icon-refresh-cw mr-50"></i> Reset Filters
@@ -1162,7 +1162,7 @@
                                     </span>
                                     <h5 class="font-weight-bold text-dark mb-50">{{ Str::limit($spotlightNotice->title, 55) }}
                                     </h5>
-                                    <p class="text-muted font-small-3 mb-1">
+                                    <p class="font-small-3 mb-1">
                                         {{ Str::limit($spotlightNotice->description ?: $spotlightNotice->content, 90) }}
                                     </p>
                                     <button type="button" class="btn btn-outline-primary btn-sm btn-block view-announcement-btn"
@@ -1229,14 +1229,14 @@
                                 <span>Academy Support Desk</span>
                             </div>
                             <div class="sidebar-body text-left">
-                                <p class="text-muted font-small-3 mb-1">
+                                <p class="font-small-3 mb-1">
                                     Have a question regarding any notice, test schedule, or portal update?
                                 </p>
                                 <div class="d-flex align-items-center mb-50 font-small-3">
                                     <i class="feather icon-mail text-primary mr-50"></i>
                                     <span class="text-dark font-weight-bold">support@aspirelearners.co.uk</span>
                                 </div>
-                                <div class="d-flex align-items-center font-small-3 text-muted">
+                                <div class="d-flex align-items-center font-small-3">
                                     <i class="feather icon-clock text-secondary mr-50"></i>
                                     <span>Mon - Fri: 9:00 AM - 5:00 PM</span>
                                 </div>
@@ -1310,7 +1310,7 @@
                             <a href="" id="detail-img-link" target="_blank" title="Click to view full image in new tab">
                                 <img src="" id="detail-img" class="modal-img-display" alt="Attached preview">
                             </a>
-                            <div class="mt-50 text-muted font-small-2">
+                            <div class="mt-50 font-small-2">
                                 <i class="feather icon-maximize-2 mr-25"></i> Click image to view in high resolution
                             </div>
                         </div>
@@ -1324,7 +1324,7 @@
                                     <div class="text-left">
                                         <div id="detail-file-name" class="font-weight-bold text-dark text-truncate"
                                             style="max-width: 320px;">document.pdf</div>
-                                        <small class="text-muted">Official Document Attachment</small>
+                                        <small>Official Document Attachment</small>
                                     </div>
                                 </div>
                                 <a href="" id="detail-file-download" class="btn btn-danger btn-sm font-weight-bold"

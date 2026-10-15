@@ -249,7 +249,7 @@
                                     <h4 class="card-title font-weight-bold mb-0">
                                         <i class="feather icon-edit-2 mr-1 text-primary"></i> Personal Details
                                     </h4>
-                                    <small class="text-muted">Update your public identification and account contact
+                                    <small>Update your public identification and account contact
                                         information.</small>
                                 </div>
                                 <div class="card-body">
@@ -303,7 +303,7 @@
                                                 <label class="font-weight-bold">Account Role</label>
                                                 <input type="text" class="form-control bg-light"
                                                     value="{{ ucfirst($user->role) }}" disabled readonly>
-                                                <small class="text-muted">Role permissions are assigned by system
+                                                <small>Role permissions are assigned by system
                                                     administration.</small>
                                             </div>
                                         </div>
@@ -419,7 +419,7 @@
                                             <h4 class="card-title font-weight-bold mb-0">
                                                 <i class="feather icon-lock mr-1 text-primary"></i> Change Password
                                             </h4>
-                                            <small class="text-muted">Ensure your account uses a strong, unique password to
+                                            <small>Ensure your account uses a strong, unique password to
                                                 maintain security.</small>
                                         </div>
                                         <div class="card-body">

@@ -160,7 +160,7 @@
                                                                     <i class="feather icon-info"></i> Currently in multiple classes: <strong>{{ $student->classes->pluck('name')->join(', ') }}</strong>. Selecting a class will update their primary class assignment.
                                                                 </small>
                                                             @else
-                                                                <small class="text-muted">Optionally assign or change this student's class.</small>
+                                                                <small>Optionally assign or change this student's class.</small>
                                                             @endif
                                                         </div>
                                                     </div>

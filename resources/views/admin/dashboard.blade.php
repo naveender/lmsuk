@@ -677,7 +677,7 @@
                                                 </div>
                                             </div>
                                         @empty
-                                            <div class="text-muted font-small-2 py-1 text-center">No subject metrics available</div>
+                                            <div class="font-small-2 py-1 text-center">No subject metrics available</div>
                                         @endforelse
                                     </div>
                                 </div>

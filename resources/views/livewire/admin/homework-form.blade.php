@@ -485,7 +485,7 @@
                         </h4>
                     </div>
                     <div class="card-body pt-2">
-                        <p class="text-muted font-small-3 mb-1">
+                        <p class="font-small-3 mb-1">
                             Upload your homework document for students. Supported formats:
                         </p>
                         <div class="d-flex align-items-center mb-2">
@@ -502,7 +502,7 @@
                                 accept=".docx,.doc,.pdf,.txt">
                             <i class="feather icon-upload-cloud text-primary" style="font-size: 38px;"></i>
                             <h6 class="font-weight-bold mt-1 mb-25 text-dark">Click to select or drop file here</h6>
-                            <span class="text-muted font-small-2">Maximum file size: 25 MB</span>
+                            <span class="font-small-2">Maximum file size: 25 MB</span>
                         </div>
 
                         <!-- Upload Loading indicator -->
@@ -545,7 +545,7 @@
                                                 style="max-width: 170px;" title="{{ $existing_file_name }}">
                                                 {{ $existing_file_name }}
                                             </h6>
-                                            <span class="text-muted font-small-2">{{ $existing_file_size }} •
+                                            <span class="font-small-2">{{ $existing_file_size }} •
                                                 {{ strtoupper($existing_file_type) }}</span>
                                         </div>
                                     </div>
@@ -592,7 +592,7 @@
                                     {{ $is_active ? 'Active' : 'Inactive' }}
                                 </label>
                             </div>
-                            <small class="form-text text-muted mt-50">
+                            <small class="form-text mt-50">
                                 @if($is_active)
                                     <span class="text-success"><i class="feather icon-check-circle mr-25"></i>Active:
                                         Visible on student side to matching Class, Group Year & Academic Year.</span>

@@ -213,7 +213,7 @@
                                     </div>
                                 @else
                                     <div class="text-center py-2">
-                                        <p class="text-muted mb-1">No children linked to this parent yet.</p>
+                                        <p class="mb-1">No children linked to this parent yet.</p>
                                         <a href="{{ route('admin.parents.show', $parent->id) }}" class="btn btn-sm btn-outline-primary">
                                             <i class="feather icon-plus"></i> Link a Student
                                         </a>

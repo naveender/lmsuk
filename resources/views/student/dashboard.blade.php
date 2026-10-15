@@ -100,7 +100,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-2 mt-1">
                     <div>
                         <h3 class="font-weight-bold mb-0 text-dark learning-hub-title">Learning Hub</h3>
-                        <p class="text-muted font-small-3 mb-0">Select a module below to access your learning materials and
+                        <p class="font-small-3 mb-0">Select a module below to access your learning materials and
                             tools</p>
                     </div>
                 </div>
@@ -244,7 +244,7 @@
                                 </div>
                                 <h4 class="font-weight-bold text-dark mb-50 spotlight-title">Need to practice this week's
                                     scheduled papers?</h4>
-                                <p class="text-muted font-medium-1 mb-0 spotlight-desc">
+                                <p class="font-medium-1 mb-0 spotlight-desc">
                                     Access all assigned weekly tests, download offline homework sheets, and check your test
                                     deadlines in one place.
                                 </p>

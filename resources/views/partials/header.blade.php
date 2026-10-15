@@ -57,7 +57,7 @@
                                     </div>
                                     <div class="flex-grow-1">
                                         <p class="font-weight-bold text-dark mb-25 font-small-2">New student registration</p>
-                                        <small class="text-muted d-block font-small-1">James Wilson enrolled in Year 7</small>
+                                        <small class="d-block font-small-1">James Wilson enrolled in Year 7</small>
                                         <small class="text-primary font-small-1 font-weight-bold mt-25 d-inline-block">Just now</small>
                                     </div>
                                 </a>
@@ -67,8 +67,8 @@
                                     </div>
                                     <div class="flex-grow-1">
                                         <p class="font-weight-bold text-dark mb-25 font-small-2">System Announcement</p>
-                                        <small class="text-muted d-block font-small-1">Term assessments schedule live</small>
-                                        <small class="text-muted font-small-1 mt-25 d-inline-block">2 hours ago</small>
+                                        <small class="d-block font-small-1">Term assessments schedule live</small>
+                                        <small class="font-small-1 mt-25 d-inline-block">2 hours ago</small>
                                     </div>
                                 </a>
                                 <a href="{{ route('logs') }}" class="dropdown-item d-flex align-items-start py-1 px-2">
@@ -77,8 +77,8 @@
                                     </div>
                                     <div class="flex-grow-1">
                                         <p class="font-weight-bold text-dark mb-25 font-small-2">Audit Logs Synced</p>
-                                        <small class="text-muted d-block font-small-1">Activity logs updated</small>
-                                        <small class="text-muted font-small-1 mt-25 d-inline-block">Today</small>
+                                        <small class="d-block font-small-1">Activity logs updated</small>
+                                        <small class="font-small-1 mt-25 d-inline-block">Today</small>
                                     </div>
                                 </a>
                             </div>

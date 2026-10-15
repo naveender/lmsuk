@@ -58,7 +58,7 @@
                     <i data-lucide="filter"></i>
                     <span>Filters</span>
                 </h2>
-                <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters" style="color: #7A8499;">
+                <button type="button" class="btn btn-link p-0" aria-label="Toggle filters" style="color: #7A8499;">
                     <i data-lucide="chevron-up" id="userFilterToggleIcon" style="width: 18px; height: 18px;"></i>
                 </button>
             </div>
@@ -201,13 +201,13 @@
                                 <td style="text-align: center;">
                                     <input type="checkbox" class="custom-theme-checkbox row-checkbox" value="{{ $user->id }}">
                                 </td>
-                                <td class="text-muted font-weight-bold">{{ $users->firstItem() + $index }}</td>
+                                <td class="font-weight-bold">{{ $users->firstItem() + $index }}</td>
                                 <td>
                                     <div class="student-profile-cell">
                                         <img src="{{ $avatarUrl }}" alt="{{ $user->name }}" class="student-avatar-img" onerror="this.src='{{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}'">
                                         <div class="d-flex flex-column">
                                             <span class="student-name-text">{{ $user->name }}</span>
-                                            <small class="text-muted" style="font-size: 11px;">ID: #{{ $user->id }}</small>
+                                            <small style="font-size: 11px;">ID: #{{ $user->id }}</small>
                                         </div>
                                     </div>
                                 </td>
@@ -217,7 +217,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="text-muted">{{ $user->email }}</span>
+                                    <span>{{ $user->email }}</span>
                                 </td>
                                 <td>
                                     @if($user->role === 'admin')
@@ -239,7 +239,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="text-muted">{{ $user->created_at ? $user->created_at->format('d M Y') : 'N/A' }}</span>
+                                    <span>{{ $user->created_at ? $user->created_at->format('d M Y') : 'N/A' }}</span>
                                 </td>
                                 <td style="text-align: center;">
                                     <div class="action-icon-group">
@@ -264,7 +264,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center py-4 text-muted">
+                                <td colspan="8" class="text-center py-4">
                                     <i data-lucide="users" style="width: 40px; height: 40px; opacity: 0.3; margin-bottom: 8px;"></i>
                                     <p class="mb-0">No users found matching your criteria.</p>
                                 </td>
@@ -324,27 +324,27 @@
                     </h6>
                     <div class="row">
                         <div class="col-md-6 col-12 mb-1">
-                            <small class="text-muted d-block">Full Name</small>
+                            <small class="d-block">Full Name</small>
                             <strong class="text-dark font-small-3" id="uFullName">John Doe</strong>
                         </div>
                         <div class="col-md-6 col-12 mb-1">
-                            <small class="text-muted d-block">Username</small>
+                            <small class="d-block">Username</small>
                             <span class="text-dark font-weight-bold font-small-3" id="uUsername">johndoe</span>
                         </div>
                         <div class="col-md-6 col-12 mb-1">
-                            <small class="text-muted d-block">Email Address</small>
+                            <small class="d-block">Email Address</small>
                             <span class="text-dark font-weight-bold font-small-3" id="uEmail">john@example.com</span>
                         </div>
                         <div class="col-md-6 col-12 mb-1">
-                            <small class="text-muted d-block">Account Role</small>
+                            <small class="d-block">Account Role</small>
                             <span class="text-dark font-weight-bold font-small-3" id="uRoleText">Admin</span>
                         </div>
                         <div class="col-md-6 col-12">
-                            <small class="text-muted d-block">Registered Date</small>
+                            <small class="d-block">Registered Date</small>
                             <span class="text-dark font-weight-bold font-small-3" id="uJoined">14 Oct 2026</span>
                         </div>
                         <div class="col-md-6 col-12">
-                            <small class="text-muted d-block">Phone Number</small>
+                            <small class="d-block">Phone Number</small>
                             <span class="text-dark font-weight-bold font-small-3" id="uPhone">Not Available</span>
                         </div>
                     </div>
@@ -360,24 +360,24 @@
                     <div id="uStudentInfoBlock" style="display: none;">
                         <div class="row">
                             <div class="col-md-4 col-12 mb-1">
-                                <small class="text-muted d-block">Year Group</small>
+                                <small class="d-block">Year Group</small>
                                 <strong class="text-primary font-small-3" id="uYearGroup">Year 7</strong>
                             </div>
                             <div class="col-md-4 col-12 mb-1">
-                                <small class="text-muted d-block">Date of Birth</small>
+                                <small class="d-block">Date of Birth</small>
                                 <span class="text-dark font-small-3" id="uDob">Not Specified</span>
                             </div>
                             <div class="col-md-4 col-12 mb-1">
-                                <small class="text-muted d-block">Gender</small>
+                                <small class="d-block">Gender</small>
                                 <span class="text-dark font-small-3" id="uGender">Not Specified</span>
                             </div>
                             <div class="col-12 mt-1">
-                                <small class="text-muted d-block mb-25">Assigned Parent / Guardian</small>
+                                <small class="d-block mb-25">Assigned Parent / Guardian</small>
                                 <div id="uParentAssigned">
                                     <strong class="text-primary font-small-3" id="uParentName">Parent Name</strong>
                                 </div>
                                 <div id="uParentUnassigned" style="display: none;">
-                                    <span class="text-muted font-weight-500">(Parent User)</span><br>
+                                    <span class="font-weight-500">(Parent User)</span><br>
                                     <span class="text-danger font-italic font-weight-bold font-small-2"><em>Not assigned</em></span>
                                 </div>
                             </div>
@@ -388,11 +388,11 @@
                     <div id="uParentInfoBlock" style="display: none;">
                         <div class="row">
                             <div class="col-md-6 col-12 mb-1">
-                                <small class="text-muted d-block">Relationship</small>
+                                <small class="d-block">Relationship</small>
                                 <strong class="text-primary font-small-3" id="uRelation">Guardian</strong>
                             </div>
                             <div class="col-md-6 col-12 mb-1">
-                                <small class="text-muted d-block">Address</small>
+                                <small class="d-block">Address</small>
                                 <span class="text-dark font-small-3" id="uAddress">Not Provided</span>
                             </div>
                         </div>
@@ -400,7 +400,7 @@
 
                     <!-- Admin / Generic Info -->
                     <div id="uGeneralInfoBlock">
-                        <p class="font-small-3 text-muted mb-0">System account with standard administrative privileges.</p>
+                        <p class="font-small-3 mb-0">System account with standard administrative privileges.</p>
                     </div>
 
                 </div>
@@ -501,7 +501,7 @@
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 title: 'Delete User?',
-                html: `Are you sure you want to delete <strong>${userName}</strong>?<br><small class="text-muted">This user will be soft-deleted from the system.</small>`,
+                html: `Are you sure you want to delete <strong>${userName}</strong>?<br><small>This user will be soft-deleted from the system.</small>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#FA2833',

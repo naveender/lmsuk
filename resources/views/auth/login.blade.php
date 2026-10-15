@@ -698,7 +698,7 @@
                 <form id="forgot-password-form">
                     @csrf
                     <div class="modal-body">
-                        <p class="text-muted mb-2" style="font-size: 0.9rem;">Enter your email address and we'll send you a
+                        <p class="mb-2" style="font-size: 0.9rem;">Enter your email address and we'll send you a
                             link to reset your password.</p>
 
                         <div id="modal-alert-container"></div>

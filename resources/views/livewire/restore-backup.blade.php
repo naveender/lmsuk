@@ -9,7 +9,7 @@
                         {{ $isAnotherRestoreRunning ? 'disabled' : '' }}>
                     <i class="feather icon-database"></i> Restore File
                 </button>
-                <small class="text-center text-muted mt-1">
+                <small class="text-center mt-1">
                     <span class="fw-semibold">Size:</span> {{ $fileSizeHuman }} &nbsp;•&nbsp; 
                     <span class="fw-semibold">Est. Time:</span> {{ $estimatedTime }}
                 </small>
@@ -46,11 +46,11 @@
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center mt-1">
-                                <small class="text-muted fw-semibold">
+                                <small class="fw-semibold">
                                     <i class="feather icon-bar-chart-2"></i> {{ $progress }}% Complete
                                 </small>
                                 @if($status === 'running' && $estimatedTimeRemaining || $status === 'transferring' || $status === 'extracting')
-                                    <small class="text-muted fw-semibold">
+                                    <small class="fw-semibold">
                                         <i class="feather icon-clock"></i> {{ $estimatedTimeRemaining }} left
                                     </small>
                                 @endif

@@ -70,7 +70,7 @@
                                             <div>
                                                 <h5 class="font-weight-bold mb-0">{{ $attempt->score }} /
                                                     {{ $attempt->max_score }}</h5>
-                                                <small class="text-muted">Total Marks</small>
+                                                <small>Total Marks</small>
                                             </div>
                                         </div>
                                     </div>
@@ -82,7 +82,7 @@
                                             <div>
                                                 <h5 class="font-weight-bold mb-0 text-success">
                                                     {{ $attempt->correct_answers }}</h5>
-                                                <small class="text-muted">Correct Answers</small>
+                                                <small>Correct Answers</small>
                                             </div>
                                         </div>
                                     </div>
@@ -94,7 +94,7 @@
                                             <div>
                                                 <h5 class="font-weight-bold mb-0 text-danger">
                                                     {{ $attempt->total_questions - $attempt->correct_answers }}</h5>
-                                                <small class="text-muted">Incorrect/Unanswered</small>
+                                                <small>Incorrect/Unanswered</small>
                                             </div>
                                         </div>
                                     </div>
@@ -107,7 +107,7 @@
                                                 <h5 class="font-weight-bold mb-0 text-dark">
                                                     {{ gmdate('H:i:s', $attempt->time_spent) }}
                                                 </h5>
-                                                <small class="text-muted">Time Spent</small>
+                                                <small>Time Spent</small>
                                             </div>
                                         </div>
                                     </div>
@@ -118,7 +118,7 @@
                                             </div>
                                             <div>
                                                 <h5 class="font-weight-bold mb-0">{{ $attempt->total_questions }}</h5>
-                                                <small class="text-muted">Total Questions</small>
+                                                <small>Total Questions</small>
                                             </div>
                                         </div>
                                     </div>
@@ -160,7 +160,7 @@
                             class="card-header bg-transparent border-bottom pt-3 pb-3 d-flex flex-wrap align-items-center justify-content-between">
                             <div>
                                 <h4 class="card-title font-weight-bold text-dark mb-0">Question-by-Question Review</h4>
-                                <p class="text-muted mb-0 font-small-3 mt-25">Detailed breakdown of each question and response
+                                <p class="mb-0 font-small-3 mt-25">Detailed breakdown of each question and response
                                     status.</p>
                             </div>
 
@@ -289,12 +289,12 @@
                                                                         <i class="feather icon-x text-danger font-medium-2"></i>
                                                                     @else
                                                                         <i
-                                                                            class="feather icon-alert-circle text-muted font-medium-2"></i>
+                                                                            class="feather icon-alert-circle font-medium-2"></i>
                                                                     @endif
                                                                 </div>
                                                                 <div>
                                                                     <small
-                                                                        class="text-uppercase text-muted font-weight-bold d-block font-small-1">Your
+                                                                        class="text-uppercase font-weight-bold d-block font-small-1">Your
                                                                         Response</small>
                                                                     <span
                                                                         class="font-weight-bold font-small-2 {{ $isCorrect ? 'text-success' : ($ans ? 'text-danger' : 'text-secondary') }}">
@@ -314,7 +314,7 @@
                                                                     @if($ans && $ans->selectedOption)
                                                                         {{ $ans->selectedOption->option_text }}
                                                                     @else
-                                                                        <span class="text-muted font-italic font-weight-normal">No Answer
+                                                                        <span class="font-italic font-weight-normal">No Answer
                                                                             Selected</span>
                                                                     @endif
                                                                 @elseif($question->type === 'multiple_choice')
@@ -324,7 +324,7 @@
                                                                         @endphp
                                                                         {{ implode(', ', $selectedOptions) }}
                                                                     @else
-                                                                        <span class="text-muted font-italic font-weight-normal">No Answer
+                                                                        <span class="font-italic font-weight-normal">No Answer
                                                                             Selected</span>
                                                                     @endif
                                                                 @elseif($question->type === 'matching_drag_drop' || $question->type === 'matching_text')
@@ -344,7 +344,7 @@
                                                                         @endphp
                                                                         {{ implode(', ', $studentPairTexts) }}
                                                                     @else
-                                                                        <span class="text-muted font-italic font-weight-normal">No Answer
+                                                                        <span class="font-italic font-weight-normal">No Answer
                                                                             Selected</span>
                                                                     @endif
                                                                 @else
@@ -358,7 +358,7 @@
                                                                             {{ $ans->answer_text }}
                                                                         @endif
                                                                     @else
-                                                                        <span class="text-muted font-italic font-weight-normal">No Answer
+                                                                        <span class="font-italic font-weight-normal">No Answer
                                                                             Entered</span>
                                                                     @endif
                                                                 @endif
@@ -378,7 +378,7 @@
                                                                 </div>
                                                                 <div>
                                                                     <small
-                                                                        class="text-uppercase text-muted font-weight-bold d-block font-small-1">Correct
+                                                                        class="text-uppercase font-weight-bold d-block font-small-1">Correct
                                                                         Response</small>
                                                                     <span class="font-weight-bold font-small-2 text-success">Key
                                                                         Solution</span>

@@ -62,7 +62,7 @@
                                                                     name="username" value="{{ old('username') }}"
                                                                     placeholder="Enter Username" autocomplete="off"
                                                                     required>
-                                                                <small class="text-muted">Username must be unique.
+                                                                <small>Username must be unique.
                                                                     Suggested: <a href="javascript:void(0)"
                                                                         id="suggest_username"></a></small>
                                                             </div>

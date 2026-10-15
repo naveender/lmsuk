@@ -119,7 +119,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="7" class="text-center text-muted py-4">
+                                                <td colspan="7" class="text-center py-4">
                                                     <div class="my-2">
                                                         <i class="feather icon-info font-large-2 text-warning mb-2"></i>
                                                         <h5>No Topics Found</h5>

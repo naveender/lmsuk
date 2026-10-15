@@ -65,7 +65,7 @@
                                         style="width: 90%; border-radius: 8px; background: linear-gradient(90deg, #ff9f43, #28c76f);"
                                         aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
-                                <div class="d-flex justify-content-between text-muted font-small-2">
+                                <div class="d-flex justify-content-between font-small-2">
                                     <span class="text-light-50"><i class="feather icon-check text-success mr-25"></i> Paper
                                         Digitisation</span>
                                     <span class="text-light-50"><i class="feather icon-check text-success mr-25"></i>
@@ -219,7 +219,7 @@
                     <h4 class="font-weight-bold text-dark mb-50">
                         <i class="feather icon-clipboard text-warning mr-50"></i> What's Coming in Centre Test Scores
                     </h4>
-                    <p class="text-muted mb-2">Detailed in-centre exam transparency, teacher marks, and progress insights.
+                    <p class="mb-2">Detailed in-centre exam transparency, teacher marks, and progress insights.
                     </p>
                 </div>
 
@@ -232,7 +232,7 @@
                                     <i class="feather icon-file-text font-medium-4"></i>
                                 </div>
                                 <h5 class="font-weight-bold text-dark mb-1">Official Mock Scorecards</h5>
-                                <p class="text-muted font-small-3 mb-0">
+                                <p class="font-small-3 mb-0">
                                     Access certified breakdown of marks from your in-person tuition centre mock exams and
                                     baseline test sittings.
                                 </p>
@@ -248,7 +248,7 @@
                                     <i class="feather icon-bar-chart-2 font-medium-4"></i>
                                 </div>
                                 <h5 class="font-weight-bold text-dark mb-1">Age-Standardised Scores</h5>
-                                <p class="text-muted font-small-3 mb-0">
+                                <p class="font-small-3 mb-0">
                                     View nationally calibrated Standardised Age Scores (SAS) reflecting actual 11+ and
                                     grammar school examination formats.
                                 </p>
@@ -264,7 +264,7 @@
                                     <i class="feather icon-users font-medium-4"></i>
                                 </div>
                                 <h5 class="font-weight-bold text-dark mb-1">Centre Batch Rankings</h5>
-                                <p class="text-muted font-small-3 mb-0">
+                                <p class="font-small-3 mb-0">
                                     Discover how your marks compare across class cohorts and centres with anonymized
                                     percentile rankings.
                                 </p>
@@ -280,7 +280,7 @@
                                     <i class="feather icon-message-circle font-medium-4"></i>
                                 </div>
                                 <h5 class="font-weight-bold text-dark mb-1">Tutor Feedback &amp; Notes</h5>
-                                <p class="text-muted font-small-3 mb-0">
+                                <p class="font-small-3 mb-0">
                                     Read personalised invigilator comments, areas of commendation, and recommended target
                                     topics for your next session.
                                 </p>

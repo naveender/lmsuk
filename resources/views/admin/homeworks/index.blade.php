@@ -60,7 +60,7 @@
                         <i data-lucide="filter"></i>
                         <span>Filters</span>
                     </h2>
-                    <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters" style="color: #7A8499;">
+                    <button type="button" class="btn btn-link p-0" aria-label="Toggle filters" style="color: #7A8499;">
                         <i data-lucide="chevron-up" id="filterToggleIcon" style="width: 18px; height: 18px;"></i>
                     </button>
                 </div>
@@ -183,7 +183,7 @@
                         <tbody>
                             @forelse($homeworks as $index => $homework)
                                 <tr id="homework-row-{{ $homework->id }}">
-                                    <td class="font-weight-bold text-muted">
+                                    <td class="font-weight-bold">
                                         {{ $homeworks->firstItem() + $index }}
                                     </td>
                                     <td>
@@ -191,11 +191,11 @@
                                             {{ $homework->title }}
                                         </div>
                                         @if($homework->description)
-                                            <div class="text-muted font-small-2 text-truncate" style="max-width: 320px;">
+                                            <div class="font-small-2 text-truncate" style="max-width: 320px;">
                                                 {{ Str::limit(strip_tags($homework->description), 70) }}
                                             </div>
                                         @endif
-                                        <div class="font-small-1 text-muted mt-1">
+                                        <div class="font-small-1 mt-1">
                                             Created: {{ $homework->created_at->format('d M Y') }}
                                         </div>
                                     </td>
@@ -210,7 +210,7 @@
                                                 </span>
                                             @endif
                                             @if($homework->yearGroup)
-                                                <span class="text-muted font-small-1">
+                                                <span class="font-small-1">
                                                     {{ $homework->yearGroup->title }}
                                                 </span>
                                             @endif
@@ -224,10 +224,10 @@
                                                 <i data-lucide="download" style="width: 12px; height: 12px; vertical-align: middle;"></i> Download
                                             </a>
                                             @if($homework->file_size)
-                                                <div class="font-small-1 text-muted mt-25">{{ $homework->file_size }}</div>
+                                                <div class="font-small-1 mt-25">{{ $homework->file_size }}</div>
                                             @endif
                                         @else
-                                            <span class="text-muted font-small-2">No file</span>
+                                            <span class="font-small-2">No file</span>
                                         @endif
                                     </td>
                                     <td class="text-center">
@@ -253,7 +253,7 @@
                                         <div class="font-weight-bold font-small-2 text-dark">
                                             {{ $homework->user->name ?? 'Admin' }}
                                         </div>
-                                        <div class="font-small-1 text-muted">
+                                        <div class="font-small-1">
                                             {{ ucfirst($homework->user->role ?? 'admin') }}
                                         </div>
                                     </td>
@@ -299,9 +299,9 @@
                                 <tr>
                                     <td colspan="7" class="text-center py-4">
                                         <div class="empty-state">
-                                            <i data-lucide="book-open" class="text-muted" style="width: 48px; height: 48px; stroke-width: 1.5;"></i>
+                                            <i data-lucide="book-open" style="width: 48px; height: 48px; stroke-width: 1.5;"></i>
                                             <h5 class="mt-2 font-weight-bold text-dark">No Homeworks Found</h5>
-                                            <p class="text-muted font-small-3">No homework entries match your criteria, or none have been assigned yet.</p>
+                                            <p class="font-small-3">No homework entries match your criteria, or none have been assigned yet.</p>
                                             <a href="{{ route('admin.homeworks.create') }}" class="btn btn-primary btn-sm mt-1" style="border-radius: 6px;">
                                                 <i data-lucide="plus" style="width: 14px; height: 14px; vertical-align: middle;"></i> Create First Homework
                                             </a>
@@ -348,7 +348,7 @@
                     <div class="spinner-border text-primary" role="status">
                         <span class="sr-only">Loading...</span>
                     </div>
-                    <p class="text-muted mt-2">Loading homework details...</p>
+                    <p class="mt-2">Loading homework details...</p>
                 </div>
             </div>
             <div class="modal-footer bg-light" style="border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
@@ -378,7 +378,7 @@
                 <div class="spinner-border text-primary" role="status">
                     <span class="sr-only">Loading...</span>
                 </div>
-                <p class="text-muted mt-2">Loading homework details...</p>
+                <p class="mt-2">Loading homework details...</p>
             </div>
         `);
         $('#modalEditHomeworkBtn').attr('href', '/admin/homeworks/' + homeworkId + '/edit');
@@ -406,16 +406,16 @@
 
                     <div class="card p-2 bg-light border-0 mb-3" style="border-radius: 8px;">
                         <h5 class="font-weight-bold text-dark mb-1">${hw.title}</h5>
-                        ${hw.description ? `<div class="text-dark font-small-3 mt-1">${hw.description}</div>` : '<p class="text-muted font-small-2 mb-0">No extra description provided.</p>'}
+                        ${hw.description ? `<div class="text-dark font-small-3 mt-1">${hw.description}</div>` : '<p class="font-small-2 mb-0">No extra description provided.</p>'}
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <small class="text-muted d-block">Created By</small>
+                            <small class="d-block">Created By</small>
                             <strong>${data.creator_name}</strong>
                         </div>
                         <div class="col-md-6">
-                            <small class="text-muted d-block">Attached Resource</small>
+                            <small class="d-block">Attached Resource</small>
                             ${hw.file_path ? `
                                 <a href="/admin/homeworks/${hw.id}/download" class="btn btn-sm btn-outline-primary mt-1 font-weight-bold" style="border-radius: 6px;">
                                     <i data-lucide="download" style="width: 14px; height: 14px; vertical-align: middle;"></i> Download Resource File
@@ -442,7 +442,7 @@
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 title: 'Delete Homework?',
-                html: `Are you sure you want to delete <strong>"${homeworkTitle}"</strong>?<br><small class="text-muted">This will soft-delete the homework and detach it from associated course schedules.</small>`,
+                html: `Are you sure you want to delete <strong>"${homeworkTitle}"</strong>?<br><small>This will soft-delete the homework and detach it from associated course schedules.</small>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#FA2833',

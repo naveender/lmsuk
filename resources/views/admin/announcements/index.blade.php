@@ -91,7 +91,7 @@
                         <i data-lucide="filter"></i>
                         <span>Filters</span>
                     </h2>
-                    <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters"
+                    <button type="button" class="btn btn-link p-0" aria-label="Toggle filters"
                         style="color: #7A8499;">
                         <i data-lucide="chevron-up" id="announcementFilterToggleIcon"
                             style="width: 18px; height: 18px;"></i>
@@ -270,7 +270,7 @@
                                         <input type="checkbox" class="custom-theme-checkbox row-checkbox"
                                             value="{{ $announcement->id }}">
                                     </td>
-                                    <td class="text-muted font-weight-bold">{{ $announcements->firstItem() + $index }}</td>
+                                    <td class="font-weight-bold">{{ $announcements->firstItem() + $index }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="student-id-badge mr-1"
@@ -300,8 +300,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <span
-                                            class="text-muted">{{ optional($announcement->academicYear)->name ?? 'All Sessions' }}</span>
+                                        <span>{{ optional($announcement->academicYear)->name ?? 'All Sessions' }}</span>
                                     </td>
                                     <td>
                                         <div class="d-flex flex-wrap align-items-center" style="gap: 4px; max-width: 250px;">
@@ -401,7 +400,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="10" class="text-center py-4 text-muted">
+                                    <td colspan="10" class="text-center py-4">
                                         <i data-lucide="bell"
                                             style="width: 40px; height: 40px; opacity: 0.3; margin-bottom: 8px;"></i>
                                         <p class="mb-0">No announcements found matching your criteria.</p>
@@ -593,10 +592,10 @@
                             tbody.append(`
                                                                     <tr>
                                                                         <td><strong>${item.name}</strong></td>
-                                                                        <td><span class="text-muted">${item.email}</span></td>
+                                                                        <td><span>${item.email}</span></td>
                                                                         <td><span class="badge badge-light-primary">${item.role}</span></td>
                                                                         <td>${badge}</td>
-                                                                        <td><span class="text-muted">${item.viewed_at || '-'}</span></td>
+                                                                        <td><span>${item.viewed_at || '-'}</span></td>
                                                                     </tr>
                                                                 `);
                         });
@@ -626,8 +625,8 @@
                                                                     <tr>
                                                                         <td><strong>${item.admin}</strong></td>
                                                                         <td><span class="badge badge-light-primary">${item.action}</span></td>
-                                                                        <td><span class="text-muted">${item.details || '-'}</span></td>
-                                                                        <td><span class="text-muted">${item.created_at}</span></td>
+                                                                        <td><span>${item.details || '-'}</span></td>
+                                                                        <td><span>${item.created_at}</span></td>
                                                                     </tr>
                                                                 `);
                         });
@@ -654,7 +653,7 @@
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     title: 'Delete Announcement?',
-                    html: `Are you sure you want to delete announcement <strong>${title}</strong>?<br><small class="text-muted">This will stop delivery to all recipients.</small>`,
+                    html: `Are you sure you want to delete announcement <strong>${title}</strong>?<br><small>This will stop delivery to all recipients.</small>`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#FA2833',

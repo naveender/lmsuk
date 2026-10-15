@@ -60,7 +60,7 @@
                         <i data-lucide="filter"></i>
                         <span>Filters</span>
                     </h2>
-                    <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters"
+                    <button type="button" class="btn btn-link p-0" aria-label="Toggle filters"
                         style="color: #7A8499;">
                         <i data-lucide="chevron-up" id="filterToggleIcon" style="width: 18px; height: 18px;"></i>
                     </button>
@@ -164,7 +164,7 @@
                                         <input type="checkbox" class="custom-theme-checkbox row-checkbox"
                                             value="{{ $topic->id }}">
                                     </td>
-                                    <td class="text-muted font-weight-bold">{{ $topics->firstItem() + $index }}</td>
+                                    <td class="font-weight-bold">{{ $topics->firstItem() + $index }}</td>
                                     <td>
                                         <span class="badge"
                                             style="background: rgba(6, 48, 128, 0.08); color: var(--theme-primary); font-weight: 600; border-radius: 6px; padding: 5px 10px;">
@@ -204,8 +204,7 @@
                                         </button>
                                     </td>
                                     <td>
-                                        <span
-                                            class="text-muted">{{ $topic->created_at ? $topic->created_at->format('d M Y') : 'N/A' }}</span>
+                                        <span>{{ $topic->created_at ? $topic->created_at->format('d M Y') : 'N/A' }}</span>
                                     </td>
                                     <td style="text-align: center;">
                                         <div class="action-icon-group">
@@ -225,7 +224,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center py-4 text-muted">
+                                    <td colspan="7" class="text-center py-4">
                                         <i data-lucide="folder"
                                             style="width: 40px; height: 40px; opacity: 0.3; margin-bottom: 8px;"></i>
                                         <p class="mb-0">No topics found matching your criteria.</p>
@@ -312,7 +311,7 @@
                                     style="width: 16px; height: 16px;"></i>
                                 <span>Add New Subtopic</span>
                             </span>
-                            <button type="button" class="btn btn-link btn-sm text-muted p-0" onclick="closeSubtopicForm()">
+                            <button type="button" class="btn btn-link btn-sm p-0" onclick="closeSubtopicForm()">
                                 <i data-lucide="x" style="width: 16px; height: 16px;"></i>
                             </button>
                         </div>
@@ -337,7 +336,7 @@
                                     <div class="col-md-5 col-12 mb-2">
                                         <label class="form-label font-weight-bold font-small-3" for="subtopicFormCode">
                                             Subtopic Code <span
-                                                class="text-muted font-weight-normal font-small-2">(Optional)</span>
+                                                class="font-weight-normal font-small-2">(Optional)</span>
                                         </label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
@@ -355,7 +354,7 @@
                                         <select id="subtopicFormParentId" class="custom-select form-control">
                                             <!-- Dynamically populated -->
                                         </select>
-                                        <small class="text-muted">Select whether this subtopic attaches directly to the main
+                                        <small>Select whether this subtopic attaches directly to the main
                                             topic or nests as a sub-subtopic.</small>
                                     </div>
                                 </div>
@@ -383,7 +382,7 @@
                         <div class="spinner-border text-primary mb-2" role="status" style="width: 2.5rem; height: 2.5rem;">
                             <span class="sr-only">Loading...</span>
                         </div>
-                        <p class="text-muted mb-0 font-weight-bold">Loading subtopics tree...</p>
+                        <p class="mb-0 font-weight-bold">Loading subtopics tree...</p>
                     </div>
 
                     <!-- Tree Empty State -->
@@ -393,7 +392,7 @@
                             <i data-lucide="folder-plus" style="width: 30px; height: 30px;"></i>
                         </div>
                         <h5 class="font-weight-bold text-dark">No Subtopics Found</h5>
-                        <p class="text-muted font-small-3 mb-3">This topic currently has no subtopics attached. Add your
+                        <p class="font-small-3 mb-3">This topic currently has no subtopics attached. Add your
                             first subtopic to build the hierarchy.</p>
                         <button type="button" class="btn btn-primary font-weight-bold px-3 py-1"
                             onclick="openAddSubtopicForm()"
@@ -421,7 +420,7 @@
                                             CODE
                                         </span>
                                     </div>
-                                    <div class="text-muted font-small-2 mt-25">
+                                    <div class="font-small-2 mt-25">
                                         <span id="rootTopicSubject">Subject</span> &bull;
                                         <span class="font-weight-bold text-primary" id="rootSubtopicsSummary">0
                                             subtopics</span>
@@ -449,7 +448,7 @@
 
                 <!-- Modal Footer -->
                 <div class="modal-footer py-2 px-3 bg-white border-top d-flex justify-content-between align-items-center">
-                    <div class="text-muted font-small-2 d-flex align-items-center">
+                    <div class="font-small-2 d-flex align-items-center">
                         <i data-lucide="info" style="width: 14px; height: 14px;" class="mr-1 text-primary"></i>
                         <span>Use <strong>+</strong>, <strong>edit</strong>, or <strong>delete</strong> buttons on any
                             subtopic node to manage the hierarchy directly.</span>

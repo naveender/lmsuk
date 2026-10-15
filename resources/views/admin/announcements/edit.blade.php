@@ -507,7 +507,7 @@
                                                             <input type="datetime-local" name="show_from" id="show_from"
                                                                 value="{{ old('show_from', $announcement->show_from ? $announcement->show_from->format('Y-m-d\TH:i') : '') }}"
                                                                 class="form-control">
-                                                            <small class="text-muted">Defines when the announcement becomes
+                                                            <small>Defines when the announcement becomes
                                                                 visible. Leave blank for immediate visibility.</small>
                                                         </div>
                                                     </div>
@@ -522,7 +522,7 @@
                                                             <input type="datetime-local" name="expires_at" id="expires_at"
                                                                 value="{{ old('expires_at', $announcement->expires_at ? $announcement->expires_at->format('Y-m-d\TH:i') : '') }}"
                                                                 class="form-control">
-                                                            <small class="text-muted">Defines when the announcement
+                                                            <small>Defines when the announcement
                                                                 automatically expires and is hidden.</small>
                                                         </div>
                                                     </div>
@@ -541,7 +541,7 @@
                                                                 <label class="font-weight-bold" for="is_draft"
                                                                     id="is_draft_label">Save as Draft</label>
                                                             </div>
-                                                            <small class="d-block text-muted mt-50" id="is_draft_help">
+                                                            <small class="d-block mt-50" id="is_draft_help">
                                                                 Invisible to recipients until published.
                                                             </small>
                                                         </div>
@@ -562,7 +562,7 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-body">
-                                        <p class="text-muted font-small-3">Choose one or more recipient groups. (Bypassed if
+                                        <p class="font-small-3">Choose one or more recipient groups. (Bypassed if
                                             saved as Draft, required if publishing immediately).</p>
 
                                         <!-- Active students checkbox -->
@@ -778,7 +778,7 @@
                                                                     class="font-weight-bold text-dark text-truncate"
                                                                     style="max-width: 220px; font-size: 0.9rem;">
                                                                     document.pdf</div>
-                                                                <small class="text-muted">PDF Document</small>
+                                                                <small>PDF Document</small>
                                                             </div>
                                                             <i
                                                                 class="feather icon-download-cloud font-medium-3 text-secondary"></i>
@@ -862,7 +862,7 @@
                                                                         class="font-weight-bold text-dark text-truncate"
                                                                         style="max-width: 100px; font-size: 0.75rem;">
                                                                         document.pdf</div>
-                                                                    <small class="text-muted"
+                                                                    <small
                                                                         style="font-size: 0.65rem;">PDF Document</small>
                                                                 </div>
                                                             </div>

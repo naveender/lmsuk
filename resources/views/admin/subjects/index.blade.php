@@ -58,7 +58,7 @@
                     <i data-lucide="filter"></i>
                     <span>Filters</span>
                 </h2>
-                <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters" style="color: #7A8499;">
+                <button type="button" class="btn btn-link p-0" aria-label="Toggle filters" style="color: #7A8499;">
                     <i data-lucide="chevron-up" id="subjectFilterToggleIcon" style="width: 18px; height: 18px;"></i>
                 </button>
             </div>
@@ -162,7 +162,7 @@
                                 <td style="text-align: center;">
                                     <input type="checkbox" class="custom-theme-checkbox row-checkbox" value="{{ $subject->id }}">
                                 </td>
-                                <td class="text-muted font-weight-bold">{{ $subjects->firstItem() + $index }}</td>
+                                <td class="font-weight-bold">{{ $subjects->firstItem() + $index }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         @if($subject->image)
@@ -175,7 +175,7 @@
                                         <div>
                                             <strong class="text-dark font-weight-bold d-block">{{ $subject->title }}</strong>
                                             @if($subject->description)
-                                                <small class="text-muted" style="font-size: 11px;">{{ Str::limit($subject->description, 40) }}</small>
+                                                <small style="font-size: 11px;">{{ Str::limit($subject->description, 40) }}</small>
                                             @endif
                                         </div>
                                     </div>
@@ -218,7 +218,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-4 text-muted">
+                                <td colspan="7" class="text-center py-4">
                                     <i data-lucide="book-open" style="width: 40px; height: 40px; opacity: 0.3; margin-bottom: 8px;"></i>
                                     <p class="mb-0">No subjects found matching your criteria.</p>
                                 </td>

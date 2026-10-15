@@ -43,7 +43,7 @@
     <div class="text-center mb-2">
         <i class="feather icon-upload-cloud text-primary spin" style="font-size: 3.5rem; display: inline-block;"></i>
         <h4 class="mt-2 font-weight-bold" id="lblTitle">Background Uploading</h4>
-        <p class="text-muted small" id="lblFilename">Preparing upload files...</p>
+        <p class="small" id="lblFilename">Preparing upload files...</p>
     </div>
 
     <!-- Progress UI -->
@@ -51,21 +51,21 @@
         <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" id="progressBarValue" role="progressbar" style="width: 0%"></div>
     </div>
 
-    <div class="d-flex justify-content-between mb-2 small text-muted font-weight-bold">
+    <div class="d-flex justify-content-between mb-2 small font-weight-bold">
         <span id="lblPercentage">0%</span>
         <span id="lblSize">0 MB / 0 MB</span>
     </div>
 
     <div class="card bg-light p-2 mb-2">
-        <div class="d-flex justify-content-between small text-muted">
+        <div class="d-flex justify-content-between small">
             <span>Upload Speed:</span>
             <span class="font-weight-bold" id="lblSpeed">0 KB/s</span>
         </div>
-        <div class="d-flex justify-content-between small text-muted mt-50">
+        <div class="d-flex justify-content-between small mt-50">
             <span>Time Remaining:</span>
             <span class="font-weight-bold" id="lblEta">ETA: --</span>
         </div>
-        <div class="d-flex justify-content-between small text-muted mt-50">
+        <div class="d-flex justify-content-between small mt-50">
             <span>Status:</span>
             <span class="badge badge-warning" id="lblStatus">Processing Chunks</span>
         </div>

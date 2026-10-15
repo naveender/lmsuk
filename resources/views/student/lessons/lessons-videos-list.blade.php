@@ -180,7 +180,7 @@
                     </a>
                     <div>
                         <h5 class="mb-0 text-dark font-weight-bold">{{ $subject->title }} Lessons</h5>
-                        <span class="text-muted font-small-3">General Repository Videos</span>
+                        <span class="font-small-3">General Repository Videos</span>
                     </div>
                 </div>
 
@@ -239,7 +239,7 @@
                                     </div>
                                     <hr>
                                     <h6 class="font-weight-bold text-dark mb-1">Description</h6>
-                                    <p class="text-muted" id="activeVideoDescription" style="line-height: 1.6;">
+                                    <p id="activeVideoDescription" style="line-height: 1.6;">
                                         {{ $firstVideo->description ?: 'No description provided for this video lecture.' }}
                                     </p>
                                 </div>
@@ -304,7 +304,7 @@
                                                                     class="feather icon-clock mr-25"></i>{{ gmdate('i:s', $vProgress->watch_time) }}
                                                                 watched</span>
                                                         @else
-                                                            <span class="text-muted">Not played</span>
+                                                            <span>Not played</span>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -333,9 +333,9 @@
                 @else
                     <div class="card text-center border-0 shadow-sm p-4 bg-white">
                         <div class="card-body">
-                            <i class="feather icon-video text-muted font-large-3 mb-2"></i>
+                            <i class="feather icon-video font-large-3 mb-2"></i>
                             <h4 class="text-dark font-weight-bold">No Video Lessons Available</h4>
-                            <p class="text-muted">We couldn't find any unassigned general video files for this subject matching
+                            <p>We couldn't find any unassigned general video files for this subject matching
                                 your visibility configurations.</p>
                         </div>
                     </div>

@@ -209,7 +209,7 @@
                                     </h4>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-muted small mb-3">Customize how the Aspire Learners platform looks on
+                                    <p class="small mb-3">Customize how the Aspire Learners platform looks on
                                         your screen.</p>
 
                                     <div class="row">
@@ -239,7 +239,7 @@
                                                                 <i class="feather icon-sun mr-1 text-warning"></i> Light
                                                                 Mode
                                                             </h5>
-                                                            <small class="text-muted">Standard clean & crisp
+                                                            <small>Standard clean & crisp
                                                                 interface</small>
                                                         </div>
                                                         <span class="badge badge-light-primary">Light</span>
@@ -274,7 +274,7 @@
                                                                 <i class="feather icon-moon mr-1 text-primary"></i> Dark
                                                                 Mode
                                                             </h5>
-                                                            <small class="text-muted">Sleek, low-light eye comfort</small>
+                                                            <small>Sleek, low-light eye comfort</small>
                                                         </div>
                                                         <span class="badge badge-light-secondary">Dark</span>
                                                     </div>
@@ -293,13 +293,13 @@
                                     </h4>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-muted small mb-3">Manage how and when you receive automated updates from
+                                    <p class="small mb-3">Manage how and when you receive automated updates from
                                         the academy.</p>
 
                                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                         <div>
                                             <h6 class="font-weight-bold mb-0">Announcement & Notice Alerts</h6>
-                                            <small class="text-muted">Receive email notification whenever a new class
+                                            <small>Receive email notification whenever a new class
                                                 announcement is published.</small>
                                         </div>
                                         <div class="custom-control custom-switch">
@@ -313,7 +313,7 @@
                                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                         <div>
                                             <h6 class="font-weight-bold mb-0">Assessments & Homework Reminders</h6>
-                                            <small class="text-muted">Stay notified about upcoming weekly paper deadlines
+                                            <small>Stay notified about upcoming weekly paper deadlines
                                                 and published exam results.</small>
                                         </div>
                                         <div class="custom-control custom-switch">
@@ -327,7 +327,7 @@
                                     <div class="d-flex justify-content-between align-items-center py-2">
                                         <div>
                                             <h6 class="font-weight-bold mb-0">Audio Cues & Sound Alerts</h6>
-                                            <small class="text-muted">Play helpful gentle sounds during practice tests and
+                                            <small>Play helpful gentle sounds during practice tests and
                                                 timer notifications.</small>
                                         </div>
                                         <div class="custom-control custom-switch">
@@ -355,7 +355,7 @@
                                                 <label class="font-weight-bold">Timezone</label>
                                                 <input type="text" class="form-control bg-light"
                                                     value="Europe/London (GMT / BST)" disabled readonly>
-                                                <small class="text-muted">Standard academic calendar timezone.</small>
+                                                <small>Standard academic calendar timezone.</small>
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-12">
@@ -405,7 +405,7 @@
                                                 <div class="form-group">
                                                     <label class="font-weight-bold">Storage Usage</label>
                                                     <div class="d-flex justify-content-between mb-1">
-                                                        <small class="text-muted">156.7 GB / 500 GB used</small>
+                                                        <small>156.7 GB / 500 GB used</small>
                                                         <small class="text-primary font-weight-bold">31.3%</small>
                                                     </div>
                                                     <div class="progress progress-bar-primary progress-lg">
@@ -418,7 +418,7 @@
                                             <div class="col-lg-6 col-12">
                                                 <div class="form-group">
                                                     <label class="font-weight-bold">Available Space</label>
-                                                    <div class="p-2 bg-light rounded text-muted">
+                                                    <div class="p-2 bg-light rounded">
                                                         <i class="feather icon-hard-drive mr-1"></i> 343.3 GB remaining on
                                                         backup volume
                                                     </div>
@@ -439,7 +439,7 @@
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <div>
                                                 <h6 class="font-weight-bold mb-0">Email Notifications</h6>
-                                                <small class="text-muted">Receive backup and system health alerts via
+                                                <small>Receive backup and system health alerts via
                                                     email</small>
                                             </div>
                                             <div class="custom-control custom-switch">
@@ -470,30 +470,30 @@
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-6 col-12 mb-2">
-                                                <label class="font-weight-bold text-muted">Backup Service Status</label>
+                                                <label class="font-weight-bold">Backup Service Status</label>
                                                 <div class="d-flex align-items-center">
                                                     <span class="badge badge-success mr-2"><i class="feather icon-check"></i>
                                                         Operational</span>
                                                     <span
-                                                        class="small text-muted">{{ setting('system_backup_status', 'Healthy') }}</span>
+                                                        class="small">{{ setting('system_backup_status', 'Healthy') }}</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-12 mb-2">
-                                                <label class="font-weight-bold text-muted">Last System Backup</label>
+                                                <label class="font-weight-bold">Last System Backup</label>
                                                 <div>
                                                     <span
                                                         class="font-weight-bold">{{ setting('system_last_backup', now()->subHours(6)->format('Y-m-d H:i')) }}</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-12 mb-2">
-                                                <label class="font-weight-bold text-muted">System Framework Version</label>
+                                                <label class="font-weight-bold">System Framework Version</label>
                                                 <div>
                                                     <span class="badge badge-light-primary font-weight-bold">Laravel
                                                         {{ app()->version() }}</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-12 mb-2">
-                                                <label class="font-weight-bold text-muted">Database Engine</label>
+                                                <label class="font-weight-bold">Database Engine</label>
                                                 <div>
                                                     <span
                                                         class="font-weight-bold">{{ setting('system_database_engine', config('database.default', 'mysql')) }}</span>

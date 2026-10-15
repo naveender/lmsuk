@@ -222,7 +222,7 @@
                                                     <input type="text" name="duration" id="media_duration"
                                                         class="form-control" placeholder="e.g. 15:30"
                                                         value="{{ $mediaFile->duration }}">
-                                                    <small class="text-muted">Format: MM:SS or HH:MM:SS</small>
+                                                    <small>Format: MM:SS or HH:MM:SS</small>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-12">
@@ -253,7 +253,7 @@
                                                 <div>
                                                     <input type="file" id="thumbnailFileInput"
                                                         class="form-control-file mb-50" accept="image/*">
-                                                    <small class="text-muted">JPG, PNG, WEBP (Max 2MB). Ideal size: 16:9
+                                                    <small>JPG, PNG, WEBP (Max 2MB). Ideal size: 16:9
                                                         ratio.</small>
                                                     <input type="hidden" name="thumbnail_path" id="shared_thumbnail_path"
                                                         value="">
@@ -282,7 +282,7 @@
                                                 <div class="card-body">
                                                     <h5 class="text-primary font-weight-bold mb-1"><i
                                                             class="feather icon-refresh-cw"></i> Video File Replacement</h5>
-                                                    <p class="text-muted small">If you want to upload a new video file to
+                                                    <p class="small">If you want to upload a new video file to
                                                         replace the existing one, toggle the checkbox below. The previous file
                                                         will be automatically deleted from storage upon successful upload.</p>
 
@@ -339,7 +339,7 @@
                                                                 </div>
                                                             </div>
                                                             <div
-                                                                class="d-flex justify-content-between align-items-center mt-1 text-muted small">
+                                                                class="d-flex justify-content-between align-items-center mt-1 small">
                                                                 <span id="lblProgressSize">0 MB / 0 MB</span>
                                                                 <span id="lblProgressSpeed">0 KB/s</span>
                                                                 <span id="lblProgressEta">ETA: --</span>
@@ -367,7 +367,7 @@
                                             <div class="card-body">
                                                 <h5 class="text-primary font-weight-bold mb-1"><i
                                                         class="feather icon-award"></i> Course & Weekly Scheduling</h5>
-                                                <p class="text-muted small">Optionally assign this video resource directly
+                                                <p class="small">Optionally assign this video resource directly
                                                     to a course and schedule it for a specific week.</p>
 
                                                 <!-- Step 1: Assignment Card Selector -->

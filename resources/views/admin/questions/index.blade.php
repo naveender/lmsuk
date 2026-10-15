@@ -258,7 +258,7 @@
                                                     {{ $question->difficulty }}
                                                 </span>
                                             @else
-                                                <span class="text-muted font-small-2">—</span>
+                                                <span class="font-small-2">—</span>
                                             @endif
                                         </td>
                                         <td class="text-center">

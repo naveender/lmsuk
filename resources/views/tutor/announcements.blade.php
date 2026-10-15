@@ -346,7 +346,7 @@
                 <!-- Header Filters & Search Row -->
                 <div class="row align-items-center mb-2">
                     <div class="col-md-7 col-12 mb-1 mb-md-0">
-                        <p class="text-muted mb-0">Stay informed with the latest updates from the academy.</p>
+                        <p class="mb-0">Stay informed with the latest updates from the academy.</p>
                     </div>
                     <div class="col-md-5 col-12 d-flex justify-content-md-end justify-content-start align-items-center">
                         <div class="search-wrapper">
@@ -454,7 +454,7 @@
                                                     <i class="feather icon-file-text font-medium-3 text-danger mr-50"></i>
                                                     <span class="font-small-3 font-weight-bold text-dark mr-50 text-truncate"
                                                         style="max-width: 250px;">{{ basename($announcement->media) }}</span>
-                                                    <i class="feather icon-download-cloud font-medium-1 text-muted"></i>
+                                                    <i class="feather icon-download-cloud font-medium-1"></i>
                                                 </a>
                                             @endif
                                         </div>
@@ -478,7 +478,7 @@
                         @empty
                             <div class="card p-3 text-center empty-state-card" style="border-radius: 14px;">
                                 <div class="card-body py-3">
-                                    <i class="feather icon-bell font-large-2 text-muted mb-2"></i>
+                                    <i class="feather icon-bell font-large-2 mb-2"></i>
                                     <h4>No announcements found for you.</h4>
                                     <p class="text-secondary mb-0">Check back later for any new academy notices.</p>
                                 </div>
@@ -489,7 +489,7 @@
                         <div class="card p-3 text-center empty-state-card" id="empty-state-placeholder"
                             style="display:none; border-radius: 14px;">
                             <div class="card-body py-3">
-                                <i class="feather icon-bell-off font-large-3 text-muted mb-2 d-inline-block"
+                                <i class="feather icon-bell-off font-large-3 mb-2 d-inline-block"
                                     style="opacity: 0.6;"></i>
                                 <h4 class="font-weight-bold text-dark">All Caught Up!</h4>
                                 <p class="text-secondary mb-0">No academy announcements match your selected filter.</p>
@@ -590,7 +590,7 @@
                                                                 class="font-weight-bold text-dark text-truncate"
                                                                 style="max-width: 280px; font-size: 0.9rem;">document.pdf
                                                             </div>
-                                                            <small class="text-muted">PDF Document</small>
+                                                            <small>PDF Document</small>
                                                         </div>
                                                         <a href="" id="detail-file-download"
                                                             class="btn btn-sm btn-danger ml-1" target="_blank">

@@ -58,7 +58,7 @@
                     <i data-lucide="filter"></i>
                     <span>Filters</span>
                 </h2>
-                <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters" style="color: #7A8499;">
+                <button type="button" class="btn btn-link p-0" aria-label="Toggle filters" style="color: #7A8499;">
                     <i data-lucide="chevron-up" id="classFilterToggleIcon" style="width: 18px; height: 18px;"></i>
                 </button>
             </div>
@@ -181,7 +181,7 @@
                                 <td style="text-align: center;">
                                     <input type="checkbox" class="custom-theme-checkbox row-checkbox" value="{{ $class->id }}">
                                 </td>
-                                <td class="text-muted font-weight-bold">{{ $classes->firstItem() + $index }}</td>
+                                <td class="font-weight-bold">{{ $classes->firstItem() + $index }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="student-id-badge mr-1" style="background: rgba(36, 119, 249, 0.1); color: var(--theme-primary-bright); width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px;">
@@ -196,7 +196,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="text-muted">{{ $class->academic_year ?: 'N/A' }}</span>
+                                    <span>{{ $class->academic_year ?: 'N/A' }}</span>
                                 </td>
                                 <td>
                                     <a href="{{ route('admin.classes.students', $class->id) }}" class="badge" style="background: rgba(36, 119, 249, 0.12); color: var(--theme-primary-bright); font-weight: 700; border-radius: 6px; padding: 6px 12px; text-decoration: none;">
@@ -236,7 +236,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center py-4 text-muted">
+                                <td colspan="8" class="text-center py-4">
                                     <i data-lucide="layers" style="width: 40px; height: 40px; opacity: 0.3; margin-bottom: 8px;"></i>
                                     <p class="mb-0">No classes found matching your criteria.</p>
                                 </td>
@@ -293,7 +293,7 @@
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 title: 'Delete Class?',
-                html: `Are you sure you want to delete class <strong>${className}</strong>?<br><small class="text-muted">This class will be removed and detached from current rosters.</small>`,
+                html: `Are you sure you want to delete class <strong>${className}</strong>?<br><small>This class will be removed and detached from current rosters.</small>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#FA2833',

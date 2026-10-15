@@ -1345,7 +1345,7 @@
                             <span id="username-feedback-text"></span>
                         </div>
                         <div id="username-suggestions" style="display: none;">
-                            <div class="text-muted small mb-25" style="font-size: 0.72rem;">Suggested Usernames:</div>
+                            <div class="small mb-25" style="font-size: 0.72rem;">Suggested Usernames:</div>
                             <div id="suggestions-list" class="d-flex flex-wrap align-items-center"></div>
                         </div>
                     </div>

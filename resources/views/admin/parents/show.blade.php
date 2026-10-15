@@ -43,7 +43,7 @@
                                             {{ strtoupper(substr($parent->name, 0, 1)) }}
                                         </div>
                                         <h4 class="mt-1 mb-0">{{ $parent->name }}</h4>
-                                        <small class="text-muted">{{ optional($parent->parentDetail)->relation ?? 'Parent' }}</small>
+                                        <small>{{ optional($parent->parentDetail)->relation ?? 'Parent' }}</small>
                                     </div>
                                     <hr>
                                     <ul class="list-unstyled">
@@ -120,7 +120,7 @@
                                                                 @if($child->group_year)
                                                                     {{ $child->group_year }}{{ $child->group_year == 1 ? 'st' : ($child->group_year == 2 ? 'nd' : ($child->group_year == 3 ? 'rd' : 'th')) }} year
                                                                 @else
-                                                                    <span class="text-muted">N/A</span>
+                                                                    <span>N/A</span>
                                                                 @endif
                                                             </td>
                                                             <td>
@@ -146,7 +146,7 @@
                                     @else
                                         <div class="text-center py-3">
                                             <i class="feather icon-users" style="font-size: 3rem; color: #ccc;"></i>
-                                            <p class="text-muted mt-1 mb-0">No children linked to this parent yet.</p>
+                                            <p class="mt-1 mb-0">No children linked to this parent yet.</p>
                                         </div>
                                     @endif
                                 </div>
@@ -179,7 +179,7 @@
                                             </div>
                                         </form>
                                     @else
-                                        <p class="text-muted mb-1">All students are already assigned to a parent.</p>
+                                        <p class="mb-1">All students are already assigned to a parent.</p>
                                         <a href="{{ route('admin.students.create') }}" class="btn btn-sm btn-outline-primary">
                                             <i class="feather icon-plus"></i> Create New Student
                                         </a>

@@ -726,7 +726,7 @@
                             <i class="feather icon-award"></i>
                         </div>
                         <h3 class="font-weight-bold text-dark mb-1">Exceptional Mastery! No Focus Areas Found</h3>
-                        <p class="text-muted max-w-500 mx-auto mb-2 font-medium-1">
+                        <p class="max-w-500 mx-auto mb-2 font-medium-1">
                             All your attempted topics currently have scores at or above your <strong>{{ $threshold }}%</strong>
                             benchmark. Keep maintaining this excellent momentum!
                         </p>
@@ -838,7 +838,7 @@
                                                     <tr class="topic-data-row" data-topic-name="{{ strtolower($row['name']) }}">
                                                         <td>
                                                             <div class="font-weight-bold text-dark d-flex align-items-center">
-                                                                <i class="feather icon-corner-down-right text-muted mr-50"></i>
+                                                                <i class="feather icon-corner-down-right mr-50"></i>
                                                                 <span>{{ $row['name'] }}</span>
                                                             </div>
                                                         </td>
@@ -854,7 +854,7 @@
                                                                     {{ $row['average'] }}%
                                                                 </span>
                                                             @else
-                                                                <span class="text-muted">—</span>
+                                                                <span>—</span>
                                                             @endif
                                                         </td>
                                                         <td>
@@ -864,7 +864,7 @@
                                                                     {{ $row['first_average'] }}%
                                                                 </span>
                                                             @else
-                                                                <span class="text-muted">—</span>
+                                                                <span>—</span>
                                                             @endif
                                                         </td>
                                                         <td>
@@ -874,7 +874,7 @@
                                                                     {{ $row['last_average'] }}%
                                                                 </span>
                                                             @else
-                                                                <span class="text-muted">—</span>
+                                                                <span>—</span>
                                                             @endif
                                                         </td>
                                                         <td>
@@ -901,7 +901,7 @@
                             <i class="feather icon-search"></i>
                         </div>
                         <h4 class="font-weight-bold text-dark mb-50">No focus topics match your search</h4>
-                        <p class="text-muted mb-1 font-small-3">Try checking spelling or reset your keyword filter.</p>
+                        <p class="mb-1 font-small-3">Try checking spelling or reset your keyword filter.</p>
                         <button type="button" class="btn btn-outline-primary btn-sm" id="resetSearchBtn">
                             Clear Search Filter
                         </button>
@@ -913,7 +913,7 @@
                     <h5 class="font-weight-bold text-dark mb-1 d-flex align-items-center">
                         <i class="feather icon-info text-primary mr-50"></i> Understanding Your Focus Areas
                     </h5>
-                    <p class="text-muted font-small-3 mb-2">
+                    <p class="font-small-3 mb-2">
                         Focus areas are dynamically calculated using full completed test papers. Sweeps and abandoned
                         attempts are excluded to ensure statistical accuracy.
                     </p>
@@ -925,7 +925,7 @@
                                 </div>
                                 <div>
                                     <strong class="text-dark d-block font-small-3 mb-25">80% Target Benchmark</strong>
-                                    <small class="text-muted">Recommended standard for 11+ grammar and selective school
+                                    <small>Recommended standard for 11+ grammar and selective school
                                         entry.</small>
                                 </div>
                             </div>
@@ -937,7 +937,7 @@
                                 </div>
                                 <div>
                                     <strong class="text-dark d-block font-small-3 mb-25">Baseline vs. Current</strong>
-                                    <small class="text-muted">Compare first attempt to latest attempt to see retention and
+                                    <small>Compare first attempt to latest attempt to see retention and
                                         recovery.</small>
                                 </div>
                             </div>
@@ -949,7 +949,7 @@
                                 </div>
                                 <div>
                                     <strong class="text-dark d-block font-small-3 mb-25">Verified Full Attempts</strong>
-                                    <small class="text-muted">Only complete exam sessions are included for realistic mastery
+                                    <small>Only complete exam sessions are included for realistic mastery
                                         stats.</small>
                                 </div>
                             </div>
@@ -961,7 +961,7 @@
                                 </div>
                                 <div>
                                     <strong class="text-dark d-block font-small-3 mb-25">Targeted Practice</strong>
-                                    <small class="text-muted">Direct practice on your lowest scoring topics gives the
+                                    <small>Direct practice on your lowest scoring topics gives the
                                         fastest score gains.</small>
                                 </div>
                             </div>

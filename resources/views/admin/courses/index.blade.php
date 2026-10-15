@@ -60,7 +60,7 @@
                         <i data-lucide="filter"></i>
                         <span>Filters</span>
                     </h2>
-                    <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters" style="color: #7A8499;">
+                    <button type="button" class="btn btn-link p-0" aria-label="Toggle filters" style="color: #7A8499;">
                         <i data-lucide="chevron-up" id="filterToggleIcon" style="width: 18px; height: 18px;"></i>
                     </button>
                 </div>
@@ -135,7 +135,7 @@
                         <tbody>
                             @forelse($courses as $index => $course)
                                 <tr id="course-row-{{ $course->id }}">
-                                    <td class="font-weight-bold text-muted">
+                                    <td class="font-weight-bold">
                                         {{ $courses->firstItem() + $index }}
                                     </td>
                                     <td>
@@ -143,7 +143,7 @@
                                             {{ $course->name }}
                                         </div>
                                         @if($course->description)
-                                            <div class="text-muted font-small-2 text-truncate" style="max-width: 380px;">
+                                            <div class="font-small-2 text-truncate" style="max-width: 380px;">
                                                 {{ Str::limit(strip_tags($course->description), 80) }}
                                             </div>
                                         @endif
@@ -216,9 +216,9 @@
                                 <tr>
                                     <td colspan="6" class="text-center py-4">
                                         <div class="empty-state">
-                                            <i data-lucide="book" class="text-muted" style="width: 48px; height: 48px; stroke-width: 1.5;"></i>
+                                            <i data-lucide="book" style="width: 48px; height: 48px; stroke-width: 1.5;"></i>
                                             <h5 class="mt-2 font-weight-bold text-dark">No Courses Found</h5>
-                                            <p class="text-muted font-small-3">No courses match your filter criteria, or none have been added yet.</p>
+                                            <p class="font-small-3">No courses match your filter criteria, or none have been added yet.</p>
                                             <a href="{{ route('admin.courses.create') }}" class="btn btn-primary btn-sm mt-1" style="border-radius: 6px;">
                                                 <i data-lucide="plus" style="width: 14px; height: 14px; vertical-align: middle;"></i> Create New Course
                                             </a>
@@ -261,7 +261,7 @@
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 title: 'Delete Course?',
-                html: `Are you sure you want to delete <strong>"${courseName}"</strong>?<br><small class="text-muted">Associated weekly paper assignments and video links will also be removed.</small>`,
+                html: `Are you sure you want to delete <strong>"${courseName}"</strong>?<br><small>Associated weekly paper assignments and video links will also be removed.</small>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#FA2833',

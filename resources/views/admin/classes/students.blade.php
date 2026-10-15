@@ -54,7 +54,7 @@
                                         </div>
                                         <div>
                                             <h3 class="mb-0 font-weight-bold">{{ $class->name }}</h3>
-                                            <p class="text-muted mb-0">
+                                            <p class="mb-0">
                                                 <span class="mr-2"><strong>Academic Year:</strong> {{ $class->academic_year }}</span>
                                                 <span><strong>Group Year:</strong> {{ $class->group_year }}</span>
                                             </p>
@@ -125,8 +125,8 @@
                                         </div>
                                     @else
                                         <div class="text-center py-4">
-                                            <i class="feather icon-user-x text-muted" style="font-size: 3.5rem;"></i>
-                                            <p class="text-muted mt-1 font-weight-medium">No students currently in this class.</p>
+                                            <i class="feather icon-user-x" style="font-size: 3.5rem;"></i>
+                                            <p class="mt-1 font-weight-medium">No students currently in this class.</p>
                                         </div>
                                     @endif
                                 </div>
@@ -143,7 +143,7 @@
                                     <i data-lucide="filter"></i>
                                     <span>Filter Available Students</span>
                                 </h2>
-                                <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters" style="color: #7A8499;">
+                                <button type="button" class="btn btn-link p-0" aria-label="Toggle filters" style="color: #7A8499;">
                                     <i data-lucide="chevron-up" id="availFilterToggleIcon" style="width: 18px; height: 18px;"></i>
                                 </button>
                             </div>
@@ -274,8 +274,8 @@
                                         </div>
                                     @else
                                         <div class="text-center py-4">
-                                            <i class="feather icon-users text-muted" style="font-size: 3.5rem;"></i>
-                                            <p class="text-muted mt-1 font-weight-medium">No available students found.</p>
+                                            <i class="feather icon-users" style="font-size: 3.5rem;"></i>
+                                            <p class="mt-1 font-weight-medium">No available students found.</p>
                                         </div>
                                     @endif
                                 </div>

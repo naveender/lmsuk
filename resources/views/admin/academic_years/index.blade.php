@@ -58,7 +58,7 @@
                     <i data-lucide="filter"></i>
                     <span>Filters</span>
                 </h2>
-                <button type="button" class="btn btn-link p-0 text-muted" aria-label="Toggle filters" style="color: #7A8499;">
+                <button type="button" class="btn btn-link p-0" aria-label="Toggle filters" style="color: #7A8499;">
                     <i data-lucide="chevron-up" id="academicYearFilterToggleIcon" style="width: 18px; height: 18px;"></i>
                 </button>
             </div>
@@ -160,7 +160,7 @@
                                 <td style="text-align: center;">
                                     <input type="checkbox" class="custom-theme-checkbox row-checkbox" value="{{ $ay->id }}">
                                 </td>
-                                <td class="text-muted font-weight-bold">{{ $academicYears->firstItem() + $index }}</td>
+                                <td class="font-weight-bold">{{ $academicYears->firstItem() + $index }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="student-id-badge mr-1" style="background: rgba(36, 119, 249, 0.1); color: var(--theme-primary-bright); width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px;">
@@ -175,10 +175,10 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="text-muted">{{ $ay->start_date ? date('d M Y', strtotime($ay->start_date)) : 'N/A' }}</span>
+                                    <span>{{ $ay->start_date ? date('d M Y', strtotime($ay->start_date)) : 'N/A' }}</span>
                                 </td>
                                 <td>
-                                    <span class="text-muted">{{ $ay->end_date ? date('d M Y', strtotime($ay->end_date)) : 'N/A' }}</span>
+                                    <span>{{ $ay->end_date ? date('d M Y', strtotime($ay->end_date)) : 'N/A' }}</span>
                                 </td>
                                 <td>
                                     @if($ay->is_active)
@@ -208,7 +208,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center py-4 text-muted">
+                                <td colspan="8" class="text-center py-4">
                                     <i data-lucide="calendar" style="width: 40px; height: 40px; opacity: 0.3; margin-bottom: 8px;"></i>
                                     <p class="mb-0">No academic years found matching your criteria.</p>
                                 </td>
