@@ -6,9 +6,9 @@
     $englishSubject = \App\Models\Subject::where('title', 'like', '%english%')->first();
     $vrSubject = \App\Models\Subject::where('title', 'like', '%verbal%')->first();
 
-    $mathUrl = $mathSubject ? route('student.videolessonslist', ['subject_id' => $mathSubject->id]) : route('student.videolessonscategories');
-    $englishUrl = $englishSubject ? route('student.videolessonslist', ['subject_id' => $englishSubject->id]) : route('student.videolessonscategories');
-    $vrUrl = $vrSubject ? route('student.videolessonslist', ['subject_id' => $vrSubject->id]) : route('student.videolessonscategories');
+    $mathUrl = $mathSubject ? route('student.videolessonscategories', ['subject_id' => $mathSubject->id]) : route('student.videolessonscategories');
+    $englishUrl = $englishSubject ? route('student.videolessonscategories', ['subject_id' => $englishSubject->id]) : route('student.videolessonscategories');
+    $vrUrl = $vrSubject ? route('student.videolessonscategories', ['subject_id' => $vrSubject->id]) : route('student.videolessonscategories');
 
     $isLessonsActive = request()->routeIs('student.videolessonscategories') || request()->routeIs('student.videolessonslist');
     $currentSubjectId = request('subject_id');
@@ -41,29 +41,31 @@
             </li>
 
             <!-- 2. Lessons (with expandable submenu) -->
-            <li class="menu-item-wrapper has-submenu {{ $isLessonsActive ? 'open' : '' }}" data-title="Lessons">
-                <a href="javascript:void(0);" class="menu-link submenu-toggle" id="studentLessonsToggle">
+            <li class="menu-item-wrapper has-submenu {{ $isLessonsActive ? 'open active' : '' }}" data-title="Lessons">
+                <a href="{{ route('student.videolessonscategories') }}" class="menu-link" id="studentLessonsLink">
                     <i class="feather icon-book-open"></i>
                     <span class="menu-text">Lessons</span>
-                    <i class="feather icon-chevron-down submenu-arrow"></i>
+                    <span class="submenu-arrow-wrapper ml-auto" id="studentLessonsArrowBtn" title="Toggle lessons list">
+                        <i class="feather icon-chevron-down submenu-arrow"></i>
+                    </span>
                 </a>
                 <ul class="submenu-items student-submenu">
                     <!-- English -->
-                    <li class="{{ (request()->routeIs('student.videolessonslist') && $englishSubject && $currentSubjectId == $englishSubject->id) ? 'active' : '' }}">
+                    <li class="{{ ($englishSubject && $currentSubjectId == $englishSubject->id) ? 'active' : '' }}">
                         <a href="{{ $englishUrl }}" class="menu-link">
                             <span class="subject-dot dot-red"></span>
                             <span class="menu-text">English</span>
                         </a>
                     </li>
                     <!-- Maths -->
-                    <li class="{{ (request()->routeIs('student.videolessonslist') && $mathSubject && $currentSubjectId == $mathSubject->id) ? 'active' : '' }}">
+                    <li class="{{ ($mathSubject && $currentSubjectId == $mathSubject->id) ? 'active' : '' }}">
                         <a href="{{ $mathUrl }}" class="menu-link">
                             <span class="subject-dot dot-blue"></span>
                             <span class="menu-text">Maths</span>
                         </a>
                     </li>
                     <!-- Verbal Reasoning -->
-                    <li class="{{ (request()->routeIs('student.videolessonslist') && $vrSubject && $currentSubjectId == $vrSubject->id) ? 'active' : '' }}">
+                    <li class="{{ ($vrSubject && $currentSubjectId == $vrSubject->id) ? 'active' : '' }}">
                         <a href="{{ $vrUrl }}" class="menu-link">
                             <span class="subject-dot dot-yellow"></span>
                             <span class="menu-text">Verbal Reasoning</span>
@@ -160,11 +162,12 @@
 <!-- Submenu Toggle Script -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var toggle = document.getElementById('studentLessonsToggle');
-        if (toggle) {
-            toggle.addEventListener('click', function(e) {
+        var arrowBtn = document.getElementById('studentLessonsArrowBtn');
+        if (arrowBtn) {
+            arrowBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                var parent = toggle.closest('.has-submenu');
+                e.stopPropagation();
+                var parent = arrowBtn.closest('.has-submenu');
                 if (parent) {
                     parent.classList.toggle('open');
                 }

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff5f5"/>
+      <stop offset="100%" stop-color="#fed7d7"/>
+    </linearGradient>
+    <linearGradient id="redBlock" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e53e3e"/>
+      <stop offset="100%" stop-color="#9b2c2c"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#bg)"/>
+  <!-- Open Book on Left -->
+  <g transform="translate(60, 90)">
+    <path d="M40 160 C 90 140, 150 140, 190 155 C 230 140, 290 140, 340 160 L 330 40 C 280 20, 230 20, 190 35 C 150 20, 100 20, 50 40 Z" fill="#ffffff" stroke="#e2e8f0" stroke-width="4"/>
+    <path d="M190 35 L 190 155" stroke="#cbd5e1" stroke-width="3"/>
+    <!-- Page lines -->
+    <line x1="80" y1="65" x2="160" y2="60" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+    <line x1="80" y1="85" x2="160" y2="80" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+    <line x1="80" y1="105" x2="160" y2="100" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+    <line x1="80" y1="125" x2="140" y2="120" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+    <line x1="220" y1="60" x2="300" y2="65" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+    <line x1="220" y1="80" x2="300" y2="85" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+    <line x1="220" y1="100" x2="300" y2="105" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <!-- Red Block with Text on Right -->
+  <g transform="translate(410, 45)">
+    <rect width="200" height="260" rx="14" fill="url(#redBlock)" transform="rotate(4, 100, 130)"/>
+    <text x="100" y="85" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="28" fill="#ffffff" text-anchor="middle" letter-spacing="1">READ</text>
+    <text x="100" y="140" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="26" fill="#ffffff" text-anchor="middle" letter-spacing="1">ANALYSE</text>
+    <text x="100" y="195" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="24" fill="#ffffff" text-anchor="middle" letter-spacing="1">SUCCEED</text>
+  </g>
+</svg>

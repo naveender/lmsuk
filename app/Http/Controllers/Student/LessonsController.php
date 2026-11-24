@@ -16,7 +16,7 @@ class LessonsController extends Controller
      * Only "General Video File" media (not assigned to any course weekly schedule)
      * that match the student's class, group year, and academic year are visible.
      */
-    public function index()
+    public function index(Request $request)
     {
         $student = auth()->user();
         $detail = $student->studentDetail;
@@ -72,51 +72,49 @@ class LessonsController extends Controller
         }
         $studentAcademicYears = $studentAcademicYears->unique()->filter()->values();
 
-        // Build base query for general (unassigned) published video files
-        $baseQuery = MediaFile::where('publication_status', 'published')
-            ->whereDoesntHave('courses');
+        // Build query for published video files visible to the student
+        $mediaQuery = MediaFile::where('publication_status', 'published')
+            ->with(['subject', 'class', 'yearGroup']);
 
         // Apply visibility filters
-        $baseQuery->where(function ($q) use ($classIds) {
+        $mediaQuery->where(function ($q) use ($classIds) {
             $q->whereNull('class_id');
             if ($classIds->isNotEmpty()) {
                 $q->orWhereIn('class_id', $classIds);
             }
         });
 
-        $baseQuery->where(function ($q) use ($yearGroupIds) {
+        $mediaQuery->where(function ($q) use ($yearGroupIds) {
             $q->whereNull('year_group_id');
             if ($yearGroupIds->isNotEmpty()) {
                 $q->orWhereIn('year_group_id', $yearGroupIds);
             }
         });
 
-        $baseQuery->where(function ($q) use ($studentAcademicYears) {
+        $mediaQuery->where(function ($q) use ($studentAcademicYears) {
             $q->whereNull('academic_year');
             if ($studentAcademicYears->isNotEmpty()) {
                 $q->orWhereIn('academic_year', $studentAcademicYears);
             }
         });
 
-        // Get all matching video IDs
-        $visibleMediaIds = (clone $baseQuery)->pluck('id');
+        // Get all matching published media files
+        $mediaFiles = $mediaQuery->orderBy('created_at', 'desc')->get();
+        $visibleMediaIds = $mediaFiles->pluck('id');
 
-        // Get subjects that have at least one visible video
-        $subjects = Subject::where('is_active', true)
-            ->whereHas('mediaFiles', function ($q) use ($visibleMediaIds) {
-                $q->whereIn('media_files.id', $visibleMediaIds);
-            })
-            ->withCount(['mediaFiles' => function ($q) use ($visibleMediaIds) {
-                $q->whereIn('media_files.id', $visibleMediaIds);
-            }])
-            ->get();
+        // Get all active subjects
+        $subjects = Subject::where('is_active', true)->orderBy('id')->get();
+
+        // Load student watch progress for all visible videos
+        $videoProgressMap = StudentVideoProgress::where('user_id', $student->id)
+            ->whereIn('media_file_id', $visibleMediaIds)
+            ->get()
+            ->keyBy('media_file_id');
 
         // Load student's total progress per subject
         $progressBySubject = [];
         foreach ($subjects as $subject) {
-            $subjectVideoIds = MediaFile::where('subject_id', $subject->id)
-                ->whereIn('id', $visibleMediaIds)
-                ->pluck('id');
+            $subjectVideoIds = $mediaFiles->where('subject_id', $subject->id)->pluck('id');
 
             $completed = StudentVideoProgress::where('user_id', $student->id)
                 ->whereIn('media_file_id', $subjectVideoIds)
@@ -132,16 +130,20 @@ class LessonsController extends Controller
             ];
         }
 
-        $totalVideos = collect($progressBySubject)->sum('total');
+        $totalVideos = $mediaFiles->count();
         $totalCompletedVideos = collect($progressBySubject)->sum('completed');
         $overallVideoProgress = $totalVideos > 0 ? round(($totalCompletedVideos / $totalVideos) * 100) : 0;
+        $selectedSubjectId = $request->query('subject_id');
 
         return view('student.lessons.video-lessons-category', compact(
             'subjects',
+            'mediaFiles',
+            'videoProgressMap',
             'progressBySubject',
             'totalVideos',
             'totalCompletedVideos',
-            'overallVideoProgress'
+            'overallVideoProgress',
+            'selectedSubjectId'
         ));
     }
 
@@ -207,10 +209,9 @@ class LessonsController extends Controller
         }
         $studentAcademicYears = $studentAcademicYears->unique()->filter()->values();
 
-        // Query general (unassigned) published videos for this subject
+        // Query published videos for this subject
         $mediaQuery = MediaFile::where('publication_status', 'published')
-            ->where('subject_id', $subjectId)
-            ->whereDoesntHave('courses');
+            ->where('subject_id', $subjectId);
 
         // Apply visibility filters
         $mediaQuery->where(function ($q) use ($classIds) {

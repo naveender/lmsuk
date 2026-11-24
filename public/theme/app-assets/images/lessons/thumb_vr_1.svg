@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360">
+  <defs>
+    <linearGradient id="vrGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="60%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#eab308"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#vrGrad1)"/>
+  <!-- Patterns sequence -->
+  <g transform="translate(70, 110)">
+    <!-- Red Circle -->
+    <circle cx="60" cy="70" r="42" fill="#ef4444"/>
+    <!-- Blue Triangle -->
+    <polygon points="190,26 235,112 145,112" fill="#2563eb"/>
+    <!-- Amber/Orange Square -->
+    <rect x="270" y="28" width="84" height="84" rx="10" fill="#f97316"/>
+    <!-- Dashed Box with ? -->
+    <rect x="390" y="24" width="90" height="90" rx="12" fill="#ffffff" fill-opacity="0.6" stroke="#475569" stroke-width="3" stroke-dasharray="8 6"/>
+    <text x="435" y="88" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="56" fill="#1e293b" text-anchor="middle">?</text>
+  </g>
+</svg>

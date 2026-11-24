@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360">
+  <defs>
+    <linearGradient id="vrGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="60%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#vrGrad2)"/>
+  <!-- Letter Sequence Cards: [A] [C] [F] [?] -->
+  <g transform="translate(80, 110)">
+    <!-- Card A -->
+    <rect x="20" y="24" width="85" height="92" rx="12" fill="#ffffff" stroke="#d97706" stroke-width="2.5" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.06))"/>
+    <text x="62" y="88" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="48" fill="#1e293b" text-anchor="middle">A</text>
+    <!-- Card C -->
+    <rect x="140" y="24" width="85" height="92" rx="12" fill="#ffffff" stroke="#d97706" stroke-width="2.5" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.06))"/>
+    <text x="182" y="88" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="48" fill="#1e293b" text-anchor="middle">C</text>
+    <!-- Card F -->
+    <rect x="260" y="24" width="85" height="92" rx="12" fill="#ffffff" stroke="#2563eb" stroke-width="2.5" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.06))"/>
+    <text x="302" y="88" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="48" fill="#1e293b" text-anchor="middle">F</text>
+    <!-- Card ? -->
+    <rect x="380" y="24" width="85" height="92" rx="12" fill="#ffffff" fill-opacity="0.6" stroke="#475569" stroke-width="2.5" stroke-dasharray="6 5"/>
+    <text x="422" y="88" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="52" fill="#1e293b" text-anchor="middle">?</text>
+  </g>
+</svg>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360">
+  <defs>
+    <linearGradient id="mathGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="60%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#mathGrad1)"/>
+  <!-- Decorative triangles -->
+  <polygon points="60,200 120,290 30,290" fill="#1d4ed8" opacity="0.6"/>
+  <polygon points="560,40 620,110 520,110" fill="#60a5fa" opacity="0.4"/>
+  <!-- Grid dot pattern -->
+  <circle cx="80" cy="60" r="3" fill="#ffffff" opacity="0.4"/>
+  <circle cx="120" cy="60" r="3" fill="#ffffff" opacity="0.4"/>
+  <circle cx="160" cy="60" r="3" fill="#ffffff" opacity="0.4"/>
+  <circle cx="80" cy="100" r="3" fill="#ffffff" opacity="0.4"/>
+  <circle cx="120" cy="100" r="3" fill="#ffffff" opacity="0.4"/>
+  <circle cx="160" cy="100" r="3" fill="#ffffff" opacity="0.4"/>
+  <!-- Main Equation: 2 + 3 * 4 = ? -->
+  <text x="320" y="205" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="64" fill="#ffffff" text-anchor="middle" letter-spacing="4">2 + 3 × 4 = ?</text>
+</svg>
