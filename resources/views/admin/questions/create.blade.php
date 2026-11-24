@@ -182,7 +182,7 @@
                             {{-- Multiple Question Images --}}
                             <div class="form-group">
                                 <label class="d-block font-weight-bold">Question Images (Optional)</label>
-                                <p class="text-muted small mb-1">Upload multiple question images. Click &times; on the preview thumbnail to remove.</p>
+                                <p class="small mb-1">Upload multiple question images. Click &times; on the preview thumbnail to remove.</p>
                                 <div id="question-images-preview" class="d-flex flex-wrap mb-2" style="gap:8px;"></div>
                                 <div class="d-flex align-items-center" style="gap:8px;">
                                     <label class="btn btn-sm btn-outline-primary mb-0" for="question_images_input_temp">
@@ -190,14 +190,14 @@
                                     </label>
                                     <input type="file" id="question_images_input" name="images[]" multiple accept="image/*" class="d-none">
                                     <input type="file" id="question_images_input_temp" multiple accept="image/*" class="d-none">
-                                    <small class="text-muted">JPEG, PNG, GIF, WebP - up to 2MB each</small>
+                                    <small>JPEG, PNG, GIF, WebP - up to 2MB each</small>
                                 </div>
                             </div>
 
                             {{-- Explanation (Rich Text with Quill) --}}
                             <div class="form-group">
                                 <label class="font-weight-bold">Explanation (Optional)</label>
-                                <p class="text-muted small mb-1">Rich text with formatting support for student feedback.</p>
+                                <p class="small mb-1">Rich text with formatting support for student feedback.</p>
                                 <textarea name="explanation" id="explanation_input" class="d-none">{{ old('explanation') }}</textarea>
                                 <div id="explanation_editor" style="min-height:160px; background:#fff; border:1px solid #d8d6de; border-radius:0.357rem;"></div>
                             </div>
@@ -205,7 +205,7 @@
                             {{-- Explanation Images --}}
                             <div class="form-group">
                                 <label class="d-block font-weight-bold">Explanation Images (Optional)</label>
-                                <p class="text-muted small mb-1">Upload explanation-specific images.</p>
+                                <p class="small mb-1">Upload explanation-specific images.</p>
                                 <div id="explanation-images-preview" class="d-flex flex-wrap mb-2" style="gap:8px;"></div>
                                 <div class="d-flex align-items-center" style="gap:8px;">
                                     <label class="btn btn-sm btn-outline-info mb-0" for="explanation_images_input_temp">
@@ -213,7 +213,7 @@
                                     </label>
                                     <input type="file" id="explanation_images_input" name="explanation_images[]" multiple accept="image/*" class="d-none">
                                     <input type="file" id="explanation_images_input_temp" multiple accept="image/*" class="d-none">
-                                    <small class="text-muted">JPEG, PNG, GIF, WebP - up to 2MB each</small>
+                                    <small>JPEG, PNG, GIF, WebP - up to 2MB each</small>
                                 </div>
                             </div>
                         </div></div>
@@ -225,7 +225,7 @@
                             <h4 class="card-title">Answer Options</h4>
                         </div>
                         <div class="card-content"><div class="card-body">
-                            <p class="text-muted mb-2" id="choices-help">Add options and mark the correct one(s).</p>
+                            <p class="mb-2" id="choices-help">Add options and mark the correct one(s).</p>
                             <div id="options-container">
                                 <div class="option-row d-flex align-items-center mb-1">
                                     <input type="text" name="options[]" class="form-control mr-1" placeholder="Option 1" value="{{ old('options.0') }}">
@@ -254,7 +254,7 @@
                     <div class="card type-section" id="section-picture" style="display:none;">
                         <div class="card-header"><h4 class="card-title">Picture Options</h4></div>
                         <div class="card-content"><div class="card-body">
-                            <p class="text-muted mb-2">Upload images as options and mark the correct one(s).</p>
+                            <p class="mb-2">Upload images as options and mark the correct one(s).</p>
                             <div id="picture-options-container">
                                 <div class="picture-option-row row mb-2 align-items-center">
                                     <div class="col-md-4">
@@ -301,7 +301,7 @@
                     <div class="card type-section" id="section-blanks" style="display:none;">
                         <div class="card-header"><h4 class="card-title">Blank Answers</h4></div>
                         <div class="card-content"><div class="card-body">
-                            <p class="text-muted mb-2">Use <code>___</code> in the question text to indicate blanks. Add the correct answers below in order.</p>
+                            <p class="mb-2">Use <code>___</code> in the question text to indicate blanks. Add the correct answers below in order.</p>
                             <div id="blanks-container">
                                 <div class="blank-row d-flex align-items-center mb-1">
                                     <span class="mr-1 font-weight-bold">Blank 1:</span>
@@ -319,7 +319,7 @@
                     <div class="card type-section" id="section-matching" style="display:none;">
                         <div class="card-header"><h4 class="card-title">Matching Pairs</h4></div>
                         <div class="card-content"><div class="card-body">
-                            <p class="text-muted mb-2">Define left-right matching pairs.</p>
+                            <p class="mb-2">Define left-right matching pairs.</p>
                             <div id="matching-container">
                                 <div class="matching-row row mb-1">
                                     <div class="col-md-5">

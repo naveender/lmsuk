@@ -286,36 +286,58 @@ class QuestionController extends Controller
     /**
      * Remove the specified question.
      */
-    public function destroy(Question $question)
+    public function destroy(Question $question, Request $request)
     {
-        // Clean up single image
-        if ($question->image && Storage::disk('public')->exists($question->image)) {
-            Storage::disk('public')->delete($question->image);
-        }
+        try {
+            DB::beginTransaction();
 
-        // Clean up multiple question images
-        foreach ($question->images ?? [] as $img) {
-            if (Storage::disk('public')->exists($img)) {
-                Storage::disk('public')->delete($img);
+            // Clean up single image
+            if ($question->image && Storage::disk('public')->exists($question->image)) {
+                Storage::disk('public')->delete($question->image);
             }
-        }
 
-        // Clean up explanation images
-        foreach ($question->explanation_images ?? [] as $img) {
-            if (Storage::disk('public')->exists($img)) {
-                Storage::disk('public')->delete($img);
+            // Clean up multiple question images
+            foreach ($question->images ?? [] as $img) {
+                if (Storage::disk('public')->exists($img)) {
+                    Storage::disk('public')->delete($img);
+                }
             }
-        }
 
-        foreach ($question->options as $opt) {
-            if ($opt->option_image && Storage::disk('public')->exists($opt->option_image)) {
-                Storage::disk('public')->delete($opt->option_image);
+            // Clean up explanation images
+            foreach ($question->explanation_images ?? [] as $img) {
+                if (Storage::disk('public')->exists($img)) {
+                    Storage::disk('public')->delete($img);
+                }
             }
+
+            foreach ($question->options as $opt) {
+                if ($opt->option_image && Storage::disk('public')->exists($opt->option_image)) {
+                    Storage::disk('public')->delete($opt->option_image);
+                }
+            }
+
+            $question->options()->delete();
+            $question->delete();
+            DB::commit();
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Question deleted successfully.'
+                ]);
+            }
+
+            return redirect()->route('admin.questions.index')->with('success', 'Question deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error deleting question: ' . $e->getMessage()
+                ], 500);
+            }
+            return redirect()->route('admin.questions.index')->with('error', 'Error deleting question: ' . $e->getMessage());
         }
-
-        $question->delete(); // cascade deletes options
-
-        return redirect()->route('admin.questions.index')->with('success', 'Question deleted successfully.');
     }
 
     /**
@@ -1288,6 +1310,25 @@ class QuestionController extends Controller
             'success' => true,
             'results' => $results,
         ]);
+    }
+
+    /**
+     * Display the specified question details.
+     */
+    public function show(Question $question, Request $request)
+    {
+        $question->load(['subject', 'topic', 'subtopic', 'options']);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'question' => $question,
+                'subject_name' => $question->subject->title ?? '—',
+                'topic_name' => $question->topic->name ?? '—',
+                'subtopic_name' => $question->subtopic->name ?? '—',
+                'type_label' => $question->type_label,
+            ]);
+        }
+        return redirect()->route('admin.questions.edit', $question->id);
     }
 }
 

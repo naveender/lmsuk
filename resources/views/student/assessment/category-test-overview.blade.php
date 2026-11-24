@@ -245,7 +245,7 @@
                                                 <div class="subject-progress-bar">
                                                     <div class="subject-progress-fill" style="width: {{ $progressPercentage }}%"></div>
                                                 </div>
-                                                <div class="d-flex justify-content-between align-items-center mt-50 font-small-2 text-muted">
+                                                <div class="d-flex justify-content-between align-items-center mt-50 font-small-2">
                                                     <span>{{ $completedCount }} of {{ $totalPapers }} Done</span>
                                                     <span>
                                                         <i class="feather icon-calendar mr-25"></i>

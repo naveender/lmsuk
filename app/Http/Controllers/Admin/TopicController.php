@@ -58,6 +58,56 @@ class TopicController extends Controller
         return view('admin.topics.add', compact('topics', 'subjects'));
     }
 
+    public function tree(Topic $topic)
+    {
+        $topic->load(['subject', 'subTopics' => function($q) {
+            $q->with(['subTopics' => function($sq) {
+                $sq->with('subTopics')->orderBy('name', 'asc');
+            }])->orderBy('name', 'asc');
+        }]);
+
+        return response()->json([
+            'success' => true,
+            'topic' => [
+                'id' => $topic->id,
+                'name' => $topic->name,
+                'code' => $topic->code,
+                'subject_id' => $topic->subject_id,
+                'subject' => $topic->subject ? $topic->subject->title : null,
+                'subtopics_count' => $this->countAllSubtopics($topic),
+                'subtopics' => $topic->subTopics->map(function($sub) {
+                    return $this->formatTopicNode($sub);
+                }),
+            ]
+        ]);
+    }
+
+    private function countAllSubtopics($topic)
+    {
+        $count = $topic->subTopics->count();
+        foreach ($topic->subTopics as $child) {
+            if ($child->subTopics && $child->subTopics->isNotEmpty()) {
+                $count += $this->countAllSubtopics($child);
+            }
+        }
+        return $count;
+    }
+
+    private function formatTopicNode($node)
+    {
+        return [
+            'id' => $node->id,
+            'name' => $node->name,
+            'code' => $node->code,
+            'parent' => $node->parent,
+            'subject_id' => $node->subject_id,
+            'created_at' => $node->created_at ? $node->created_at->format('d M Y') : 'N/A',
+            'children' => $node->subTopics ? $node->subTopics->map(function($c) {
+                return $this->formatTopicNode($c);
+            }) : [],
+        ];
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -82,14 +132,31 @@ class TopicController extends Controller
             $thumbnailPath = $request->file('thumbnail')->store('topics', 'public');
         }
 
-        Topic::create([
+        $parentId = $request->parent_id == 0 ? null : $request->parent_id;
+        $subjectId = $request->subject_id;
+        if (!$subjectId && $parentId) {
+            $parentTopic = Topic::find($parentId);
+            if ($parentTopic) {
+                $subjectId = $parentTopic->subject_id;
+            }
+        }
+
+        $newTopic = Topic::create([
             'code' => $request->topic_code,
             'name' => $request->name,
-            'parent' => $request->parent_id == 0 ? null : $request->parent_id,
-            'subject_id' => $request->subject_id,
+            'parent' => $parentId,
+            'subject_id' => $subjectId,
             'slug' => $slug,
             'thumbnail' => $thumbnailPath,
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Subtopic created successfully.',
+                'topic' => $this->formatTopicNode($newTopic)
+            ]);
+        }
 
         return redirect()->route('topics')->with('success', 'Topic created successfully.');
     }
@@ -126,14 +193,25 @@ class TopicController extends Controller
             }
         }
 
+        $parentId = $request->has('parent_id') ? ($request->parent_id == 0 ? null : $request->parent_id) : $topic->parent;
+        $subjectId = $request->has('subject_id') ? $request->subject_id : $topic->subject_id;
+
         $topic->update([
-            'code' => $request->topic_code,
+            'code' => $request->topic_code ?? $topic->code,
             'name' => $request->name,
-            'parent' => $request->parent_id == 0 ? null : $request->parent_id,
-            'subject_id' => $request->subject_id,
+            'parent' => $parentId,
+            'subject_id' => $subjectId,
             'slug' => $slug,
             'thumbnail' => $thumbnailPath,
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Subtopic updated successfully.',
+                'topic' => $this->formatTopicNode($topic)
+            ]);
+        }
 
         return redirect()->route('topics')->with('success', 'Topic updated successfully.');
     }
@@ -141,6 +219,14 @@ class TopicController extends Controller
     public function destroy(Topic $topic)
     {
         $topic->delete();
+
+        if ($request->ajax() || $request->wantsJson() || request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Topic deleted successfully.'
+            ]);
+        }
+
         return redirect()->route('topics')->with('success', 'Topic deleted successfully.');
     }
 }

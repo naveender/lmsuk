@@ -103,18 +103,55 @@ class HomeworkController extends Controller
     }
 
     /**
+     * Display the specified homework details.
+     */
+    public function show(Homework $homework, Request $request)
+    {
+        $homework->load(['subject', 'topic', 'subtopic', 'class', 'yearGroup', 'user', 'courses']);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'homework' => $homework,
+                'subject_name' => $homework->subject->title ?? '—',
+                'topic_name' => $homework->topic->name ?? '—',
+                'class_name' => $homework->class->name ?? '—',
+                'year_group_name' => $homework->yearGroup->title ?? '—',
+                'creator_name' => $homework->user->name ?? 'Admin',
+            ]);
+        }
+        return redirect()->route('admin.homeworks.edit', $homework->id);
+    }
+
+    /**
      * Delete the homework assignment and its uploaded files.
      */
-    public function destroy(Homework $homework)
+    public function destroy(Homework $homework, Request $request)
     {
-        if ($homework->file_path && Storage::disk('public')->exists($homework->file_path)) {
-            Storage::disk('public')->delete($homework->file_path);
+        try {
+            if ($homework->file_path && Storage::disk('public')->exists($homework->file_path)) {
+                Storage::disk('public')->delete($homework->file_path);
+            }
+
+            $homework->courses()->detach();
+            $homework->delete();
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Homework deleted successfully.'
+                ]);
+            }
+
+            return redirect()->route('admin.homeworks.index')->with('success', 'Homework deleted successfully.');
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error deleting homework: ' . $e->getMessage()
+                ], 500);
+            }
+            return redirect()->route('admin.homeworks.index')->with('error', 'Error deleting homework: ' . $e->getMessage());
         }
-
-        $homework->courses()->detach();
-        $homework->delete();
-
-        return redirect()->route('admin.homeworks.index')->with('success', 'Homework deleted successfully.');
     }
 
     /**

@@ -7,19 +7,20 @@
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper">
-        <div class="content-header row">
-            <div class="content-header-left col-md-9 col-12 mb-2">
-                <div class="row breadcrumbs-top">
-                    <div class="col-12">
-                        <h2 class="content-header-title float-left mb-0 font-weight-bold">System Configurations</h2>
-                        <div class="breadcrumb-wrapper col-12">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                                <li class="breadcrumb-item active">System Configs</li>
-                            </ol>
-                        </div>
-                    </div>
+        <!-- Page Header / Title & Breadcrumbs -->
+        <div class="admin-page-header">
+            <div class="admin-page-title-wrap">
+                <div class="admin-title-row">
+                    <h1 class="admin-page-heading">System Configurations</h1>
+                    <nav class="admin-breadcrumbs" aria-label="Breadcrumb">
+                        <a href="{{ route('admin.dashboard') }}">Home</a>
+                        <span class="breadcrumb-sep">&raquo;</span>
+                        <span>Settings</span>
+                        <span class="breadcrumb-sep">&raquo;</span>
+                        <span>System Configs</span>
+                    </nav>
                 </div>
+                <p class="admin-page-subtitle">Configure application runtime settings, defaults, and integrations</p>
             </div>
         </div>
         
@@ -75,7 +76,7 @@
                                         <!-- SMTP Configuration -->
                                         <div class="tab-pane active" id="smtp-pane" role="tabpanel" aria-labelledby="smtp-tab">
                                             <h5 class="mb-1 text-primary"><i class="feather icon-mail"></i> SMTP Mail Delivery Settings</h5>
-                                            <p class="text-muted">Configure SMTP options for outbound transactional emails, announcements alerts, and account recovery.</p>
+                                            <p>Configure SMTP options for outbound transactional emails, announcements alerts, and account recovery.</p>
                                             
                                             <div class="row">
                                                 <div class="col-md-6 col-12">
@@ -135,7 +136,7 @@
                                         <!-- Wasabi Cloud Storage -->
                                         <div class="tab-pane" id="wasabi-pane" role="tabpanel" aria-labelledby="wasabi-tab">
                                             <h5 class="mb-1 text-primary"><i class="feather icon-cloud"></i> Wasabi Cloud Storage Settings</h5>
-                                            <p class="text-muted">Configure Wasabi S3 compatible cloud storage keys to directly host and retrieve learning resource videos.</p>
+                                            <p>Configure Wasabi S3 compatible cloud storage keys to directly host and retrieve learning resource videos.</p>
                                             
                                             <div class="row">
                                                 <div class="col-md-6 col-12">
@@ -179,7 +180,7 @@
                                         <!-- Amazon S3 -->
                                         <div class="tab-pane" id="s3-pane" role="tabpanel" aria-labelledby="s3-tab">
                                             <h5 class="mb-1 text-primary"><i class="feather icon-server"></i> Amazon S3 storage settings</h5>
-                                            <p class="text-muted">Configure AWS S3 storage credentials to distribute course media assets globally.</p>
+                                            <p>Configure AWS S3 storage credentials to distribute course media assets globally.</p>
                                             
                                             <div class="row">
                                                 <div class="col-md-6 col-12">
@@ -217,7 +218,7 @@
                                         <!-- Global Configurations -->
                                         <div class="tab-pane" id="global-pane" role="tabpanel" aria-labelledby="global-tab">
                                             <h5 class="mb-1 text-primary"><i class="feather icon-globe"></i> Global Application Settings</h5>
-                                            <p class="text-muted">Configure default media limitations, site-wide parameters, and global settings.</p>
+                                            <p>Configure default media limitations, site-wide parameters, and global settings.</p>
                                             
                                             <div class="row">
                                                 <div class="col-md-6 col-12">
@@ -229,7 +230,7 @@
                                                                 <span class="input-group-text">MB</span>
                                                             </div>
                                                         </div>
-                                                        <small class="text-muted">Default is 1024 MB (1 GB). Adjust this limit for chunked uploader capacity restrictions.</small>
+                                                        <small>Default is 1024 MB (1 GB). Adjust this limit for chunked uploader capacity restrictions.</small>
                                                     </div>
                                                 </div>
                                             </div>

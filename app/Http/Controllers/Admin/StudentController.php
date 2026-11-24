@@ -20,19 +20,65 @@ class StudentController extends Controller
         $query = User::where('role', 'student')->with(['studentDetail.parent', 'classes']);
 
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $search = trim($request->search);
+            $cleanId = preg_replace('/[^0-9]/', '', $search);
+            $query->where(function($q) use ($search, $cleanId) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('username', 'like', "%{$search}%");
+                if (!empty($cleanId)) {
+                    $q->orWhere('id', (int)$cleanId);
+                }
             });
+        }
+
+        if ($request->filled('year_group')) {
+            $yearGroup = $request->year_group;
+            $ygModel = YearGroup::where('value', $yearGroup)->orWhere('title', $yearGroup)->first();
+            $possibleValues = [$yearGroup];
+            if ($ygModel) {
+                $possibleValues[] = $ygModel->value;
+                $possibleValues[] = $ygModel->title;
+            }
+            $possibleValues = array_unique(array_filter($possibleValues));
+
+            $query->whereHas('studentDetail', function($q) use ($possibleValues) {
+                $q->whereIn('group_year', $possibleValues);
+            });
+        }
+
+        if ($request->filled('class_id')) {
+            $classId = $request->class_id;
+            $query->whereHas('classes', function($q) use ($classId) {
+                $q->where('classes.id', $classId);
+            });
+        }
+
+        if ($request->filled('parent_status')) {
+            if ($request->parent_status === 'linked') {
+                $query->whereHas('studentDetail', function($q) {
+                    $q->whereNotNull('parent_id');
+                });
+            } elseif ($request->parent_status === 'unassigned') {
+                $query->where(function($q) {
+                    $q->whereDoesntHave('studentDetail')
+                      ->orWhereHas('studentDetail', function($sq) {
+                          $sq->whereNull('parent_id');
+                      });
+                });
+            }
         }
 
         if ($request->filled('date')) {
             $query->whereDate('created_at', $request->date);
         }
 
-        $students = $query->latest()->paginate(20);
-        return view('admin.students.index', compact('students'));
+        $totalStudents = User::where('role', 'student')->count();
+        $yearGroups = YearGroup::where('is_active', 1)->get();
+        $classes = Classes::where('is_active', true)->orderBy('name')->get();
+
+        $students = $query->latest()->paginate(15);
+        return view('admin.students.index', compact('students', 'totalStudents', 'yearGroups', 'classes'));
     }
 
     public function create()
@@ -132,6 +178,26 @@ class StudentController extends Controller
         return redirect()->route('admin.students.index')->with('success', 'Student created successfully.');
     }
 
+    public function show($student)
+    {
+        $studentUser = $student instanceof User ? $student : User::where('id', $student)->firstOrFail();
+
+        if ($studentUser->role !== 'student') {
+            abort(404);
+        }
+
+        $studentUser->load(['studentDetail.parent', 'studentDetail.academicYear', 'classes']);
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'student' => $studentUser
+            ]);
+        }
+
+        return redirect()->route('admin.students.index');
+    }
+
     public function edit(User $student)
     {
         if ($student->role !== 'student') {
@@ -215,15 +281,27 @@ class StudentController extends Controller
         return redirect()->route('admin.students.index')->with('success', 'Student updated successfully.');
     }
 
-    public function destroy(User $student)
+    public function destroy($student)
     {
-        if ($student->role !== 'student') {
+        $studentUser = $student instanceof User ? $student : User::where('id', $student)->firstOrFail();
+
+        if ($studentUser->role !== 'student') {
             abort(404);
         }
-        if ($student->studentDetail) {
-            $student->studentDetail->delete();
+
+        DB::transaction(function () use ($studentUser) {
+            if ($studentUser->studentDetail) {
+                $studentUser->studentDetail->delete();
+            }
+            $studentUser->delete();
+        });
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Student soft-deleted successfully.'
+            ]);
         }
-        $student->delete();
 
         return redirect()->route('admin.students.index')->with('success', 'Student deleted successfully.');
     }

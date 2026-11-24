@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="{{ asset('theme/app-assets/css/colors.css') }}">
 <link rel="stylesheet" href="{{ asset('theme/app-assets/css/components.css') }}">
 <link rel="stylesheet" href="{{ asset('theme/app-assets/css/themes/dark-layout.css') }}">
-<link rel="stylesheet" href="{{ asset('theme/app-assets/css/themes/semi-dark-layout') }}">
+<link rel="stylesheet" href="{{ asset('theme/app-assets/css/themes/semi-dark-layout.css') }}">
 <!-- END: Theme CSS-->
 
 
@@ -35,3 +35,4 @@
 
 <!-- BEGIN: Custom CSS-->
 <link rel="stylesheet" href="{{ asset('theme/app-assets/css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('theme/app-assets/css/admin-theme.css') }}">

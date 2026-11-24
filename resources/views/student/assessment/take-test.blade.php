@@ -39,7 +39,7 @@
                         <div class="stat-pill mr-3 d-flex align-items-center bg-light-primary text-primary px-3 py-1 rounded-lg">
                             <i class="feather icon-list mr-2 font-medium-2"></i>
                             <div>
-                                <small class="d-block text-uppercase font-weight-bold text-muted" style="font-size: 0.55rem; letter-spacing: 0.5px;">Total Qs</small>
+                                <small class="d-block text-uppercase font-weight-bold" style="font-size: 0.55rem; letter-spacing: 0.5px;">Total Qs</small>
                                 <span class="font-weight-bold" style="font-size: 0.9rem;">{{ $questions->count() }}</span>
                             </div>
                         </div>
@@ -48,12 +48,12 @@
                         <div class="stat-pill mr-3 d-flex align-items-center bg-light-success text-success px-3 py-1 rounded-lg">
                             <i class="feather icon-check-circle mr-2 font-medium-2"></i>
                             <div>
-                                <small class="d-block text-uppercase font-weight-bold text-muted" style="font-size: 0.55rem; letter-spacing: 0.5px;">Answered</small>
+                                <small class="d-block text-uppercase font-weight-bold" style="font-size: 0.55rem; letter-spacing: 0.5px;">Answered</small>
                                 <span class="font-weight-bold" style="font-size: 0.9rem;">
                                     <span id="stat-answered">0</span>
-                                    <small class="font-weight-normal text-muted font-weight-bold" style="font-size: 0.75rem;">
+                                    <small class="font-weight-normal font-weight-bold" style="font-size: 0.75rem;">
                                         [ <span id="stat-guess-bracket" style="color: #ff9f43;">0</span> | 
-                                        <span id="stat-fairly-sure-bracket" style="color: #7367f0;">0</span> | 
+                                        <span id="stat-fairly-sure-bracket" style="color: #2477F9;">0</span> | 
                                         <span id="stat-sure-bracket" style="color: #28c76f;">0</span> ]
                                     </small>
                                 </span>
@@ -64,7 +64,7 @@
                         <div class="stat-pill mr-3 d-flex align-items-center bg-light-warning text-warning px-3 py-1 rounded-lg">
                             <i class="feather icon-skip-forward mr-2 font-medium-2"></i>
                             <div>
-                                <small class="d-block text-uppercase font-weight-bold text-muted" style="font-size: 0.55rem; letter-spacing: 0.5px;">Skipped</small>
+                                <small class="d-block text-uppercase font-weight-bold" style="font-size: 0.55rem; letter-spacing: 0.5px;">Skipped</small>
                                 <span class="font-weight-bold" style="font-size: 0.9rem;" id="stat-skipped">0</span>
                             </div>
                         </div>
@@ -73,7 +73,7 @@
                         <div class="stat-pill mr-3 d-flex align-items-center bg-light-danger text-danger px-3 py-1 rounded-lg">
                             <i class="feather icon-info mr-2 font-medium-2"></i>
                             <div>
-                                <small class="d-block text-uppercase font-weight-bold text-muted" style="font-size: 0.55rem; letter-spacing: 0.5px;">Unanswered</small>
+                                <small class="d-block text-uppercase font-weight-bold" style="font-size: 0.55rem; letter-spacing: 0.5px;">Unanswered</small>
                                 <span class="font-weight-bold" style="font-size: 0.9rem;" id="stat-unanswered">{{ $questions->count() }}</span>
                             </div>
                         </div>
@@ -119,7 +119,7 @@
                                             $inputName = "answers[{$question->id}][answer_text][]";
                                             $inputId = "blank-{$question->id}-{$blankIndex}";
                                             $readonlyAttr = $isLocked ? 'readonly tabindex="-1"' : '';
-                                            $borderStyle = $isLocked ? 'border: 2px solid #cbd5e1; background-color: #f1f5f9; pointer-events: none;' : 'border: 2px solid #7367f0;';
+                                            $borderStyle = $isLocked ? 'border: 2px solid #cbd5e1; background-color: #f1f5f9; pointer-events: none;' : 'border: 2px solid #2477F9;';
                                             $html = '<input type="text" name="' . $inputName . '" id="' . $inputId . '" class="form-control test-input blank-input-field d-inline-block" placeholder="blank ' . ($blankIndex + 1) . '" value="' . $val . '" oninput="checkTextInput(' . ($index + 1) . ', this)" ' . $readonlyAttr . ' style="' . $borderStyle . ' border-radius: 6px; height: 32px; padding: 2px 8px; font-size: 0.95rem; width: 150px; margin: 0 4px; vertical-align: middle;">';
                                             $blankIndex++;
                                             return $html;
@@ -184,7 +184,7 @@
 
                                 <!-- Option/Answer choices box layout -->
                                 <div class="answer-section">
-                                    <h6 class="font-weight-bold text-muted text-uppercase mb-3" style="font-size: 0.7rem; letter-spacing: 1px;">Answer Options</h6>
+                                    <h6 class="font-weight-bold text-uppercase mb-3" style="font-size: 0.7rem; letter-spacing: 1px;">Answer Options</h6>
                                     
                                     <!-- Choice questions grid -->
                                     @if(in_array($question->type, ['single_choice_radio', 'multiple_choice', 'picture_choice']))
@@ -249,7 +249,7 @@
                                                     class="form-control test-input select-input" 
                                                     onchange="selectDropdownOption({{ $index + 1 }}, this)" 
                                                     @if($isLocked) tabindex="-1" @endif 
-                                                    style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#7367f0' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 8px; height: 46px; font-weight: 500;">
+                                                    style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#2477F9' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 8px; height: 46px; font-weight: 500;">
                                                 <option value="">-- Choose Option --</option>
                                                 @foreach($question->options as $option)
                                                     <option value="{{ $option->id }}" {{ ($ans && $ans->selected_option_id == $option->id) ? 'selected' : '' }}>
@@ -286,7 +286,7 @@
                                                                     class="form-control test-input select-input matching-select" 
                                                                     onchange="selectDropdownOption({{ $index + 1 }}, this)"
                                                                     @if($isLocked) tabindex="-1" @endif
-                                                                    style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#7367f0' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 8px; width: 180px; height: 38px; font-weight: 500; font-size: 0.85rem;">
+                                                                    style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#2477F9' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 8px; width: 180px; height: 38px; font-weight: 500; font-size: 0.85rem;">
                                                                 <option value="">-- Match --</option>
                                                                 @foreach($rightOptions as $opt)
                                                                     <option value="{{ $opt }}" {{ ($savedMatches[$pairIndex] ?? '') === $opt ? 'selected' : '' }}>
@@ -329,7 +329,7 @@
                                             <div class="row">
                                                 <!-- Targets Column (Left Items) -->
                                                 <div class="col-md-7 col-12">
-                                                    <h6 class="font-weight-bold text-muted mb-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">MATCHING TARGETS</h6>
+                                                    <h6 class="font-weight-bold mb-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">MATCHING TARGETS</h6>
                                                     @foreach($pairs as $pairIndex => $pair)
                                                         @php
                                                             $savedMatchVal = $savedMatches[$pairIndex] ?? '';
@@ -347,7 +347,7 @@
                                                                 {{ $pair['left'] }}
                                                             </div>
                                                             
-                                                            <i class="feather icon-link text-muted mx-3"></i>
+                                                            <i class="feather icon-link mx-3"></i>
                                                             
                                                             <!-- Drop Zone / Match Zone -->
                                                             <div class="drop-zone border-dashed d-flex align-items-center justify-content-center" 
@@ -356,7 +356,7 @@
                                                                  ondragover="allowDrop(event)"
                                                                  ondrop="handleDrop(event)"
                                                                  onclick="handleDropzoneClick(this)"
-                                                                 style="border: 2px dashed #7367f0; border-radius: 8px; width: 180px; min-height: 42px; background-color: #fbfaff; cursor: pointer; transition: all 0.2s; padding: 4px;">
+                                                                 style="border: 2px dashed #2477F9; border-radius: 8px; width: 180px; min-height: 42px; background-color: #fbfaff; cursor: pointer; transition: all 0.2s; padding: 4px;">
                                                                 
                                                                 @if($savedMatchVal)
                                                                     <div class="draggable-card p-2 bg-primary text-white font-weight-bold text-center rounded matched-card" 
@@ -369,7 +369,7 @@
                                                                         {{ $savedMatchVal }}
                                                                     </div>
                                                                 @else
-                                                                    <span class="text-muted font-small-2 drag-placeholder">Drop or click here</span>
+                                                                    <span class="font-small-2 drag-placeholder">Drop or click here</span>
                                                                 @endif
                                                             </div>
                                                         </div>
@@ -378,7 +378,7 @@
 
                                                 <!-- Draggables Pool Column (Right Items) -->
                                                 <div class="col-md-5 col-12">
-                                                    <h6 class="font-weight-bold text-muted mb-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">DRAG OR CLICK ITEMS</h6>
+                                                    <h6 class="font-weight-bold mb-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">DRAG OR CLICK ITEMS</h6>
                                                     <div class="draggables-pool p-3 border rounded d-flex flex-wrap align-content-start" 
                                                          data-question-id="{{ $question->id }}"
                                                          ondragover="allowDrop(event)"
@@ -399,7 +399,7 @@
                                                         @endforeach
                                                         
                                                         @if(count($unmatchedRightItems) === 0 && count($matchedRightItems) === 0)
-                                                            <span class="text-muted font-small-2 pool-empty-message">No matching items found.</span>
+                                                            <span class="font-small-2 pool-empty-message">No matching items found.</span>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -409,7 +409,7 @@
                                     <!-- Text / Blanks / Free text -->
                                     @else
                                         @if($question->type === 'fill_in_the_blanks' && $hasInlineBlanks)
-                                            <div class="text-muted font-small-3 mt-2"><i class="feather icon-info mr-1 text-info"></i> Please fill in the blanks above.</div>
+                                            <div class="font-small-3 mt-2"><i class="feather icon-info mr-1 text-info"></i> Please fill in the blanks above.</div>
                                         @else
                                             <div class="form-group mb-0">
                                                 @if($question->type === 'free_text')
@@ -419,7 +419,7 @@
                                                               placeholder="Type your explanation or essay answer here..."
                                                               oninput="checkTextInput({{ $index + 1 }}, this)"
                                                               @if($isLocked) readonly tabindex="-1" @endif
-                                                              style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#7367f0' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 12px; padding: 12px; font-size: 0.95rem;">{{ $ans ? $ans->answer_text : '' }}</textarea>
+                                                              style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#2477F9' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 12px; padding: 12px; font-size: 0.95rem;">{{ $ans ? $ans->answer_text : '' }}</textarea>
                                                 @else
                                                     <input type="text" 
                                                            name="answers[{{ $question->id }}][answer_text]" 
@@ -428,7 +428,7 @@
                                                            value="{{ $ans ? $ans->answer_text : '' }}"
                                                            oninput="checkTextInput({{ $index + 1 }}, this)"
                                                            @if($isLocked) readonly tabindex="-1" @endif
-                                                           style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#7367f0' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 8px; height: 46px; font-size: 0.95rem; max-width: 450px;">
+                                                           style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#2477F9' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 8px; height: 46px; font-size: 0.95rem; max-width: 450px;">
                                                 @endif
                                             </div>
                                         @endif
@@ -526,7 +526,7 @@
                                              style="cursor: pointer; border-radius: 12px; padding: 10px 14px; margin-bottom: 8px;">
                                             
                                             <!-- Left Dot Indicator for Active Question -->
-                                            <span class="active-dot d-none bg-primary" style="position: absolute; left: 6px; top: calc(50% - 4px); width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 10px #7367f0;"></span>
+                                            <span class="active-dot d-none bg-primary" style="position: absolute; left: 6px; top: calc(50% - 4px); width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 10px #2477F9;"></span>
 
                                             <div class="d-flex align-items-center pl-2">
                                                 <span class="q-num-label font-weight-bold text-dark mr-2">Q{{ $index + 1 }}</span>
@@ -607,7 +607,7 @@
                         <!-- Feedback Loading (Instant Feedback) -->
                         <div id="feedback-loading-wrapper" class="d-none align-items-center">
                             <span class="spinner-border spinner-border-sm text-primary mr-2" role="status" aria-hidden="true"></span>
-                            <span class="font-weight-bold text-muted" style="font-size: 0.8rem;">Evaluating answer...</span>
+                            <span class="font-weight-bold" style="font-size: 0.8rem;">Evaluating answer...</span>
                         </div>
 
                         <!-- Continue Button (Instant Feedback) -->
@@ -814,7 +814,7 @@
         }
 
         .btn-toolbar-skip {
-            background: linear-gradient(135deg, #7367f0 0%, #4839eb 100%) !important;
+            background: linear-gradient(135deg, #2477F9 0%, #4839eb 100%) !important;
             border: none !important;
             color: #ffffff !important;
             padding: 6px 16px !important;
@@ -914,13 +914,13 @@
             align-items: center;
         }
         .option-card:hover {
-            border-color: #7367f0 !important;
+            border-color: #2477F9 !important;
             background-color: #f8fafc;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(115, 103, 240, 0.06);
         }
         .selected-option-card {
-            border-color: #7367f0 !important;
+            border-color: #2477F9 !important;
             border-width: 2px !important;
             background: linear-gradient(135deg, #f5f3ff 0%, #fbfaff 100%) !important;
             box-shadow: 0 5px 12px rgba(115, 103, 240, 0.1) !important;
@@ -929,7 +929,7 @@
             width: 34px;
             height: 34px;
             background-color: #f1efff;
-            color: #7367f0;
+            color: #2477F9;
             border-radius: 50%;
             font-weight: 700;
             font-size: 0.95rem;
@@ -939,7 +939,7 @@
             transition: all 0.15s;
         }
         .selected-option-card .option-letter {
-            background-color: #7367f0 !important;
+            background-color: #2477F9 !important;
             color: white !important;
             box-shadow: 0 2px 4px rgba(115, 103, 240, 0.2);
         }
@@ -1182,7 +1182,7 @@
         }
         .drop-zone.drag-active {
             background-color: #eef2ff !important;
-            border-color: #7367f0 !important;
+            border-color: #2477F9 !important;
         }
         .draggable-card:hover {
             transform: translateY(-1px);
@@ -1244,7 +1244,7 @@
         .question-sidebar-card.active-row {
             background: linear-gradient(135deg, rgba(115, 103, 240, 0.06) 0%, rgba(115, 103, 240, 0.12) 100%) !important;
             border-color: rgba(115, 103, 240, 0.6) !important;
-            border-left: 4px solid #7367f0 !important;
+            border-left: 4px solid #2477F9 !important;
             box-shadow: 0 6px 18px rgba(115, 103, 240, 0.1) !important;
             transform: scale(1.02);
             backdrop-filter: blur(10px);

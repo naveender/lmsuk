@@ -159,7 +159,7 @@
                         {{-- Multiple Question Images --}}
                         <div class="form-group">
                             <label class="d-block font-weight-bold">Question Images (Optional)</label>
-                            <p class="text-muted small mb-1">Existing images below. Click &times; to remove. Add more using the button.</p>
+                            <p class="small mb-1">Existing images below. Click &times; to remove. Add more using the button.</p>
 
                             {{-- Existing images grid --}}
                             <div id="question-images-preview" class="d-flex flex-wrap mb-2" style="gap:8px;">
@@ -189,14 +189,14 @@
                                 </label>
                                 <input type="file" id="question_images_input" name="images[]" multiple accept="image/*" class="d-none">
                                 <input type="file" id="question_images_input_temp" multiple accept="image/*" class="d-none">
-                                <small class="text-muted">JPEG, PNG, GIF, WebP - up to 2MB each</small>
+                                <small>JPEG, PNG, GIF, WebP - up to 2MB each</small>
                             </div>
                         </div>
 
                         {{-- Explanation (Rich Text with Quill) --}}
                         <div class="form-group">
                             <label class="font-weight-bold">Explanation (Optional)</label>
-                            <p class="text-muted small mb-1">Rich text with formatting support for student feedback.</p>
+                            <p class="small mb-1">Rich text with formatting support for student feedback.</p>
                             {{-- Hidden textarea that gets submitted --}}
                             <textarea name="explanation" id="explanation_input" class="d-none">{{ old('explanation', $question->explanation) }}</textarea>
                             {{-- Quill editor container --}}
@@ -206,7 +206,7 @@
                         {{-- Explanation Images --}}
                         <div class="form-group">
                             <label class="d-block font-weight-bold">Explanation Images (Optional)</label>
-                            <p class="text-muted small mb-1">Existing images below. Click &times; to remove. Add more using the button.</p>
+                            <p class="small mb-1">Existing images below. Click &times; to remove. Add more using the button.</p>
 
                             {{-- Existing explanation images --}}
                             <div id="explanation-images-preview" class="d-flex flex-wrap mb-2" style="gap:8px;">
@@ -227,7 +227,7 @@
                                 </label>
                                 <input type="file" id="explanation_images_input" name="explanation_images[]" multiple accept="image/*" class="d-none">
                                 <input type="file" id="explanation_images_input_temp" multiple accept="image/*" class="d-none">
-                                <small class="text-muted">JPEG, PNG, GIF, WebP - up to 2MB each</small>
+                                <small>JPEG, PNG, GIF, WebP - up to 2MB each</small>
                             </div>
                         </div>
                     </div></div>
@@ -295,7 +295,7 @@
                 <div class="card type-section" id="section-blanks" style="display:none;">
                     <div class="card-header"><h4 class="card-title">Blank Answers</h4></div>
                     <div class="card-content"><div class="card-body">
-                        <p class="text-muted mb-2">Use <code>___</code> in the question text for blanks.</p>
+                        <p class="mb-2">Use <code>___</code> in the question text for blanks.</p>
                         <div id="blanks-container">
                             @forelse($blanks as $i => $b)
                             <div class="blank-row d-flex align-items-center mb-1">

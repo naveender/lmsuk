@@ -90,6 +90,13 @@ class ClassesController extends Controller
     {
         $class->delete();
 
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Class deleted successfully.'
+            ]);
+        }
+
         return redirect()->route('admin.classes.index')->with('success', 'Class deleted successfully.');
     }
 

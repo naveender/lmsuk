@@ -465,7 +465,7 @@ class MediaFileController extends Controller
         ]);
     }
 
-    public function destroy(MediaFile $mediaFile)
+    public function destroy(MediaFile $mediaFile, Request $request)
     {
         try {
             // Delete actual file if stored locally or in cloud
@@ -480,13 +480,28 @@ class MediaFileController extends Controller
             if ($mediaFile->thumbnail_path) {
                 Storage::disk('public')->delete($mediaFile->thumbnail_path);
             }
+
+            $mediaFile->courses()->detach();
+            $mediaFile->delete();
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Media file deleted successfully.'
+                ]);
+            }
+
+            return redirect()->route('admin.media-files.index')->with('success', 'Media file deleted successfully.');
         } catch (\Exception $e) {
             logger()->error('Failed to delete physical media file: ' . $e->getMessage());
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error deleting media file: ' . $e->getMessage()
+                ], 500);
+            }
+            return redirect()->route('admin.media-files.index')->with('error', 'Error deleting media file: ' . $e->getMessage());
         }
-
-        $mediaFile->delete();
-
-        return redirect()->route('admin.media-files.index')->with('success', 'Media file deleted successfully.');
     }
 
     /**
@@ -590,5 +605,25 @@ class MediaFileController extends Controller
             return sprintf('%02d:%02d:%02d', $hours, $minutes, $secs);
         }
         return sprintf('%02d:%02d', $minutes, $secs);
+    }
+
+    /**
+     * Display media file details.
+     */
+    public function show(MediaFile $media_file, Request $request)
+    {
+        $media_file->load(['subject', 'class', 'yearGroup', 'courses']);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'media_file' => $media_file,
+                'subject_name' => $media_file->subject->title ?? '—',
+                'class_name' => $media_file->class->name ?? '—',
+                'year_group_name' => $media_file->yearGroup->title ?? '—',
+                'file_url' => $media_file->file_url,
+                'thumbnail_url' => $media_file->thumbnail_url,
+            ]);
+        }
+        return redirect()->route('admin.media-files.edit', $media_file->id);
     }
 }

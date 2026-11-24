@@ -76,6 +76,13 @@ class YearGroupController extends Controller
     {
         $yearGroup->delete();
 
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Year Group deleted successfully.'
+            ]);
+        }
+
         return redirect()->route('admin.year-groups.index')->with('success', 'Year Group deleted successfully.');
     }
 }

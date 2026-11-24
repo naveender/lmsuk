@@ -82,13 +82,47 @@ class CourseController extends Controller
     }
 
     /**
+     * Display the specified course details (JSON for modal / redirect).
+     */
+    public function show(Course $course, Request $request)
+    {
+        $course->loadCount(['papers', 'mediaFiles']);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'course' => $course,
+                'papers_count' => $course->papers_count,
+                'videos_count' => $course->media_files_count,
+            ]);
+        }
+        return redirect()->route('admin.courses.edit', $course->id);
+    }
+
+    /**
      * Remove the specified course from storage.
      */
-    public function destroy(Course $course)
+    public function destroy(Course $course, Request $request)
     {
-        $course->delete();
+        try {
+            $course->delete();
 
-        return redirect()->route('admin.courses.index')->with('success', 'Course deleted successfully.');
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Course deleted successfully.'
+                ]);
+            }
+
+            return redirect()->route('admin.courses.index')->with('success', 'Course deleted successfully.');
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error deleting course: ' . $e->getMessage()
+                ], 500);
+            }
+            return redirect()->route('admin.courses.index')->with('error', 'Error deleting course: ' . $e->getMessage());
+        }
     }
 
     /**
