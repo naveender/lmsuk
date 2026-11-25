@@ -581,6 +581,7 @@ class AssessmentController extends Controller
         // Map papers to subtopics
         foreach ($subtopics as $subtopic) {
             $papersQuery = Paper::visibleTo($student)
+                ->with(['questions', 'subject'])
                 ->where('subtopic_id', $subtopic->id);
 
             if (request()->filled('paper_name')) {
@@ -598,6 +599,36 @@ class AssessmentController extends Controller
                     ->where('paper_id', $paper->id)
                     ->where('status', 'completed')
                     ->count();
+
+                // Compute real paper metadata for the start-test modal
+                $questionsCount = $paper->questions->count();
+                $paper->questions_count = $questionsCount;
+
+                $totalMarks = 0;
+                $qTypes = [];
+                foreach ($paper->questions as $q) {
+                    $totalMarks += $q->pivot->marks ?? $paper->default_marks ?? 1;
+                    $qTypes[] = $q->type;
+                }
+                $paper->total_marks = $totalMarks > 0
+                    ? $totalMarks
+                    : ($questionsCount * ($paper->default_marks ?? 1));
+
+                $uniqueTypes = array_values(array_unique($qTypes));
+                $choiceTypes = ['single_choice_radio', 'single_choice_dropdown', 'multiple_choice', 'picture_choice'];
+                $directTypes = ['fill_in_the_blanks', 'free_text', 'matching_text'];
+
+                if (empty($uniqueTypes)) {
+                    $paper->display_type = Paper::TYPES[$paper->type] ?? ucfirst($paper->type ?? 'Test');
+                } elseif (empty(array_diff($uniqueTypes, $directTypes))) {
+                    $paper->display_type = 'Direct Answer';
+                } elseif (empty(array_diff($uniqueTypes, $choiceTypes))) {
+                    $paper->display_type = 'Multiple Choice';
+                } elseif (count($uniqueTypes) === 1) {
+                    $paper->display_type = Question::TYPES[$uniqueTypes[0]] ?? 'Standard';
+                } else {
+                    $paper->display_type = 'Mixed Format';
+                }
 
                 return $paper;
             });
