@@ -63,11 +63,66 @@ class AnnouncementsController extends Controller
         $announcements = $query->orderByRaw("CASE priority WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END ASC")
             ->orderBy('show_from', 'desc')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($announcement) {
+                [$categoryKey, $categoryLabel] = $this->classifyAnnouncement($announcement);
+                $announcement->category_key = $categoryKey;
+                $announcement->category_label = $categoryLabel;
+                return $announcement;
+            });
 
         $viewedIds = AnnouncementView::where('user_id', $user->id)->pluck('announcement_id')->toArray();
 
-        return view('student.announcements', compact('announcements', 'viewedIds'));
+        $totalAnnouncementsCount = $announcements->count();
+        $importantCount = $announcements->where('category_key', 'important')->count();
+        $upcomingEventsCount = $announcements->where('category_key', 'upcoming')->count();
+        $generalUpdatesCount = max(0, $totalAnnouncementsCount - $importantCount - $upcomingEventsCount);
+
+        return view('student.announcements', compact(
+            'announcements',
+            'viewedIds',
+            'totalAnnouncementsCount',
+            'importantCount',
+            'upcomingEventsCount',
+            'generalUpdatesCount'
+        ));
+    }
+
+    /**
+     * Classify an announcement into UI filter categories matching the student portal design.
+     */
+    private function classifyAnnouncement(Announcement $announcement): array
+    {
+        $haystack = strtolower(trim(
+            ($announcement->title ?? '') . ' ' .
+            ($announcement->description ?? '') . ' ' .
+            ($announcement->content ?? '')
+        ));
+
+        if ($announcement->priority === 'high') {
+            return ['important', 'Important'];
+        }
+
+        if (
+            preg_match('/\b(schedule|timetable|event|events|upcoming|starting|starts|workshop|webinar|calendar|batch|session|sessions|deadline)\b/i', $haystack)
+            || ($announcement->show_from && $announcement->show_from->isFuture())
+        ) {
+            return ['upcoming', 'Upcoming Event'];
+        }
+
+        if (preg_match('/\b(holiday|holidays|closed|closure|bank holiday)\b/i', $haystack)) {
+            return ['general', 'General'];
+        }
+
+        if (preg_match('/\b(result|results|published|portal|report|feedback|score|scores|centre update|system update|maintenance)\b/i', $haystack)) {
+            return ['centre_update', 'Centre Update'];
+        }
+
+        if (preg_match('/\b(paper|papers|homework|worksheet|worksheets|lesson|lessons|practice|english|math|maths|verbal|revision|study|resource|resources|topic|curriculum|quiz|mock)\b/i', $haystack)) {
+            return ['academic', 'Academic'];
+        }
+
+        return ['general', 'General'];
     }
 
     public function view(Announcement $announcement)
