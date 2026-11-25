@@ -1,105 +1,280 @@
 @extends('layouts.app')
 
-@section('title', 'TEST: ' . $attempt->paper->title)
+@section('title', $attempt->paper->title . ' - Assessment')
 
 @section('content')
-    <!-- Google Fonts for Modern Styling -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    @php
+        $studentUser = auth()->user();
+        $totalQuestionsCount = $questions->count();
 
-    <!-- Outer sandboxed wrapper to prevent header/menu conflicts -->
-    <div class="fullscreen-player-content">
-        <!-- Mobile Sidebar Backdrop Overlay -->
-        <div class="drawer-backdrop" onclick="toggleSidebar()"></div>
-        
-        <!-- Fullscreen Player Frame -->
-        <div class="player-frame">
-            
-            <!-- Top Status Bar -->
-            <div class="top-status-bar d-flex justify-content-between align-items-center px-3 px-md-4 py-2 border-bottom bg-white">
-                <div class="d-flex align-items-center min-width-0 flex-grow-1 mr-2">
-                    <span class="badge badge-pill badge-light-primary px-3 py-1 font-weight-bold text-uppercase mr-3 d-none d-md-inline" style="font-size: 0.7rem; letter-spacing: 0.5px; white-space: nowrap;">
-                        {{ $attempt->paper->subject->title }} &nbsp;•&nbsp; {{ $attempt->paper->topic->name }}
-                    </span>
-                    <h5 class="mb-0 font-weight-bold text-dark text-truncate" style="letter-spacing: -0.5px;">{{ $attempt->paper->title }}</h5>
-                </div>
-                
-                <div class="d-flex align-items-center justify-content-end flex-shrink-0">
-                    <!-- Mobile Clock -->
-                    <div class="d-md-none mr-2 bg-dark py-1 px-2 rounded" style="border: 1px solid #334155;">
-                        <span id="mobile-digital-clock" class="font-weight-bold text-danger text-monospace" style="font-family: 'Share Tech Mono', monospace; font-size: 1rem; text-shadow: 0 0 5px rgba(248, 113, 113, 0.5);">00:00:00</span>
+        // Classify paper format for header subtitle and subject icon
+        $qTypes = $questions->pluck('type')->unique()->values()->all();
+        $choiceTypes = ['single_choice_radio', 'single_choice_dropdown', 'multiple_choice', 'picture_choice'];
+        $directTypes = ['fill_in_the_blanks', 'free_text', 'matching_text', 'matching_drag_drop', 'file_upload'];
+
+        if (!empty($qTypes) && empty(array_diff($qTypes, $choiceTypes))) {
+            $paperSubtitle = 'Answer the questions below and choose the best option.';
+        } elseif (!empty($qTypes) && empty(array_diff($qTypes, $directTypes))) {
+            $paperSubtitle = 'Answer the questions below by typing your answer.';
+        } else {
+            $paperSubtitle = 'Answer each question below carefully.';
+        }
+
+        $subjectNameLower = strtolower($attempt->paper->subject?->title ?? $attempt->paper->title ?? '');
+        $subjectIconType = 'book';
+        if (str_contains($subjectNameLower, 'math') || str_contains($subjectNameLower, 'numeracy') || str_contains($subjectNameLower, 'arithmetic')) {
+            $subjectIconType = 'calculator';
+        } elseif (str_contains($subjectNameLower, 'verbal') || str_contains($subjectNameLower, 'reasoning')) {
+            $subjectIconType = 'brain';
+        }
+
+        $hasCustomInstruction = !empty(trim(strip_tags((string) $attempt->paper->instruction)));
+    @endphp
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Distraction-free Exam Shell -->
+    <div class="exam-player-shell">
+
+        <!-- Top Global Navbar -->
+        <header class="exam-topbar">
+            <div class="exam-topbar-inner">
+                <a href="javascript:void(0)" class="exam-brand-link" title="{{ $attempt->paper->title }}">
+                    <img src="{{ asset('theme/app-assets/images/logo/Aspire-Learner-Horizontal-Full-Logo.png') }}"
+                         alt="Aspire Learners" class="exam-logo-light">
+                    <img src="{{ asset('theme/app-assets/images/logo/Aspire-Learner-horizontal-white-Full-Logo.png') }}"
+                         alt="Aspire Learners" class="exam-logo-dark">
+                </a>
+
+                <div class="exam-topbar-right">
+                    <!-- Notification Bell -->
+                    <div class="dropdown">
+                        <button type="button" class="exam-bell-btn" id="examBellDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Test Status">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            <span class="exam-bell-badge">3</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right exam-dropdown-menu shadow-lg border-0" aria-labelledby="examBellDropdown">
+                            <div class="px-3 py-2 border-bottom d-flex align-items-center justify-content-between">
+                                <span class="font-weight-bold text-dark" style="font-size: 0.85rem;">Test Reminders</span>
+                                <span class="badge badge-pill badge-light-primary font-small-1">Active</span>
+                            </div>
+                            <div class="p-3" style="font-size: 0.82rem; color: #475569; line-height: 1.5;">
+                                <div class="mb-2"><strong>Auto-Save Active:</strong> Answers are saved automatically as you work.</div>
+                                <div class="mb-2"><strong>Mark for Review:</strong> Flag questions to revisit before submitting.</div>
+                                <div><strong>Save &amp; Exit:</strong> Safely save your progress and resume later.</div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Mobile Drawer Toggle Button -->
-                    <button type="button" class="btn btn-sm btn-outline-primary d-md-none mr-2" onclick="toggleSidebar()" style="border-radius: 6px; padding: 4px 8px; font-weight: 600;">
-                        <i class="feather icon-menu mr-1"></i> Overview
-                    </button>
-
-                    <div class="d-none d-md-flex align-items-center">
-                        <!-- Stat Card: Total Questions -->
-                        <div class="stat-pill mr-3 d-flex align-items-center bg-light-primary text-primary px-3 py-1 rounded-lg">
-                            <i class="feather icon-list mr-2 font-medium-2"></i>
-                            <div>
-                                <small class="d-block text-uppercase font-weight-bold" style="font-size: 0.55rem; letter-spacing: 0.5px;">Total Qs</small>
-                                <span class="font-weight-bold" style="font-size: 0.9rem;">{{ $questions->count() }}</span>
+                    <!-- User Profile Pill -->
+                    <div class="dropdown">
+                        <button type="button" class="exam-user-pill dropdown-toggle" id="examUserDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="{{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}"
+                                 alt="{{ $studentUser->name ?? 'Student User' }}"
+                                 class="exam-user-avatar">
+                            <div class="exam-user-meta d-none d-sm-flex">
+                                <span class="exam-user-name">{{ $studentUser->name ?? 'Student User' }}</span>
+                                <span class="exam-user-role">Student</span>
                             </div>
-                        </div>
-
-                        <!-- Stat Card: Answered with Certainty counts -->
-                        <div class="stat-pill mr-3 d-flex align-items-center bg-light-success text-success px-3 py-1 rounded-lg">
-                            <i class="feather icon-check-circle mr-2 font-medium-2"></i>
-                            <div>
-                                <small class="d-block text-uppercase font-weight-bold" style="font-size: 0.55rem; letter-spacing: 0.5px;">Answered</small>
-                                <span class="font-weight-bold" style="font-size: 0.9rem;">
-                                    <span id="stat-answered">0</span>
-                                    <small class="font-weight-normal font-weight-bold" style="font-size: 0.75rem;">
-                                        [ <span id="stat-guess-bracket" style="color: #ff9f43;">0</span> | 
-                                        <span id="stat-fairly-sure-bracket" style="color: #2477F9;">0</span> | 
-                                        <span id="stat-sure-bracket" style="color: #28c76f;">0</span> ]
-                                    </small>
-                                </span>
+                            <svg class="exam-user-chevron d-none d-sm-block" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right exam-dropdown-menu shadow-lg border-0" aria-labelledby="examUserDropdown">
+                            <div class="px-3 py-2 border-bottom">
+                                <div class="font-weight-bold text-dark" style="font-size: 0.88rem;">{{ $studentUser->name ?? 'Student User' }}</div>
+                                <div class="text-muted" style="font-size: 0.76rem;">{{ $studentUser->email ?? '' }}</div>
                             </div>
-                        </div>
-
-                        <!-- Stat Card: Skipped -->
-                        <div class="stat-pill mr-3 d-flex align-items-center bg-light-warning text-warning px-3 py-1 rounded-lg">
-                            <i class="feather icon-skip-forward mr-2 font-medium-2"></i>
-                            <div>
-                                <small class="d-block text-uppercase font-weight-bold" style="font-size: 0.55rem; letter-spacing: 0.5px;">Skipped</small>
-                                <span class="font-weight-bold" style="font-size: 0.9rem;" id="stat-skipped">0</span>
-                            </div>
-                        </div>
-
-                        <!-- Stat Card: Unanswered -->
-                        <div class="stat-pill mr-3 d-flex align-items-center bg-light-danger text-danger px-3 py-1 rounded-lg">
-                            <i class="feather icon-info mr-2 font-medium-2"></i>
-                            <div>
-                                <small class="d-block text-uppercase font-weight-bold" style="font-size: 0.55rem; letter-spacing: 0.5px;">Unanswered</small>
-                                <span class="font-weight-bold" style="font-size: 0.9rem;" id="stat-unanswered">{{ $questions->count() }}</span>
-                            </div>
+                            <a class="dropdown-item exam-menu-item theme-toggle-menu-item" href="{{ route('change.theme') }}" id="examThemeToggle">
+                                <i class="feather icon-{{ session('theme', 'light') === 'dark' ? 'sun' : 'moon' }} mr-2" id="examThemeIcon"></i>
+                                <span id="examThemeLabel">{{ session('theme', 'light') === 'dark' ? 'Light Mode' : 'Dark Mode' }}</span>
+                            </a>
+                            <button type="button" class="dropdown-item exam-menu-item text-primary font-weight-bold" onclick="submitTestForm('pause')">
+                                <i class="feather icon-log-out mr-2"></i>
+                                <span>Save &amp; Exit Test</span>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+        </header>
 
-            <!-- Main Form Wrapper -->
-            <form id="test-taking-form" action="" method="POST" class="mb-0 flex-grow-1 d-flex flex-column overflow-hidden">
+        <!-- Main Exam Container -->
+        <main class="exam-main-container">
+
+            <!-- Paper Header Row -->
+            <div class="exam-paper-header">
+                <div class="exam-paper-title-wrap">
+                    <div class="exam-subject-badge">
+                        @if($subjectIconType === 'calculator')
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="4" y="2" width="16" height="20" rx="2"/>
+                                <line x1="8" y1="6" x2="16" y2="6"/>
+                                <line x1="16" y1="14" x2="16" y2="18"/>
+                                <path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/>
+                                <path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/>
+                            </svg>
+                        @elseif($subjectIconType === 'brain')
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.04"/>
+                                <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.04"/>
+                            </svg>
+                        @else
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                            </svg>
+                        @endif
+                    </div>
+
+                    <div class="exam-title-meta">
+                        <h1 class="exam-paper-title">{{ $attempt->paper->title }}</h1>
+                        <p class="exam-paper-subtitle">
+                            <span>{{ $paperSubtitle }}</span>
+                            @if($hasCustomInstruction)
+                                <button type="button" class="exam-instr-link" data-toggle="modal" data-target="#instructionsModal">
+                                    View Instructions
+                                </button>
+                            @endif
+                        </p>
+                    </div>
+                </div>
+
+                <div class="exam-header-actions">
+                    <button type="button" class="btn-save-exit" onclick="submitTestForm('pause')">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                            <polyline points="10 17 15 12 10 7"/>
+                            <line x1="15" y1="12" x2="3" y2="12"/>
+                        </svg>
+                        <span>Save &amp; Exit</span>
+                    </button>
+
+                    <button type="button" class="btn-submit-test" onclick="submitTestForm('submit')">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                        <span>Submit Test</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 6-Stat Summary Bar -->
+            <section class="exam-meta-bar" aria-label="Test overview">
+                <div class="exam-meta-grid">
+                    <!-- 1. Questions -->
+                    <div class="exam-meta-item">
+                        <div class="exam-meta-icon meta-bg-blue">
+                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="4" y="2" width="16" height="20" rx="2"/>
+                                <line x1="8" y1="6" x2="16" y2="6"/>
+                                <line x1="8" y1="10" x2="16" y2="10"/>
+                                <line x1="8" y1="14" x2="12" y2="14"/>
+                                <line x1="8" y1="18" x2="12" y2="18"/>
+                            </svg>
+                        </div>
+                        <div class="exam-meta-text">
+                            <span class="exam-meta-label">Questions</span>
+                            <span class="exam-meta-value val-blue">{{ $totalQuestionsCount }}</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. Duration -->
+                    <div class="exam-meta-item">
+                        <div class="exam-meta-icon meta-bg-amber">
+                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="9"/>
+                                <polyline points="12 7 12 12 15 14"/>
+                            </svg>
+                        </div>
+                        <div class="exam-meta-text">
+                            <span class="exam-meta-label">Duration</span>
+                            <span class="exam-meta-value val-amber">
+                                {{ $attempt->paper->total_time > 0 ? $attempt->paper->total_time . ' mins' : 'Unlimited' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Time Left / Elapsed -->
+                    <div class="exam-meta-item">
+                        <div class="exam-meta-icon meta-bg-green">
+                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="13" r="8"/>
+                                <path d="M12 9v4l2 2"/>
+                                <path d="M5 3L2 6"/>
+                                <path d="M22 6l-3-3"/>
+                                <line x1="10" y1="2" x2="14" y2="2"/>
+                            </svg>
+                        </div>
+                        <div class="exam-meta-text">
+                            <span class="exam-meta-label">{{ $remainingSeconds !== null ? 'Time Left' : 'Time Elapsed' }}</span>
+                            <span class="exam-meta-value val-green" id="digital-clock">00:00</span>
+                        </div>
+                    </div>
+
+                    <!-- 4. Answered -->
+                    <div class="exam-meta-item">
+                        <div class="exam-meta-icon meta-bg-green">
+                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <div class="exam-meta-text">
+                            <span class="exam-meta-count" id="stat-answered">0</span>
+                            <span class="exam-meta-sublabel">Answered</span>
+                        </div>
+                    </div>
+
+                    <!-- 5. Unanswered -->
+                    <div class="exam-meta-item">
+                        <div class="exam-meta-icon meta-bg-gray"></div>
+                        <div class="exam-meta-text">
+                            <span class="exam-meta-count" id="stat-unanswered">{{ $totalQuestionsCount }}</span>
+                            <span class="exam-meta-sublabel">Unanswered</span>
+                        </div>
+                    </div>
+
+                    <!-- 6. Marked for Review -->
+                    <div class="exam-meta-item exam-meta-item-last">
+                        <div class="exam-meta-icon meta-bg-purple-soft">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="#7c3aed" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                                <line x1="4" y1="22" x2="4" y2="15"/>
+                            </svg>
+                        </div>
+                        <div class="exam-meta-text">
+                            <span class="exam-meta-count" id="stat-flagged">0</span>
+                            <span class="exam-meta-sublabel">Marked for Review</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Two-Column Workspace -->
+            <form id="test-taking-form" action="" method="POST" class="mb-0">
                 @csrf
-                <div class="row no-gutters flex-grow-1 overflow-hidden">
-                    
-                    <!-- Left Panel: Single Question area -->
-                    <div class="col-md-9 col-12 d-flex flex-column left-panel">
-                        
-                        @foreach($questions as $index => $question)
+                <div class="exam-workspace-grid">
+
+                    <!-- Left Column: Question Card -->
+                    <div class="exam-question-col">
+                        @forelse($questions as $index => $question)
                             @php
                                 $ans = $answers->get($question->id);
-                                $paperQuestion = DB::table('paper_question')
-                                    ->where('paper_id', $attempt->paper_id)
-                                    ->where('question_id', $question->id)
-                                    ->first();
-                                $marks = $paperQuestion->marks ?? $question->marks ?? $attempt->paper->default_marks ?? 1;
+                                $marks = $question->pivot->marks ?? $question->marks ?? $attempt->paper->default_marks ?? 1;
                                 $isLocked = ($ans && !$attempt->paper->allow_reattempt_question && $ans->confidence !== null && $ans->confidence !== '');
-                                
-                                $description = $question->description;
+                                $isFlagged = ($ans && $ans->is_flagged);
+
+                                $rawDescription = (string) ($question->description ?? '');
+                                $rawTitle = (string) ($question->title ?? '');
+                                $cleanTitle = trim(strip_tags($rawTitle));
+                                $cleanDesc = trim(strip_tags($rawDescription));
+
+                                $description = $rawDescription;
                                 $hasInlineBlanks = false;
                                 if ($question->type === 'fill_in_the_blanks' && !empty($description)) {
                                     if (preg_match('/_{3,}/', $description)) {
@@ -114,587 +289,624 @@
                                             }
                                         }
                                         $blankIndex = 0;
-                                        $description = preg_replace_callback('/_{3,}/', function($match) use (&$blankIndex, $savedAnswers, $question, $index, $isLocked) {
-                                            $val = htmlspecialchars($savedAnswers[$blankIndex] ?? '');
+                                        $description = preg_replace_callback('/_{3,}/', function ($match) use (&$blankIndex, $savedAnswers, $question, $index, $isLocked) {
+                                            $val = htmlspecialchars((string) ($savedAnswers[$blankIndex] ?? ''), ENT_QUOTES, 'UTF-8');
                                             $inputName = "answers[{$question->id}][answer_text][]";
                                             $inputId = "blank-{$question->id}-{$blankIndex}";
                                             $readonlyAttr = $isLocked ? 'readonly tabindex="-1"' : '';
-                                            $borderStyle = $isLocked ? 'border: 2px solid #cbd5e1; background-color: #f1f5f9; pointer-events: none;' : 'border: 2px solid #2477F9;';
-                                            $html = '<input type="text" name="' . $inputName . '" id="' . $inputId . '" class="form-control test-input blank-input-field d-inline-block" placeholder="blank ' . ($blankIndex + 1) . '" value="' . $val . '" oninput="checkTextInput(' . ($index + 1) . ', this)" ' . $readonlyAttr . ' style="' . $borderStyle . ' border-radius: 6px; height: 32px; padding: 2px 8px; font-size: 0.95rem; width: 150px; margin: 0 4px; vertical-align: middle;">';
+                                            $lockedClass = $isLocked ? 'is-locked-input' : '';
+                                            $html = '<input type="text" name="' . $inputName . '" id="' . $inputId . '" class="inline-blank-input test-input ' . $lockedClass . '" placeholder="Answer ' . ($blankIndex + 1) . '" value="' . $val . '" oninput="checkTextInput(' . ($index + 1) . ', this)" ' . $readonlyAttr . '>';
                                             $blankIndex++;
                                             return $html;
                                         }, $description);
                                     }
                                 }
+
+                                // Determine layout: passage + separate prompt (Image 1) vs single stem box (Image 2)
+                                $hasSeparatePassage = !$hasInlineBlanks
+                                    && $cleanDesc !== ''
+                                    && $cleanTitle !== ''
+                                    && $cleanDesc !== $cleanTitle
+                                    && mb_strlen($cleanDesc) > 120;
+
+                                $hasTitleAndSubDesc = !$hasInlineBlanks
+                                    && !$hasSeparatePassage
+                                    && $cleanDesc !== ''
+                                    && $cleanTitle !== ''
+                                    && $cleanDesc !== $cleanTitle;
                             @endphp
 
-                            <!-- Question Card -->
-                            <div class="q-card d-none {{ $isLocked ? 'question-locked' : '' }}" 
-                                 id="q-card-{{ $index + 1 }}" 
-                                 data-q-num="{{ $index + 1 }}" 
+                            <div class="exam-question-card q-card {{ $index === 0 ? '' : 'd-none' }} {{ $isLocked ? 'question-locked' : '' }}"
+                                 id="q-card-{{ $index + 1 }}"
+                                 data-q-num="{{ $index + 1 }}"
                                  data-q-id="{{ $question->id }}"
+                                 data-q-type="{{ $question->type }}"
                                  data-is-locked="{{ $isLocked ? 'true' : 'false' }}">
-                                
-                                <!-- Hidden Inputs for Time, Flag, and Confidence -->
+
+                                <!-- Hidden State Inputs -->
                                 <input type="hidden" id="time-spent-{{ $question->id }}" name="answers[{{ $question->id }}][time_spent]" value="{{ $ans ? $ans->time_spent : 0 }}">
-                                <input type="hidden" id="is-flagged-{{ $question->id }}" name="answers[{{ $question->id }}][is_flagged]" value="{{ $ans && $ans->is_flagged ? 1 : 0 }}">
+                                <input type="hidden" id="is-flagged-{{ $question->id }}" name="answers[{{ $question->id }}][is_flagged]" value="{{ $isFlagged ? 1 : 0 }}">
                                 <input type="hidden" id="confidence-{{ $question->id }}" name="answers[{{ $question->id }}][confidence]" value="{{ $ans ? $ans->confidence : '' }}">
 
-                                <!-- Question Label Header -->
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h4 class="font-weight-bold mb-0 text-primary" style="letter-spacing: -0.5px;">
-                                        Question {{ $index + 1 }}
-                                    </h4>
-                                    <span class="badge badge-light-secondary font-weight-bold px-3 py-1 rounded">
-                                        {{ $marks }} {{ \Illuminate\Support\Str::plural('Mark', $marks) }}
-                                    </span>
-                                </div>
-                                
-                                <!-- Question Title -->
-                                @if(!empty($question->title) && trim(strip_tags($question->title)) !== trim(strip_tags($question->description)))
-                                    <h5 class="font-weight-bold text-dark mb-2" style="font-size: 1.2rem; line-height: 1.4;">
-                                        {{ $question->title }}
-                                    </h5>
-                                @endif
-
-                                <!-- Question Description -->
-                                <div class="question-text mb-4 text-dark font-medium-3 leading-relaxed" style="line-height: 1.6; color: #2d3748 !important;">
-                                    {!! $description !!}
-                                </div>
-
-                                <!-- Image if present -->
-                                @if($question->image || ($question->images && count($question->images) > 0))
-                                    <div class="question-images-wrapper mb-4 d-flex flex-wrap justify-content-center align-items-center" style="gap: 16px;">
-                                        @if($question->image)
-                                            <div class="question-img-item text-center">
-                                                <img src="{{ asset('storage/' . $question->image) }}" class="img-fluid rounded-lg border shadow img-zoomable" style="max-height: 200px; object-fit: contain; cursor: zoom-in; transition: transform 0.2s;" alt="Question Image">
-                                            </div>
-                                        @endif
-                                        @if($question->images)
-                                            @foreach($question->images as $img)
-                                                <div class="question-img-item text-center">
-                                                    <img src="{{ asset('storage/' . $img) }}" class="img-fluid rounded-lg border shadow img-zoomable" style="max-height: 200px; object-fit: contain; cursor: zoom-in; transition: transform 0.2s;" alt="Question Image">
-                                                </div>
-                                            @endforeach
+                                <!-- Question Card Header -->
+                                <div class="q-card-header">
+                                    <div class="d-flex align-items-center flex-wrap" style="gap: 10px;">
+                                        <h2 class="q-card-number mb-0">
+                                            Question {{ $index + 1 }} of {{ $totalQuestionsCount }}
+                                        </h2>
+                                        @if($marks > 1)
+                                            <span class="q-marks-pill">{{ $marks }} Marks</span>
                                         @endif
                                     </div>
-                                @endif
 
-                                <hr class="my-4" style="border-top: 1px solid #edf2f7;">
+                                    <button type="button"
+                                            id="flag-btn-{{ $index + 1 }}"
+                                            class="btn-mark-review {{ $isFlagged ? 'is-flagged' : '' }}"
+                                            onclick="toggleFlag({{ $index + 1 }})">
+                                        <svg class="flag-svg" width="15" height="15" viewBox="0 0 24 24" fill="{{ $isFlagged ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                                            <line x1="4" y1="22" x2="4" y2="15"/>
+                                        </svg>
+                                        <span class="flag-btn-label">{{ $isFlagged ? 'Marked for Review' : 'Mark for Review' }}</span>
+                                    </button>
+                                </div>
 
-                                <!-- Option/Answer choices box layout -->
-                                <div class="answer-section">
-                                    <h6 class="font-weight-bold text-uppercase mb-3" style="font-size: 0.7rem; letter-spacing: 1px;">Answer Options</h6>
-                                    
-                                    <!-- Choice questions grid -->
-                                    @if(in_array($question->type, ['single_choice_radio', 'multiple_choice', 'picture_choice']))
-                                        @php
-                                            $options = $question->options->sortBy('sort_order')->values();
-                                            $letterMap = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-                                        @endphp
+                                <!-- Question Body -->
+                                <div class="q-card-body">
 
-                                        <div class="row">
-                                            @foreach($options as $k => $option)
-                                                @php
-                                                    $letter = $letterMap[$k] ?? 'A';
-                                                    $isSelected = false;
-                                                    if ($question->type === 'multiple_choice') {
-                                                        $isSelected = ($ans && is_array($ans->selected_options) && in_array($option->id, $ans->selected_options));
-                                                    } else {
-                                                        $isSelected = ($ans && $ans->selected_option_id == $option->id);
-                                                    }
-                                                @endphp
-                                                <div class="col-md-6 col-12 mb-3">
-                                                    <div class="option-card {{ $isSelected ? 'selected-option-card' : '' }}" 
-                                                         id="option-container-{{ $option->id }}" 
-                                                         onclick="@if($isLocked) return; @else selectOption({{ $question->id }}, {{ $option->id }}, '{{ $question->type }}') @endif">
-                                                        
-                                                        @if($question->type === 'multiple_choice')
-                                                            <input type="checkbox" 
-                                                                   id="opt-{{ $option->id }}" 
-                                                                   name="answers[{{ $question->id }}][selected_options][]" 
-                                                                   class="d-none test-input checkbox-input-field" 
+                                    @if($hasSeparatePassage)
+                                        <!-- Image 1 Style: Passage Box + Question Stem Below -->
+                                        <div class="question-stem-box passage-box">
+                                            <div class="passage-content">{!! $description !!}</div>
+                                        </div>
+                                        <div class="question-prompt-heading">
+                                            {!! nl2br(e($question->title)) !!}
+                                        </div>
+                                    @elseif($hasTitleAndSubDesc)
+                                        <div class="question-stem-box">
+                                            <div class="question-stem-title">{!! nl2br(e($question->title)) !!}</div>
+                                            <div class="question-stem-subdesc mt-2">{!! $description !!}</div>
+                                        </div>
+                                    @elseif($hasInlineBlanks)
+                                        <div class="question-stem-box">
+                                            @if($cleanTitle !== '' && $cleanTitle !== $cleanDesc)
+                                                <div class="question-stem-title mb-2">{!! nl2br(e($question->title)) !!}</div>
+                                            @endif
+                                            <div class="question-inline-blanks">{!! $description !!}</div>
+                                        </div>
+                                    @else
+                                        <!-- Image 2 Style: Question inside Tinted Box -->
+                                        <div class="question-stem-box">
+                                            <div class="question-stem-title">
+                                                @if($cleanDesc !== '')
+                                                    {!! $description !!}
+                                                @else
+                                                    {!! nl2br(e($question->title)) !!}
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <!-- Question Images -->
+                                    @if($question->image || ($question->images && count($question->images) > 0))
+                                        <div class="question-images-wrapper">
+                                            @if($question->image)
+                                                <div class="question-img-item">
+                                                    <img src="{{ asset('storage/' . $question->image) }}" class="img-fluid rounded-lg border shadow-xs img-zoomable" alt="Question Image">
+                                                </div>
+                                            @endif
+                                            @if($question->images)
+                                                @foreach($question->images as $img)
+                                                    <div class="question-img-item">
+                                                        <img src="{{ asset('storage/' . $img) }}" class="img-fluid rounded-lg border shadow-xs img-zoomable" alt="Question Image">
+                                                    </div>
+                                                @endforeach
+                                            @endif
+                                        </div>
+                                    @endif
+
+                                    <!-- Answer Area -->
+                                    <div class="answer-area">
+                                        @if(in_array($question->type, ['single_choice_radio', 'multiple_choice']))
+                                            @php
+                                                $options = $question->options->sortBy('sort_order')->values();
+                                                $letterMap = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+                                                $isMulti = $question->type === 'multiple_choice';
+                                            @endphp
+
+                                            @if($isMulti)
+                                                <p class="answer-subhint mb-2">Select all options that apply.</p>
+                                            @endif
+
+                                            <div class="options-group-list" role="{{ $isMulti ? 'group' : 'radiogroup' }}">
+                                                @foreach($options as $k => $option)
+                                                    @php
+                                                        $letter = $letterMap[$k] ?? chr(65 + $k);
+                                                        if ($isMulti) {
+                                                            $isSelected = ($ans && is_array($ans->selected_options) && in_array($option->id, $ans->selected_options));
+                                                        } else {
+                                                            $isSelected = ($ans && $ans->selected_option_id == $option->id);
+                                                        }
+                                                    @endphp
+
+                                                    <div class="option-row-item option-card {{ $isMulti ? 'is-checkbox-option' : 'is-radio-option' }} {{ $isSelected ? 'selected-option-card' : '' }}"
+                                                         id="option-container-{{ $option->id }}"
+                                                         tabindex="{{ $isLocked ? '-1' : '0' }}"
+                                                         role="{{ $isMulti ? 'checkbox' : 'radio' }}"
+                                                         aria-checked="{{ $isSelected ? 'true' : 'false' }}"
+                                                         onclick="@if($isLocked) return; @else selectOption({{ $question->id }}, {{ $option->id }}, '{{ $question->type }}') @endif"
+                                                         onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
+
+                                                        @if($isMulti)
+                                                            <input type="checkbox"
+                                                                   id="opt-{{ $option->id }}"
+                                                                   name="answers[{{ $question->id }}][selected_options][]"
+                                                                   class="d-none test-input checkbox-input-field"
                                                                    value="{{ $option->id }}"
-                                                                   {{ $isSelected ? 'checked' : '' }}
-                                                                   onchange="checkMultipleAnswered({{ $index + 1 }}, {{ $question->id }})">
+                                                                   {{ $isSelected ? 'checked' : '' }}>
                                                         @else
-                                                            <input type="radio" 
-                                                                   id="opt-{{ $option->id }}" 
-                                                                   name="answers[{{ $question->id }}][selected_option_id]" 
-                                                                   class="d-none test-input radio-input-field" 
+                                                            <input type="radio"
+                                                                   id="opt-{{ $option->id }}"
+                                                                   name="answers[{{ $question->id }}][selected_option_id]"
+                                                                   class="d-none test-input radio-input-field"
                                                                    value="{{ $option->id }}"
-                                                                   {{ $isSelected ? 'checked' : '' }}
-                                                                   onchange="markAnswered({{ $index + 1 }})">
+                                                                   {{ $isSelected ? 'checked' : '' }}>
                                                         @endif
-                                                        
-                                                        <div class="option-letter mr-3">
-                                                            {{ $letter }}
-                                                        </div>
-                                                        
-                                                        <div class="d-flex align-items-center flex-grow-1">
-                                                            @if($option->option_image)
-                                                                <img src="{{ asset('storage/' . $option->option_image) }}" class="mr-2 rounded border" style="max-height: 40px;" alt="Option Image">
+
+                                                        <span class="option-indicator {{ $isMulti ? 'indicator-checkbox' : 'indicator-radio' }}">
+                                                            @if($isMulti)
+                                                                <svg class="checkbox-check-svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <polyline points="20 6 9 17 4 12"/>
+                                                                </svg>
                                                             @endif
-                                                            <span class="font-medium-2 text-dark font-weight-bold">{{ $option->option_text }}</span>
+                                                        </span>
+
+                                                        <span class="option-letter-label">{{ $letter }}.</span>
+
+                                                        <div class="option-content-wrap">
+                                                            @if($option->option_image)
+                                                                <img src="{{ asset('storage/' . $option->option_image) }}" class="option-inline-img img-zoomable" alt="Option {{ $letter }}" onclick="event.stopPropagation()">
+                                                            @endif
+                                                            @if(!empty($option->option_text))
+                                                                <span class="option-text-label">{{ $option->option_text }}</span>
+                                                            @endif
                                                         </div>
                                                     </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-
-                                    <!-- Single Choice Dropdown -->
-                                    @elseif($question->type === 'single_choice_dropdown')
-                                        <div class="form-group col-md-6 col-12 pl-0">
-                                            <select name="answers[{{ $question->id }}][selected_option_id]" 
-                                                    class="form-control test-input select-input" 
-                                                    onchange="selectDropdownOption({{ $index + 1 }}, this)" 
-                                                    @if($isLocked) tabindex="-1" @endif 
-                                                    style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#2477F9' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 8px; height: 46px; font-weight: 500;">
-                                                <option value="">-- Choose Option --</option>
-                                                @foreach($question->options as $option)
-                                                    <option value="{{ $option->id }}" {{ ($ans && $ans->selected_option_id == $option->id) ? 'selected' : '' }}>
-                                                        {{ $option->option_text }}
-                                                    </option>
                                                 @endforeach
-                                            </select>
-                                        </div>
+                                            </div>
 
-                                    <!-- Matching Text -->
-                                    @elseif($question->type === 'matching_text')
-                                        <div class="matching-text-container">
+                                        @elseif($question->type === 'picture_choice')
+                                            @php
+                                                $options = $question->options->sortBy('sort_order')->values();
+                                                $letterMap = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+                                            @endphp
+                                            <div class="picture-options-grid">
+                                                @foreach($options as $k => $option)
+                                                    @php
+                                                        $letter = $letterMap[$k] ?? chr(65 + $k);
+                                                        $isSelected = ($ans && $ans->selected_option_id == $option->id);
+                                                    @endphp
+                                                    <div class="picture-option-card option-card {{ $isSelected ? 'selected-option-card' : '' }}"
+                                                         id="option-container-{{ $option->id }}"
+                                                         tabindex="{{ $isLocked ? '-1' : '0' }}"
+                                                         role="radio"
+                                                         aria-checked="{{ $isSelected ? 'true' : 'false' }}"
+                                                         onclick="@if($isLocked) return; @else selectOption({{ $question->id }}, {{ $option->id }}, '{{ $question->type }}') @endif"
+                                                         onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
+                                                        <input type="radio"
+                                                               id="opt-{{ $option->id }}"
+                                                               name="answers[{{ $question->id }}][selected_option_id]"
+                                                               class="d-none test-input radio-input-field"
+                                                               value="{{ $option->id }}"
+                                                               {{ $isSelected ? 'checked' : '' }}>
+                                                        <div class="picture-option-top">
+                                                            <span class="option-indicator indicator-radio"></span>
+                                                            <span class="option-letter-label">{{ $letter }}.</span>
+                                                            @if(!empty($option->option_text))
+                                                                <span class="option-text-label">{{ $option->option_text }}</span>
+                                                            @endif
+                                                        </div>
+                                                        @if($option->option_image)
+                                                            <div class="picture-option-img-box">
+                                                                <img src="{{ asset('storage/' . $option->option_image) }}" alt="Option {{ $letter }}">
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                            </div>
+
+                                        @elseif($question->type === 'single_choice_dropdown')
+                                            <div class="direct-answer-block">
+                                                <label for="dropdown-{{ $question->id }}" class="direct-answer-label">Choose your answer below</label>
+                                                <select id="dropdown-{{ $question->id }}"
+                                                        name="answers[{{ $question->id }}][selected_option_id]"
+                                                        class="direct-answer-input test-input select-input {{ $isLocked ? 'is-locked-input' : '' }}"
+                                                        onchange="selectDropdownOption({{ $index + 1 }}, this)"
+                                                        @if($isLocked) tabindex="-1" @endif>
+                                                    <option value="">-- Choose an option --</option>
+                                                    @foreach($question->options->sortBy('sort_order') as $option)
+                                                        <option value="{{ $option->id }}" {{ ($ans && $ans->selected_option_id == $option->id) ? 'selected' : '' }}>
+                                                            {{ $option->option_text }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                        @elseif($question->type === 'matching_text')
                                             @php
                                                 $pairs = $question->metadata['matching_pairs'] ?? [];
-                                                // Extract all right values and shuffle them for the dropdown options
                                                 $rightOptions = collect($pairs)->pluck('right')->shuffle()->all();
                                                 $savedMatches = [];
                                                 if ($ans && $ans->answer_text) {
                                                     $decoded = json_decode($ans->answer_text, true);
-                                                    if (is_array($decoded)) {
-                                                        $savedMatches = $decoded;
-                                                    } else {
-                                                        $savedMatches = [$ans->answer_text];
-                                                    }
+                                                    $savedMatches = is_array($decoded) ? $decoded : [$ans->answer_text];
                                                 }
                                             @endphp
-                                            <div class="row">
-                                                @foreach($pairs as $pairIndex => $pair)
-                                                    <div class="col-md-6 col-12 mb-3">
-                                                        <div class="p-3 border rounded d-flex align-items-center justify-content-between" style="border-radius: 8px; background-color: rgba(115, 103, 240, 0.04); border-color: #e2e8f0;">
-                                                            <span class="font-weight-bold text-dark font-medium-1" style="font-size: 0.9rem;">{{ $pair['left'] }}</span>
-                                                            <i class="feather icon-arrow-right text-primary mx-2"></i>
-                                                            <select name="answers[{{ $question->id }}][answer_text][]" 
-                                                                    class="form-control test-input select-input matching-select" 
-                                                                    onchange="selectDropdownOption({{ $index + 1 }}, this)"
-                                                                    @if($isLocked) tabindex="-1" @endif
-                                                                    style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#2477F9' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 8px; width: 180px; height: 38px; font-weight: 500; font-size: 0.85rem;">
-                                                                <option value="">-- Match --</option>
-                                                                @foreach($rightOptions as $opt)
-                                                                    <option value="{{ $opt }}" {{ ($savedMatches[$pairIndex] ?? '') === $opt ? 'selected' : '' }}>
-                                                                        {{ $opt }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </select>
+                                            <div class="matching-text-container">
+                                                <label class="direct-answer-label">Match each item below</label>
+                                                <div class="row">
+                                                    @foreach($pairs as $pairIndex => $pair)
+                                                        <div class="col-md-6 col-12 mb-3">
+                                                            <div class="matching-pair-row">
+                                                                <span class="matching-left-text">{{ $pair['left'] }}</span>
+                                                                <i class="feather icon-arrow-right text-primary mx-2"></i>
+                                                                <select name="answers[{{ $question->id }}][answer_text][]"
+                                                                        class="form-control test-input select-input matching-select {{ $isLocked ? 'is-locked-input' : '' }}"
+                                                                        onchange="selectDropdownOption({{ $index + 1 }}, this)"
+                                                                        @if($isLocked) tabindex="-1" @endif>
+                                                                    <option value="">-- Match --</option>
+                                                                    @foreach($rightOptions as $opt)
+                                                                        <option value="{{ $opt }}" {{ ($savedMatches[$pairIndex] ?? '') === $opt ? 'selected' : '' }}>
+                                                                            {{ $opt }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                @endforeach
+                                                    @endforeach
+                                                </div>
                                             </div>
-                                        </div>
 
-                                    <!-- Matching Drag and Drop -->
-                                    @elseif($question->type === 'matching_drag_drop')
-                                        <div class="matching-drag-drop-container" id="matching-container-{{ $question->id }}">
+                                        @elseif($question->type === 'matching_drag_drop')
                                             @php
                                                 $pairs = $question->metadata['matching_pairs'] ?? [];
                                                 $savedMatches = [];
                                                 if ($ans && $ans->answer_text) {
                                                     $decoded = json_decode($ans->answer_text, true);
-                                                    if (is_array($decoded)) {
-                                                        $savedMatches = $decoded;
-                                                    } else {
-                                                        $savedMatches = [$ans->answer_text];
-                                                    }
+                                                    $savedMatches = is_array($decoded) ? $decoded : [$ans->answer_text];
                                                 }
-                                                
-                                                // Find which right items are already matched
                                                 $matchedRightItems = array_filter($savedMatches);
-                                                
-                                                // Draggable right items are those that are NOT already matched, shuffled
                                                 $allRightItems = collect($pairs)->pluck('right')->all();
                                                 $unmatchedRightItems = collect($allRightItems)
                                                     ->filter(fn($item) => !in_array($item, $matchedRightItems))
                                                     ->shuffle()
                                                     ->all();
                                             @endphp
-
-                                            <div class="row">
-                                                <!-- Targets Column (Left Items) -->
-                                                <div class="col-md-7 col-12">
-                                                    <h6 class="font-weight-bold mb-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">MATCHING TARGETS</h6>
-                                                    @foreach($pairs as $pairIndex => $pair)
-                                                        @php
-                                                            $savedMatchVal = $savedMatches[$pairIndex] ?? '';
-                                                        @endphp
-                                                        <!-- Hidden input to store match value -->
-                                                        <input type="hidden" 
-                                                               name="answers[{{ $question->id }}][answer_text][]" 
-                                                               id="matching-hidden-{{ $question->id }}-{{ $pairIndex }}" 
-                                                               value="{{ $savedMatchVal }}"
-                                                               class="matching-hidden-input">
-
-                                                        <div class="d-flex align-items-center mb-3 p-2 border rounded bg-white target-row" style="border-radius: 8px; border-color: #edf2f7;">
-                                                            <!-- Left Item Text -->
-                                                            <div class="font-weight-bold text-dark px-3 py-2 rounded flex-grow-1" style="min-width: 120px; font-size: 0.9rem; background-color: #f8fafc; border: 1px solid #edf2f7;">
-                                                                {{ $pair['left'] }}
-                                                            </div>
-                                                            
-                                                            <i class="feather icon-link mx-3"></i>
-                                                            
-                                                            <!-- Drop Zone / Match Zone -->
-                                                            <div class="drop-zone border-dashed d-flex align-items-center justify-content-center" 
-                                                                 data-question-id="{{ $question->id }}"
-                                                                 data-pair-index="{{ $pairIndex }}"
-                                                                 ondragover="allowDrop(event)"
-                                                                 ondrop="handleDrop(event)"
-                                                                 onclick="handleDropzoneClick(this)"
-                                                                 style="border: 2px dashed #2477F9; border-radius: 8px; width: 180px; min-height: 42px; background-color: #fbfaff; cursor: pointer; transition: all 0.2s; padding: 4px;">
-                                                                
-                                                                @if($savedMatchVal)
-                                                                    <div class="draggable-card p-2 bg-primary text-white font-weight-bold text-center rounded matched-card" 
-                                                                         draggable="{{ $isLocked ? 'false' : 'true' }}"
-                                                                         ondragstart="handleDragStart(event)"
-                                                                         onclick="handleCardClick(event, this)"
-                                                                         data-value="{{ $savedMatchVal }}"
-                                                                         data-question-id="{{ $question->id }}"
-                                                                         style="cursor: grab; width: 100%; font-size: 0.85rem; border-radius: 6px; box-shadow: 0 2px 4px rgba(115,103,240,0.2);">
-                                                                        {{ $savedMatchVal }}
-                                                                    </div>
-                                                                @else
-                                                                    <span class="font-small-2 drag-placeholder">Drop or click here</span>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-
-                                                <!-- Draggables Pool Column (Right Items) -->
-                                                <div class="col-md-5 col-12">
-                                                    <h6 class="font-weight-bold mb-3" style="font-size: 0.75rem; letter-spacing: 0.5px;">DRAG OR CLICK ITEMS</h6>
-                                                    <div class="draggables-pool p-3 border rounded d-flex flex-wrap align-content-start" 
-                                                         data-question-id="{{ $question->id }}"
-                                                         ondragover="allowDrop(event)"
-                                                         ondrop="handleReturnToPool(event)"
-                                                         onclick="handlePoolClick(this)"
-                                                         style="min-height: 150px; border-radius: 8px; background-color: #f8fafc; border-color: #e2e8f0; gap: 8px;">
-                                                        
-                                                        @foreach($unmatchedRightItems as $rightItem)
-                                                            <div class="draggable-card p-2 bg-white text-primary font-weight-bold text-center border border-primary rounded" 
-                                                                 draggable="{{ $isLocked ? 'false' : 'true' }}"
-                                                                 ondragstart="handleDragStart(event)"
-                                                                 onclick="handleCardClick(event, this)"
-                                                                 data-value="{{ $rightItem }}"
-                                                                 data-question-id="{{ $question->id }}"
-                                                                 style="cursor: grab; width: fit-content; max-width: 100%; font-size: 0.85rem; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-width: 2px !important; transition: all 0.2s;">
-                                                                {{ $rightItem }}
+                                            <div class="matching-drag-drop-container" id="matching-container-{{ $question->id }}">
+                                                <div class="row">
+                                                    <div class="col-md-7 col-12 mb-3 mb-md-0">
+                                                        <label class="direct-answer-label">Matching Targets</label>
+                                                        @foreach($pairs as $pairIndex => $pair)
+                                                            @php $savedMatchVal = $savedMatches[$pairIndex] ?? ''; @endphp
+                                                            <input type="hidden"
+                                                                   name="answers[{{ $question->id }}][answer_text][]"
+                                                                   id="matching-hidden-{{ $question->id }}-{{ $pairIndex }}"
+                                                                   value="{{ $savedMatchVal }}"
+                                                                   class="matching-hidden-input">
+                                                            <div class="matching-target-row">
+                                                                <div class="matching-target-label">{{ $pair['left'] }}</div>
+                                                                <i class="feather icon-link text-primary mx-2"></i>
+                                                                <div class="drop-zone"
+                                                                     data-question-id="{{ $question->id }}"
+                                                                     data-pair-index="{{ $pairIndex }}"
+                                                                     ondragover="allowDrop(event)"
+                                                                     ondrop="handleDrop(event)"
+                                                                     onclick="handleDropzoneClick(this)">
+                                                                    @if($savedMatchVal)
+                                                                        <div class="draggable-card matched-card"
+                                                                             draggable="{{ $isLocked ? 'false' : 'true' }}"
+                                                                             ondragstart="handleDragStart(event)"
+                                                                             onclick="handleCardClick(event, this)"
+                                                                             data-value="{{ $savedMatchVal }}"
+                                                                             data-question-id="{{ $question->id }}">
+                                                                            {{ $savedMatchVal }}
+                                                                        </div>
+                                                                    @else
+                                                                        <span class="drag-placeholder">Drop or click here</span>
+                                                                    @endif
+                                                                </div>
                                                             </div>
                                                         @endforeach
-                                                        
-                                                        @if(count($unmatchedRightItems) === 0 && count($matchedRightItems) === 0)
-                                                            <span class="font-small-2 pool-empty-message">No matching items found.</span>
-                                                        @endif
+                                                    </div>
+
+                                                    <div class="col-md-5 col-12">
+                                                        <label class="direct-answer-label">Drag or Click Items</label>
+                                                        <div class="draggables-pool"
+                                                             data-question-id="{{ $question->id }}"
+                                                             ondragover="allowDrop(event)"
+                                                             ondrop="handleReturnToPool(event)"
+                                                             onclick="handlePoolClick(this)">
+                                                            @foreach($unmatchedRightItems as $rightItem)
+                                                                <div class="draggable-card pool-card"
+                                                                     draggable="{{ $isLocked ? 'false' : 'true' }}"
+                                                                     ondragstart="handleDragStart(event)"
+                                                                     onclick="handleCardClick(event, this)"
+                                                                     data-value="{{ $rightItem }}"
+                                                                     data-question-id="{{ $question->id }}">
+                                                                    {{ $rightItem }}
+                                                                </div>
+                                                            @endforeach
+                                                            @if(count($unmatchedRightItems) === 0 && count($matchedRightItems) === 0)
+                                                                <span class="drag-placeholder">No matching items found.</span>
+                                                            @endif
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                    <!-- Text / Blanks / Free text -->
-                                    @else
-                                        @if($question->type === 'fill_in_the_blanks' && $hasInlineBlanks)
-                                            <div class="font-small-3 mt-2"><i class="feather icon-info mr-1 text-info"></i> Please fill in the blanks above.</div>
                                         @else
-                                            <div class="form-group mb-0">
-                                                @if($question->type === 'free_text')
-                                                    <textarea name="answers[{{ $question->id }}][answer_text]" 
-                                                              class="form-control test-input text-input" 
-                                                              rows="5" 
-                                                              placeholder="Type your explanation or essay answer here..."
-                                                              oninput="checkTextInput({{ $index + 1 }}, this)"
-                                                              @if($isLocked) readonly tabindex="-1" @endif
-                                                              style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#2477F9' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 12px; padding: 12px; font-size: 0.95rem;">{{ $ans ? $ans->answer_text : '' }}</textarea>
-                                                @else
-                                                    <input type="text" 
-                                                           name="answers[{{ $question->id }}][answer_text]" 
-                                                           class="form-control test-input text-input" 
-                                                           placeholder="Type your answer here..."
+                                            <!-- Image 2 Style: Direct Answer / Input Based -->
+                                            @if($question->type === 'fill_in_the_blanks' && $hasInlineBlanks)
+                                                <p class="direct-answer-hint mb-0">Fill in the blanks in the text above.</p>
+                                            @elseif($question->type === 'free_text')
+                                                @php $wordLimit = $question->metadata['word_limit'] ?? null; @endphp
+                                                <div class="direct-answer-block">
+                                                    <label for="answer-input-{{ $question->id }}" class="direct-answer-label">Type your answer below</label>
+                                                    <textarea id="answer-input-{{ $question->id }}"
+                                                              name="answers[{{ $question->id }}][answer_text]"
+                                                              class="direct-answer-textarea test-input text-input {{ $isLocked ? 'is-locked-input' : '' }}"
+                                                              rows="5"
+                                                              placeholder="Enter your answer here"
+                                                              oninput="checkTextInput({{ $index + 1 }}, this); updateWordCount({{ $question->id }}, this, {{ $wordLimit ? (int)$wordLimit : 'null' }})"
+                                                              @if($isLocked) readonly tabindex="-1" @endif>{{ $ans ? $ans->answer_text : '' }}</textarea>
+                                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                                        <span class="direct-answer-hint">Write your answer clearly.</span>
+                                                        <span class="direct-answer-hint" id="word-count-{{ $question->id }}">
+                                                            @if($wordLimit)
+                                                                Max {{ $wordLimit }} words
+                                                            @endif
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <div class="direct-answer-block">
+                                                    <label for="answer-input-{{ $question->id }}" class="direct-answer-label">Type your answer below</label>
+                                                    <input type="text"
+                                                           id="answer-input-{{ $question->id }}"
+                                                           name="answers[{{ $question->id }}][answer_text]"
+                                                           class="direct-answer-input test-input text-input {{ $isLocked ? 'is-locked-input' : '' }}"
+                                                           placeholder="Enter your answer here"
                                                            value="{{ $ans ? $ans->answer_text : '' }}"
                                                            oninput="checkTextInput({{ $index + 1 }}, this)"
-                                                           @if($isLocked) readonly tabindex="-1" @endif
-                                                           style="border: 2px solid {{ $isLocked ? '#cbd5e1' : '#2477F9' }}; background-color: {{ $isLocked ? '#f1f5f9' : '#ffffff' }}; pointer-events: {{ $isLocked ? 'none' : 'auto' }}; border-radius: 8px; height: 46px; font-size: 0.95rem; max-width: 450px;">
-                                                @endif
-                                            </div>
+                                                           autocomplete="off"
+                                                           @if($isLocked) readonly tabindex="-1" @endif>
+                                                    <p class="direct-answer-hint mt-2 mb-0">Write only the final answer.</p>
+                                                </div>
+                                            @endif
                                         @endif
-                                    @endif
+                                    </div>
 
-                                </div>
+                                    <!-- Instant Feedback Card (if paper allows instant feedback) -->
+                                    @php
+                                        $showFeedback = false;
+                                        $feedbackClass = '';
+                                        $feedbackTitle = '';
+                                        $correctValText = '';
+                                        $explanationText = $question->explanation;
 
-                                <!-- Instant Feedback Card -->
-                                @php
-                                    $showFeedback = false;
-                                    $feedbackClass = '';
-                                    $feedbackTitle = '';
-                                    $correctValText = '';
-                                    $explanationText = $question->explanation;
-                                    
-                                    if ($attempt->paper->allow_instant_feedback && $ans && $ans->confidence !== null && $ans->confidence !== '') {
-                                        $showFeedback = true;
-                                        $isCorrect = $ans->is_correct;
-                                        $feedbackClass = $isCorrect ? 'bg-light-success border-success text-success' : 'bg-light-danger border-danger text-danger';
-                                        $feedbackTitle = $isCorrect ? 'Correct!' : 'Incorrect';
-                                        
-                                        if ($question->type === 'fill_in_the_blanks') {
-                                            $correctValText = implode(', ', $question->metadata['blank_answers'] ?? []);
-                                            if (empty($correctValText)) {
-                                                $correctValText = $question->options->where('is_correct', true)->first()?->option_text ?? '';
+                                        if ($attempt->paper->allow_instant_feedback && $ans && $ans->confidence !== null && $ans->confidence !== '') {
+                                            $showFeedback = true;
+                                            $isCorrect = $ans->is_correct;
+                                            $feedbackClass = $isCorrect ? 'feedback-correct' : 'feedback-incorrect';
+                                            $feedbackTitle = $isCorrect ? 'Correct!' : 'Incorrect';
+
+                                            if ($question->type === 'fill_in_the_blanks') {
+                                                $correctValText = implode(', ', $question->metadata['blank_answers'] ?? []);
+                                                if (empty($correctValText)) {
+                                                    $correctValText = $question->options->where('is_correct', true)->first()?->option_text ?? '';
+                                                }
+                                            } elseif ($question->type === 'matching_drag_drop' || $question->type === 'matching_text') {
+                                                $pairs = $question->metadata['matching_pairs'] ?? [];
+                                                $pairTexts = [];
+                                                foreach ($pairs as $pair) {
+                                                    $pairTexts[] = $pair['left'] . ' ➔ ' . $pair['right'];
+                                                }
+                                                $correctValText = implode(', ', $pairTexts);
+                                            } else {
+                                                $correctValText = implode(', ', $question->options->where('is_correct', true)->pluck('option_text')->toArray());
                                             }
-                                        } else {
-                                            $correctValText = implode(', ', $question->options->where('is_correct', true)->pluck('option_text')->toArray());
                                         }
-                                    }
-                                @endphp
-                                <div class="instant-feedback-box mt-4 p-3 rounded border {{ $showFeedback ? '' : 'd-none' }} {{ $feedbackClass }}" id="feedback-box-{{ $question->id }}" style="border-width: 2px !important;">
-                                    <h5 class="font-weight-bold feedback-title mb-2">{{ $feedbackTitle }}</h5>
-                                    <p class="mb-2"><strong>Correct Answer:</strong> <span class="feedback-correct-answer font-weight-bold">{{ $correctValText }}</span></p>
-                                    <div class="feedback-explanation p-3 bg-white rounded text-dark font-small-3 border mt-2 {{ $explanationText || ($question->explanation_images && count($question->explanation_images) > 0) ? '' : 'd-none' }}" id="feedback-explanation-container-{{ $question->id }}">
-                                        <strong>Explanation:</strong> 
-                                        <div class="explanation-content">{!! $explanationText !!}</div>
-                                        @if($question->explanation_images && count($question->explanation_images) > 0)
-                                            <div class="explanation-images-wrapper mt-2 d-flex flex-wrap align-items-center" style="gap: 8px;">
-                                                @foreach($question->explanation_images as $expImg)
-                                                    <img src="{{ asset('storage/' . $expImg) }}" class="img-fluid rounded border img-zoomable" style="max-height: 120px; object-fit: contain; cursor: zoom-in; transition: transform 0.2s;" alt="Explanation Image">
-                                                @endforeach
-                                            </div>
-                                        @endif
+                                    @endphp
+
+                                    <div class="instant-feedback-box mt-4 {{ $showFeedback ? '' : 'd-none' }} {{ $feedbackClass }}" id="feedback-box-{{ $question->id }}">
+                                        <div class="feedback-title">{{ $feedbackTitle }}</div>
+                                        <div class="feedback-correct-row {{ $correctValText !== '' ? '' : 'd-none' }}">
+                                            <strong>Correct Answer:</strong> <span class="feedback-correct-answer">{{ $correctValText }}</span>
+                                        </div>
+                                        <div class="feedback-explanation {{ $explanationText || ($question->explanation_images && count($question->explanation_images) > 0) ? '' : 'd-none' }}" id="feedback-explanation-container-{{ $question->id }}">
+                                            <strong>Explanation:</strong>
+                                            <div class="explanation-content mt-1">{!! $explanationText !!}</div>
+                                            @if($question->explanation_images && count($question->explanation_images) > 0)
+                                                <div class="explanation-images-wrapper mt-2 d-flex flex-wrap align-items-center" style="gap: 8px;">
+                                                    @foreach($question->explanation_images as $expImg)
+                                                        <img src="{{ asset('storage/' . $expImg) }}" class="img-fluid rounded border img-zoomable" style="max-height: 120px; object-fit: contain; cursor: zoom-in;" alt="Explanation Image">
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
 
-                            </div>
-                        @endforeach
+                                <!-- Card Footer: Previous & Next Question -->
+                                <div class="q-card-footer">
+                                    <button type="button"
+                                            class="btn-nav-prev {{ $index === 0 ? 'is-disabled' : '' }}"
+                                            onclick="prevQuestion()"
+                                            {{ $index === 0 ? 'disabled' : '' }}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="19" y1="12" x2="5" y2="12"/>
+                                            <polyline points="12 19 5 12 12 5"/>
+                                        </svg>
+                                        <span>Previous</span>
+                                    </button>
 
-                    </div>
+                                    <div class="d-flex align-items-center" style="gap: 10px;">
+                                        @if($attempt->paper->allow_instant_feedback && !$isLocked)
+                                            <button type="button"
+                                                    class="btn-check-answer"
+                                                    id="check-answer-btn-{{ $question->id }}"
+                                                    onclick="checkInstantFeedback({{ $index + 1 }}, {{ $question->id }})">
+                                                Check Answer
+                                            </button>
+                                        @endif
 
-                    <!-- Right Panel: Question Index & Stopwatch Timers Table -->
-                    <div class="col-md-3 col-12 bg-light d-flex flex-column justify-content-between p-0 border-left right-panel">
-                        
-                        <div style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
-                            <div class="p-3 d-flex justify-content-between align-items-center right-panel-header" style="height: 55px; min-height: 55px;">
-                                <h6 class="font-weight-bold text-primary text-uppercase mb-0" style="font-size: 0.75rem; letter-spacing: 1.5px;">Questions Overview</h6>
-                                <!-- Digital LED clock on top nearby the header -->
-                                <div class="stopwatch-led-container py-1 px-2 d-none d-md-block">
-                                    <h5 id="digital-clock" class="mb-0 font-weight-bold text-danger">00:00:00</h5>
+                                        @if($index + 1 < $totalQuestionsCount)
+                                            <button type="button" class="btn-nav-next" onclick="nextQuestion()">
+                                                <span>Next Question</span>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                                    <polyline points="12 5 19 12 12 19"/>
+                                                </svg>
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn-nav-next" onclick="submitTestForm('submit')">
+                                                <span>Submit Test</span>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                                    <line x1="22" y1="2" x2="11" y2="13"/>
+                                                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                                </svg>
+                                            </button>
+                                        @endif
+                                    </div>
                                 </div>
-                                <!-- Mobile close button -->
-                                <button type="button" class="close d-md-none" onclick="toggleSidebar()" aria-label="Close" style="font-size: 1.5rem; line-height: 1; padding: 0; margin: 0; color: #475569; opacity: 0.8; background: none; border: 0;">
-                                    <span aria-hidden="true">&times;</span>
+                            </div>
+                        @empty
+                            <div class="exam-question-card text-center py-5">
+                                <h3 class="q-card-number mb-2">No Questions Available</h3>
+                                <p class="text-muted mb-4">This paper currently has no questions configured.</p>
+                                <button type="button" class="btn-save-exit mx-auto" onclick="submitTestForm('pause')">
+                                    Save &amp; Exit
                                 </button>
                             </div>
-                            <div class="questions-list-wrapper" style="flex: 1; overflow-y: auto; padding: 15px;">
-                                <div style="display: flex; flex-direction: column; gap: 8px;">
-                                    @foreach($questions as $index => $question)
-                                        @php
-                                            $ans = $answers->get($question->id);
-                                            $statusText = 'Unanswered';
-                                            $statusClass = 'status-badge-unanswered';
-                                            if ($ans) {
-                                                if ($ans->confidence !== null && $ans->confidence !== '') {
-                                                    $statusText = ucwords(str_replace('_', ' ', $ans->confidence));
-                                                    if ($ans->confidence === 'guess') {
-                                                        $statusClass = 'status-badge-guess';
-                                                    } elseif ($ans->confidence === 'fairly_sure') {
-                                                        $statusClass = 'status-badge-fairly-sure';
-                                                    } elseif ($ans->confidence === 'sure') {
-                                                        $statusClass = 'status-badge-sure';
-                                                    }
-                                                } elseif ($ans->selected_option_id || $ans->selected_options || $ans->answer_text) {
-                                                    $statusText = 'Answered';
-                                                    $statusClass = 'status-badge-answered';
+                        @endforelse
+                    </div>
+
+                    <!-- Right Column: Progress & Question Navigator -->
+                    <aside class="exam-sidebar-col">
+                        <!-- Progress Card -->
+                        <div class="exam-sidebar-card mb-3">
+                            <h3 class="sidebar-card-title">Progress</h3>
+                            <div class="progress-meta-row">
+                                <span id="progress-text">0 of {{ $totalQuestionsCount }} answered</span>
+                                <strong id="progress-percent">0%</strong>
+                            </div>
+                            <div class="exam-progress-track">
+                                <div class="exam-progress-fill" id="progress-bar-fill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Question Navigator Card -->
+                        <div class="exam-sidebar-card">
+                            <h3 class="sidebar-card-title">Question Navigator</h3>
+
+                            <div class="q-nav-grid" id="question-navigator-grid">
+                                @foreach($questions as $index => $question)
+                                    @php
+                                        $ans = $answers->get($question->id);
+                                        $hasSavedAns = false;
+                                        if ($ans) {
+                                            $hasSavedText = false;
+                                            if (is_string($ans->answer_text) && trim($ans->answer_text) !== '') {
+                                                $decodedAns = json_decode($ans->answer_text, true);
+                                                if (is_array($decodedAns)) {
+                                                    $hasSavedText = count(array_filter($decodedAns, fn($v) => trim((string) $v) !== '')) > 0;
+                                                } else {
+                                                    $hasSavedText = true;
                                                 }
                                             }
-                                            $isFlagged = ($ans && $ans->is_flagged);
-                                        @endphp
-                                        <div id="sidebar-row-{{ $index + 1 }}" 
-                                             class="question-sidebar-card clickable-row d-flex align-items-center justify-content-between position-relative" 
-                                             onclick="jumpToQuestion({{ $index + 1 }})" 
-                                             style="cursor: pointer; border-radius: 12px; padding: 10px 14px; margin-bottom: 8px;">
-                                            
-                                            <!-- Left Dot Indicator for Active Question -->
-                                            <span class="active-dot d-none bg-primary" style="position: absolute; left: 6px; top: calc(50% - 4px); width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 10px #2477F9;"></span>
+                                            $hasSavedAns = !empty($ans->selected_option_id)
+                                                || (is_array($ans->selected_options) && count($ans->selected_options) > 0)
+                                                || $hasSavedText;
+                                        }
+                                        $isFlagged = ($ans && $ans->is_flagged);
+                                    @endphp
+                                    <button type="button"
+                                            id="nav-btn-{{ $index + 1 }}"
+                                            class="q-nav-btn {{ $index === 0 ? 'is-current' : '' }} {{ $hasSavedAns ? 'is-answered' : '' }} {{ $isFlagged ? 'is-flagged' : '' }}"
+                                            onclick="jumpToQuestion({{ $index + 1 }})"
+                                            aria-label="Go to question {{ $index + 1 }}">
+                                        <span class="q-nav-num">{{ $index + 1 }}</span>
+                                        <span class="q-nav-flag {{ $isFlagged ? '' : 'd-none' }}" aria-hidden="true">
+                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                                                <line x1="4" y1="22" x2="4" y2="15"/>
+                                            </svg>
+                                        </span>
+                                    </button>
+                                @endforeach
+                            </div>
 
-                                            <div class="d-flex align-items-center pl-2">
-                                                <span class="q-num-label font-weight-bold text-dark mr-2">Q{{ $index + 1 }}</span>
-                                                
-                                                <span class="flag-icon {{ $isFlagged ? '' : 'd-none' }} text-danger mr-2" style="line-height: 1;"><i class="feather icon-flag font-small-3"></i></span>
-                                                
-                                                <span class="status-dot-badge badge badge-pill {{ $statusClass }} font-weight-bold">
-                                                    {{ $statusText }}
-                                                </span>
-                                            </div>
-
-                                            <div class="time-pill-container">
-                                                <i class="feather icon-clock text-primary mr-1" style="font-size: 0.7rem; vertical-align: middle;"></i>
-                                                <span id="sidebar-time-{{ $index + 1 }}" class="time-pill text-monospace font-weight-bold text-primary text-right" style="width: 38px;">
-                                                    00:00
-                                                </span>
-                                            </div>
-                                        </div>
-                                    @endforeach
+                            <!-- Legend -->
+                            <div class="q-nav-legend">
+                                <div class="legend-item">
+                                    <span class="legend-dot legend-dot-current"></span>
+                                    <span>Current Question</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot legend-dot-answered"></span>
+                                    <span>Answered</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot legend-dot-unanswered"></span>
+                                    <span>Unanswered</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot legend-dot-flagged"></span>
+                                    <span>Marked for Review</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                </div>
-
-                <!-- Bottom Navigation/Toolbar -->
-                <div class="bottom-toolbar">
-                    
-                    <!-- Left Actions: Inst & Flag -->
-                    <div class="d-flex align-items-center">
-                        <button type="button" class="btn btn-outline-secondary btn-toolbar-instructions d-flex align-items-center shadow-sm mr-2" data-toggle="modal" data-target="#instructionsModal">
-                            <i class="feather icon-info mr-2 font-medium-1"></i>
-                            <span class="btn-text">Instructions</span>
-                        </button>
-                        <button type="button" class="btn btn-outline-danger btn-toolbar-flag d-flex align-items-center shadow-sm" id="flag-btn" onclick="toggleFlag()">
-                            <i class="feather icon-flag mr-2 font-medium-1"></i>
-                            <span class="btn-text">Flag Question</span>
-                        </button>
-                    </div>
-
-                    <!-- Middle Actions: Input State & Skip OR Certainty Toggles -->
-                    <div class="d-flex align-items-center justify-content-center flex-grow-1">
-                        
-                        <!-- Go Back Button (Visible in both states, except on Question 1) -->
-                        <button type="button" id="go-back-btn" class="btn mr-2 btn-toolbar-back d-flex align-items-center shadow-sm" onclick="prevQuestion()">
-                            <i class="feather icon-arrow-left mr-2 font-medium-1"></i>
-                            <span class="btn-text">Go Back</span>
-                        </button>
-
-                        <!-- Skip Button (Shown only when NOT answered) -->
-                        <div id="skip-action-wrapper" class="d-flex align-items-center">
-                            <span class="mr-2 font-weight-bold text-primary px-3 py-1.5 rounded-lg border bg-light d-none d-sm-inline" style="font-size: 0.72rem; background-color: #f8fafc; border-color: #e2e8f0; line-height: 1.5;">
-                                <span id="current-input-count">0</span> / 1 Selected
-                            </span>
-                            <button type="button" class="btn btn-primary btn-toolbar-skip d-flex align-items-center shadow" onclick="skipQuestion()">
-                                <span class="btn-text mr-2">Skip</span>
-                                <i class="feather icon-arrow-right font-medium-1"></i>
-                            </button>
-                        </div>
-
-                        <!-- Certainty Buttons (Shown only when answered) -->
-                        <div id="confidence-action-wrapper" class="d-none align-items-center">
-                            <button type="button" class="btn mr-2 btn-toolbar-guess d-flex align-items-center shadow-sm" onclick="selectConfidence('guess')">
-                                <i class="feather icon-help-circle mr-2 font-medium-1"></i>
-                                <span class="btn-text">Guess</span>
-                            </button>
-                            <button type="button" class="btn mr-2 btn-toolbar-fairly-sure d-flex align-items-center shadow-sm" onclick="selectConfidence('fairly_sure')">
-                                <i class="feather icon-smile mr-2 font-medium-1"></i>
-                                <span class="btn-text">Fairly Sure</span>
-                            </button>
-                            <button type="button" class="btn btn-toolbar-sure d-flex align-items-center shadow-sm" onclick="selectConfidence('sure')">
-                                <i class="feather icon-check-circle mr-2 font-medium-1"></i>
-                                <span class="btn-text">Sure</span>
-                            </button>
-                        </div>
-
-                        <!-- Feedback Loading (Instant Feedback) -->
-                        <div id="feedback-loading-wrapper" class="d-none align-items-center">
-                            <span class="spinner-border spinner-border-sm text-primary mr-2" role="status" aria-hidden="true"></span>
-                            <span class="font-weight-bold" style="font-size: 0.8rem;">Evaluating answer...</span>
-                        </div>
-
-                        <!-- Continue Button (Instant Feedback) -->
-                        <div id="continue-action-wrapper" class="d-none align-items-center">
-                            <button type="button" class="btn btn-success d-flex align-items-center shadow" onclick="advanceAfterFeedback()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; border: none !important; border-radius: 30px; font-weight: 700; padding: 6px 20px;">
-                                <span class="btn-text mr-2">Continue</span>
-                                <i class="feather icon-arrow-right font-medium-1"></i>
-                            </button>
-                        </div>
-
-                    </div>
-
-                    <!-- Right Actions: Pause & Finish -->
-                    <div class="d-flex align-items-center">
-                        <button type="button" class="btn btn-outline-warning btn-toolbar-pause d-flex align-items-center shadow-sm mr-2" onclick="submitTestForm('pause')">
-                            <i class="feather icon-pause mr-2 font-medium-1"></i>
-                            <span class="btn-text">Pause</span>
-                        </button>
-                        <button type="button" class="btn btn-success btn-toolbar-finish d-flex align-items-center shadow" onclick="submitTestForm('submit')">
-                            <i class="feather icon-check mr-2 font-medium-1"></i>
-                            <span class="btn-text">Finish</span>
-                        </button>
-                    </div>
+                    </aside>
 
                 </div>
             </form>
 
-        </div>
+        </main>
     </div>
 
     <!-- Instructions Modal -->
-    <div class="modal fade text-left" id="instructionsModal" tabindex="-1" role="dialog" aria-labelledby="instructionsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content" style="border-radius: 12px; overflow: hidden; border: 0;">
-                <div class="modal-header text-white" style="background-color: #0b5891;">
-                    <h5 class="modal-title text-white font-weight-bold" id="instructionsModalLabel">Test Instructions</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body text-dark font-medium-1 p-4" style="line-height: 1.6;">
-                    {!! $attempt->paper->instruction ?? '<p>No specific instructions provided. Answer all questions to the best of your ability.</p>' !!}
-                </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" style="border-radius: 6px;">Close</button>
+    @if($hasCustomInstruction)
+        <div class="modal fade text-left" id="instructionsModal" tabindex="-1" role="dialog" aria-labelledby="instructionsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content" style="border-radius: 16px; overflow: hidden; border: 0;">
+                    <div class="modal-header text-white" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);">
+                        <h5 class="modal-title text-white font-weight-bold" id="instructionsModalLabel">Paper Instructions</h5>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-dark p-4" style="line-height: 1.65; font-size: 0.95rem;">
+                        {!! $attempt->paper->instruction !!}
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" style="border-radius: 8px;">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
 @endsection
 
 @push('styles')
     <style>
-        /* Modern Jakarta Font */
-        html, body {
-            font-family: 'Plus Jakarta Sans', sans-serif !important;
-            background-color: #f1f5f9 !important;
-            overflow: hidden !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            height: 100% !important;
-            width: 100% !important;
-        }
-
-        /* FORCE TRUE FULLSCREEN PLAYER VIEW OVERRIDING ALL THEME WRAPPERS & HORIZONTAL MENUS */
-        .fullscreen-player-content {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            z-index: 99999 !important;
-            background-color: #f1f5f9 !important;
-            overflow: hidden !important;
-        }
-
-        .header-navbar, 
-        .main-menu, 
+        /* Override default theme shell */
+        .header-navbar,
+        .main-menu,
         .horizontal-menu-wrapper,
-        .footer, 
-        .content-header, 
-        .sidenav-overlay, 
-        .drag-target, 
+        .footer,
+        .content-header,
+        .sidenav-overlay,
+        .drag-target,
         .header-navbar-shadow {
             display: none !important;
             visibility: hidden !important;
@@ -705,718 +917,1518 @@
             margin: 0 !important;
         }
 
+        html, body {
+            font-family: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            background-color: #f2f6fc !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            min-height: 100% !important;
+        }
+
         body.vertical-layout.navbar-floating .app-content,
         body.horizontal-layout.navbar-floating .app-content,
-        .app-content, 
-        .content-wrapper, 
+        body.student-theme-active .app-content,
+        .app-content,
+        .content-wrapper,
         .content-body {
             padding: 0 !important;
             margin: 0 !important;
-            min-height: 100vh !important;
             width: 100% !important;
             max-width: 100% !important;
-            overflow: hidden !important;
-            height: 100vh !important;
+            min-height: 100vh !important;
+            background-color: #f2f6fc !important;
         }
 
-        /* COMPACT INTERNAL SCROLLING LAYOUT */
-        .player-frame {
-            height: 100% !important;
-            width: 100% !important;
-            margin: 0 !important;
-            border: 0 !important;
-            border-radius: 0 !important;
+        .exam-player-shell {
+            position: relative;
+            z-index: 1035;
+            min-height: 100vh;
+            background-color: #f2f6fc;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            box-shadow: none !important;
-            background-color: #ffffff;
         }
 
-        .top-status-bar {
-            flex-shrink: 0;
-            z-index: 100;
-        }
-
-        .left-panel {
-            overflow-y: auto;
-            flex-grow: 1;
-            padding: 25px 40px !important;
-            background-color: #ffffff;
-            height: 100%;
-        }
-
-        .right-panel {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            border-left: 1px solid rgba(226, 232, 240, 0.4) !important;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(241, 245, 249, 0.2) 100%) !important;
-            backdrop-filter: blur(25px) saturate(210%);
-            -webkit-backdrop-filter: blur(25px) saturate(210%);
-            height: 100%;
-            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.015) !important;
-        }
-
-        .bottom-toolbar {
-            flex-shrink: 0;
-            z-index: 100;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border-top: 1px solid #e2e8f0;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.03);
-            padding: 12px 24px;
-            display: flex;
-            flex-wrap: nowrap;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* TOOLBAR BUTTONS */
-        .bottom-toolbar .btn {
-            border-radius: 30px !important;
-            font-size: 0.72rem !important;
-            font-weight: 700 !important;
-            padding: 6px 14px !important;
-            transition: all 0.2s ease-in-out;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-            letter-spacing: 0.3px;
-        }
-
-        .bottom-toolbar .btn i {
-            font-size: 0.85rem;
-        }
-
-        .btn-toolbar-instructions {
-            border-color: #cbd5e1 !important;
-            color: #475569 !important;
-            background-color: #ffffff !important;
-        }
-        .btn-toolbar-instructions:hover {
-            background-color: #f8fafc !important;
-            border-color: #94a3b8 !important;
-            color: #1e293b !important;
-        }
-
-        .btn-toolbar-flag {
-            border-color: #fee2e2 !important;
-            color: #dc2626 !important;
-            background-color: #ffffff !important;
-        }
-        .btn-toolbar-flag:hover {
-            background-color: #fef2f2 !important;
-            border-color: #fca5a5 !important;
-            color: #b91c1c !important;
-        }
-
-        .btn-toolbar-skip {
-            background: linear-gradient(135deg, #2477F9 0%, #4839eb 100%) !important;
-            border: none !important;
-            color: #ffffff !important;
-            padding: 6px 16px !important;
-        }
-        .btn-toolbar-skip:hover {
-            opacity: 0.95;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(115, 103, 240, 0.2) !important;
-        }
-
-        .btn-toolbar-back {
-            background-color: #f1f5f9 !important;
-            border: 1px solid #cbd5e1 !important;
-            color: #475569 !important;
-        }
-        .btn-toolbar-back:hover {
-            background-color: #e2e8f0 !important;
-            color: #1e293b !important;
-        }
-
-        .btn-toolbar-guess {
-            background-color: #fffaf0 !important;
-            border: 1px solid #ffe3b3 !important;
-            color: #dd6b20 !important;
-        }
-        .btn-toolbar-guess:hover {
-            background-color: #fff4e0 !important;
-            color: #c05621 !important;
-        }
-
-        .btn-toolbar-fairly-sure {
-            background-color: #f5f3ff !important;
-            border: 1px solid #e9d5ff !important;
-            color: #7c3aed !important;
-        }
-        .btn-toolbar-fairly-sure:hover {
-            background-color: #ede9fe !important;
-            color: #6d28d9 !important;
-        }
-
-        .btn-toolbar-sure {
-            background-color: #f0fdf4 !important;
-            border: 1px solid #bbf7d0 !important;
-            color: #16a34a !important;
-        }
-        .btn-toolbar-sure:hover {
-            background-color: #dcfce7 !important;
-            color: #15803d !important;
-        }
-
-        .btn-toolbar-pause {
-            border-color: #fef3c7 !important;
-            color: #d97706 !important;
-            background-color: #ffffff !important;
-        }
-        .btn-toolbar-pause:hover {
-            background-color: #fffbeb !important;
-            border-color: #fde68a !important;
-            color: #b45309 !important;
-        }
-
-        .btn-toolbar-finish {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-            border: none !important;
-            color: #ffffff !important;
-            padding: 6px 16px !important;
-        }
-        .btn-toolbar-finish:hover {
-            opacity: 0.95;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
-        }
-
-        .bg-light-primary {
-            background-color: rgba(115, 103, 240, 0.08) !important;
-        }
-        .bg-light-success {
-            background-color: rgba(40, 199, 111, 0.08) !important;
-        }
-        .bg-light-warning {
-            background-color: rgba(255, 159, 67, 0.08) !important;
-        }
-        .bg-light-danger {
-            background-color: rgba(234, 84, 85, 0.08) !important;
-        }
-
-        /* SELECTION CARD ANIMATIONS */
-        .option-card {
-            cursor: pointer;
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0 !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-            border-radius: 12px !important;
-            padding: 14px 18px !important;
-            display: flex;
-            align-items: center;
-        }
-        .option-card:hover {
-            border-color: #2477F9 !important;
-            background-color: #f8fafc;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(115, 103, 240, 0.06);
-        }
-        .selected-option-card {
-            border-color: #2477F9 !important;
-            border-width: 2px !important;
-            background: linear-gradient(135deg, #f5f3ff 0%, #fbfaff 100%) !important;
-            box-shadow: 0 5px 12px rgba(115, 103, 240, 0.1) !important;
-        }
-        .option-letter {
-            width: 34px;
-            height: 34px;
-            background-color: #f1efff;
-            color: #2477F9;
-            border-radius: 50%;
-            font-weight: 700;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s;
-        }
-        .selected-option-card .option-letter {
-            background-color: #2477F9 !important;
-            color: white !important;
-            box-shadow: 0 2px 4px rgba(115, 103, 240, 0.2);
-        }
-
-        .clickable-row:hover {
-            background-color: #f1f5f9;
-        }
-        .active-row {
-            background-color: #eef2ff !important;
-        }
-        .active-row .active-dot {
-            display: inline !important;
-        }
-
-        .stopwatch-led-container {
-            border: 2px solid #334155;
-            background-color: #0f172a;
-            border-radius: 8px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.1);
-        }
-        #digital-clock {
-            font-family: 'Share Tech Mono', monospace;
-            color: #f87171; /* Neon red-orange */
-            text-shadow: 0 0 10px rgba(248, 113, 113, 0.7);
-            letter-spacing: 1px;
-            font-size: 1rem;
-            margin: 0;
-        }
-
-        #flag-btn.flagged-active {
-            background-color: #dc2626 !important;
-            border-color: #dc2626 !important;
-            color: #ffffff !important;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3) !important;
-            animation: pulse 1s infinite alternate;
-        }
-        #flag-btn.flagged-active i {
-            color: #ffffff !important;
-        }
-
-        @keyframes pulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.08); }
-        }
-
-        .stat-pill {
-            box-shadow: 0 1px 2px rgba(0,0,0,0.01);
-            border: 1px solid #edf2f7;
-            border-radius: 8px;
-        }
-
-        /* MOBILE RESPONSIVE DRAWER & TOOLBAR */
-        .drawer-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(0, 0, 0, 0.4);
-            z-index: 99999;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .drawer-backdrop.show {
-            display: block;
-            opacity: 1;
-        }
-
-        @media (max-width: 767.98px) {
-            .left-panel {
-                padding: 20px 20px !important;
-            }
-
-
-            .drawer-backdrop {
-                z-index: 999999 !important;
-            }
-
-            .right-panel {
-                position: fixed !important;
-                top: 0 !important;
-                right: -300px !important;
-                width: 300px !important;
-                max-width: 300px !important;
-                flex: 0 0 300px !important;
-                height: 100vh !important;
-                z-index: 1000000 !important;
-                background: rgba(255, 255, 255, 0.6) !important;
-                backdrop-filter: blur(25px) saturate(210%) !important;
-                -webkit-backdrop-filter: blur(25px) saturate(210%) !important;
-                display: flex !important;
-                transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05) !important;
-                border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
-            }
-
-            .right-panel.open {
-                right: 0 !important;
-            }
-
-            /* Option cards stack on mobile */
-            .answer-section .row > [class*="col-"] {
-                max-width: 100%;
-                flex: 0 0 100%;
-            }
-
-            /* Bottom Toolbar 2-Row Stack Layout on Mobile */
-            .bottom-toolbar {
-                padding: 10px 14px !important;
-                display: flex !important;
-                flex-wrap: wrap !important;
-                justify-content: space-between !important;
-                gap: 10px 4px !important;
-                background: #ffffff !important;
-            }
-            
-            /* Order containers on mobile */
-            .bottom-toolbar > div:nth-child(1) { /* Left Actions (Instructions, Flag) */
-                order: 1 !important;
-                flex: 0 0 auto !important;
-            }
-            .bottom-toolbar > div:nth-child(3) { /* Right Actions (Pause, Finish) */
-                order: 2 !important;
-                flex: 0 0 auto !important;
-            }
-            .bottom-toolbar > div:nth-child(2) { /* Middle Actions (Back, Skip/Certainty) */
-                order: 3 !important;
-                flex: 0 0 100% !important;
-                justify-content: center !important;
-                margin-top: 4px !important;
-            }
-
-            /* Secondary actions (Instructions, Flag, Pause) -> icon only on mobile */
-            .btn-toolbar-instructions,
-            .btn-toolbar-flag,
-            .btn-toolbar-pause {
-                width: 38px !important;
-                height: 38px !important;
-                min-width: 38px !important;
-                border-radius: 50% !important;
-                padding: 0 !important;
-                display: inline-flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                margin-right: 6px !important;
-            }
-            .btn-toolbar-instructions .btn-text,
-            .btn-toolbar-flag .btn-text,
-            .btn-toolbar-pause .btn-text {
-                display: none !important;
-            }
-            .btn-toolbar-instructions i,
-            .btn-toolbar-flag i,
-            .btn-toolbar-pause i {
-                margin-right: 0 !important;
-                font-size: 1.05rem !important;
-            }
-
-            /* Primary actions (Go Back, Skip, Certainty buttons, Finish) -> keep text labels & nice touch sizes */
-            .btn-toolbar-skip,
-            .btn-toolbar-finish {
-                border-radius: 20px !important;
-                font-size: 0.75rem !important;
-                padding: 8px 14px !important;
-                height: 38px !important;
-                display: inline-flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                margin-right: 6px !important;
-            }
-            .btn-toolbar-skip i,
-            .btn-toolbar-finish i {
-                font-size: 0.9rem !important;
-            }
-
-            /* Certainty Buttons & Back Button: circular icon-only layout on all mobile devices under 768px */
-            .btn-toolbar-back,
-            .btn-toolbar-guess,
-            .btn-toolbar-fairly-sure,
-            .btn-toolbar-sure {
-                width: 38px !important;
-                height: 38px !important;
-                min-width: 38px !important;
-                border-radius: 50% !important;
-                padding: 0 !important;
-                display: inline-flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                margin-right: 6px !important;
-            }
-            .btn-toolbar-back .btn-text,
-            .btn-toolbar-guess .btn-text,
-            .btn-toolbar-fairly-sure .btn-text,
-            .btn-toolbar-sure .btn-text {
-                display: none !important;
-            }
-            .btn-toolbar-back i,
-            .btn-toolbar-guess i,
-            .btn-toolbar-fairly-sure i,
-            .btn-toolbar-sure i {
-                margin-right: 0 !important;
-                font-size: 1.05rem !important;
-            }
-
-            #skip-action-wrapper span, 
-            #confidence-action-wrapper span {
-                font-size: 0.7rem !important;
-                padding: 4px 8px !important;
-                margin-right: 6px !important;
-            }
-        }
-
-        @media (min-width: 768px) and (max-width: 991.98px) {
-            .bottom-toolbar {
-                padding: 8px 16px !important;
-            }
-            .bottom-toolbar .btn {
-                font-size: 0.7rem !important;
-                padding: 6px 10px !important;
-            }
-            .bottom-toolbar .btn i {
-                font-size: 0.8rem !important;
-            }
-        }
-
-        /* Ensure SweetAlert is on top of the fullscreen player wrapper */
         .swal2-container {
             z-index: 999999 !important;
         }
 
-        /* Drag and Drop Styles */
-        .border-dashed {
-            border-style: dashed !important;
-        }
-        .drop-zone:hover {
-            background-color: #f1efff !important;
-            border-color: #4839eb !important;
-        }
-        .drop-zone.drag-active {
-            background-color: #eef2ff !important;
-            border-color: #2477F9 !important;
-        }
-        .draggable-card:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.08) !important;
-        }
-        .draggable-card.selected-card {
-            border-color: #28c76f !important;
-            box-shadow: 0 0 0 3px rgba(40, 199, 111, 0.25) !important;
+        /* Top Navbar */
+        .exam-topbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e6edf7;
+            box-shadow: 0 1px 6px rgba(15, 23, 42, 0.03);
+            position: sticky;
+            top: 0;
+            z-index: 1038;
         }
 
-        /* Premium Glassmorphic Sidebar styles */
-        .right-panel-header {
-            background: rgba(255, 255, 255, 0.35) !important;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.5) !important;
-        }
-
-        .questions-list-wrapper::-webkit-scrollbar {
-            width: 6px;
-        }
-        .questions-list-wrapper::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .questions-list-wrapper::-webkit-scrollbar-thumb {
-            background: rgba(115, 103, 240, 0.15);
-            border-radius: 4px;
-        }
-        .questions-list-wrapper::-webkit-scrollbar-thumb:hover {
-            background: rgba(115, 103, 240, 0.3);
-        }
-
-        .question-sidebar-card {
-            background: rgba(255, 255, 255, 0.35) !important;
-            border: 1px solid rgba(255, 255, 255, 0.5) !important;
-            border-left: 4px solid transparent !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01) !important;
-            border-radius: 12px !important;
-            padding: 10px 14px 10px 10px !important;
-            margin-bottom: 8px;
-            cursor: pointer;
-            position: relative;
+        .exam-topbar-inner {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 10px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.05, 1) !important;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            gap: 16px;
         }
 
-        .question-sidebar-card:hover {
-            background: rgba(255, 255, 255, 0.75) !important;
-            border-color: rgba(115, 103, 240, 0.4) !important;
-            border-left: 4px solid rgba(115, 103, 240, 0.4) !important;
-            transform: translateY(-2px) scale(1.015);
-            box-shadow: 0 6px 15px rgba(115, 103, 240, 0.06) !important;
+        .exam-brand-link {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
         }
 
-        .question-sidebar-card.active-row {
-            background: linear-gradient(135deg, rgba(115, 103, 240, 0.06) 0%, rgba(115, 103, 240, 0.12) 100%) !important;
-            border-color: rgba(115, 103, 240, 0.6) !important;
-            border-left: 4px solid #2477F9 !important;
-            box-shadow: 0 6px 18px rgba(115, 103, 240, 0.1) !important;
-            transform: scale(1.02);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+        .exam-logo-light,
+        .exam-logo-dark {
+            height: 36px;
+            width: auto;
+            object-fit: contain;
         }
 
-        .question-sidebar-card.active-row .active-dot {
-            display: inline !important;
+        .exam-logo-dark {
+            display: none;
         }
 
-        .q-num-label {
-            font-size: 0.88rem !important;
-            font-weight: 700 !important;
-            color: #1e293b !important;
-            letter-spacing: -0.3px;
+        .exam-topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
         }
 
-        /* Glass status badges */
-        .status-dot-badge {
-            font-size: 0.65rem !important;
-            font-weight: 700 !important;
-            letter-spacing: 0.4px;
-            padding: 4px 10px !important;
-            border-radius: 20px !important;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            text-transform: uppercase;
-        }
-        
-        .status-badge-unanswered {
-            background: rgba(239, 68, 68, 0.12) !important;
-            color: #ef4444 !important;
-            border: 1px solid rgba(239, 68, 68, 0.2) !important;
+        .exam-bell-btn {
+            position: relative;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: #1e3a8a;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
         }
 
-        .status-badge-answered {
-            background: rgba(59, 130, 246, 0.12) !important;
-            color: #3b82f6 !important;
-            border: 1px solid rgba(59, 130, 246, 0.2) !important;
+        .exam-bell-btn:hover {
+            background-color: #f1f5fb;
         }
 
-        .status-badge-guess {
-            background: rgba(245, 158, 11, 0.12) !important;
-            color: #f59e0b !important;
-            border: 1px solid rgba(245, 158, 11, 0.2) !important;
+        .exam-bell-badge {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            min-width: 17px;
+            height: 17px;
+            border-radius: 999px;
+            background-color: #ef4444;
+            color: #ffffff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid #ffffff;
         }
 
-        .status-badge-fairly-sure {
-            background: rgba(99, 102, 241, 0.12) !important;
-            color: #6366f1 !important;
-            border: 1px solid rgba(99, 102, 241, 0.2) !important;
+        .exam-user-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: transparent;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
         }
 
-        .status-badge-sure {
-            background: rgba(16, 185, 129, 0.12) !important;
-            color: #10b981 !important;
-            border: 1px solid rgba(16, 185, 129, 0.2) !important;
+        .exam-user-pill::after {
+            display: none !important;
         }
 
-        .time-pill-container {
-            background: rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            border-radius: 20px;
-            padding: 2px 8px;
+        .exam-user-pill:hover {
+            background-color: #f1f5fb;
+        }
+
+        .exam-user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #dbeafe;
+        }
+
+        .exam-user-meta {
+            flex-direction: column;
+            text-align: left;
+            line-height: 1.2;
+        }
+
+        .exam-user-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #0b1f51;
+        }
+
+        .exam-user-role {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .exam-user-chevron {
+            color: #64748b;
+        }
+
+        .exam-dropdown-menu {
+            border-radius: 12px;
+            min-width: 240px;
+            margin-top: 8px;
+        }
+
+        .exam-menu-item {
+            padding: 9px 16px;
+            font-size: 0.85rem;
             display: flex;
             align-items: center;
         }
 
-        .time-pill {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.78rem !important;
-            color: #475569 !important;
+        /* Main Container */
+        .exam-main-container {
+            width: 100%;
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 22px 24px 36px;
+            flex: 1;
         }
 
-        /* Glass stopwatch clock styling */
-        .stopwatch-led-container {
-            border: 1px solid rgba(255, 255, 255, 0.4) !important;
-            background: rgba(15, 23, 42, 0.65) !important;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border-radius: 30px !important;
-            padding: 4px 12px !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+        /* Paper Header Row */
+        .exam-paper-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .exam-paper-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .exam-subject-badge {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            box-shadow: 0 6px 16px rgba(220, 38, 38, 0.24);
             display: inline-flex;
             align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
-        #digital-clock {
-            font-family: 'Share Tech Mono', monospace;
-            color: #f43f5e !important;
-            text-shadow: 0 0 8px rgba(244, 63, 94, 0.6);
-            letter-spacing: 1px;
-            font-size: 0.9rem;
+        .exam-title-meta {
+            min-width: 0;
+        }
+
+        .exam-paper-title {
+            color: #0b1f51;
+            font-size: 1.55rem;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+            line-height: 1.25;
+            margin: 0 0 2px;
+        }
+
+        .exam-paper-subtitle {
+            color: #64748b;
+            font-size: 0.92rem;
+            font-weight: 500;
             margin: 0;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .exam-instr-link {
+            background: none;
+            border: none;
+            padding: 0;
+            color: #2563eb;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .exam-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .btn-save-exit {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #ffffff;
+            color: #0b1f51;
+            border: 1px solid #dbe4f0;
+            border-radius: 10px;
+            padding: 10px 18px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-save-exit:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        .btn-submit-test {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #1677ff 0%, #0b5ed7 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 4px 14px rgba(22, 119, 255, 0.28);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-submit-test:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(22, 119, 255, 0.36);
+        }
+
+        /* 6-Stat Summary Bar */
+        .exam-meta-bar {
+            background-color: #ffffff;
+            border-radius: 14px;
+            border: 1px solid #e6edf7;
+            box-shadow: 0 3px 14px rgba(15, 23, 42, 0.04);
+            padding: 14px 18px;
+            margin-bottom: 20px;
+        }
+
+        .exam-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            align-items: center;
+            gap: 8px;
+        }
+
+        .exam-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 12px;
+            border-right: 1px solid #e6edf7;
+            min-width: 0;
+        }
+
+        .exam-meta-item-last {
+            border-right: none;
+        }
+
+        .exam-meta-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .meta-bg-blue {
+            background-color: #1677ff;
+            box-shadow: 0 3px 10px rgba(22, 119, 255, 0.2);
+        }
+
+        .meta-bg-amber {
+            background-color: #f59e0b;
+            box-shadow: 0 3px 10px rgba(245, 158, 11, 0.2);
+        }
+
+        .meta-bg-green {
+            background-color: #16a34a;
+            box-shadow: 0 3px 10px rgba(22, 163, 74, 0.2);
+        }
+
+        .meta-bg-gray {
+            background-color: #e9eef5;
+        }
+
+        .meta-bg-purple-soft {
+            background-color: #ede9fe;
+        }
+
+        .exam-meta-text {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .exam-meta-label {
+            font-size: 0.76rem;
+            color: #64748b;
+            font-weight: 500;
+            line-height: 1.2;
+        }
+
+        .exam-meta-value {
+            font-size: 1.05rem;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-top: 2px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .val-blue { color: #1677ff; }
+        .val-amber { color: #f59e0b; }
+        .val-green { color: #16a34a; }
+        .val-warning { color: #d97706 !important; }
+        .val-danger { color: #dc2626 !important; }
+
+        .exam-meta-count {
+            font-size: 1.02rem;
+            font-weight: 800;
+            color: #0b1f51;
+            line-height: 1.2;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .exam-meta-sublabel {
+            font-size: 0.76rem;
+            color: #64748b;
+            font-weight: 500;
+            line-height: 1.2;
+            margin-top: 2px;
+            white-space: nowrap;
+        }
+
+        /* Two-Column Workspace */
+        .exam-workspace-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 340px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* Question Card */
+        .exam-question-card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e6edf7;
+            box-shadow: 0 3px 16px rgba(15, 23, 42, 0.04);
+            padding: 24px 28px;
+            display: flex;
+            flex-direction: column;
+            min-height: 490px;
+        }
+
+        .q-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .q-card-number {
+            color: #0b1f51;
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: -0.2px;
+        }
+
+        .q-marks-pill {
+            background-color: #f1f5fb;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            border-radius: 999px;
+            padding: 2px 10px;
+            font-size: 0.74rem;
+            font-weight: 600;
+        }
+
+        .btn-mark-review {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background-color: #f8fafc;
+            color: #1e293b;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 7px 14px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-mark-review:hover {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .btn-mark-review.is-flagged {
+            background-color: #f3e8ff;
+            border-color: #c084fc;
+            color: #7c3aed;
+        }
+
+        /* Question Box & Stem */
+        .q-card-body {
+            flex: 1;
+        }
+
+        .question-stem-box {
+            background-color: #f1f5fb;
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+        }
+
+        .question-stem-title {
+            color: #0b1f51;
+            font-size: 1.04rem;
+            font-weight: 700;
+            line-height: 1.55;
+        }
+
+        .question-stem-title p:last-child,
+        .passage-content p:last-child,
+        .question-stem-subdesc p:last-child {
+            margin-bottom: 0;
+        }
+
+        .passage-content {
+            color: #1e293b;
+            font-size: 0.94rem;
+            line-height: 1.65;
+        }
+
+        .question-stem-subdesc {
+            color: #334155;
+            font-size: 0.94rem;
+            line-height: 1.55;
+        }
+
+        .question-prompt-heading {
+            color: #0b1f51;
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .question-inline-blanks {
+            color: #0b1f51;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 2.1;
+        }
+
+        .inline-blank-input {
+            display: inline-block;
+            width: 160px;
+            height: 34px;
+            padding: 4px 10px;
+            margin: 0 4px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            background-color: #ffffff;
+            color: #0b1f51;
+            font-size: 0.94rem;
+            font-weight: 600;
+            vertical-align: middle;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .inline-blank-input:focus {
+            border-color: #1677ff;
+            box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.14);
+        }
+
+        .question-images-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .question-img-item img {
+            max-height: 220px;
+            object-fit: contain;
+            cursor: zoom-in;
+            transition: transform 0.2s ease;
+        }
+
+        /* Image 1: Option-Based List */
+        .answer-subhint {
+            font-size: 0.84rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .options-group-list {
+            border: 1px solid #dfe7f2;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+
+        .option-row-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 18px;
+            border-bottom: 1px solid #eef2f7;
+            cursor: pointer;
+            transition: background-color 0.15s ease, box-shadow 0.15s ease;
+            user-select: none;
+            outline: none;
+        }
+
+        .option-row-item:last-child {
+            border-bottom: none;
+        }
+
+        .option-row-item:hover {
+            background-color: #f8fbff;
+        }
+
+        .option-row-item:focus-visible {
+            box-shadow: inset 0 0 0 2px #93c5fd;
+        }
+
+        .option-row-item.selected-option-card {
+            background-color: #e8f1ff;
+            box-shadow: inset 0 0 0 1.5px #4d90fe;
+        }
+
+        .option-indicator {
+            width: 19px;
+            height: 19px;
+            flex-shrink: 0;
+            margin-top: 2px;
+            border: 1.6px solid #cbd5e1;
+            background-color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .indicator-radio {
+            border-radius: 50%;
+        }
+
+        .indicator-checkbox {
+            border-radius: 5px;
+        }
+
+        .checkbox-check-svg {
+            opacity: 0;
+            transform: scale(0.7);
+            transition: all 0.15s ease;
+        }
+
+        .selected-option-card .indicator-radio {
+            border-color: #1677ff;
+            background-color: #1677ff;
+            box-shadow: inset 0 0 0 4px #1677ff;
+            position: relative;
+        }
+
+        .selected-option-card .indicator-radio::after {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            display: block;
+        }
+
+        .selected-option-card .indicator-checkbox {
+            border-color: #1677ff;
+            background-color: #1677ff;
+        }
+
+        .selected-option-card .checkbox-check-svg {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .option-letter-label {
+            color: #0b1f51;
+            font-weight: 700;
+            font-size: 0.94rem;
+            min-width: 22px;
+            flex-shrink: 0;
+            line-height: 1.5;
+        }
+
+        .option-content-wrap {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .option-text-label {
+            color: #1e293b;
+            font-size: 0.94rem;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .option-inline-img {
+            max-height: 60px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Picture Choice */
+        .picture-options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .picture-option-card {
+            border: 1.5px solid #dfe7f2;
+            border-radius: 12px;
+            padding: 14px;
+            background-color: #ffffff;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .picture-option-card:hover {
+            border-color: #93c5fd;
+            background-color: #f8fbff;
+        }
+
+        .picture-option-card.selected-option-card {
+            background-color: #e8f1ff;
+            border-color: #2563eb;
+            box-shadow: 0 3px 12px rgba(37, 99, 235, 0.12);
+        }
+
+        .picture-option-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .picture-option-img-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .picture-option-img-box img {
+            max-height: 140px;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        /* Image 2: Direct Answer / Input Based */
+        .direct-answer-block {
+            margin-top: 6px;
+        }
+
+        .direct-answer-label {
+            display: block;
+            color: #0b1f51;
+            font-size: 0.96rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .direct-answer-input {
+            width: 100%;
+            height: 48px;
+            padding: 10px 16px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            background-color: #ffffff;
+            color: #0b1f51;
+            font-size: 0.98rem;
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .direct-answer-input::placeholder,
+        .direct-answer-textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        .direct-answer-input:focus,
+        .direct-answer-textarea:focus {
+            border-color: #1677ff;
+            box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.14);
+        }
+
+        .direct-answer-textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            background-color: #ffffff;
+            color: #0b1f51;
+            font-size: 0.96rem;
+            font-weight: 500;
+            line-height: 1.55;
+            outline: none;
+            resize: vertical;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .direct-answer-hint {
+            color: #64748b;
+            font-size: 0.84rem;
+            font-weight: 500;
+        }
+
+        .is-locked-input {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+            pointer-events: none;
+            color: #64748b !important;
+        }
+
+        /* Matching Question Types */
+        .matching-pair-row,
+        .matching-target-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border: 1px solid #dfe7f2;
+            border-radius: 10px;
+            background-color: #f8fafc;
+            margin-bottom: 10px;
+        }
+
+        .matching-left-text,
+        .matching-target-label {
+            color: #0b1f51;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .matching-select {
+            width: 185px;
+            height: 38px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+        }
+
+        .drop-zone {
+            border: 2px dashed #60a5fa;
+            border-radius: 8px;
+            width: 185px;
+            min-height: 42px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.drag-active {
+            background-color: #eff6ff;
+            border-color: #1677ff;
+        }
+
+        .drag-placeholder {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .draggables-pool {
+            min-height: 140px;
+            border: 1px solid #dfe7f2;
+            border-radius: 10px;
+            background-color: #f8fafc;
+            padding: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 8px;
+        }
+
+        .draggable-card {
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: grab;
+            transition: all 0.15s ease;
+        }
+
+        .draggable-card.pool-card {
+            background-color: #ffffff;
+            color: #1d4ed8;
+            border: 1.5px solid #93c5fd;
+        }
+
+        .draggable-card.matched-card {
+            background-color: #1677ff;
+            color: #ffffff;
+            width: 100%;
+            text-align: center;
+        }
+
+        .draggable-card.selected-card {
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.28);
+            border-color: #16a34a !important;
+        }
+
+        /* Instant Feedback */
+        .instant-feedback-box {
+            border-radius: 12px;
+            padding: 16px 18px;
+            border: 1.5px solid transparent;
+        }
+
+        .instant-feedback-box.feedback-correct {
+            background-color: #f0fdf4;
+            border-color: #86efac;
+            color: #166534;
+        }
+
+        .instant-feedback-box.feedback-incorrect {
+            background-color: #fef2f2;
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+
+        .feedback-correct-row {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .feedback-explanation {
+            background-color: #ffffff;
+            color: #1e293b;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 0.88rem;
+            line-height: 1.55;
+        }
+
+        /* Question Card Footer */
+        .q-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: auto;
+            padding-top: 28px;
+        }
+
+        .btn-nav-prev {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #ffffff;
+            color: #0b1f51;
+            border: 1px solid #dbe4f0;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-nav-prev:hover:not(.is-disabled) {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .btn-nav-prev.is-disabled,
+        .btn-nav-prev:disabled {
+            background-color: #ebf1fa;
+            border-color: transparent;
+            color: #93a7c4;
+            cursor: not-allowed;
+        }
+
+        .btn-check-answer {
+            display: inline-flex;
+            align-items: center;
+            background-color: #eef4ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-check-answer:hover {
+            background-color: #dbeafe;
+        }
+
+        .btn-nav-next {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #1677ff 0%, #0b5ed7 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 22px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(22, 119, 255, 0.26);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-nav-next:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(22, 119, 255, 0.35);
+        }
+
+        /* Right Sidebar Cards */
+        .exam-sidebar-card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e6edf7;
+            box-shadow: 0 3px 16px rgba(15, 23, 42, 0.04);
+            padding: 20px 22px;
+        }
+
+        .sidebar-card-title {
+            color: #0b1f51;
+            font-size: 1.05rem;
+            font-weight: 800;
+            margin: 0 0 12px;
+            letter-spacing: -0.2px;
+        }
+
+        .progress-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.86rem;
+            color: #334155;
+            margin-bottom: 10px;
+        }
+
+        .progress-meta-row strong {
+            color: #0b1f51;
+            font-weight: 700;
+        }
+
+        .exam-progress-track {
+            width: 100%;
+            height: 10px;
+            background-color: #e9eef6;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .exam-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);
+            border-radius: 999px;
+            transition: width 0.3s ease;
+        }
+
+        /* Question Navigator Grid */
+        .q-nav-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 8px;
+            max-height: 310px;
+            overflow-y: auto;
+            padding: 2px;
+        }
+
+        .q-nav-btn {
+            position: relative;
+            height: 40px;
+            border-radius: 8px;
+            border: 1.5px solid transparent;
+            background-color: #f1f5fb;
+            color: #0b1f51;
+            font-size: 0.88rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .q-nav-btn:hover {
+            background-color: #e2eaf6;
+        }
+
+        .q-nav-btn.is-answered {
+            background-color: #dcfce7;
+            color: #15803d;
+            border-color: #bbf7d0;
+        }
+
+        .q-nav-btn.is-flagged {
+            background-color: #f3e8ff;
+            color: #7e22ce;
+            border-color: #d8b4fe;
+        }
+
+        .q-nav-btn.is-answered.is-flagged {
+            background-color: #f3e8ff;
+            color: #6b21a8;
+            border-color: #86efac;
+        }
+
+        .q-nav-btn.is-current {
+            border-color: #1677ff !important;
+            box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.15);
+        }
+
+        .q-nav-btn.is-current:not(.is-answered):not(.is-flagged) {
+            background-color: #e8f1ff;
+            color: #1d4ed8;
+        }
+
+        .q-nav-flag {
+            position: absolute;
+            top: 3px;
+            right: 4px;
+            color: #7c3aed;
+            line-height: 1;
+            display: inline-flex;
+        }
+
+        /* Legend */
+        .q-nav-legend {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px 12px;
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid #eef2f7;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .legend-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .legend-dot-current {
+            background-color: #e8f1ff;
+            border: 1.5px solid #1677ff;
+        }
+
+        .legend-dot-answered {
+            background-color: #4ade80;
+        }
+
+        .legend-dot-unanswered {
+            background-color: #e2e8f0;
+        }
+
+        .legend-dot-flagged {
+            background-color: #c084fc;
+        }
+
+        /* Responsive Layout */
+        @media (max-width: 1199.98px) {
+            .exam-meta-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 12px;
+            }
+            .exam-meta-item {
+                border-right: none;
+                background-color: #f8fafd;
+                border-radius: 10px;
+                padding: 8px 12px;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .exam-workspace-grid {
+                grid-template-columns: 1fr;
+            }
+            .exam-question-card {
+                min-height: auto;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .exam-topbar-inner {
+                padding: 10px 14px;
+            }
+            .exam-main-container {
+                padding: 16px 14px 28px;
+            }
+            .exam-paper-title {
+                font-size: 1.25rem;
+            }
+            .exam-header-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+            .btn-save-exit,
+            .btn-submit-test {
+                flex: 1;
+                justify-content: center;
+            }
+            .exam-meta-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .exam-question-card {
+                padding: 18px 16px;
+            }
+            .picture-options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dark Layout Support */
+        .dark-layout,
+        .dark-layout .app-content,
+        .dark-layout .exam-player-shell {
+            background-color: #0f172a !important;
+        }
+
+        .dark-layout .exam-topbar {
+            background-color: #1e293b;
+            border-bottom-color: #334155;
+        }
+
+        .dark-layout .exam-logo-light {
+            display: none;
+        }
+
+        .dark-layout .exam-logo-dark {
+            display: block;
+        }
+
+        .dark-layout .exam-bell-btn {
+            color: #e2e8f0;
+        }
+
+        .dark-layout .exam-bell-btn:hover,
+        .dark-layout .exam-user-pill:hover {
+            background-color: #334155;
+        }
+
+        .dark-layout .exam-user-name,
+        .dark-layout .exam-paper-title,
+        .dark-layout .exam-meta-count,
+        .dark-layout .q-card-number,
+        .dark-layout .question-stem-title,
+        .dark-layout .question-prompt-heading,
+        .dark-layout .direct-answer-label,
+        .dark-layout .sidebar-card-title,
+        .dark-layout .progress-meta-row strong,
+        .dark-layout .option-letter-label {
+            color: #f8fafc !important;
+        }
+
+        .dark-layout .exam-user-role,
+        .dark-layout .exam-paper-subtitle,
+        .dark-layout .exam-meta-label,
+        .dark-layout .exam-meta-sublabel,
+        .dark-layout .direct-answer-hint,
+        .dark-layout .legend-item,
+        .dark-layout .progress-meta-row {
+            color: #94a3b8;
+        }
+
+        .dark-layout .exam-meta-bar,
+        .dark-layout .exam-question-card,
+        .dark-layout .exam-sidebar-card,
+        .dark-layout .options-group-list,
+        .dark-layout .picture-option-card {
+            background-color: #1e293b;
+            border-color: #334155;
+            box-shadow: none;
+        }
+
+        .dark-layout .exam-meta-item {
+            border-right-color: #334155;
+        }
+
+        @media (max-width: 1199.98px) {
+            .dark-layout .exam-meta-item {
+                background-color: #0f172a;
+            }
+        }
+
+        .dark-layout .question-stem-box {
+            background-color: #0f172a;
+        }
+
+        .dark-layout .passage-content,
+        .dark-layout .question-stem-subdesc,
+        .dark-layout .question-inline-blanks,
+        .dark-layout .option-text-label {
+            color: #e2e8f0;
+        }
+
+        .dark-layout .option-row-item {
+            border-bottom-color: #334155;
+        }
+
+        .dark-layout .option-row-item:hover {
+            background-color: #263449;
+        }
+
+        .dark-layout .option-row-item.selected-option-card,
+        .dark-layout .picture-option-card.selected-option-card {
+            background-color: rgba(37, 99, 235, 0.22);
+        }
+
+        .dark-layout .direct-answer-input,
+        .dark-layout .direct-answer-textarea,
+        .dark-layout .inline-blank-input {
+            background-color: #0f172a;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+
+        .dark-layout .btn-save-exit,
+        .dark-layout .btn-nav-prev,
+        .dark-layout .btn-mark-review {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #f1f5f9;
+        }
+
+        .dark-layout .btn-nav-prev.is-disabled,
+        .dark-layout .btn-nav-prev:disabled {
+            background-color: #0f172a;
+            color: #475569;
+        }
+
+        .dark-layout .q-nav-btn {
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .dark-layout .q-nav-btn.is-answered {
+            background-color: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+            border-color: rgba(34, 197, 94, 0.35);
+        }
+
+        .dark-layout .q-nav-btn.is-flagged {
+            background-color: rgba(168, 85, 247, 0.22);
+            color: #d8b4fe;
+            border-color: rgba(168, 85, 247, 0.4);
+        }
+
+        .dark-layout .exam-progress-track {
+            background-color: #0f172a;
+        }
+
+        .dark-layout .q-nav-legend {
+            border-top-color: #334155;
+        }
+
+        .dark-layout .exam-dropdown-menu {
+            background-color: #1e293b;
+            border: 1px solid #334155 !important;
+        }
+
+        .dark-layout .exam-dropdown-menu .text-dark,
+        .dark-layout .exam-dropdown-menu .exam-menu-item {
+            color: #f1f5f9 !important;
+        }
+
+        .dark-layout .exam-dropdown-menu .exam-menu-item:hover {
+            background-color: #334155;
+        }
+
+        .dark-layout .matching-pair-row,
+        .dark-layout .matching-target-row,
+        .dark-layout .draggables-pool,
+        .dark-layout .drop-zone {
+            background-color: #0f172a;
+            border-color: #334155;
+        }
+
+        .dark-layout .matching-left-text,
+        .dark-layout .matching-target-label {
+            color: #f1f5f9;
+        }
+
+        .dark-layout .matching-select {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+
+        .dark-layout .feedback-explanation {
+            background-color: #0f172a;
+            border-color: #334155;
+            color: #e2e8f0;
         }
     </style>
 @endpush
 
 @push('scripts')
     <script>
-        let remainingSeconds = @json($remainingSeconds); // overall test timer
+        let remainingSeconds = @json($remainingSeconds);
         let isCountdown = remainingSeconds !== null;
-        let elapsedSeconds = {{ max(0, $attempt->time_spent) + (int) $attempt->started_at->diffInSeconds(now()) }}; // countup backup timer if no remaining limit
+        let elapsedSeconds = {{ max(0, (int) $attempt->time_spent) + ($attempt->started_at ? (int) $attempt->started_at->diffInSeconds(now()) : 0) }};
 
         let currentQuestion = 1;
         let totalQuestions = @json($questions->count());
-        let allowInstantFeedback = @json($attempt->paper->allow_instant_feedback);
-        let allowReattempt = @json($attempt->paper->allow_reattempt_question);
-        
-        let questionTimes = {}; // maps question ID -> seconds spent
-        let questionFlagged = {}; // maps question ID -> is flagged (0 or 1)
-        let questionSkipped = {}; // maps question ID -> is skipped (true/false)
+        let allowInstantFeedback = @json((bool) $attempt->paper->allow_instant_feedback);
+        let allowReattempt = @json((bool) $attempt->paper->allow_reattempt_question);
 
-        // Initialize question times, flagged states from Database values
+        let questionTimes = {};
+        let questionFlagged = {};
+
         @foreach($questions as $question)
-            @php
-                $ans = $answers->get($question->id);
-            @endphp
-            questionTimes[{{ $question->id }}] = {{ $ans ? $ans->time_spent : 0 }};
+            @php $ans = $answers->get($question->id); @endphp
+            questionTimes[{{ $question->id }}] = {{ $ans ? (int) $ans->time_spent : 0 }};
             questionFlagged[{{ $question->id }}] = {{ $ans && $ans->is_flagged ? 1 : 0 }};
-            questionSkipped[{{ $question->id }}] = false;
         @endforeach
 
         let activeQuestionTimer = null;
         let overallTimerInterval = null;
+        let autoSaveDebounceTimer = null;
+        let isSubmittingForm = false;
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Move right-panel to fullscreen-player-content on mobile to prevent clipping
-            if (window.innerWidth < 768) {
-                let panel = document.querySelector('.right-panel');
-                let container = document.querySelector('.fullscreen-player-content');
-                if (panel && container) {
-                    container.appendChild(panel);
-                }
+            if (totalQuestions > 0) {
+                showQuestion(1);
             }
 
-            // Show first question
-            showQuestion(1);
-
-            // Lock inputs for already answered questions if reattempt is not allowed
             if (!allowReattempt) {
                 document.querySelectorAll('.q-card').forEach(card => {
                     let qId = card.getAttribute('data-q-id');
-                    let confidence = document.getElementById('confidence-' + qId).value;
-                    if (confidence !== '') {
+                    let confidenceInput = document.getElementById('confidence-' + qId);
+                    if (confidenceInput && confidenceInput.value !== '') {
                         lockQuestionInputs(card);
                     }
                 });
             }
 
-            // Start timers
+            // Initialize word counts for free_text questions
+            document.querySelectorAll('textarea.text-input').forEach(ta => {
+                let card = ta.closest('.q-card');
+                if (card) {
+                    let qId = card.getAttribute('data-q-id');
+                    let wordCountEl = document.getElementById('word-count-' + qId);
+                    if (wordCountEl) {
+                        let limitMatch = wordCountEl.textContent.match(/\d+/);
+                        let limit = limitMatch ? parseInt(limitMatch[0], 10) : null;
+                        updateWordCount(qId, ta, limit);
+                    }
+                }
+            });
+
             startOverallTimer();
-            startActiveQuestionTimer();
+            if (totalQuestions > 0) {
+                startActiveQuestionTimer();
+            }
 
-            // Populate palette times and flags
-            updateSidebarDisplay();
-            updateStatsBanner();
+            for (let i = 1; i <= totalQuestions; i++) {
+                updateNavigatorTile(i);
+            }
+            updateStatsAndProgress();
+            initLightbox();
 
-            // Auto-save answers every 30 seconds
-            setInterval(autoSaveAnswers, 30000);
+            // Periodic safety auto-save every 25 seconds
+            setInterval(function() {
+                if (!isSubmittingForm) {
+                    autoSaveAnswers().catch(() => {});
+                }
+            }, 25000);
+
+            // Sync theme icon/label inside exam topbar when toggled
+            window.addEventListener('appThemeChanged', function(e) {
+                let isDark = e.detail && e.detail.theme === 'dark';
+                let icon = document.getElementById('examThemeIcon');
+                let label = document.getElementById('examThemeLabel');
+                if (icon) icon.className = 'feather icon-' + (isDark ? 'sun' : 'moon') + ' mr-2';
+                if (label) label.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+            });
         });
 
-        // Starts the overall countdown or countup timer at the bottom right
         function startOverallTimer() {
             updateDigitalClock();
             overallTimerInterval = setInterval(function() {
                 if (isCountdown) {
-                    remainingSeconds--;
                     if (remainingSeconds <= 0) {
                         clearInterval(overallTimerInterval);
                         submitTestForm('submit_auto');
+                        return;
+                    }
+                    remainingSeconds--;
+                    if (remainingSeconds <= 0) {
+                        updateDigitalClock();
+                        clearInterval(overallTimerInterval);
+                        submitTestForm('submit_auto');
+                        return;
                     }
                 } else {
                     elapsedSeconds++;
@@ -1425,347 +2437,320 @@
             }, 1000);
         }
 
-        // Update the digital clock displays
         function updateDigitalClock() {
             let clockEl = document.getElementById('digital-clock');
-            let mobClockEl = document.getElementById('mobile-digital-clock');
-            if (!clockEl && !mobClockEl) return;
+            if (!clockEl) return;
 
-            let timeVal = Math.floor(isCountdown ? remainingSeconds : elapsedSeconds);
-            if (timeVal < 0) timeVal = 0;
-
+            let timeVal = Math.max(0, Math.floor(isCountdown ? remainingSeconds : elapsedSeconds));
             let hrs = Math.floor(timeVal / 3600);
             let mins = Math.floor((timeVal % 3600) / 60);
             let secs = timeVal % 60;
 
-            let formattedTime = 
-                (hrs < 10 ? '0' : '') + hrs + ':' +
-                (mins < 10 ? '0' : '') + mins + ':' +
-                (secs < 10 ? '0' : '') + secs;
+            let formattedTime;
+            if (timeVal > 3600) {
+                formattedTime =
+                    (hrs < 10 ? '0' : '') + hrs + ':' +
+                    (mins < 10 ? '0' : '') + mins + ':' +
+                    (secs < 10 ? '0' : '') + secs;
+            } else {
+                let totalMins = Math.floor(timeVal / 60);
+                formattedTime =
+                    (totalMins < 10 ? '0' : '') + totalMins + ':' +
+                    (secs < 10 ? '0' : '') + secs;
+            }
 
-            if (clockEl) clockEl.textContent = formattedTime;
-            if (mobClockEl) mobClockEl.textContent = formattedTime;
+            clockEl.textContent = formattedTime;
+
+            if (isCountdown) {
+                clockEl.classList.remove('val-warning', 'val-danger');
+                if (timeVal <= 60) {
+                    clockEl.classList.add('val-danger');
+                } else if (timeVal <= 300) {
+                    clockEl.classList.add('val-warning');
+                }
+            }
         }
 
-        // Increments current question's time count every second
         function startActiveQuestionTimer() {
             if (activeQuestionTimer) clearInterval(activeQuestionTimer);
-            
+            if (totalQuestions <= 0) return;
+
             activeQuestionTimer = setInterval(function() {
                 let card = document.getElementById('q-card-' + currentQuestion);
                 if (!card) return;
-
                 let qId = card.getAttribute('data-q-id');
-                questionTimes[qId]++;
-
-                // Update hidden time spent input
-                document.getElementById('time-spent-' + qId).value = questionTimes[qId];
-
-                // Update sidebar cell display
-                document.getElementById('sidebar-time-' + currentQuestion).textContent = formatMMSS(questionTimes[qId]);
+                questionTimes[qId] = (questionTimes[qId] || 0) + 1;
+                let timeInput = document.getElementById('time-spent-' + qId);
+                if (timeInput) timeInput.value = questionTimes[qId];
             }, 1000);
         }
 
-        // Format seconds to MM:SS
-        function formatMMSS(sec) {
-            let m = Math.floor(sec / 60);
-            let s = sec % 60;
-            return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-        }
-
-        // Show a specific question card
         function showQuestion(qNum) {
             if (qNum < 1 || qNum > totalQuestions) return;
 
-            // Pause question timer during transition
             if (activeQuestionTimer) clearInterval(activeQuestionTimer);
 
-            // Hide previous question card
             document.querySelectorAll('.q-card').forEach(card => card.classList.add('d-none'));
 
-            // Show target question card
             let targetCard = document.getElementById('q-card-' + qNum);
             if (targetCard) {
                 targetCard.classList.remove('d-none');
             }
 
-            // Update active state in sidebar rows
-            document.querySelectorAll('.clickable-row').forEach(row => row.classList.remove('active-row'));
-            let activeRow = document.getElementById('sidebar-row-' + qNum);
-            if (activeRow) {
-                activeRow.classList.add('active-row');
+            document.querySelectorAll('.q-nav-btn').forEach(btn => btn.classList.remove('is-current'));
+            let activeNavBtn = document.getElementById('nav-btn-' + qNum);
+            if (activeNavBtn) {
+                activeNavBtn.classList.add('is-current');
+                activeNavBtn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
             }
 
-            // Update current state variables
             currentQuestion = qNum;
-
-            // Update bottom toolbar counts
-            updateCurrentInputLabel();
-
-            // Toggle actions based on active question answer status
-            let qId = targetCard.getAttribute('data-q-id');
-            let hasAnswer = checkQuestionAnswered(qId);
-            toggleBottomToolbarActions(hasAnswer);
-
-            // Hide/Show Go Back button based on whether it is the first question
-            let goBackBtn = document.getElementById('go-back-btn');
-            if (goBackBtn) {
-                if (currentQuestion === 1) {
-                    goBackBtn.classList.add('d-none');
-                    goBackBtn.classList.remove('d-flex');
-                } else {
-                    goBackBtn.classList.remove('d-none');
-                    goBackBtn.classList.add('d-flex');
-                }
-            }
-
-            // Set flagged button active state if current is flagged
-            let isFlagged = document.getElementById('is-flagged-' + qId).value === '1';
-            if (isFlagged) {
-                document.getElementById('flag-btn').classList.add('flagged-active');
-            } else {
-                document.getElementById('flag-btn').classList.remove('flagged-active');
-            }
-
-            // Resume question timer
             startActiveQuestionTimer();
         }
 
-        // Sidebar row clicks
         function jumpToQuestion(qNum) {
+            if (qNum === currentQuestion) return;
+            scheduleAutoSave(150);
             showQuestion(qNum);
-            // Close mobile sidebar if open
-            let panel = document.querySelector('.right-panel');
-            if (panel && panel.classList.contains('open')) {
-                toggleSidebar();
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < totalQuestions) {
+                scheduleAutoSave(150);
+                showQuestion(currentQuestion + 1);
             }
         }
 
-        // Navigate to the previous question
         function prevQuestion() {
             if (currentQuestion > 1) {
+                scheduleAutoSave(150);
                 showQuestion(currentQuestion - 1);
-            } else {
-                showQuestion(totalQuestions); // Wrap
             }
         }
 
-        // Toggle mobile sidebar drawer
-        function toggleSidebar() {
-            let panel = document.querySelector('.right-panel');
-            let backdrop = document.querySelector('.drawer-backdrop');
-            if (!panel || !backdrop) return;
-            
-            if (panel.classList.contains('open')) {
-                panel.classList.remove('open');
-                backdrop.classList.remove('show');
-                setTimeout(() => {
-                    backdrop.style.display = 'none';
-                }, 300);
-            } else {
-                backdrop.style.display = 'block';
-                // Force reflow
-                backdrop.offsetHeight;
-                panel.classList.add('open');
-                backdrop.classList.add('show');
-            }
-        }
-
-        // Trigger skip button action (advances index, marks skipped if empty)
-        function skipQuestion() {
-            let card = document.getElementById('q-card-' + currentQuestion);
-            let prevQ = currentQuestion;
-            if (card) {
-                let qId = card.getAttribute('data-q-id');
-                let hasAnswer = checkQuestionAnswered(qId);
-                if (!hasAnswer) {
-                    questionSkipped[qId] = true;
-                }
-            }
-            updateSidebarCardStatus(prevQ);
-
-            if (currentQuestion < totalQuestions) {
-                showQuestion(currentQuestion + 1);
-            } else {
-                showQuestion(1); // Wrap
-            }
-
-            updateStatsBanner();
-        }
-
-        // Toggle Flag button action
-        function toggleFlag() {
-            let card = document.getElementById('q-card-' + currentQuestion);
+        function toggleFlag(qNum) {
+            let targetNum = qNum || currentQuestion;
+            let card = document.getElementById('q-card-' + targetNum);
             if (!card) return;
-            
+
             let qId = card.getAttribute('data-q-id');
             let hiddenInput = document.getElementById('is-flagged-' + qId);
             if (!hiddenInput) return;
 
-            let isFlagged = hiddenInput.value === '1';
-            if (isFlagged) {
-                hiddenInput.value = '0';
-                document.getElementById('flag-btn').classList.remove('flagged-active');
-                document.querySelector('#sidebar-row-' + currentQuestion + ' .flag-icon').classList.add('d-none');
-            } else {
-                hiddenInput.value = '1';
-                document.getElementById('flag-btn').classList.add('flagged-active');
-                document.querySelector('#sidebar-row-' + currentQuestion + ' .flag-icon').classList.remove('d-none');
+            let isCurrentlyFlagged = hiddenInput.value === '1';
+            let nextFlagged = !isCurrentlyFlagged;
+            hiddenInput.value = nextFlagged ? '1' : '0';
+            questionFlagged[qId] = nextFlagged ? 1 : 0;
+
+            let flagBtn = document.getElementById('flag-btn-' + targetNum);
+            if (flagBtn) {
+                flagBtn.classList.toggle('is-flagged', nextFlagged);
+                let label = flagBtn.querySelector('.flag-btn-label');
+                let svg = flagBtn.querySelector('.flag-svg');
+                if (label) label.textContent = nextFlagged ? 'Marked for Review' : 'Mark for Review';
+                if (svg) svg.setAttribute('fill', nextFlagged ? 'currentColor' : 'none');
             }
-            
-            updateStatsBanner();
+
+            updateNavigatorTile(targetNum);
+            updateStatsAndProgress();
+            scheduleAutoSave(250);
         }
 
-        // Check if question is answered
         function checkQuestionAnswered(qId) {
             let card = document.querySelector(`.q-card[data-q-id="${qId}"]`);
             if (!card) return false;
 
-            let radioChecked = card.querySelector('input[type="radio"]:checked');
-            let checkboxChecked = card.querySelector('input[type="checkbox"]:checked');
-            
-            // Check if any select has a value
+            if (card.querySelector('input[type="radio"]:checked')) return true;
+            if (card.querySelector('input[type="checkbox"]:checked')) return true;
+
             let selectValued = false;
             card.querySelectorAll('select').forEach(sel => {
                 if (sel.value !== '') selectValued = true;
             });
+            if (selectValued) return true;
 
-            // Check if any text/textarea input has text
             let textValued = false;
             card.querySelectorAll('input[type="text"], textarea').forEach(txt => {
                 if (txt.value.trim() !== '') textValued = true;
             });
+            if (textValued) return true;
 
-            // Check if any matching hidden input has value
             let matchingValued = false;
             card.querySelectorAll('.matching-hidden-input').forEach(hidden => {
                 if (hidden.value !== '') matchingValued = true;
             });
 
-            return !!(radioChecked || checkboxChecked || selectValued || textValued || matchingValued);
+            return matchingValued;
         }
 
-        // Toggle actions bar between Skip and Certainty options
-        function toggleBottomToolbarActions(isAnswered) {
-            let skipWrapper = document.getElementById('skip-action-wrapper');
-            let confidenceWrapper = document.getElementById('confidence-action-wrapper');
-            let continueWrapper = document.getElementById('continue-action-wrapper');
-            let feedbackLoading = document.getElementById('feedback-loading-wrapper');
-            if (!skipWrapper || !confidenceWrapper) return;
-
-            skipWrapper.classList.replace('d-flex', 'd-none');
-            confidenceWrapper.classList.replace('d-flex', 'd-none');
-            if (continueWrapper) continueWrapper.classList.replace('d-flex', 'd-none');
-            if (feedbackLoading) feedbackLoading.classList.replace('d-flex', 'd-none');
-
-            let card = document.getElementById('q-card-' + currentQuestion);
-            if (!card) return;
-            let qId = card.getAttribute('data-q-id');
-            let confidence = document.getElementById('confidence-' + qId).value;
-
-            if (!allowReattempt && confidence !== '') {
-                // Locked question, do not show skip or confidence buttons
-            } else {
-                if (isAnswered) {
-                    confidenceWrapper.classList.replace('d-none', 'd-flex');
-                } else {
-                    skipWrapper.classList.replace('d-none', 'd-flex');
-                }
-            }
-        }
-
-        // Selected option handler from cards grid clicks (supports toggle check/uncheck)
         function selectOption(questionId, optionId, type) {
             let container = document.getElementById('option-container-' + optionId);
             let input = document.getElementById('opt-' + optionId);
             if (!input || !container) return;
 
+            let questionCard = container.closest('.q-card');
+            if (!questionCard || questionCard.getAttribute('data-is-locked') === 'true') return;
+
+            let qNum = parseInt(questionCard.getAttribute('data-q-num'), 10);
+
             if (type === 'single_choice_radio' || type === 'picture_choice') {
                 let isAlreadyChecked = container.classList.contains('selected-option-card');
-                
-                // Clear selected style on siblings
-                let questionCard = container.closest('.q-card');
+
                 questionCard.querySelectorAll('.option-card').forEach(box => {
                     box.classList.remove('selected-option-card');
+                    box.setAttribute('aria-checked', 'false');
                 });
-                
+
                 if (isAlreadyChecked) {
                     input.checked = false;
-                    // Clear confidence on uncheck
-                    document.getElementById('confidence-' + questionId).value = '';
-                    toggleBottomToolbarActions(false);
                 } else {
                     input.checked = true;
                     container.classList.add('selected-option-card');
-                    questionSkipped[questionId] = false;
-                    toggleBottomToolbarActions(true);
+                    container.setAttribute('aria-checked', 'true');
                 }
             } else if (type === 'multiple_choice') {
                 input.checked = !input.checked;
-                if (input.checked) {
-                    container.classList.add('selected-option-card');
-                    questionSkipped[questionId] = false;
-                } else {
-                    container.classList.remove('selected-option-card');
+                container.classList.toggle('selected-option-card', input.checked);
+                container.setAttribute('aria-checked', input.checked ? 'true' : 'false');
+            }
+
+            updateNavigatorTile(qNum);
+            updateStatsAndProgress();
+            scheduleAutoSave(300);
+        }
+
+        function checkTextInput(qNum, element) {
+            updateNavigatorTile(qNum);
+            updateStatsAndProgress();
+            scheduleAutoSave(700);
+        }
+
+        function selectDropdownOption(qNum, element) {
+            updateNavigatorTile(qNum);
+            updateStatsAndProgress();
+            scheduleAutoSave(300);
+        }
+
+        function updateWordCount(qId, textarea, limit) {
+            let el = document.getElementById('word-count-' + qId);
+            if (!el) return;
+            let text = textarea.value.trim();
+            let words = text === '' ? 0 : text.split(/\s+/).length;
+            if (limit) {
+                el.textContent = words + ' / ' + limit + ' words';
+                el.style.color = words > limit ? '#dc2626' : '';
+            } else {
+                el.textContent = words > 0 ? words + (words === 1 ? ' word' : ' words') : '';
+            }
+        }
+
+        function updateNavigatorTile(qNum) {
+            let card = document.getElementById('q-card-' + qNum);
+            let navBtn = document.getElementById('nav-btn-' + qNum);
+            if (!card || !navBtn) return;
+
+            let qId = card.getAttribute('data-q-id');
+            let hasAnswer = checkQuestionAnswered(qId);
+            let isFlagged = document.getElementById('is-flagged-' + qId)?.value === '1';
+
+            navBtn.classList.toggle('is-answered', hasAnswer);
+            navBtn.classList.toggle('is-flagged', isFlagged);
+
+            let flagBadge = navBtn.querySelector('.q-nav-flag');
+            if (flagBadge) {
+                flagBadge.classList.toggle('d-none', !isFlagged);
+            }
+        }
+
+        function updateStatsAndProgress() {
+            let answered = 0;
+            let flagged = 0;
+
+            for (let i = 1; i <= totalQuestions; i++) {
+                let card = document.getElementById('q-card-' + i);
+                if (!card) continue;
+                let qId = card.getAttribute('data-q-id');
+
+                if (checkQuestionAnswered(qId)) {
+                    answered++;
                 }
-                
-                let questionCard = container.closest('.q-card');
-                let checkboxes = questionCard.querySelectorAll('input[type="checkbox"]:checked');
-                if (checkboxes.length > 0) {
-                    toggleBottomToolbarActions(true);
-                } else {
-                    document.getElementById('confidence-' + questionId).value = '';
-                    toggleBottomToolbarActions(false);
+                if (document.getElementById('is-flagged-' + qId)?.value === '1') {
+                    flagged++;
                 }
             }
 
-            updateCurrentInputLabel();
-            updateStatsBanner();
-            updateSidebarCardStatus(currentQuestion);
+            let unanswered = Math.max(0, totalQuestions - answered);
+            let pct = totalQuestions > 0 ? Math.round((answered / totalQuestions) * 100) : 0;
+
+            let statAns = document.getElementById('stat-answered');
+            let statUnans = document.getElementById('stat-unanswered');
+            let statFlag = document.getElementById('stat-flagged');
+            let progText = document.getElementById('progress-text');
+            let progPct = document.getElementById('progress-percent');
+            let progBar = document.getElementById('progress-bar-fill');
+
+            if (statAns) statAns.textContent = answered;
+            if (statUnans) statUnans.textContent = unanswered;
+            if (statFlag) statFlag.textContent = flagged;
+            if (progText) progText.textContent = answered + ' of ' + totalQuestions + ' answered';
+            if (progPct) progPct.textContent = pct + '%';
+            if (progBar) progBar.style.width = pct + '%';
         }
 
-        // Handles confidence selection Guess, Fairly Sure, Sure and advances question
-        // Also triggers background save of answers
-        function selectConfidence(level) {
-            let card = document.getElementById('q-card-' + currentQuestion);
+        function checkInstantFeedback(qNum, qId) {
+            let card = document.getElementById('q-card-' + qNum);
             if (!card) return;
 
-            let qId = card.getAttribute('data-q-id');
-            document.getElementById('confidence-' + qId).value = level;
-            updateSidebarCardStatus(currentQuestion);
+            if (!checkQuestionAnswered(qId)) {
+                Swal.fire({
+                    title: 'No Answer Provided',
+                    text: 'Please select or enter an answer before checking.',
+                    type: 'info',
+                    confirmButtonColor: '#1677ff'
+                });
+                return;
+            }
 
-            if (allowInstantFeedback) {
-                let confidenceWrapper = document.getElementById('confidence-action-wrapper');
-                let feedbackLoading = document.getElementById('feedback-loading-wrapper');
-                if (confidenceWrapper) confidenceWrapper.classList.replace('d-flex', 'd-none');
-                if (feedbackLoading) {
-                    feedbackLoading.classList.remove('d-none');
-                    feedbackLoading.classList.add('d-flex');
-                }
+            let confidenceInput = document.getElementById('confidence-' + qId);
+            if (confidenceInput && !confidenceInput.value) {
+                confidenceInput.value = 'sure';
+            }
 
-                autoSaveAnswers()
-                    .then(data => {
-                        if (feedbackLoading) feedbackLoading.classList.replace('d-flex', 'd-none');
-                        
-                        if (data && data.evaluations) {
-                            let evaluation = data.evaluations.find(e => e.question_id == qId);
-                            if (evaluation) {
-                                let feedbackBox = document.getElementById('feedback-box-' + qId);
-                                if (feedbackBox) {
-                                    feedbackBox.classList.remove('d-none');
-                                    feedbackBox.classList.remove('bg-light-success', 'border-success', 'text-success', 'bg-light-danger', 'border-danger', 'text-danger');
-                                    if (evaluation.is_correct) {
-                                        feedbackBox.classList.add('bg-light-success', 'border-success', 'text-success');
-                                        feedbackBox.querySelector('.feedback-title').textContent = 'Correct!';
-                                    } else {
-                                        feedbackBox.classList.add('bg-light-danger', 'border-danger', 'text-danger');
-                                        feedbackBox.querySelector('.feedback-title').textContent = 'Incorrect';
-                                    }
-                                    
-                                    feedbackBox.querySelector('.feedback-correct-answer').textContent = evaluation.correct_answer;
-                                    
-                                    let explanationBox = document.getElementById('feedback-explanation-container-' + qId);
-                                    if (evaluation.explanation || (explanationBox && explanationBox.querySelector('.explanation-images-wrapper'))) {
+            let checkBtn = document.getElementById('check-answer-btn-' + qId);
+            if (checkBtn) {
+                checkBtn.disabled = true;
+                checkBtn.textContent = 'Checking...';
+            }
+
+            autoSaveAnswers()
+                .then(data => {
+                    if (checkBtn) {
+                        checkBtn.disabled = false;
+                        checkBtn.textContent = 'Check Answer';
+                    }
+
+                    if (data && data.evaluations) {
+                        let evaluation = data.evaluations.find(e => e.question_id == qId);
+                        if (evaluation) {
+                            let feedbackBox = document.getElementById('feedback-box-' + qId);
+                            if (feedbackBox) {
+                                feedbackBox.classList.remove('d-none', 'feedback-correct', 'feedback-incorrect');
+                                feedbackBox.classList.add(evaluation.is_correct ? 'feedback-correct' : 'feedback-incorrect');
+                                feedbackBox.querySelector('.feedback-title').textContent = evaluation.is_correct ? 'Correct!' : 'Incorrect';
+
+                                let correctRow = feedbackBox.querySelector('.feedback-correct-row');
+                                let correctAnsSpan = feedbackBox.querySelector('.feedback-correct-answer');
+                                if (evaluation.correct_answer && evaluation.correct_answer.trim() !== '') {
+                                    correctAnsSpan.textContent = evaluation.correct_answer;
+                                    correctRow.classList.remove('d-none');
+                                } else {
+                                    correctRow.classList.add('d-none');
+                                }
+
+                                let explanationBox = document.getElementById('feedback-explanation-container-' + qId);
+                                if (explanationBox) {
+                                    let hasExpImgs = !!explanationBox.querySelector('.explanation-images-wrapper');
+                                    if (evaluation.explanation || hasExpImgs) {
                                         if (evaluation.explanation) {
                                             explanationBox.querySelector('.explanation-content').innerHTML = evaluation.explanation;
                                         }
@@ -1776,109 +2761,36 @@
                                 }
                             }
                         }
+                    }
 
-                        if (!allowReattempt) {
-                            lockQuestionInputs(card);
-                        }
-
-                        let continueWrapper = document.getElementById('continue-action-wrapper');
-                        if (continueWrapper) {
-                            continueWrapper.classList.remove('d-none');
-                            continueWrapper.classList.add('d-flex');
-                        }
-                        
-                        updateStatsBanner();
-                    })
-                    .catch(err => {
-                        if (feedbackLoading) feedbackLoading.classList.replace('d-flex', 'd-none');
-                        if (confidenceWrapper) confidenceWrapper.classList.replace('d-none', 'd-flex');
-                        Swal.fire('Error', 'Failed to save answer. Please try again.', 'error');
-                    });
-            } else {
-                autoSaveAnswers();
-                
-                if (!allowReattempt) {
-                    lockQuestionInputs(card);
-                }
-
-                if (currentQuestion < totalQuestions) {
-                    showQuestion(currentQuestion + 1);
-                } else {
-                    showQuestion(1); // wrap
-                }
-
-                updateStatsBanner();
-            }
-        }
-
-        function markAnswered(qNum) {
-            // Placeholder
-        }
-
-        function checkMultipleAnswered(qNum, questionId) {
-            // Placeholder
-        }
-
-        function checkTextInput(qNum, element) {
-            let card = document.getElementById('q-card-' + qNum);
-            if (card) {
-                let qId = card.getAttribute('data-q-id');
-                if (checkQuestionAnswered(qId)) {
-                    questionSkipped[qId] = false;
-                    toggleBottomToolbarActions(true);
-                } else {
-                    document.getElementById('confidence-' + qId).value = '';
-                    toggleBottomToolbarActions(false);
-                }
-            }
-            updateCurrentInputLabel();
-            updateStatsBanner();
-            updateSidebarCardStatus(qNum);
-        }
-
-        function selectDropdownOption(qNum, element) {
-            let card = document.getElementById('q-card-' + qNum);
-            if (card) {
-                let qId = card.getAttribute('data-q-id');
-                if (checkQuestionAnswered(qId)) {
-                    questionSkipped[qId] = false;
-                    toggleBottomToolbarActions(true);
-                } else {
-                    document.getElementById('confidence-' + qId).value = '';
-                    toggleBottomToolbarActions(false);
-                }
-            }
-            updateCurrentInputLabel();
-            updateStatsBanner();
-            updateSidebarCardStatus(qNum);
-        }
-
-        // Live input counters
-        function updateCurrentInputLabel() {
-            let card = document.getElementById('q-card-' + currentQuestion);
-            if (!card) return;
-
-            let hasAnswer = checkQuestionAnswered(card.getAttribute('data-q-id'));
-            document.getElementById('current-input-count').textContent = hasAnswer ? '1' : '0';
+                    if (!allowReattempt) {
+                        lockQuestionInputs(card);
+                        if (checkBtn) checkBtn.classList.add('d-none');
+                    }
+                })
+                .catch(() => {
+                    if (checkBtn) {
+                        checkBtn.disabled = false;
+                        checkBtn.textContent = 'Check Answer';
+                    }
+                    Swal.fire('Error', 'Failed to evaluate answer. Please try again.', 'error');
+                });
         }
 
         function lockQuestionInputs(card) {
             if (!card) return;
+            card.setAttribute('data-is-locked', 'true');
             card.querySelectorAll('.option-card').forEach(box => {
                 box.style.pointerEvents = 'none';
             });
             card.querySelectorAll('select').forEach(sel => {
-                sel.style.pointerEvents = 'none';
+                sel.classList.add('is-locked-input');
                 sel.setAttribute('tabindex', '-1');
-                sel.style.backgroundColor = '#f1f5f9';
-                sel.style.borderColor = '#cbd5e1';
             });
             card.querySelectorAll('input[type="text"], textarea').forEach(input => {
                 input.readOnly = true;
+                input.classList.add('is-locked-input');
                 input.setAttribute('tabindex', '-1');
-                input.style.pointerEvents = 'none';
-                input.style.backgroundColor = '#f1f5f9';
-                input.style.borderColor = '#cbd5e1';
             });
             card.querySelectorAll('.draggable-card').forEach(c => {
                 c.setAttribute('draggable', 'false');
@@ -1890,203 +2802,85 @@
             });
         }
 
-        function advanceAfterFeedback() {
-            let continueWrapper = document.getElementById('continue-action-wrapper');
-            if (continueWrapper) {
-                continueWrapper.classList.replace('d-flex', 'd-none');
-            }
-
-            if (currentQuestion < totalQuestions) {
-                showQuestion(currentQuestion + 1);
-            } else {
-                showQuestion(1); // wrap
-            }
-        }
-
-        // Update status badge on sidebar for a specific question card
-        function updateSidebarCardStatus(qNum) {
-            let card = document.getElementById('q-card-' + qNum);
-            if (!card) return;
-
-            let qId = card.getAttribute('data-q-id');
-            let badge = document.querySelector('#sidebar-row-' + qNum + ' .status-dot-badge');
-            if (!badge) return;
-
-            let confidence = document.getElementById('confidence-' + qId).value;
-            let hasAnswer = checkQuestionAnswered(qId);
-
-            let statusText = 'Unanswered';
-            let statusClass = 'status-badge-unanswered';
-
-            if (confidence !== null && confidence !== '') {
-                statusText = ucWords(confidence.replace('_', ' '));
-                if (confidence === 'guess') {
-                    statusClass = 'status-badge-guess';
-                } else if (confidence === 'fairly_sure') {
-                    statusClass = 'status-badge-fairly-sure';
-                } else if (confidence === 'sure') {
-                    statusClass = 'status-badge-sure';
-                }
-            } else if (hasAnswer) {
-                statusText = 'Answered';
-                statusClass = 'status-badge-answered';
-            } else if (questionSkipped[qId]) {
-                statusText = 'Skipped';
-                statusClass = 'status-badge-unanswered';
-            }
-
-            badge.className = 'status-dot-badge badge badge-pill ' + statusClass + ' font-weight-bold';
-            badge.textContent = statusText;
-        }
-
-        function ucWords(str) {
-            return str.replace(/\b[a-z]/g, function(letter) {
-                return letter.toUpperCase();
-            });
-        }
-
-        // Refresh times and flags on sidebar table
-        function updateSidebarDisplay() {
-            for (let i = 1; i <= totalQuestions; i++) {
-                let card = document.getElementById('q-card-' + i);
-                if (!card) continue;
-
-                let qId = card.getAttribute('data-q-id');
-                
-                // Set time spent cell text
-                document.getElementById('sidebar-time-' + i).textContent = formatMMSS(questionTimes[qId]);
-
-                // Set flag cell visibility
-                let isFlagged = document.getElementById('is-flagged-' + qId).value === '1';
-                if (isFlagged) {
-                    document.querySelector('#sidebar-row-' + i + ' .flag-icon').classList.remove('d-none');
-                } else {
-                    document.querySelector('#sidebar-row-' + i + ' .flag-icon').classList.add('d-none');
-                }
-
-                // Update status badge
-                updateSidebarCardStatus(i);
-            }
-        }
-
-        // Computes real-time status stats on the top banner including certainty breakdowns
-        function updateStatsBanner() {
-            let answered = 0;
-            let flagged = 0;
-            let skipped = 0;
-            let unanswered = 0;
-
-            let guess = 0;
-            let fairlySure = 0;
-            let sure = 0;
-
-            for (let i = 1; i <= totalQuestions; i++) {
-                let card = document.getElementById('q-card-' + i);
-                if (!card) continue;
-
-                let qId = card.getAttribute('data-q-id');
-                
-                // Check flagged
-                let isFlagged = document.getElementById('is-flagged-' + qId).value === '1';
-                if (isFlagged) {
-                    flagged++;
-                }
-
-                // Check confidence level
-                let confidence = document.getElementById('confidence-' + qId).value;
-                if (confidence === 'guess') {
-                    guess++;
-                } else if (confidence === 'fairly_sure') {
-                    fairlySure++;
-                } else if (confidence === 'sure') {
-                    sure++;
-                }
-
-                // Check answered
-                let hasAnswer = checkQuestionAnswered(qId);
-                if (hasAnswer) {
-                    answered++;
-                } else {
-                    if (questionSkipped[qId]) {
-                        skipped++;
-                    } else {
-                        unanswered++;
-                    }
-                }
-            }
-
-            document.getElementById('stat-answered').textContent = answered;
-            document.getElementById('stat-guess-bracket').textContent = guess;
-            document.getElementById('stat-fairly-sure-bracket').textContent = fairlySure;
-            document.getElementById('stat-sure-bracket').textContent = sure;
-
-            document.getElementById('stat-skipped').textContent = skipped;
-            document.getElementById('stat-unanswered').textContent = unanswered;
-        }
-
-        // Submits test form with Pause or Submit actions
         function submitTestForm(action) {
+            if (isSubmittingForm) return;
             let form = document.getElementById('test-taking-form');
             if (!form) return;
 
-            // Stop question timer
             if (activeQuestionTimer) clearInterval(activeQuestionTimer);
+            if (autoSaveDebounceTimer) clearTimeout(autoSaveDebounceTimer);
 
             if (action === 'pause') {
                 Swal.fire({
-                    title: 'Pause Test?',
-                    text: 'Are you sure you want to pause your test? Your current progress will be saved, and you can resume later.',
+                    title: 'Save & Exit?',
+                    text: 'Your answers and remaining time will be saved so you can resume this test later.',
                     type: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#ff9f43',
-                    cancelButtonColor: '#82868b',
-                    confirmButtonText: 'Yes, pause it!',
-                    cancelButtonText: 'No, keep going'
+                    confirmButtonColor: '#1677ff',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Yes, Save & Exit',
+                    cancelButtonText: 'Continue Test'
                 }).then(function(result) {
                     if (result && (result.value || result.isConfirmed || result === true)) {
-                        let f = document.getElementById('test-taking-form');
-                        f.action = "{{ route('student.attempts.pause', $attempt->id) }}";
-                        f.submit();
+                        isSubmittingForm = true;
+                        form.action = "{{ route('student.attempts.pause', $attempt->id) }}";
+                        form.submit();
                     } else {
-                        // Resume timer if cancelled
                         startActiveQuestionTimer();
                     }
                 });
+            } else if (action === 'submit_auto') {
+                isSubmittingForm = true;
+                form.action = "{{ route('student.attempts.submit', $attempt->id) }}";
+                form.submit();
             } else {
-                if (action === 'submit_auto') {
-                    form.action = "{{ route('student.attempts.submit', $attempt->id) }}";
-                    form.submit();
-                } else {
-                    Swal.fire({
-                        title: 'Finish & Submit Test?',
-                        text: 'Are you sure you want to finish and submit your test? You will not be able to change your answers once submitted.',
-                        type: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#28c76f',
-                        cancelButtonColor: '#82868b',
-                        confirmButtonText: 'Yes, submit it!',
-                        cancelButtonText: 'No, keep working'
-                    }).then(function(result) {
-                        if (result && (result.value || result.isConfirmed || result === true)) {
-                            let f = document.getElementById('test-taking-form');
-                            f.action = "{{ route('student.attempts.submit', $attempt->id) }}";
-                            f.submit();
-                        } else {
-                            // Resume timer if cancelled
-                            startActiveQuestionTimer();
-                        }
-                    });
+                let unansweredCount = 0;
+                for (let i = 1; i <= totalQuestions; i++) {
+                    let card = document.getElementById('q-card-' + i);
+                    if (card && !checkQuestionAnswered(card.getAttribute('data-q-id'))) {
+                        unansweredCount++;
+                    }
                 }
+
+                let confirmText = unansweredCount > 0
+                    ? `You still have ${unansweredCount} unanswered ${unansweredCount === 1 ? 'question' : 'questions'}. Once submitted, you cannot change your answers.`
+                    : 'Are you sure you want to submit your test? Once submitted, you cannot change your answers.';
+
+                Swal.fire({
+                    title: 'Submit Test?',
+                    text: confirmText,
+                    type: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#1677ff',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Yes, Submit Test',
+                    cancelButtonText: 'Review Answers'
+                }).then(function(result) {
+                    if (result && (result.value || result.isConfirmed || result === true)) {
+                        isSubmittingForm = true;
+                        form.action = "{{ route('student.attempts.submit', $attempt->id) }}";
+                        form.submit();
+                    } else {
+                        startActiveQuestionTimer();
+                    }
+                });
             }
         }
 
-        // AJAX background auto-saver
+        function scheduleAutoSave(delay = 500) {
+            if (isSubmittingForm) return;
+            if (autoSaveDebounceTimer) clearTimeout(autoSaveDebounceTimer);
+            autoSaveDebounceTimer = setTimeout(function() {
+                autoSaveAnswers().catch(() => {});
+            }, delay);
+        }
+
         function autoSaveAnswers() {
             let form = document.getElementById('test-taking-form');
-            if (!form) return Promise.resolve(null);
+            if (!form || isSubmittingForm) return Promise.resolve(null);
 
             let formData = new FormData(form);
-            
+
             return fetch("{{ route('student.attempts.save', $attempt->id) }}", {
                 method: "POST",
                 body: formData,
@@ -2094,18 +2888,13 @@
                     "X-Requested-With": "XMLHttpRequest"
                 }
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Answers auto-saved successfully in background.");
-                return data;
-            })
-            .catch(error => {
-                console.error("Auto-save error: ", error);
-                throw error;
+            .then(response => {
+                if (!response.ok) throw new Error('Save failed');
+                return response.json();
             });
         }
 
-        // HTML5 Drag and Drop API handlers
+        // Drag and Drop Matching Handlers
         let activeDraggedElement = null;
         let activeSelectedCard = null;
 
@@ -2134,8 +2923,7 @@
             let questionId = dropzone.getAttribute('data-question-id');
             let pairIndex = dropzone.getAttribute('data-pair-index');
 
-            if (!activeDraggedElement) return;
-            if (activeDraggedElement.getAttribute('data-question-id') != questionId) return;
+            if (!activeDraggedElement || activeDraggedElement.getAttribute('data-question-id') != questionId) return;
 
             performMatch(dropzone, activeDraggedElement, questionId, pairIndex);
             activeDraggedElement = null;
@@ -2149,23 +2937,17 @@
             if (qCard && qCard.getAttribute('data-is-locked') === 'true') return;
 
             let questionId = pool.getAttribute('data-question-id');
-
-            if (!activeDraggedElement) return;
-            if (activeDraggedElement.getAttribute('data-question-id') != questionId) return;
+            if (!activeDraggedElement || activeDraggedElement.getAttribute('data-question-id') != questionId) return;
 
             returnCardToPool(pool, activeDraggedElement, questionId);
             activeDraggedElement = null;
         }
 
-        // Click to Match implementation (highly accessible and mobile friendly)
         function handleCardClick(e, card) {
             e.stopPropagation();
             let qCard = card.closest('.q-card');
             if (qCard && qCard.getAttribute('data-is-locked') === 'true') return;
 
-            let questionId = card.getAttribute('data-question-id');
-
-            // Toggle select state
             if (activeSelectedCard === card) {
                 card.classList.remove('selected-card');
                 activeSelectedCard = null;
@@ -2181,22 +2963,19 @@
         function handleDropzoneClick(dropzone) {
             let qCard = dropzone.closest('.q-card');
             if (qCard && qCard.getAttribute('data-is-locked') === 'true') return;
+
             if (!activeSelectedCard) {
-                // If they click a matched card inside the dropzone, we return it to the pool
                 let matchedCard = dropzone.querySelector('.draggable-card');
                 if (matchedCard) {
                     let questionId = dropzone.getAttribute('data-question-id');
                     let pool = document.querySelector(`.draggables-pool[data-question-id="${questionId}"]`);
-                    if (pool) {
-                        returnCardToPool(pool, matchedCard, questionId);
-                    }
+                    if (pool) returnCardToPool(pool, matchedCard, questionId);
                 }
                 return;
             }
 
             let questionId = dropzone.getAttribute('data-question-id');
             let pairIndex = dropzone.getAttribute('data-pair-index');
-
             if (activeSelectedCard.getAttribute('data-question-id') != questionId) return;
 
             performMatch(dropzone, activeSelectedCard, questionId, pairIndex);
@@ -2212,7 +2991,6 @@
             let questionId = pool.getAttribute('data-question-id');
             if (activeSelectedCard.getAttribute('data-question-id') != questionId) return;
 
-            // Only return to pool if it's currently inside a dropzone
             if (activeSelectedCard.closest('.drop-zone')) {
                 returnCardToPool(pool, activeSelectedCard, questionId);
                 activeSelectedCard.classList.remove('selected-card');
@@ -2224,92 +3002,58 @@
             let hiddenInput = document.getElementById(`matching-hidden-${questionId}-${pairIndex}`);
             if (!hiddenInput) return;
 
-            // Check if dropzone already has a matched card
             let existingCard = dropzone.querySelector('.draggable-card');
             let pool = document.querySelector(`.draggables-pool[data-question-id="${questionId}"]`);
 
             if (existingCard) {
-                if (existingCard === card) return; // dropped on itself
-                // Return existing card to pool
+                if (existingCard === card) return;
                 returnCardToPool(pool, existingCard, questionId);
             }
 
-            // Remove placeholder if present
             let placeholder = dropzone.querySelector('.drag-placeholder');
             if (placeholder) placeholder.style.display = 'none';
 
-            // Add classes for styling
+            card.classList.remove('pool-card');
             card.classList.add('matched-card');
-            card.classList.remove('bg-white', 'text-primary', 'border', 'border-primary');
-            card.classList.add('bg-primary', 'text-white');
-            card.style.width = '100%';
-
-            // Append card to dropzone
             dropzone.appendChild(card);
 
-            // Update hidden input value
             hiddenInput.value = card.getAttribute('data-value');
 
-            // Check input status for test validation
             let cardElement = document.querySelector(`.q-card[data-q-id="${questionId}"]`);
             if (cardElement) {
-                let qNum = cardElement.getAttribute('data-q-num');
-                checkTextInput(qNum, null);
+                checkTextInput(parseInt(cardElement.getAttribute('data-q-num'), 10), null);
             }
         }
 
         function returnCardToPool(pool, card, questionId) {
-            // Find the dropzone it was in and clear its hidden input
             let dropzone = card.closest('.drop-zone');
             if (dropzone) {
                 let pairIndex = dropzone.getAttribute('data-pair-index');
                 let hiddenInput = document.getElementById(`matching-hidden-${questionId}-${pairIndex}`);
                 if (hiddenInput) hiddenInput.value = '';
 
-                // Restore placeholder text in the dropzone
                 let placeholder = dropzone.querySelector('.drag-placeholder');
                 if (placeholder) placeholder.style.display = 'block';
             }
 
-            // Style back as pool item
-            card.classList.remove('matched-card', 'bg-primary', 'text-white');
-            card.classList.add('bg-white', 'text-primary', 'border', 'border-primary');
-            card.style.width = 'auto';
-
-            // Append to pool
+            card.classList.remove('matched-card');
+            card.classList.add('pool-card');
             pool.appendChild(card);
 
-            // Check input status for test validation
             let cardElement = document.querySelector(`.q-card[data-q-id="${questionId}"]`);
             if (cardElement) {
-                let qNum = cardElement.getAttribute('data-q-num');
-                checkTextInput(qNum, null);
+                checkTextInput(parseInt(cardElement.getAttribute('data-q-num'), 10), null);
             }
         }
 
-        // ── Premium Image Lightbox / Zoom Logic ───────────────────────────────
-        document.addEventListener('DOMContentLoaded', function() {
-            // Inject lightbox HTML
+        function initLightbox() {
             const lightboxHtml = `
-                <div id="premium-image-lightbox" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 99999; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; cursor: zoom-out;">
-                    <span style="position: absolute; top: 20px; right: 25px; color: #f8fafc; font-size: 40px; font-weight: 200; cursor: pointer; transition: color 0.2s;" id="close-lightbox-btn">&times;</span>
-                    <img id="lightbox-zoomed-img" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); transform: scale(0.9); transition: transform 0.3s ease;" alt="Zoomed Image">
+                <div id="premium-image-lightbox" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 99999; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.25s ease; cursor: zoom-out;">
+                    <span id="close-lightbox-btn" style="position: absolute; top: 20px; right: 26px; color: #f8fafc; font-size: 38px; font-weight: 300; cursor: pointer;">&times;</span>
+                    <img id="lightbox-zoomed-img" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 10px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);" alt="Zoomed Image">
                 </div>
             `;
             document.body.insertAdjacentHTML('beforeend', lightboxHtml);
-
-            // Inject CSS styles
-            const style = document.createElement('style');
-            style.innerHTML = `
-                .img-zoomable:hover {
-                    transform: scale(1.03);
-                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-                }
-                #close-lightbox-btn:hover {
-                    color: #ef4444 !important;
-                }
-            `;
-            document.head.appendChild(style);
 
             const lightbox = document.getElementById('premium-image-lightbox');
             const lightboxImg = document.getElementById('lightbox-zoomed-img');
@@ -2319,34 +3063,25 @@
                 if (e.target.classList.contains('img-zoomable')) {
                     lightboxImg.src = e.target.src;
                     lightbox.style.display = 'flex';
-                    // Trigger reflow for transition
                     lightbox.offsetHeight;
                     lightbox.style.opacity = '1';
-                    lightboxImg.style.transform = 'scale(1)';
                 }
             });
 
             function closeLightbox() {
                 lightbox.style.opacity = '0';
-                lightboxImg.style.transform = 'scale(0.9)';
                 setTimeout(() => {
                     lightbox.style.display = 'none';
-                }, 300);
+                }, 250);
             }
 
             lightbox.addEventListener('click', function(e) {
-                if (e.target !== lightboxImg) {
-                    closeLightbox();
-                }
+                if (e.target !== lightboxImg) closeLightbox();
             });
-
             closeBtn.addEventListener('click', closeLightbox);
-            
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && lightbox.style.display === 'flex') {
-                    closeLightbox();
-                }
+                if (e.key === 'Escape' && lightbox.style.display === 'flex') closeLightbox();
             });
-        });
+        }
     </script>
 @endpush

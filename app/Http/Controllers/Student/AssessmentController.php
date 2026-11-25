@@ -717,7 +717,7 @@ class AssessmentController extends Controller
     public function takeTest($attemptId)
     {
         $student = auth()->user();
-        $attempt = PaperAttempt::with(['paper.questions.options'])->findOrFail($attemptId);
+        $attempt = PaperAttempt::with(['paper.subject', 'paper.topic', 'paper.questions.options'])->findOrFail($attemptId);
 
         if ($attempt->user_id !== $student->id) {
             abort(403, 'Unauthorized access to this test attempt.');
@@ -725,14 +725,17 @@ class AssessmentController extends Controller
 
         if ($attempt->status === 'completed') {
             if ($attempt->paper->hide_result) {
-                return redirect()->route('student.topics.subtopics', $attempt->paper->topic_id)
+                $fallbackUrl = $attempt->paper->topic_id
+                    ? route('student.topics.subtopics', $attempt->paper->topic_id)
+                    : route('student.weeklytests');
+                return redirect($fallbackUrl)
                     ->with('error', 'Results for this paper are hidden.');
             }
             return redirect()->route('student.attempts.result', $attempt);
         }
 
-        // Resume if paused
-        if ($attempt->status === 'paused') {
+        // Resume if paused (Save & Exit) or missing started_at
+        if ($attempt->status === 'paused' || !$attempt->started_at) {
             $now = now();
             $attempt->update([
                 'status' => 'in_progress',
@@ -751,8 +754,8 @@ class AssessmentController extends Controller
         $remainingSeconds = null;
         if ($attempt->paper->total_time > 0) {
             $timeLimitSeconds = $attempt->paper->total_time * 60;
-            $timeSpentSoFar = max(0, $attempt->time_spent);
-            $elapsedInSession = (int) $attempt->started_at->diffInSeconds(now());
+            $timeSpentSoFar = max(0, (int) $attempt->time_spent);
+            $elapsedInSession = $attempt->started_at ? (int) $attempt->started_at->diffInSeconds(now()) : 0;
             
             $remainingSeconds = $timeLimitSeconds - ($timeSpentSoFar + $elapsedInSession);
             if ($remainingSeconds < 0) {
@@ -821,18 +824,18 @@ class AssessmentController extends Controller
     }
 
     /**
-     * Pause a test attempt.
+     * Save & Exit (pause) a test attempt.
      */
     public function pauseTest(Request $request, $attemptId)
     {
-        $attempt = PaperAttempt::findOrFail($attemptId);
+        $attempt = PaperAttempt::with('paper.questions')->findOrFail($attemptId);
         if ($attempt->user_id !== auth()->id() || $attempt->status === 'completed') {
             abort(403);
         }
 
         // Calculate time spent
-        $elapsed = (int) $attempt->started_at->diffInSeconds(now());
-        $attempt->time_spent = max(0, $attempt->time_spent) + $elapsed;
+        $elapsed = $attempt->started_at ? (int) $attempt->started_at->diffInSeconds(now()) : 0;
+        $attempt->time_spent = max(0, (int) $attempt->time_spent) + $elapsed;
 
         // Save answers
         $this->saveAnswers($attempt, $request->input('answers', []));
@@ -841,9 +844,12 @@ class AssessmentController extends Controller
         $attempt->paused_at = now();
         $attempt->save();
 
-        return redirect()
-            ->route('student.topics.subtopics', $attempt->paper->topic_id)
-            ->with('success', 'Test paused successfully. You can resume it later!');
+        $redirectUrl = $attempt->paper->topic_id
+            ? route('student.topics.subtopics', $attempt->paper->topic_id)
+            : route('student.weeklytests');
+
+        return redirect($redirectUrl)
+            ->with('success', 'Progress saved! You can resume this test later.');
     }
 
     /**
@@ -851,14 +857,14 @@ class AssessmentController extends Controller
      */
     public function submitTest(Request $request, $attemptId)
     {
-        $attempt = PaperAttempt::findOrFail($attemptId);
+        $attempt = PaperAttempt::with('paper.questions')->findOrFail($attemptId);
         if ($attempt->user_id !== auth()->id() || $attempt->status === 'completed') {
             abort(403);
         }
 
         // Calculate time spent
-        $elapsed = (int) $attempt->started_at->diffInSeconds(now());
-        $attempt->time_spent = max(0, $attempt->time_spent) + $elapsed;
+        $elapsed = $attempt->started_at ? (int) $attempt->started_at->diffInSeconds(now()) : 0;
+        $attempt->time_spent = max(0, (int) $attempt->time_spent) + $elapsed;
 
         // Save answers
         $this->saveAnswers($attempt, $request->input('answers', []));
@@ -875,8 +881,10 @@ class AssessmentController extends Controller
         $attempt->save();
 
         if ($attempt->paper->hide_result) {
-            return redirect()
-                ->route('student.topics.subtopics', $attempt->paper->topic_id)
+            $redirectUrl = $attempt->paper->topic_id
+                ? route('student.topics.subtopics', $attempt->paper->topic_id)
+                : route('student.weeklytests');
+            return redirect($redirectUrl)
                 ->with('success', 'Test submitted successfully!');
         }
 
@@ -897,8 +905,10 @@ class AssessmentController extends Controller
         }
 
         if ($attempt->paper->hide_result) {
-            return redirect()
-                ->route('student.topics.subtopics', $attempt->paper->topic_id)
+            $redirectUrl = $attempt->paper->topic_id
+                ? route('student.topics.subtopics', $attempt->paper->topic_id)
+                : route('student.weeklytests');
+            return redirect($redirectUrl)
                 ->with('error', 'Results for this paper are hidden.');
         }
 
