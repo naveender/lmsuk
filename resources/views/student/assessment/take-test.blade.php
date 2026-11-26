@@ -895,6 +895,105 @@
             </div>
         </div>
     @endif
+
+    <!-- Pause / Save & Exit Confirmation Modal -->
+    <div class="modal fade" id="pauseConfirmModal" tabindex="-1" role="dialog" aria-labelledby="pauseConfirmModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered pause-modal-dialog" role="document">
+            <div class="modal-content pause-modal-content">
+                <button type="button" class="pause-modal-close-btn" data-dismiss="modal" aria-label="Close">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+
+                <div class="pause-modal-body">
+                    <!-- Pause Cloud Illustration -->
+                    <div class="pause-modal-illustration" aria-hidden="true">
+                        <svg width="240" height="96" viewBox="0 0 240 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="pauseCloudGrad" x1="120" y1="34" x2="120" y2="88" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#EBF3FF"/>
+                                    <stop offset="100%" stop-color="#F7FAFF"/>
+                                </linearGradient>
+                            </defs>
+                            <!-- Soft Clouds -->
+                            <path d="M52 84H188C197.941 84 206 75.9411 206 66C206 56.6976 198.943 49.0468 189.882 48.1003C186.103 34.2367 173.413 24 158.3 24C151.14 24 144.519 26.2925 139.124 30.1816C133.482 24.4841 125.647 21 117 21C102.771 21 90.8923 30.8919 87.7438 44.1782C84.7491 42.7852 81.4119 42 77.9 42C65.4736 42 55.4 52.0736 55.4 64.5C55.4 65.1714 55.4294 65.8359 55.487 66.4926C47.8295 67.6285 42 74.2297 42 82.2C42 83.2 42.4 84 52 84Z" fill="url(#pauseCloudGrad)"/>
+                            <!-- Accent Dashes -->
+                            <line x1="64" y1="29" x2="72" y2="33" stroke="#7EB2FF" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="168" y1="28" x2="174" y2="23" stroke="#7EB2FF" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="173" y1="37" x2="180" y2="36" stroke="#7EB2FF" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="171" y1="45" x2="177" y2="47" stroke="#7EB2FF" stroke-width="3" stroke-linecap="round"/>
+                            <!-- Central Circle -->
+                            <circle cx="120" cy="46" r="36" fill="#CFE2FF"/>
+                            <!-- Pause Bars -->
+                            <rect x="106" y="30" width="10" height="32" rx="4" fill="#1D5DF0"/>
+                            <rect x="124" y="30" width="10" height="32" rx="4" fill="#1D5DF0"/>
+                        </svg>
+                    </div>
+
+                    <h2 class="pause-modal-title" id="pauseConfirmModalTitle">Pause Test?</h2>
+                    <p class="pause-modal-desc">
+                        Your answers and progress will be saved. You can continue this test later from where you stopped.
+                    </p>
+
+                    <!-- 3-Column Attempt Summary -->
+                    <div class="pause-summary-box">
+                        <div class="pause-summary-item">
+                            <div class="pause-summary-icon pause-icon-blue">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="4" y="3" width="16" height="18" rx="2"/>
+                                    <line x1="8" y1="8" x2="16" y2="8"/>
+                                    <line x1="8" y1="12" x2="16" y2="12"/>
+                                    <line x1="8" y1="16" x2="12" y2="16"/>
+                                </svg>
+                            </div>
+                            <span class="pause-summary-label">Questions Answered</span>
+                            <span class="pause-summary-val val-dark" id="pause-modal-answered">0 / {{ $totalQuestionsCount }}</span>
+                        </div>
+
+                        <div class="pause-summary-item">
+                            <div class="pause-summary-icon pause-icon-green">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="13" r="8"/>
+                                    <path d="M12 9v4l2 2"/>
+                                    <line x1="10" y1="2" x2="14" y2="2"/>
+                                </svg>
+                            </div>
+                            <span class="pause-summary-label">{{ $remainingSeconds !== null ? 'Time Remaining' : 'Time Elapsed' }}</span>
+                            <span class="pause-summary-val val-green" id="pause-modal-time">00:00</span>
+                        </div>
+
+                        <div class="pause-summary-item pause-summary-item-last">
+                            <div class="pause-summary-icon pause-icon-purple">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="#7c3aed" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                                    <line x1="4" y1="22" x2="4" y2="15"/>
+                                </svg>
+                            </div>
+                            <span class="pause-summary-label">Marked for Review</span>
+                            <span class="pause-summary-val val-purple" id="pause-modal-flagged">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Modal Action Buttons -->
+                    <div class="pause-modal-actions">
+                        <button type="button" class="btn-pause-continue" data-dismiss="modal">
+                            Continue Test
+                        </button>
+                        <button type="button" class="btn-pause-save-exit" id="confirm-save-exit-btn" onclick="confirmSaveAndExit()">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8"/>
+                                <polyline points="17 16 21 12 17 8"/>
+                                <line x1="21" y1="12" x2="9" y2="12"/>
+                            </svg>
+                            <span>Save &amp; Exit</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('styles')
@@ -2329,6 +2428,267 @@
             border-color: #334155;
             color: #e2e8f0;
         }
+
+        /* Pause / Save & Exit Confirmation Modal */
+        #pauseConfirmModal {
+            z-index: 1060 !important;
+        }
+
+        .pause-modal-dialog {
+            max-width: 470px;
+            margin: 1rem auto;
+        }
+
+        .pause-modal-content {
+            position: relative;
+            border: none;
+            border-radius: 22px;
+            background-color: #ffffff;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+            overflow: hidden;
+        }
+
+        .pause-modal-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: #0b1f51;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.18s ease;
+            z-index: 2;
+        }
+
+        .pause-modal-close-btn:hover {
+            background-color: #f1f5fb;
+        }
+
+        .pause-modal-body {
+            padding: 26px 26px 24px;
+            text-align: center;
+        }
+
+        .pause-modal-illustration {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .pause-modal-title {
+            color: #0b1f51;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+            margin: 0 0 8px;
+        }
+
+        .pause-modal-desc {
+            color: #475569;
+            font-size: 0.93rem;
+            line-height: 1.5;
+            max-width: 360px;
+            margin: 0 auto 20px;
+        }
+
+        .pause-summary-box {
+            background-color: #f3f7fd;
+            border: 1px solid #e6edf7;
+            border-radius: 14px;
+            padding: 16px 10px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            margin-bottom: 22px;
+        }
+
+        .pause-summary-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 8px;
+            border-right: 1px solid #dde6f3;
+        }
+
+        .pause-summary-item-last {
+            border-right: none;
+        }
+
+        .pause-summary-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .pause-icon-blue {
+            background-color: #1677ff;
+            box-shadow: 0 3px 8px rgba(22, 119, 255, 0.22);
+        }
+
+        .pause-icon-green {
+            background-color: #16a34a;
+            box-shadow: 0 3px 8px rgba(22, 163, 74, 0.22);
+        }
+
+        .pause-icon-purple {
+            background-color: #ede9fe;
+        }
+
+        .pause-summary-label {
+            color: #475569;
+            font-size: 0.76rem;
+            font-weight: 500;
+            line-height: 1.25;
+            margin-bottom: 4px;
+        }
+
+        .pause-summary-val {
+            font-size: 1.12rem;
+            font-weight: 800;
+            line-height: 1.2;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .pause-summary-val.val-dark { color: #0b1f51; }
+        .pause-summary-val.val-green { color: #16a34a; }
+        .pause-summary-val.val-purple { color: #6d28d9; }
+
+        .pause-modal-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .btn-pause-continue {
+            height: 46px;
+            border-radius: 12px;
+            border: 1.5px solid #cbd5e1;
+            background-color: #ffffff;
+            color: #1677ff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .btn-pause-continue:hover {
+            background-color: #f8fbff;
+            border-color: #93c5fd;
+        }
+
+        .btn-pause-save-exit {
+            height: 46px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .btn-pause-save-exit:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.38);
+        }
+
+        .btn-pause-save-exit:disabled {
+            opacity: 0.75;
+            cursor: wait;
+        }
+
+        @media (max-width: 575.98px) {
+            .pause-modal-dialog {
+                margin: 0.75rem;
+            }
+            .pause-modal-body {
+                padding: 22px 18px 20px;
+            }
+            .pause-summary-box {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 14px 16px;
+            }
+            .pause-summary-item {
+                flex-direction: row;
+                justify-content: space-between;
+                border-right: none;
+                border-bottom: 1px solid #dde6f3;
+                padding: 0 0 10px;
+            }
+            .pause-summary-item-last {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+            .pause-summary-icon {
+                margin-bottom: 0;
+                margin-right: 10px;
+            }
+            .pause-summary-label {
+                margin-bottom: 0;
+                margin-right: auto;
+                text-align: left;
+            }
+            .pause-modal-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .dark-layout .pause-modal-content {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+        }
+
+        .dark-layout .pause-modal-title,
+        .dark-layout .pause-summary-val.val-dark,
+        .dark-layout .pause-modal-close-btn {
+            color: #f8fafc;
+        }
+
+        .dark-layout .pause-modal-close-btn:hover {
+            background-color: #334155;
+        }
+
+        .dark-layout .pause-modal-desc,
+        .dark-layout .pause-summary-label {
+            color: #94a3b8;
+        }
+
+        .dark-layout .pause-summary-box {
+            background-color: #0f172a;
+            border-color: #334155;
+        }
+
+        .dark-layout .pause-summary-item {
+            border-color: #334155;
+        }
+
+        .dark-layout .btn-pause-continue {
+            background-color: #0f172a;
+            border-color: #334155;
+            color: #60a5fa;
+        }
+
+        .dark-layout .btn-pause-continue:hover {
+            background-color: #172554;
+            border-color: #2563eb;
+        }
     </style>
 @endpush
 
@@ -2412,6 +2772,15 @@
                 if (icon) icon.className = 'feather icon-' + (isDark ? 'sun' : 'moon') + ' mr-2';
                 if (label) label.textContent = isDark ? 'Light Mode' : 'Dark Mode';
             });
+
+            // Resume active question timer if Pause / Save & Exit modal is dismissed without exiting
+            if (window.jQuery) {
+                $('#pauseConfirmModal').on('hidden.bs.modal', function () {
+                    if (!isSubmittingForm) {
+                        startActiveQuestionTimer();
+                    }
+                });
+            }
         });
 
         function startOverallTimer() {
@@ -2460,6 +2829,11 @@
             }
 
             clockEl.textContent = formattedTime;
+
+            let pauseModalTimeEl = document.getElementById('pause-modal-time');
+            if (pauseModalTimeEl) {
+                pauseModalTimeEl.textContent = formattedTime;
+            }
 
             if (isCountdown) {
                 clockEl.classList.remove('val-warning', 'val-danger');
@@ -2802,6 +3176,26 @@
             });
         }
 
+        function confirmSaveAndExit() {
+            if (isSubmittingForm) return;
+            let form = document.getElementById('test-taking-form');
+            if (!form) return;
+
+            isSubmittingForm = true;
+            if (activeQuestionTimer) clearInterval(activeQuestionTimer);
+            if (autoSaveDebounceTimer) clearTimeout(autoSaveDebounceTimer);
+
+            let confirmBtn = document.getElementById('confirm-save-exit-btn');
+            if (confirmBtn) {
+                confirmBtn.disabled = true;
+                let span = confirmBtn.querySelector('span');
+                if (span) span.textContent = 'Saving...';
+            }
+
+            form.action = "{{ route('student.attempts.pause', $attempt->id) }}";
+            form.submit();
+        }
+
         function submitTestForm(action) {
             if (isSubmittingForm) return;
             let form = document.getElementById('test-taking-form');
@@ -2811,24 +3205,28 @@
             if (autoSaveDebounceTimer) clearTimeout(autoSaveDebounceTimer);
 
             if (action === 'pause') {
-                Swal.fire({
-                    title: 'Save & Exit?',
-                    text: 'Your answers and remaining time will be saved so you can resume this test later.',
-                    type: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#1677ff',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Yes, Save & Exit',
-                    cancelButtonText: 'Continue Test'
-                }).then(function(result) {
-                    if (result && (result.value || result.isConfirmed || result === true)) {
-                        isSubmittingForm = true;
-                        form.action = "{{ route('student.attempts.pause', $attempt->id) }}";
-                        form.submit();
-                    } else {
-                        startActiveQuestionTimer();
-                    }
-                });
+                let answeredCount = 0;
+                let flaggedCount = 0;
+                for (let i = 1; i <= totalQuestions; i++) {
+                    let card = document.getElementById('q-card-' + i);
+                    if (!card) continue;
+                    let qId = card.getAttribute('data-q-id');
+                    if (checkQuestionAnswered(qId)) answeredCount++;
+                    if (document.getElementById('is-flagged-' + qId)?.value === '1') flaggedCount++;
+                }
+
+                let modalAnsEl = document.getElementById('pause-modal-answered');
+                let modalTimeEl = document.getElementById('pause-modal-time');
+                let modalFlagEl = document.getElementById('pause-modal-flagged');
+                let mainClockEl = document.getElementById('digital-clock');
+
+                if (modalAnsEl) modalAnsEl.textContent = answeredCount + ' / ' + totalQuestions;
+                if (modalTimeEl && mainClockEl) modalTimeEl.textContent = mainClockEl.textContent;
+                if (modalFlagEl) modalFlagEl.textContent = flaggedCount;
+
+                if (window.jQuery) {
+                    $('#pauseConfirmModal').modal('show');
+                }
             } else if (action === 'submit_auto') {
                 isSubmittingForm = true;
                 form.action = "{{ route('student.attempts.submit', $attempt->id) }}";
