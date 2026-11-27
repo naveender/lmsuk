@@ -99,17 +99,24 @@ class AssessmentController extends Controller
         // Status can be: completed, paused, Not completed
         $paperIds = $papers->pluck('id');
 
-        // Fetch student attempts for these papers
-        $attempts = PaperAttempt::where('user_id', $student->id)
-            ->whereIn('paper_id', $paperIds)
-            ->get()
-            ->groupBy('paper_id');
+        // Fetch student attempts for these papers (latest first)
+        $attempts = $paperIds->isNotEmpty()
+            ? PaperAttempt::where('user_id', $student->id)
+                ->whereIn('paper_id', $paperIds)
+                ->orderByDesc('completed_at')
+                ->orderByDesc('id')
+                ->get()
+                ->groupBy('paper_id')
+            : collect();
 
+        $allWeekPapersCount = $papers->count();
         $filteredPapers = [];
         $totalEstimatedTime = 0;
         $totalTimeSpent = 0;
         $totalScores = 0;
         $completedCount = 0;
+        $overdueCount = 0;
+        $lateCount = 0;
 
         foreach ($papers as $paper) {
             $paperAttempts = $attempts->get($paper->id) ?? collect();
@@ -119,18 +126,18 @@ class AssessmentController extends Controller
             // Check if there is any active/paused/in-progress attempt
             $pausedAttempt = $paperAttempts->whereIn('status', ['paused', 'in_progress'])->first();
 
-            $totalEstimatedTime += $paper->total_time ?? 0;
+            $totalEstimatedTime += (int) ($paper->total_time ?? 0);
 
             if ($completedAttempt) {
                 $status = 'completed';
                 $score = $completedAttempt->score;
                 $maxScore = $completedAttempt->max_score;
-                $percentage = $maxScore > 0 ? round(($score / $maxScore) * 100) : 0;
-                $completedAt = $completedAttempt->completed_at ? $completedAttempt->completed_at->format('d M Y H:i') : '';
+                $percentage = $maxScore > 0 ? (int) round(($score / $maxScore) * 100) : 0;
+                $completedAt = $completedAttempt->completed_at ? $completedAttempt->completed_at->format('d M H:i') : '';
                 $completedAttemptId = $completedAttempt->id;
                 $activeAttempt = null;
 
-                $totalTimeSpent += $completedAttempt->time_spent ?? 0;
+                $totalTimeSpent += (int) ($completedAttempt->time_spent ?? 0);
                 $totalScores += $percentage;
                 $completedCount++;
             } elseif ($pausedAttempt) {
@@ -142,7 +149,8 @@ class AssessmentController extends Controller
                 $completedAttemptId = null;
                 $activeAttempt = $pausedAttempt;
 
-                $totalTimeSpent += $pausedAttempt->time_spent ?? 0;
+                $totalTimeSpent += (int) ($pausedAttempt->time_spent ?? 0);
+                $lateCount++;
             } else {
                 $status = 'Not completed';
                 $score = null;
@@ -151,6 +159,7 @@ class AssessmentController extends Controller
                 $completedAt = '';
                 $completedAttemptId = null;
                 $activeAttempt = null;
+                $overdueCount++;
             }
 
             $paper->attempt_status = $status;
@@ -179,66 +188,94 @@ class AssessmentController extends Controller
 
         $papers = collect($filteredPapers);
 
-        // Calculate dynamic overview metrics
-        $avgScore = $completedCount > 0 ? round($totalScores / $completedCount) : 94; // fallback to 94% as in reference
-        $totalPapersCount = $papers->count() > 0 ? $papers->count() : 13; // fallback to 13
-        $completedPapersCount = $completedCount > 0 ? $completedCount : 13; // fallback to 13
-        $taskCompletionText = "{$completedPapersCount} out of {$totalPapersCount} done";
+        // Calculate real per-student overview metrics
+        $avgScore = $completedCount > 0 ? (int) round($totalScores / $completedCount) : null;
+        $totalPapersCount = $allWeekPapersCount;
+        $completedPapersCount = $completedCount;
+        $taskCompletionText = "{$completedPapersCount} / {$totalPapersCount}";
 
-        // Format Estimated Time (total_time in minutes, fallback to 2h 32m 56s)
+        // Format Estimated Time (total_time in minutes)
         if ($totalEstimatedTime > 0) {
-            $estHours = floor($totalEstimatedTime / 60);
+            $estHours = (int) floor($totalEstimatedTime / 60);
             $estMins = $totalEstimatedTime % 60;
-            $estimatedTimeText = "{$estHours}h {$estMins}m 00s";
+            $estimatedTimeText = $estHours > 0
+                ? "{$estHours}h {$estMins}m"
+                : "{$estMins}m 00s";
         } else {
-            $estimatedTimeText = "2h 32m 56s";
+            $estimatedTimeText = '0m';
         }
 
-        // Format Taken Time (time_spent in seconds, fallback to 2h 14m 21s)
+        // Format Taken Time (time_spent in seconds)
         if ($totalTimeSpent > 0) {
-            $takenHours = floor($totalTimeSpent / 3600);
-            $takenMins = floor(($totalTimeSpent % 3600) / 60);
+            $takenHours = (int) floor($totalTimeSpent / 3600);
+            $takenMins = (int) floor(($totalTimeSpent % 3600) / 60);
             $takenSecs = $totalTimeSpent % 60;
-            $takenTimeText = "{$takenHours}h {$takenMins}m {$takenSecs}s";
+            $takenTimeText = $takenHours > 0
+                ? "{$takenHours}h {$takenMins}m {$takenSecs}s"
+                : ($takenMins > 0 ? "{$takenMins}m {$takenSecs}s" : "{$takenSecs}s");
         } else {
-            $takenTimeText = "2h 14m 21s";
+            $takenTimeText = '0s';
         }
 
-        // Overdue & Late counts (with fallback)
-        $overdueCount = $papers->where('attempt_status', 'Not completed')->count();
-        $lateCount = $papers->where('attempt_status', 'paused')->count();
-        if ($papers->count() === 0) {
-            $overdueCount = 0;
-            $lateCount = 1;
-        }
+        $pendingCount = $overdueCount + $lateCount;
 
         $selectedWeekModel = null;
         if ($request->filled('week')) {
             $selectedWeekModel = \App\Models\Week::find($request->week);
         }
-        $selectedWeekName = $selectedWeekModel ? $selectedWeekModel->name : ($weeks->first()?->name ?? 'Week 21');
-        $selectedWeekDueDate = $selectedWeekModel ? $selectedWeekModel->due_date : ($weeks->first()?->due_date ?? null);
 
-        // Final Deadline (e.g. End of this week Sunday or standard deadline)
-        if ($selectedWeekDueDate) {
-            $finalDeadlineText = Carbon::parse($selectedWeekDueDate)->format('d M Y 21:00');
+        if ($selectedWeekModel) {
+            $selectedWeekName = $selectedWeekModel->name;
+            $selectedWeekDueDate = $selectedWeekModel->due_date;
         } else {
-            $finalDeadlineText = Carbon::now()->addDays(5)->format('d M Y 21:00');
+            $selectedWeekName = $weeks->count() === 1 ? $weeks->first()->name : 'All Weeks';
+            $upcomingWeek = $weeks->whereNotNull('due_date')
+                ->sortBy('due_date')
+                ->first(fn($w) => Carbon::parse($w->due_date)->endOfDay()->gte(now()));
+            $fallbackDueWeek = $upcomingWeek ?? $weeks->whereNotNull('due_date')->sortByDesc('due_date')->first();
+            $selectedWeekDueDate = $fallbackDueWeek?->due_date;
+        }
+
+        $isDeadlinePassed = false;
+        $deadlineSubtext = null;
+        if ($selectedWeekDueDate) {
+            $dueCarbon = Carbon::parse($selectedWeekDueDate);
+            $finalDeadlineText = $dueCarbon->format('d M Y, 21:00');
+            $deadlineEnd = $dueCarbon->copy()->setTime(21, 0);
+            $isDeadlinePassed = $deadlineEnd->isPast();
+            $deadlineSubtext = $dueCarbon->isToday()
+                ? 'Due today at 21:00'
+                : ($isDeadlinePassed
+                    ? 'Deadline passed'
+                    : 'Due in ' . max(1, (int) now()->startOfDay()->diffInDays($dueCarbon->copy()->startOfDay())) . ' ' . \Illuminate\Support\Str::plural('day', max(1, (int) now()->startOfDay()->diffInDays($dueCarbon->copy()->startOfDay()))));
+        } else {
+            $finalDeadlineText = 'No Deadline Set';
         }
 
         $metrics = [
-            'score' => $avgScore . '%',
-            'completion' => $taskCompletionText,
-            'runtime' => "Estimated: {$estimatedTimeText} | Taken: {$takenTimeText}",
-            'overdue_late' => "Overdue Tasks: {$overdueCount} | Late Tasks: {$lateCount}",
-            'deadline' => $finalDeadlineText,
+            'has_score'          => $avgScore !== null,
+            'score_pct'          => $avgScore ?? 0,
+            'score'              => $avgScore !== null ? $avgScore . '%' : '—',
+            'completed_count'    => $completedPapersCount,
+            'total_count'        => $totalPapersCount,
+            'completion'         => $taskCompletionText,
+            'estimated_text'     => $estimatedTimeText,
+            'taken_text'         => $takenTimeText,
+            'runtime'            => "Estimated: {$estimatedTimeText} | Taken: {$takenTimeText}",
+            'overdue_count'      => $overdueCount,
+            'late_count'         => $lateCount,
+            'pending_count'      => $pendingCount,
+            'overdue_late'       => "Pending: {$overdueCount} | Paused: {$lateCount}",
+            'deadline'           => $finalDeadlineText,
+            'deadline_subtext'   => $deadlineSubtext,
+            'is_deadline_passed' => $isDeadlinePassed,
         ];
 
         // Paginate the collection manually (best practice)
         $currentPage = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage();
         $perPage = 10;
         $currentItems = $papers->slice(($currentPage - 1) * $perPage, $perPage)->values();
-        
+
         $papers = new \Illuminate\Pagination\LengthAwarePaginator(
             $currentItems,
             $papers->count(),
@@ -248,15 +285,25 @@ class AssessmentController extends Controller
         );
         $papers->withQueryString();
 
-        // Course title and week number context
-        $selectedCourse = null;
-        if ($request->filled('course_id')) {
-            $selectedCourse = Course::find($request->course_id);
+        // Selected subject & course context for header
+        $selectedSubject = $request->filled('subject_id') ? Subject::find($request->subject_id) : null;
+        $selectedCourse = $request->filled('course_id') ? Course::find($request->course_id) : null;
+        $detail = $student->studentDetail;
+        $yearGroupLabel = $detail?->group_year ?: $student->classes()->pluck('classes.group_year')->filter()->first();
+
+        if ($selectedCourse && $selectedSubject) {
+            $courseTitle = $selectedCourse->name . ' · ' . $selectedSubject->title;
+        } elseif ($selectedCourse) {
+            $courseTitle = $selectedCourse->name;
+        } elseif ($selectedSubject) {
+            $courseTitle = $selectedSubject->title . ' Weekly Plan';
+        } elseif ($courses->count() === 1) {
+            $courseTitle = $courses->first()->name;
+        } else {
+            $courseTitle = 'Weekly Portal Hub';
         }
-        $courseTitle = $selectedCourse ? $selectedCourse->name : ($courses->first()?->name ?? 'YS Maths (Sat)');
 
         // Media files & homework weekly query based on student profile visibility settings
-        $detail = $student->studentDetail;
         $groupYearName = $detail?->group_year;
         $academicYearVal = $detail?->academic_year;
         $classIds = $student->classes()->pluck('classes.id');
@@ -417,8 +464,12 @@ class AssessmentController extends Controller
             'papers',
             'metrics',
             'courseTitle',
+            'selectedSubject',
+            'selectedCourse',
+            'selectedWeekModel',
             'selectedWeekName',
             'selectedWeekDueDate',
+            'yearGroupLabel',
             'allWeeks',
             'mediaFiles',
             'videoProgressMap',
