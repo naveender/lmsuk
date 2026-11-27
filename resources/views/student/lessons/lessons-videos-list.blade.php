@@ -186,7 +186,8 @@
 
                 @if($mediaFiles->isNotEmpty())
                     @php 
-                                        $firstVideo = $mediaFiles->first();
+                        $requestedVideoId = request('video_id');
+                        $firstVideo = ($requestedVideoId ? $mediaFiles->firstWhere('id', $requestedVideoId) : null) ?? $mediaFiles->first();
                         $firstProgress = $videoProgressMap[$firstVideo->id] ?? null;
                     @endphp
 
@@ -277,7 +278,7 @@
                                                 }
                                             @endphp
 
-                                            <div class="playlist-item d-flex align-items-start p-1 mb-2 {{ $loop->first ? 'active-playlist-item' : '' }} {{ $isVCompleted ? 'playlist-completed' : '' }}"
+                                            <div class="playlist-item d-flex align-items-start p-1 mb-2 {{ $video->id == $firstVideo->id ? 'active-playlist-item' : '' }} {{ $isVCompleted ? 'playlist-completed' : '' }}"
                                                 data-id="{{ $video->id }}" data-embed="{{ $video->embed_url }}"
                                                 data-title="{{ $video->title }}"
                                                 data-desc="{{ $video->description ?: 'No description provided.' }}"

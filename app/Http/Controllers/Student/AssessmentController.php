@@ -99,17 +99,24 @@ class AssessmentController extends Controller
         // Status can be: completed, paused, Not completed
         $paperIds = $papers->pluck('id');
 
-        // Fetch student attempts for these papers
-        $attempts = PaperAttempt::where('user_id', $student->id)
-            ->whereIn('paper_id', $paperIds)
-            ->get()
-            ->groupBy('paper_id');
+        // Fetch student attempts for these papers (latest first)
+        $attempts = $paperIds->isNotEmpty()
+            ? PaperAttempt::where('user_id', $student->id)
+                ->whereIn('paper_id', $paperIds)
+                ->orderByDesc('completed_at')
+                ->orderByDesc('id')
+                ->get()
+                ->groupBy('paper_id')
+            : collect();
 
+        $allWeekPapersCount = $papers->count();
         $filteredPapers = [];
         $totalEstimatedTime = 0;
         $totalTimeSpent = 0;
         $totalScores = 0;
         $completedCount = 0;
+        $overdueCount = 0;
+        $lateCount = 0;
 
         foreach ($papers as $paper) {
             $paperAttempts = $attempts->get($paper->id) ?? collect();
@@ -119,18 +126,18 @@ class AssessmentController extends Controller
             // Check if there is any active/paused/in-progress attempt
             $pausedAttempt = $paperAttempts->whereIn('status', ['paused', 'in_progress'])->first();
 
-            $totalEstimatedTime += $paper->total_time ?? 0;
+            $totalEstimatedTime += (int) ($paper->total_time ?? 0);
 
             if ($completedAttempt) {
                 $status = 'completed';
                 $score = $completedAttempt->score;
                 $maxScore = $completedAttempt->max_score;
-                $percentage = $maxScore > 0 ? round(($score / $maxScore) * 100) : 0;
-                $completedAt = $completedAttempt->completed_at ? $completedAttempt->completed_at->format('d M Y H:i') : '';
+                $percentage = $maxScore > 0 ? (int) round(($score / $maxScore) * 100) : 0;
+                $completedAt = $completedAttempt->completed_at ? $completedAttempt->completed_at->format('d M H:i') : '';
                 $completedAttemptId = $completedAttempt->id;
                 $activeAttempt = null;
 
-                $totalTimeSpent += $completedAttempt->time_spent ?? 0;
+                $totalTimeSpent += (int) ($completedAttempt->time_spent ?? 0);
                 $totalScores += $percentage;
                 $completedCount++;
             } elseif ($pausedAttempt) {
@@ -142,7 +149,8 @@ class AssessmentController extends Controller
                 $completedAttemptId = null;
                 $activeAttempt = $pausedAttempt;
 
-                $totalTimeSpent += $pausedAttempt->time_spent ?? 0;
+                $totalTimeSpent += (int) ($pausedAttempt->time_spent ?? 0);
+                $lateCount++;
             } else {
                 $status = 'Not completed';
                 $score = null;
@@ -151,6 +159,7 @@ class AssessmentController extends Controller
                 $completedAt = '';
                 $completedAttemptId = null;
                 $activeAttempt = null;
+                $overdueCount++;
             }
 
             $paper->attempt_status = $status;
@@ -179,66 +188,94 @@ class AssessmentController extends Controller
 
         $papers = collect($filteredPapers);
 
-        // Calculate dynamic overview metrics
-        $avgScore = $completedCount > 0 ? round($totalScores / $completedCount) : 94; // fallback to 94% as in reference
-        $totalPapersCount = $papers->count() > 0 ? $papers->count() : 13; // fallback to 13
-        $completedPapersCount = $completedCount > 0 ? $completedCount : 13; // fallback to 13
-        $taskCompletionText = "{$completedPapersCount} out of {$totalPapersCount} done";
+        // Calculate real per-student overview metrics
+        $avgScore = $completedCount > 0 ? (int) round($totalScores / $completedCount) : null;
+        $totalPapersCount = $allWeekPapersCount;
+        $completedPapersCount = $completedCount;
+        $taskCompletionText = "{$completedPapersCount} / {$totalPapersCount}";
 
-        // Format Estimated Time (total_time in minutes, fallback to 2h 32m 56s)
+        // Format Estimated Time (total_time in minutes)
         if ($totalEstimatedTime > 0) {
-            $estHours = floor($totalEstimatedTime / 60);
+            $estHours = (int) floor($totalEstimatedTime / 60);
             $estMins = $totalEstimatedTime % 60;
-            $estimatedTimeText = "{$estHours}h {$estMins}m 00s";
+            $estimatedTimeText = $estHours > 0
+                ? "{$estHours}h {$estMins}m"
+                : "{$estMins}m 00s";
         } else {
-            $estimatedTimeText = "2h 32m 56s";
+            $estimatedTimeText = '0m';
         }
 
-        // Format Taken Time (time_spent in seconds, fallback to 2h 14m 21s)
+        // Format Taken Time (time_spent in seconds)
         if ($totalTimeSpent > 0) {
-            $takenHours = floor($totalTimeSpent / 3600);
-            $takenMins = floor(($totalTimeSpent % 3600) / 60);
+            $takenHours = (int) floor($totalTimeSpent / 3600);
+            $takenMins = (int) floor(($totalTimeSpent % 3600) / 60);
             $takenSecs = $totalTimeSpent % 60;
-            $takenTimeText = "{$takenHours}h {$takenMins}m {$takenSecs}s";
+            $takenTimeText = $takenHours > 0
+                ? "{$takenHours}h {$takenMins}m {$takenSecs}s"
+                : ($takenMins > 0 ? "{$takenMins}m {$takenSecs}s" : "{$takenSecs}s");
         } else {
-            $takenTimeText = "2h 14m 21s";
+            $takenTimeText = '0s';
         }
 
-        // Overdue & Late counts (with fallback)
-        $overdueCount = $papers->where('attempt_status', 'Not completed')->count();
-        $lateCount = $papers->where('attempt_status', 'paused')->count();
-        if ($papers->count() === 0) {
-            $overdueCount = 0;
-            $lateCount = 1;
-        }
+        $pendingCount = $overdueCount + $lateCount;
 
         $selectedWeekModel = null;
         if ($request->filled('week')) {
             $selectedWeekModel = \App\Models\Week::find($request->week);
         }
-        $selectedWeekName = $selectedWeekModel ? $selectedWeekModel->name : ($weeks->first()?->name ?? 'Week 21');
-        $selectedWeekDueDate = $selectedWeekModel ? $selectedWeekModel->due_date : ($weeks->first()?->due_date ?? null);
 
-        // Final Deadline (e.g. End of this week Sunday or standard deadline)
-        if ($selectedWeekDueDate) {
-            $finalDeadlineText = Carbon::parse($selectedWeekDueDate)->format('d M Y 21:00');
+        if ($selectedWeekModel) {
+            $selectedWeekName = $selectedWeekModel->name;
+            $selectedWeekDueDate = $selectedWeekModel->due_date;
         } else {
-            $finalDeadlineText = Carbon::now()->addDays(5)->format('d M Y 21:00');
+            $selectedWeekName = $weeks->count() === 1 ? $weeks->first()->name : 'All Weeks';
+            $upcomingWeek = $weeks->whereNotNull('due_date')
+                ->sortBy('due_date')
+                ->first(fn($w) => Carbon::parse($w->due_date)->endOfDay()->gte(now()));
+            $fallbackDueWeek = $upcomingWeek ?? $weeks->whereNotNull('due_date')->sortByDesc('due_date')->first();
+            $selectedWeekDueDate = $fallbackDueWeek?->due_date;
+        }
+
+        $isDeadlinePassed = false;
+        $deadlineSubtext = null;
+        if ($selectedWeekDueDate) {
+            $dueCarbon = Carbon::parse($selectedWeekDueDate);
+            $finalDeadlineText = $dueCarbon->format('d M Y, 21:00');
+            $deadlineEnd = $dueCarbon->copy()->setTime(21, 0);
+            $isDeadlinePassed = $deadlineEnd->isPast();
+            $deadlineSubtext = $dueCarbon->isToday()
+                ? 'Due today at 21:00'
+                : ($isDeadlinePassed
+                    ? 'Deadline passed'
+                    : 'Due in ' . max(1, (int) now()->startOfDay()->diffInDays($dueCarbon->copy()->startOfDay())) . ' ' . \Illuminate\Support\Str::plural('day', max(1, (int) now()->startOfDay()->diffInDays($dueCarbon->copy()->startOfDay()))));
+        } else {
+            $finalDeadlineText = 'No Deadline Set';
         }
 
         $metrics = [
-            'score' => $avgScore . '%',
-            'completion' => $taskCompletionText,
-            'runtime' => "Estimated: {$estimatedTimeText} | Taken: {$takenTimeText}",
-            'overdue_late' => "Overdue Tasks: {$overdueCount} | Late Tasks: {$lateCount}",
-            'deadline' => $finalDeadlineText,
+            'has_score'          => $avgScore !== null,
+            'score_pct'          => $avgScore ?? 0,
+            'score'              => $avgScore !== null ? $avgScore . '%' : '—',
+            'completed_count'    => $completedPapersCount,
+            'total_count'        => $totalPapersCount,
+            'completion'         => $taskCompletionText,
+            'estimated_text'     => $estimatedTimeText,
+            'taken_text'         => $takenTimeText,
+            'runtime'            => "Estimated: {$estimatedTimeText} | Taken: {$takenTimeText}",
+            'overdue_count'      => $overdueCount,
+            'late_count'         => $lateCount,
+            'pending_count'      => $pendingCount,
+            'overdue_late'       => "Pending: {$overdueCount} | Paused: {$lateCount}",
+            'deadline'           => $finalDeadlineText,
+            'deadline_subtext'   => $deadlineSubtext,
+            'is_deadline_passed' => $isDeadlinePassed,
         ];
 
         // Paginate the collection manually (best practice)
         $currentPage = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage();
         $perPage = 10;
         $currentItems = $papers->slice(($currentPage - 1) * $perPage, $perPage)->values();
-        
+
         $papers = new \Illuminate\Pagination\LengthAwarePaginator(
             $currentItems,
             $papers->count(),
@@ -248,15 +285,25 @@ class AssessmentController extends Controller
         );
         $papers->withQueryString();
 
-        // Course title and week number context
-        $selectedCourse = null;
-        if ($request->filled('course_id')) {
-            $selectedCourse = Course::find($request->course_id);
+        // Selected subject & course context for header
+        $selectedSubject = $request->filled('subject_id') ? Subject::find($request->subject_id) : null;
+        $selectedCourse = $request->filled('course_id') ? Course::find($request->course_id) : null;
+        $detail = $student->studentDetail;
+        $yearGroupLabel = $detail?->group_year ?: $student->classes()->pluck('classes.group_year')->filter()->first();
+
+        if ($selectedCourse && $selectedSubject) {
+            $courseTitle = $selectedCourse->name . ' · ' . $selectedSubject->title;
+        } elseif ($selectedCourse) {
+            $courseTitle = $selectedCourse->name;
+        } elseif ($selectedSubject) {
+            $courseTitle = $selectedSubject->title . ' Weekly Plan';
+        } elseif ($courses->count() === 1) {
+            $courseTitle = $courses->first()->name;
+        } else {
+            $courseTitle = 'Weekly Portal Hub';
         }
-        $courseTitle = $selectedCourse ? $selectedCourse->name : ($courses->first()?->name ?? 'YS Maths (Sat)');
 
         // Media files & homework weekly query based on student profile visibility settings
-        $detail = $student->studentDetail;
         $groupYearName = $detail?->group_year;
         $academicYearVal = $detail?->academic_year;
         $classIds = $student->classes()->pluck('classes.id');
@@ -417,8 +464,12 @@ class AssessmentController extends Controller
             'papers',
             'metrics',
             'courseTitle',
+            'selectedSubject',
+            'selectedCourse',
+            'selectedWeekModel',
             'selectedWeekName',
             'selectedWeekDueDate',
+            'yearGroupLabel',
             'allWeeks',
             'mediaFiles',
             'videoProgressMap',
@@ -459,7 +510,14 @@ class AssessmentController extends Controller
     {
         $student = auth()->user();
 
-        $subjects = Subject::where('is_active', true)->get()->map(function ($subject) use ($student) {
+        $topicCountsBySubject = Topic::where(function ($q) {
+                $q->whereNull('parent')->orWhere('parent', 0);
+            })
+            ->select('subject_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('subject_id')
+            ->pluck('total', 'subject_id');
+
+        $subjects = Subject::where('is_active', true)->orderBy('id')->get()->map(function ($subject) use ($student, $topicCountsBySubject) {
             $papers = Paper::visibleTo($student)
                 ->where('subject_id', $subject->id)
                 ->get();
@@ -468,33 +526,36 @@ class AssessmentController extends Controller
             $subject->tests_count = $papers->where('type', 'test')->count();
             $subject->exams_count = $papers->where('type', 'exam')->count();
             $subject->papers = $papers;
+            $subject->topics_count = (int) ($topicCountsBySubject[$subject->id] ?? 0);
 
-            // Compute actual completion progress based on attempts
             $paperIds = $papers->pluck('id');
-            $completedCount = PaperAttempt::where('user_id', $student->id)
-                ->whereIn('paper_id', $paperIds)
-                ->where('status', 'completed')
-                ->distinct('paper_id')
-                ->count('paper_id');
+            $attempts = $paperIds->isNotEmpty()
+                ? PaperAttempt::where('user_id', $student->id)
+                    ->whereIn('paper_id', $paperIds)
+                    ->get()
+                : collect();
 
-            $pausedCount = PaperAttempt::where('user_id', $student->id)
-                ->whereIn('paper_id', $paperIds)
-                ->where('status', 'paused')
-                ->distinct('paper_id')
-                ->count('paper_id');
+            $completedAttempts = $attempts->where('status', 'completed');
+            $completedCount = $completedAttempts->pluck('paper_id')->unique()->count();
+            $pausedCount = $attempts->where('status', 'paused')->pluck('paper_id')->unique()->count();
 
-            $lastCompleted = PaperAttempt::where('user_id', $student->id)
-                ->whereIn('paper_id', $paperIds)
-                ->where('status', 'completed')
-                ->orderBy('completed_at', 'desc')
+            $lastCompleted = $completedAttempts
+                ->sortByDesc(fn($a) => $a->completed_at ?? $a->created_at)
                 ->first();
+
+            $scoredAttempts = $completedAttempts->filter(fn($a) => $a->max_score > 0);
+            $averageScore = $scoredAttempts->isNotEmpty()
+                ? (int) round($scoredAttempts->avg(fn($a) => ($a->score / $a->max_score) * 100))
+                : null;
 
             $subject->completed_papers_count = $completedCount;
             $subject->paused_papers_count = $pausedCount;
             $subject->last_completed_at = $lastCompleted ? $lastCompleted->completed_at : null;
-            $subject->progress_percentage = $subject->total_papers > 0 
-                ? round(($completedCount / $subject->total_papers) * 100) 
+            $subject->progress_percentage = $subject->total_papers > 0
+                ? (int) round(($completedCount / $subject->total_papers) * 100)
                 : 0;
+            $subject->average_score = $averageScore;
+            $subject->theme = $this->resolveSubjectTheme($subject->title ?? '');
 
             return $subject;
         });
@@ -502,7 +563,7 @@ class AssessmentController extends Controller
         $totalPapers = $subjects->sum('total_papers');
         $totalCompleted = $subjects->sum('completed_papers_count');
         $totalPaused = $subjects->sum('paused_papers_count');
-        $overallProgress = $totalPapers > 0 ? round(($totalCompleted / $totalPapers) * 100) : 0;
+        $overallProgress = $totalPapers > 0 ? (int) round(($totalCompleted / $totalPapers) * 100) : 0;
 
         return view('student.assessment.category-test-overview', compact(
             'subjects',
@@ -520,42 +581,146 @@ class AssessmentController extends Controller
     {
         $student = auth()->user();
         $subject = Subject::findOrFail($subjectId);
+        $subjectTheme = $this->resolveSubjectTheme($subject->title ?? '');
 
-        $query = Topic::where('subject_id', $subject->id)
-            ->where(function ($q) {
-                $q->whereNull('parent')->orWhere('parent', 0);
-            });
-
-        // Filter by topic name
-        if (request()->filled('topic_name')) {
-            $query->where('name', 'like', '%' . request('topic_name') . '%');
+        $statusFilter = request('status', 'all');
+        if (!in_array($statusFilter, ['all', 'in-progress', 'completed', 'not-started'], true)) {
+            $statusFilter = 'all';
         }
 
-        $topics = $query->paginate(10)->withQueryString();
+        $sortBy = request('sort', 'name_asc');
+        if (!in_array($sortBy, ['name_asc', 'name_desc', 'tests_desc', 'progress_desc'], true)) {
+            $sortBy = 'name_asc';
+        }
 
-        // Calculate statistics for each topic
-        foreach ($topics as $topic) {
-            // Get papers under this topic (and its subtopics) visible to this student
-            $papers = Paper::visibleTo($student)
-                ->where('topic_id', $topic->id)
-                ->get();
+        $allTopics = Topic::where('subject_id', $subject->id)
+            ->where(function ($q) {
+                $q->whereNull('parent')->orWhere('parent', 0);
+            })
+            ->withCount('subTopics')
+            ->orderBy('name')
+            ->get();
+
+        $topicIds = $allTopics->pluck('id');
+
+        $papersByTopic = $topicIds->isNotEmpty()
+            ? Paper::visibleTo($student)
+                ->whereIn('topic_id', $topicIds)
+                ->get()
+                ->groupBy('topic_id')
+            : collect();
+
+        $allPaperIds = $papersByTopic->flatten()->pluck('id')->unique();
+
+        $attemptsByPaper = $allPaperIds->isNotEmpty()
+            ? PaperAttempt::where('user_id', $student->id)
+                ->whereIn('paper_id', $allPaperIds)
+                ->get()
+                ->groupBy('paper_id')
+            : collect();
+
+        $allScoredAttempts = collect();
+
+        $enrichedTopics = $allTopics->map(function ($topic) use ($papersByTopic, $attemptsByPaper, &$allScoredAttempts) {
+            $papers = $papersByTopic->get($topic->id, collect());
+            $paperIds = $papers->pluck('id');
+
+            $topicAttempts = $paperIds->flatMap(fn($pid) => $attemptsByPaper->get($pid, collect()));
+            $completedAttempts = $topicAttempts->where('status', 'completed');
+            $activeCount = $topicAttempts->whereIn('status', ['paused', 'in_progress'])->count();
+
+            $scoredAttempts = $completedAttempts->filter(fn($a) => $a->max_score > 0);
+            if ($scoredAttempts->isNotEmpty()) {
+                $allScoredAttempts = $allScoredAttempts->merge($scoredAttempts);
+            }
 
             $topic->test_available = $papers->count();
-
-            // Count how many distinct papers in this topic the student has completed
-            $paperIds = $papers->pluck('id');
-            $topic->test_attempted = PaperAttempt::where('user_id', $student->id)
-                ->whereIn('paper_id', $paperIds)
-                ->where('status', 'completed')
-                ->distinct('paper_id')
-                ->count('paper_id');
-
+            $topic->test_attempted = $completedAttempts->pluck('paper_id')->unique()->count();
             $topic->easy_count = $papers->where('difficulty', 'easy')->count();
             $topic->medium_count = $papers->where('difficulty', 'medium')->count();
             $topic->hard_count = $papers->where('difficulty', 'hard')->count();
+            $topic->subtopics_count = (int) ($topic->sub_topics_count ?? 0);
+            $topic->average_accuracy = $scoredAttempts->isNotEmpty()
+                ? (int) round($scoredAttempts->avg(fn($a) => ($a->score / $a->max_score) * 100))
+                : null;
+            $topic->progress_percentage = $topic->test_available > 0
+                ? (int) round(($topic->test_attempted / $topic->test_available) * 100)
+                : 0;
+
+            if ($topic->test_available > 0 && $topic->test_attempted >= $topic->test_available) {
+                $topic->status_key = 'completed';
+            } elseif ($topic->test_attempted > 0 || $activeCount > 0) {
+                $topic->status_key = 'in-progress';
+            } else {
+                $topic->status_key = 'not-started';
+            }
+
+            return $topic;
+        });
+
+        // Subject-level KPIs across all parent topics in this subject
+        $totalTopicsCount = $enrichedTopics->count();
+        $totalTestsCount = $enrichedTopics->sum('test_available');
+        $completedTestsCount = $enrichedTopics->sum('test_attempted');
+        $subjectCompletionPct = $totalTestsCount > 0
+            ? (int) round(($completedTestsCount / $totalTestsCount) * 100)
+            : 0;
+        $subjectAvgAccuracy = $allScoredAttempts->isNotEmpty()
+            ? (int) round($allScoredAttempts->avg(fn($a) => ($a->score / $a->max_score) * 100))
+            : null;
+
+        $statusCounts = [
+            'all'         => $totalTopicsCount,
+            'in-progress' => $enrichedTopics->where('status_key', 'in-progress')->count(),
+            'completed'   => $enrichedTopics->where('status_key', 'completed')->count(),
+            'not-started' => $enrichedTopics->where('status_key', 'not-started')->count(),
+        ];
+
+        // Apply search, status filter, and sorting
+        $filtered = $enrichedTopics;
+
+        if (request()->filled('topic_name')) {
+            $needle = strtolower(trim(request('topic_name')));
+            $filtered = $filtered->filter(fn($t) => str_contains(strtolower($t->name), $needle));
         }
 
-        return view('student.assessment.assessments-topics', compact('subject', 'topics'));
+        if ($statusFilter !== 'all') {
+            $filtered = $filtered->filter(fn($t) => $t->status_key === $statusFilter);
+        }
+
+        $filtered = match ($sortBy) {
+            'name_desc'     => $filtered->sortByDesc('name', SORT_NATURAL | SORT_FLAG_CASE),
+            'tests_desc'    => $filtered->sortByDesc('test_available'),
+            'progress_desc' => $filtered->sortByDesc('progress_percentage'),
+            default         => $filtered->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE),
+        };
+
+        $filtered = $filtered->values();
+
+        // Paginate filtered collection cleanly
+        $currentPage = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 10;
+        $topics = (new \Illuminate\Pagination\LengthAwarePaginator(
+            $filtered->slice(($currentPage - 1) * $perPage, $perPage)->values(),
+            $filtered->count(),
+            $perPage,
+            $currentPage,
+            ['path' => \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPath()]
+        ))->withQueryString();
+
+        return view('student.assessment.assessments-topics', compact(
+            'subject',
+            'subjectTheme',
+            'topics',
+            'totalTopicsCount',
+            'totalTestsCount',
+            'completedTestsCount',
+            'subjectCompletionPct',
+            'subjectAvgAccuracy',
+            'statusCounts',
+            'statusFilter',
+            'sortBy'
+        ));
     }
 
     /**
@@ -566,54 +731,240 @@ class AssessmentController extends Controller
         $student = auth()->user();
         $topic = Topic::findOrFail($topicId);
         $subject = $topic->subject;
+        $subjectTheme = $this->resolveSubjectTheme($subject?->title ?? '');
 
-        // Fetch subtopics
+        // Available subtopic list for dropdown filter & overall KPI calculations
+        $allSubtopics = Topic::where('parent', $topic->id)->orderBy('name')->get();
+        $allSubtopicIds = $allSubtopics->pluck('id');
+
+        // All visible papers across all subtopics of this topic (for KPI cards & attempt history)
+        $allTopicPapers = $allSubtopicIds->isNotEmpty()
+            ? Paper::visibleTo($student)
+                ->whereIn('subtopic_id', $allSubtopicIds)
+                ->get()
+            : collect();
+        $topicPaperIds = $allTopicPapers->pluck('id');
+
+        // Pre-fetch all student attempts for this topic's papers (avoids N+1 queries)
+        $allStudentAttempts = $topicPaperIds->isNotEmpty()
+            ? PaperAttempt::where('user_id', $student->id)
+                ->whereIn('paper_id', $topicPaperIds)
+                ->orderByDesc('completed_at')
+                ->orderByDesc('id')
+                ->get()
+            : collect();
+        $attemptsByPaper = $allStudentAttempts->groupBy('paper_id');
+
+        // Topic-wide KPI summary stats
+        $totalSubtopicsCount = $allSubtopics->count();
+        $totalPapersCount = $allTopicPapers->count();
+        $completedPapersCount = $allStudentAttempts
+            ->where('status', 'completed')
+            ->pluck('paper_id')
+            ->unique()
+            ->count();
+        $completionRate = $totalPapersCount > 0
+            ? (int) round(($completedPapersCount / $totalPapersCount) * 100)
+            : 0;
+
+        $scoredTopicAttempts = $allStudentAttempts->filter(fn($a) => $a->status === 'completed' && $a->max_score > 0);
+        $averageAccuracy = $scoredTopicAttempts->isNotEmpty()
+            ? (int) round($scoredTopicAttempts->avg(fn($a) => ($a->score / $a->max_score) * 100))
+            : null;
+
+        // Fetch filtered subtopics
         $subtopicsQuery = Topic::where('parent', $topic->id);
         if (request()->filled('subtopic_name')) {
             $subtopicsQuery->where('name', 'like', '%' . request('subtopic_name') . '%');
         }
         $subtopics = $subtopicsQuery->orderBy('name')->get();
+        $filteredSubtopicIds = $subtopics->pluck('id');
 
-        // Available subtopic list for dropdown filter
-        $allSubtopics = Topic::where('parent', $topic->id)->orderBy('name')->get();
-        $allSubtopicIds = $allSubtopics->pluck('id');
+        $papersBySubtopic = $filteredSubtopicIds->isNotEmpty()
+            ? Paper::visibleTo($student)
+                ->with(['questions', 'subject'])
+                ->whereIn('subtopic_id', $filteredSubtopicIds)
+                ->when(request()->filled('paper_name'), function ($q) {
+                    $q->where('title', 'like', '%' . request('paper_name') . '%');
+                })
+                ->get()
+                ->groupBy('subtopic_id')
+            : collect();
 
-        // Map papers to subtopics
+        $choiceTypes = ['single_choice_radio', 'single_choice_dropdown', 'multiple_choice', 'picture_choice'];
+        $directTypes = ['fill_in_the_blanks', 'free_text', 'matching_text'];
+
+        $paperStatusFilter = request('paper_status', 'all');
+        $paperDifficultyFilter = strtolower(trim((string) request('paper_difficulty', '')));
+        $paperSortBy = request('paper_sort', 'subtopic_asc');
+
+        $paperEntries = collect();
+
         foreach ($subtopics as $subtopic) {
-            $papersQuery = Paper::visibleTo($student)
-                ->where('subtopic_id', $subtopic->id);
+            $subtopicPapers = $papersBySubtopic->get($subtopic->id, collect());
 
-            if (request()->filled('paper_name')) {
-                $papersQuery->where('title', 'like', '%' . request('paper_name') . '%');
-            }
+            $subtopic->papers = $subtopicPapers->map(function ($paper) use ($attemptsByPaper, $choiceTypes, $directTypes, $subtopic) {
+                $paperAttempts = $attemptsByPaper->get($paper->id, collect());
+                $completedAttempts = $paperAttempts->where('status', 'completed');
 
-            $subtopic->papers = $papersQuery->get()->map(function ($paper) use ($student) {
-                // Get active or paused attempts (optimized)
-                $paper->active_attempt = PaperAttempt::where('user_id', $student->id)
-                    ->where('paper_id', $paper->id)
-                    ->whereIn('status', ['in_progress', 'paused'])
-                    ->first();
+                $paper->active_attempt = $paperAttempts->whereIn('status', ['in_progress', 'paused'])->first();
+                $paper->completed_attempts_count = $completedAttempts->count();
 
-                $paper->completed_attempts_count = PaperAttempt::where('user_id', $student->id)
-                    ->where('paper_id', $paper->id)
-                    ->where('status', 'completed')
-                    ->count();
+                $latestCompletedAttempt = $completedAttempts->first();
+                $paper->latest_completed_attempt_id = ($latestCompletedAttempt && !$paper->hide_result)
+                    ? $latestCompletedAttempt->id
+                    : null;
+
+                $scoredPaperAttempts = $completedAttempts->filter(fn($a) => $a->max_score > 0);
+                $paper->best_accuracy = $scoredPaperAttempts->isNotEmpty()
+                    ? (int) round($scoredPaperAttempts->max(fn($a) => ($a->score / $a->max_score) * 100))
+                    : null;
+
+                $paper->status_key = $paper->active_attempt
+                    ? 'in-progress'
+                    : ($paper->completed_attempts_count > 0 ? 'completed' : 'not-started');
+
+                $questionsCount = $paper->questions->count();
+                $paper->questions_count = $questionsCount;
+
+                $totalMarks = 0;
+                $qTypes = [];
+                foreach ($paper->questions as $q) {
+                    $totalMarks += $q->pivot->marks ?? $paper->default_marks ?? 1;
+                    $qTypes[] = $q->type;
+                }
+                $paper->total_marks = $totalMarks > 0
+                    ? $totalMarks
+                    : ($questionsCount * ($paper->default_marks ?? 1));
+
+                $uniqueTypes = array_values(array_unique($qTypes));
+
+                if (empty($uniqueTypes)) {
+                    $paper->display_type = Paper::TYPES[$paper->type] ?? ucfirst($paper->type ?? 'Test');
+                } elseif (empty(array_diff($uniqueTypes, $directTypes))) {
+                    $paper->display_type = 'Direct Answer';
+                } elseif (empty(array_diff($uniqueTypes, $choiceTypes))) {
+                    $paper->display_type = 'Multiple Choice';
+                } elseif (count($uniqueTypes) === 1) {
+                    $paper->display_type = Question::TYPES[$uniqueTypes[0]] ?? 'Standard';
+                } else {
+                    $paper->display_type = 'Mixed Format';
+                }
+
+                $paper->subtopic_name = $subtopic->name;
 
                 return $paper;
             });
+
+            foreach ($subtopic->papers as $paper) {
+                $paperEntries->push((object) [
+                    'is_empty_subtopic' => false,
+                    'subtopic'          => $subtopic,
+                    'subtopic_name'     => $subtopic->name,
+                    'paper'             => $paper,
+                    'paper_title'       => $paper->title ?? '',
+                    'difficulty_key'    => strtolower($paper->difficulty ?? ''),
+                    'status_key'        => $paper->status_key,
+                    'questions_count'   => $paper->questions_count ?? 0,
+                ]);
+            }
         }
 
-        // Fetch and paginate attempts for papers in these subtopics
-        $topicPaperIds = Paper::visibleTo($student)
-            ->whereIn('subtopic_id', $allSubtopicIds)
-            ->pluck('id');
+        // Difficulty filter (applies before status pills count so status counts stay accurate)
+        $difficultyFiltered = $paperDifficultyFilter !== ''
+            ? $paperEntries->filter(fn($row) => $row->difficulty_key === $paperDifficultyFilter)
+            : $paperEntries;
 
+        $paperStatusCounts = [
+            'all'         => $difficultyFiltered->count(),
+            'in-progress' => $difficultyFiltered->where('status_key', 'in-progress')->count(),
+            'completed'   => $difficultyFiltered->where('status_key', 'completed')->count(),
+            'not-started' => $difficultyFiltered->where('status_key', 'not-started')->count(),
+        ];
+
+        $filteredPaperRows = $paperStatusFilter !== 'all'
+            ? $difficultyFiltered->filter(fn($row) => $row->status_key === $paperStatusFilter)
+            : $difficultyFiltered;
+
+        // Include empty subtopics in the table only when no paper-specific filter is active
+        $hasPaperFilter = request()->filled('paper_name')
+            || $paperDifficultyFilter !== ''
+            || $paperStatusFilter !== 'all';
+
+        if (!$hasPaperFilter) {
+            foreach ($subtopics as $subtopic) {
+                if ($subtopic->papers->isEmpty()) {
+                    $filteredPaperRows->push((object) [
+                        'is_empty_subtopic' => true,
+                        'subtopic'          => $subtopic,
+                        'subtopic_name'     => $subtopic->name,
+                        'paper'             => null,
+                        'paper_title'       => '',
+                        'difficulty_key'    => '',
+                        'status_key'        => 'empty',
+                        'questions_count'   => -1,
+                    ]);
+                }
+            }
+        }
+
+        $difficultyOrder = ['easy' => 1, 'medium' => 2, 'hard' => 3];
+        $statusOrder = ['in-progress' => 1, 'not-started' => 2, 'completed' => 3, 'empty' => 4];
+
+        $sortedPaperRows = match ($paperSortBy) {
+            'paper_asc'       => $filteredPaperRows->sortBy(fn($r) => [
+                $r->is_empty_subtopic ? 1 : 0,
+                strtolower($r->paper_title),
+                strtolower($r->subtopic_name),
+            ]),
+            'paper_desc'      => $filteredPaperRows->sortByDesc(fn($r) => [
+                $r->is_empty_subtopic ? 0 : 1,
+                strtolower($r->paper_title),
+            ]),
+            'difficulty_asc'  => $filteredPaperRows->sortBy(fn($r) => [
+                $r->is_empty_subtopic ? 1 : 0,
+                $difficultyOrder[$r->difficulty_key] ?? 9,
+                strtolower($r->subtopic_name),
+                strtolower($r->paper_title),
+            ]),
+            'questions_desc'  => $filteredPaperRows->sortBy(fn($r) => [
+                $r->is_empty_subtopic ? 1 : 0,
+                -$r->questions_count,
+                strtolower($r->paper_title),
+            ]),
+            'status'          => $filteredPaperRows->sortBy(fn($r) => [
+                $statusOrder[$r->status_key] ?? 9,
+                strtolower($r->subtopic_name),
+                strtolower($r->paper_title),
+            ]),
+            default           => $filteredPaperRows->sortBy(fn($r) => [
+                strtolower($r->subtopic_name),
+                $r->is_empty_subtopic ? 1 : 0,
+                strtolower($r->paper_title),
+            ]),
+        };
+
+        $sortedPaperRows = $sortedPaperRows->values();
+
+        $papersCurrentPage = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage('papers_page');
+        $papersPerPage = 15;
+        $paperRows = (new \Illuminate\Pagination\LengthAwarePaginator(
+            $sortedPaperRows->slice(($papersCurrentPage - 1) * $papersPerPage, $papersPerPage)->values(),
+            $sortedPaperRows->count(),
+            $papersPerPage,
+            $papersCurrentPage,
+            [
+                'path' => \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPath(),
+                'pageName' => 'papers_page',
+            ]
+        ))->withQueryString();
+
+        // Fetch and paginate attempts for papers in these subtopics
         $attemptsQuery = PaperAttempt::where('user_id', $student->id)
             ->whereIn('paper_id', $topicPaperIds)
             ->with(['paper.subtopic'])
             ->orderBy('created_at', 'desc');
 
-        // Apply attempt filters
         if (request()->filled('attempt_paper_name')) {
             $attemptsQuery->whereHas('paper', function ($q) {
                 $q->where('title', 'like', '%' . request('attempt_paper_name') . '%');
@@ -630,10 +981,26 @@ class AssessmentController extends Controller
             $attemptsQuery->where('status', request('attempt_status'));
         }
 
-        // Paginate attempts using a custom page query param
         $attempts = $attemptsQuery->paginate(10, ['*'], 'attempts_page')->withQueryString();
 
-        return view('student.assessment.assessments-subtopics', compact('topic', 'subject', 'subtopics', 'allSubtopics', 'attempts'));
+        return view('student.assessment.assessments-subtopics', compact(
+            'topic',
+            'subject',
+            'subjectTheme',
+            'subtopics',
+            'allSubtopics',
+            'paperRows',
+            'paperStatusCounts',
+            'paperStatusFilter',
+            'paperDifficultyFilter',
+            'paperSortBy',
+            'attempts',
+            'totalSubtopicsCount',
+            'totalPapersCount',
+            'completedPapersCount',
+            'completionRate',
+            'averageAccuracy'
+        ));
     }
 
     /**
@@ -686,7 +1053,7 @@ class AssessmentController extends Controller
     public function takeTest($attemptId)
     {
         $student = auth()->user();
-        $attempt = PaperAttempt::with(['paper.questions.options'])->findOrFail($attemptId);
+        $attempt = PaperAttempt::with(['paper.subject', 'paper.topic', 'paper.questions.options'])->findOrFail($attemptId);
 
         if ($attempt->user_id !== $student->id) {
             abort(403, 'Unauthorized access to this test attempt.');
@@ -694,14 +1061,17 @@ class AssessmentController extends Controller
 
         if ($attempt->status === 'completed') {
             if ($attempt->paper->hide_result) {
-                return redirect()->route('student.topics.subtopics', $attempt->paper->topic_id)
+                $fallbackUrl = $attempt->paper->topic_id
+                    ? route('student.topics.subtopics', $attempt->paper->topic_id)
+                    : route('student.weeklytests');
+                return redirect($fallbackUrl)
                     ->with('error', 'Results for this paper are hidden.');
             }
             return redirect()->route('student.attempts.result', $attempt);
         }
 
-        // Resume if paused
-        if ($attempt->status === 'paused') {
+        // Resume if paused (Save & Exit) or missing started_at
+        if ($attempt->status === 'paused' || !$attempt->started_at) {
             $now = now();
             $attempt->update([
                 'status' => 'in_progress',
@@ -720,8 +1090,8 @@ class AssessmentController extends Controller
         $remainingSeconds = null;
         if ($attempt->paper->total_time > 0) {
             $timeLimitSeconds = $attempt->paper->total_time * 60;
-            $timeSpentSoFar = max(0, $attempt->time_spent);
-            $elapsedInSession = (int) $attempt->started_at->diffInSeconds(now());
+            $timeSpentSoFar = max(0, (int) $attempt->time_spent);
+            $elapsedInSession = $attempt->started_at ? (int) $attempt->started_at->diffInSeconds(now()) : 0;
             
             $remainingSeconds = $timeLimitSeconds - ($timeSpentSoFar + $elapsedInSession);
             if ($remainingSeconds < 0) {
@@ -790,18 +1160,18 @@ class AssessmentController extends Controller
     }
 
     /**
-     * Pause a test attempt.
+     * Save & Exit (pause) a test attempt.
      */
     public function pauseTest(Request $request, $attemptId)
     {
-        $attempt = PaperAttempt::findOrFail($attemptId);
+        $attempt = PaperAttempt::with('paper.questions')->findOrFail($attemptId);
         if ($attempt->user_id !== auth()->id() || $attempt->status === 'completed') {
             abort(403);
         }
 
         // Calculate time spent
-        $elapsed = (int) $attempt->started_at->diffInSeconds(now());
-        $attempt->time_spent = max(0, $attempt->time_spent) + $elapsed;
+        $elapsed = $attempt->started_at ? (int) $attempt->started_at->diffInSeconds(now()) : 0;
+        $attempt->time_spent = max(0, (int) $attempt->time_spent) + $elapsed;
 
         // Save answers
         $this->saveAnswers($attempt, $request->input('answers', []));
@@ -810,9 +1180,12 @@ class AssessmentController extends Controller
         $attempt->paused_at = now();
         $attempt->save();
 
-        return redirect()
-            ->route('student.topics.subtopics', $attempt->paper->topic_id)
-            ->with('success', 'Test paused successfully. You can resume it later!');
+        $redirectUrl = $attempt->paper->topic_id
+            ? route('student.topics.subtopics', $attempt->paper->topic_id)
+            : route('student.weeklytests');
+
+        return redirect($redirectUrl)
+            ->with('success', 'Progress saved! You can resume this test later.');
     }
 
     /**
@@ -820,14 +1193,14 @@ class AssessmentController extends Controller
      */
     public function submitTest(Request $request, $attemptId)
     {
-        $attempt = PaperAttempt::findOrFail($attemptId);
+        $attempt = PaperAttempt::with('paper.questions')->findOrFail($attemptId);
         if ($attempt->user_id !== auth()->id() || $attempt->status === 'completed') {
             abort(403);
         }
 
         // Calculate time spent
-        $elapsed = (int) $attempt->started_at->diffInSeconds(now());
-        $attempt->time_spent = max(0, $attempt->time_spent) + $elapsed;
+        $elapsed = $attempt->started_at ? (int) $attempt->started_at->diffInSeconds(now()) : 0;
+        $attempt->time_spent = max(0, (int) $attempt->time_spent) + $elapsed;
 
         // Save answers
         $this->saveAnswers($attempt, $request->input('answers', []));
@@ -844,8 +1217,10 @@ class AssessmentController extends Controller
         $attempt->save();
 
         if ($attempt->paper->hide_result) {
-            return redirect()
-                ->route('student.topics.subtopics', $attempt->paper->topic_id)
+            $redirectUrl = $attempt->paper->topic_id
+                ? route('student.topics.subtopics', $attempt->paper->topic_id)
+                : route('student.weeklytests');
+            return redirect($redirectUrl)
                 ->with('success', 'Test submitted successfully!');
         }
 
@@ -859,30 +1234,144 @@ class AssessmentController extends Controller
      */
     public function result($attemptId)
     {
-        $attempt = PaperAttempt::with(['paper.questions.options', 'answers.question'])->findOrFail($attemptId);
+        $attempt = PaperAttempt::with([
+            'paper.subject',
+            'paper.topic',
+            'paper.questions.options',
+            'paper.questions.topic',
+            'answers.question',
+        ])->findOrFail($attemptId);
 
         if ($attempt->user_id !== auth()->id()) {
             abort(403);
         }
 
-        if ($attempt->paper->hide_result) {
-            return redirect()
-                ->route('student.topics.subtopics', $attempt->paper->topic_id)
+        $paper = $attempt->paper;
+        $backUrl = $paper->topic_id
+            ? route('student.topics.subtopics', $paper->topic_id)
+            : ($paper->subject_id
+                ? route('student.assessments.topics', $paper->subject_id)
+                : route('student.weeklytests'));
+
+        if ($paper->hide_result) {
+            return redirect($backUrl)
                 ->with('error', 'Results for this paper are hidden.');
         }
 
-        $answers = StudentAnswer::where('paper_attempt_id', $attempt->id)
+        $answers = StudentAnswer::with('selectedOption')
+            ->where('paper_attempt_id', $attempt->id)
             ->get()
             ->keyBy('question_id');
 
-        $questions = $attempt->paper->questions;
-        if ($attempt->paper->shuffle_questions) {
-            $questions = $questions->sortBy(function($q) use ($attempt) {
+        $questions = $paper->questions;
+        if ($paper->shuffle_questions) {
+            $questions = $questions->sortBy(function ($q) use ($attempt) {
                 return md5($q->id . '_' . $attempt->id);
             })->values();
         }
 
-        return view('student.assessment.result', compact('attempt', 'questions', 'answers'));
+        $totalQuestions = $questions->count() > 0 ? $questions->count() : max(0, (int) $attempt->total_questions);
+
+        $questionMarksMap = [];
+        $correctCount = 0;
+        $incorrectCount = 0;
+        $unansweredCount = 0;
+        $topicBuckets = [];
+
+        foreach ($questions as $q) {
+            $qMarks = (float) ($q->pivot->marks ?? $q->marks ?? $paper->default_marks ?? 1);
+            $questionMarksMap[$q->id] = $qMarks;
+
+            $ans = $answers->get($q->id);
+            $isCorrect = $ans && $ans->is_correct;
+            if ($ans) {
+                if ($isCorrect) {
+                    $correctCount++;
+                } else {
+                    $incorrectCount++;
+                }
+            } else {
+                $unansweredCount++;
+            }
+
+            if ($q->topic) {
+                $tid = $q->topic->id;
+                if (!isset($topicBuckets[$tid])) {
+                    $topicBuckets[$tid] = [
+                        'id'      => $tid,
+                        'name'    => $q->topic->name,
+                        'total'   => 0,
+                        'correct' => 0,
+                    ];
+                }
+                $topicBuckets[$tid]['total']++;
+                if ($isCorrect) {
+                    $topicBuckets[$tid]['correct']++;
+                }
+            }
+        }
+
+        if ($questions->isEmpty()) {
+            $correctCount = (int) $attempt->correct_answers;
+            $incorrectCount = max(0, $totalQuestions - $correctCount);
+            $unansweredCount = 0;
+        }
+
+        $maxScore = $attempt->max_score > 0
+            ? (int) $attempt->max_score
+            : (int) array_sum($questionMarksMap);
+
+        $percentage = $maxScore > 0 ? (int) round(($attempt->score / $maxScore) * 100) : 0;
+        $percentage = max(0, min(100, $percentage));
+
+        $timeSpentSec = max(0, (int) $attempt->time_spent);
+        $hours = (int) floor($timeSpentSec / 3600);
+        $mins = (int) floor(($timeSpentSec % 3600) / 60);
+        $secs = $timeSpentSec % 60;
+        $formattedTimeSpent = $hours > 0
+            ? sprintf('%dh %02dm %02ds', $hours, $mins, $secs)
+            : ($mins > 0 ? sprintf('%dm %02ds', $mins, $secs) : sprintf('%ds', $secs));
+
+        $avgSecondsPerQ = $totalQuestions > 0 ? (int) round($timeSpentSec / $totalQuestions) : 0;
+
+        $topicBreakdown = collect($topicBuckets)->map(function (array $bucket) {
+            $acc = $bucket['total'] > 0 ? (int) round(($bucket['correct'] / $bucket['total']) * 100) : 0;
+            return [
+                'id'       => $bucket['id'],
+                'name'     => $bucket['name'],
+                'total'    => $bucket['total'],
+                'correct'  => $bucket['correct'],
+                'accuracy' => $acc,
+                'url'      => route('student.topics.subtopics', $bucket['id']),
+            ];
+        })->values();
+
+        $subjectTheme = $this->resolveSubjectTheme($paper->subject?->title ?? '');
+
+        $activeAttemptForPaper = PaperAttempt::where('user_id', auth()->id())
+            ->where('paper_id', $paper->id)
+            ->whereIn('status', ['in_progress', 'paused'])
+            ->first();
+
+        return view('student.assessment.result', compact(
+            'attempt',
+            'paper',
+            'questions',
+            'answers',
+            'questionMarksMap',
+            'totalQuestions',
+            'maxScore',
+            'percentage',
+            'correctCount',
+            'incorrectCount',
+            'unansweredCount',
+            'formattedTimeSpent',
+            'avgSecondsPerQ',
+            'topicBreakdown',
+            'subjectTheme',
+            'backUrl',
+            'activeAttemptForPaper'
+        ));
     }
 
     /**
@@ -1127,5 +1616,89 @@ class AssessmentController extends Controller
             return ((int)$parts[0] * 3600) + ((int)$parts[1] * 60) + (int)$parts[2];
         }
         return (int) $durationStr;
+    }
+
+    /**
+     * Resolve unified brand theme metadata for a subject across student portal pages.
+     */
+    private function resolveSubjectTheme(string $title): array
+    {
+        $lower = strtolower(trim($title));
+
+        if (str_contains($lower, 'eng')) {
+            return [
+                'key'         => 'english',
+                'color'       => '#FA2833',
+                'color_dark'  => '#D91E27',
+                'gradient'    => 'linear-gradient(135deg, #FA2833 0%, #D91E27 100%)',
+                'soft_bg'     => '#FDEBEC',
+                'soft_text'   => '#D91E27',
+                'soft_border' => '#FECACA',
+                'icon'        => 'book-open',
+            ];
+        }
+
+        if (str_contains($lower, 'math')) {
+            return [
+                'key'         => 'maths',
+                'color'       => '#2477F9',
+                'color_dark'  => '#1757C1',
+                'gradient'    => 'linear-gradient(135deg, #2477F9 0%, #1757C1 100%)',
+                'soft_bg'     => '#EBF3FF',
+                'soft_text'   => '#1757C1',
+                'soft_border' => '#BFDBFE',
+                'icon'        => 'calculator',
+            ];
+        }
+
+        if (str_contains($lower, 'non') || str_contains($lower, 'nvr')) {
+            return [
+                'key'         => 'nvr',
+                'color'       => '#7C3AED',
+                'color_dark'  => '#6D28D9',
+                'gradient'    => 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
+                'soft_bg'     => '#F3EBFC',
+                'soft_text'   => '#6D28D9',
+                'soft_border' => '#DDD6FE',
+                'icon'        => 'shapes',
+            ];
+        }
+
+        if (str_contains($lower, 'verbal') || $lower === 'vr') {
+            return [
+                'key'         => 'vr',
+                'color'       => '#F3A521',
+                'color_dark'  => '#D97706',
+                'gradient'    => 'linear-gradient(135deg, #FBDA33 0%, #F3A521 100%)',
+                'soft_bg'     => '#FFF5E8',
+                'soft_text'   => '#D97706',
+                'soft_border' => '#FDE68A',
+                'icon'        => 'brain',
+            ];
+        }
+
+        if (str_contains($lower, 'sci')) {
+            return [
+                'key'         => 'science',
+                'color'       => '#16A34A',
+                'color_dark'  => '#15803D',
+                'gradient'    => 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)',
+                'soft_bg'     => '#EAF8F0',
+                'soft_text'   => '#15803D',
+                'soft_border' => '#BBF7D0',
+                'icon'        => 'zap',
+            ];
+        }
+
+        return [
+            'key'         => 'default',
+            'color'       => '#2477F9',
+            'color_dark'  => '#063080',
+            'gradient'    => 'linear-gradient(135deg, #2477F9 0%, #063080 100%)',
+            'soft_bg'     => '#EBF3FF',
+            'soft_text'   => '#063080',
+            'soft_border' => '#BFDBFE',
+            'icon'        => 'layers',
+        ];
     }
 }

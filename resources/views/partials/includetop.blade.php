@@ -19,7 +19,8 @@
 
 <!-- BEGIN: Page CSS-->
 @php
-    $menuType = auth()->user()?->role === 'admin' ? 'vertical' : 'horizontal';
+    $role = auth()->user()?->role;
+    $menuType = ($role === 'admin' || $role === 'student') ? 'vertical' : 'horizontal';
 @endphp
 
 <link rel="stylesheet" href="{{ asset("theme/app-assets/css/core/menu/menu-types/{$menuType}-menu.css") }}">

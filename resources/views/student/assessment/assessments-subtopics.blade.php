@@ -1,1917 +1,1920 @@
 @extends('layouts.app')
 
-@section('title', 'Subtopics & Tests - ' . $topic->name)
+@section('title', $topic->name . ' - Subtopics & Tests')
+
+@push('styles')
+    <style>
+        /* ==========================================================================
+           STUDENT TOPIC SUBTOPICS & TESTS - MODERN UI/UX (LIGHT & DARK MODE)
+           ========================================================================== */
+        .st-breadcrumb {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: var(--text-muted, #64748b);
+            margin-bottom: 0.85rem;
+        }
+
+        .st-breadcrumb a {
+            color: #2477F9;
+            text-decoration: none;
+        }
+
+        .st-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .st-breadcrumb-sep {
+            opacity: 0.55;
+        }
+
+        .st-page-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 1.4rem;
+        }
+
+        .st-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-width: 0;
+        }
+
+        .st-subject-avatar {
+            width: 54px;
+            height: 54px;
+            border-radius: 15px;
+            background-color: var(--subj-soft-bg, #ebf3ff);
+            border: 1px solid var(--subj-soft-border, #bfdbfe);
+            color: var(--subj-color, #2477F9);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .st-subject-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+        }
+
+        .st-title-meta-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .st-page-title {
+            color: var(--text-primary, #0b1f51);
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .st-subj-tag {
+            padding: 4px 11px;
+            border-radius: 999px;
+            background-color: var(--subj-soft-bg, #ebf3ff);
+            color: var(--subj-soft-text, #1757C1);
+            border: 1px solid var(--subj-soft-border, #bfdbfe);
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .st-page-subtitle {
+            color: var(--text-muted, #64748b);
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .st-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .st-header-pill-btn {
+            background-color: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #dfe7f2);
+            color: var(--text-primary, #1e293b) !important;
+            border-radius: 12px;
+            padding: 9px 16px;
+            font-size: 0.86rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none !important;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .st-header-pill-btn:hover {
+            border-color: #2477F9;
+            color: #2477F9 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(36, 119, 249, 0.14);
+        }
+
+        /* Top 4 KPI Summary Cards */
+        .st-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 1.35rem;
+        }
+
+        .st-kpi-card {
+            background-color: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-subtle, #e6edf7);
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 3px 14px rgba(15, 23, 42, 0.035);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .st-kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+        }
+
+        .st-kpi-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .st-kpi-icon.kpi-blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #2477F9 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(36, 119, 249, 0.25);
+        }
+
+        .st-kpi-icon.kpi-soft-blue {
+            background-color: #dcebff;
+            color: #2563eb;
+        }
+
+        .st-kpi-icon.kpi-green {
+            background: linear-gradient(135deg, #2ecc71 0%, #16a34a 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+        }
+
+        .st-kpi-icon.kpi-amber {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+        }
+
+        .st-kpi-meta {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .st-kpi-label {
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: var(--text-body, #334155);
+            line-height: 1.25;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .st-kpi-count {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-primary, #0b1f51);
+            line-height: 1.15;
+            margin: 2px 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .st-kpi-sub {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-muted, #64748b);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Modern Pill Navigation Tabs */
+        .st-tabs-nav {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            border-bottom: none;
+            margin-bottom: 1.25rem;
+        }
+
+        .st-tabs-nav .nav-link {
+            border: 1px solid transparent !important;
+            background-color: #e8eef7;
+            color: #334155 !important;
+            font-size: 0.88rem;
+            font-weight: 600;
+            padding: 9px 18px;
+            border-radius: 999px !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.18s ease;
+        }
+
+        .st-tabs-nav .nav-link:hover {
+            background-color: #dce5f3;
+            color: #0b1f51 !important;
+        }
+
+        .st-tabs-nav .nav-link.active {
+            background: linear-gradient(135deg, #2477F9 0%, #1757C1 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(36, 119, 249, 0.28);
+        }
+
+        .st-tab-badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            background-color: rgba(15, 23, 42, 0.08);
+            color: inherit;
+        }
+
+        .st-tabs-nav .nav-link.active .st-tab-badge {
+            background-color: rgba(255, 255, 255, 0.24);
+            color: #ffffff;
+        }
+
+        /* Filter & Search Toolbar */
+        .st-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 1.25rem;
+        }
+
+        .st-toolbar-left {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .st-toolbar-right {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .st-filter-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .st-filter-label {
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: var(--text-muted, #64748b);
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .st-select {
+            height: 40px;
+            padding: 6px 34px 6px 14px;
+            background-color: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #dfe7f2);
+            border-radius: 10px;
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: var(--text-primary, #1e293b);
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 15px 15px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .st-select:hover,
+        .st-select:focus {
+            border-color: #2477F9;
+            box-shadow: 0 0 0 3px rgba(36, 119, 249, 0.12);
+        }
+
+        .st-search-box {
+            position: relative;
+            width: 250px;
+            max-width: 100%;
+        }
+
+        .st-search-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            pointer-events: none;
+            display: inline-flex;
+        }
+
+        .st-search-input {
+            width: 100%;
+            height: 40px;
+            padding: 8px 34px 8px 36px;
+            background-color: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #dfe7f2);
+            border-radius: 10px;
+            font-size: 0.88rem;
+            color: var(--text-primary, #0b1f51);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .st-search-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .st-search-input:focus {
+            border-color: #2477F9;
+            box-shadow: 0 0 0 3px rgba(36, 119, 249, 0.12);
+        }
+
+        .st-search-clear {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            padding: 2px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none !important;
+        }
+
+        .st-search-clear:hover {
+            color: #ef4444;
+        }
+
+        .st-action-btn-light {
+            height: 40px;
+            padding: 0 14px;
+            border-radius: 10px;
+            background-color: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #dfe7f2);
+            color: var(--text-primary, #1e293b) !important;
+            font-size: 0.84rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            text-decoration: none !important;
+            transition: all 0.18s ease;
+        }
+
+        .st-action-btn-light:hover {
+            border-color: #2477F9;
+            color: #2477F9 !important;
+        }
+
+        /* Filter Pills Row */
+        .st-filter-pills {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .st-filter-pill {
+            padding: 7px 14px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background-color: #e8eef7;
+            color: #334155;
+            text-decoration: none !important;
+            border: 1px solid transparent;
+            transition: all 0.18s ease;
+        }
+
+        .st-filter-pill:hover {
+            background-color: #dce5f3;
+            color: #0b1f51;
+        }
+
+        .st-filter-pill.active {
+            background-color: #2477F9;
+            color: #ffffff;
+            box-shadow: 0 3px 10px rgba(36, 119, 249, 0.25);
+        }
+
+        /* Table Paper & Subtopic Cells */
+        .st-subtopic-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background-color: var(--subj-soft-bg, #ebf3ff);
+            color: var(--subj-soft-text, #1757C1) !important;
+            border: 1px solid var(--subj-soft-border, #bfdbfe);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-decoration: none !important;
+            white-space: nowrap;
+            transition: all 0.16s ease;
+        }
+
+        .st-subtopic-chip:hover {
+            background-color: var(--subj-color, #2477F9);
+            color: #ffffff !important;
+            border-color: transparent;
+        }
+
+        .st-paper-title {
+            font-size: 0.96rem;
+            font-weight: 700;
+            color: var(--text-primary, #0b1f51);
+            margin: 0 0 3px;
+            line-height: 1.3;
+        }
+
+        .st-paper-submeta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-muted, #64748b);
+        }
+
+        .st-qtime-primary {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-primary, #0b1f51);
+            line-height: 1.3;
+            white-space: nowrap;
+        }
+
+        .st-qtime-sub {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-muted, #64748b);
+            margin-top: 2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .st-status-sub {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--text-muted, #64748b);
+            margin-top: 4px;
+            white-space: nowrap;
+        }
+
+        .st-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: capitalize;
+            white-space: nowrap;
+        }
+
+        .st-pill-easy {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        .st-pill-medium {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+
+        .st-pill-hard {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        .st-pill-neutral {
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+
+        .st-pill-paused {
+            background-color: #fff7ed;
+            color: #ea580c;
+            border: 1px solid #fed7aa;
+        }
+
+        .st-pill-progress {
+            background-color: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+        }
+
+        .st-pill-done {
+            background-color: #f0fdf4;
+            color: #15803d;
+        }
+
+        .st-pill-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: currentColor;
+            display: inline-block;
+        }
+
+        .st-actions-cell {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        /* Start / Resume Buttons */
+        .st-btn-start {
+            padding: 7px 16px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #2477F9 0%, #1757C1 100%);
+            color: #ffffff !important;
+            border: none;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(36, 119, 249, 0.25);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .st-btn-start:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(36, 119, 249, 0.35);
+        }
+
+        .st-btn-resume {
+            padding: 7px 16px;
+            border-radius: 10px;
+            border: none;
+            color: #ffffff !important;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .st-btn-resume.is-paused {
+            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.28);
+        }
+
+        .st-btn-resume.is-active {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.28);
+        }
+
+        .st-btn-resume:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Attempt History Card & Table */
+        .st-card {
+            background-color: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-subtle, #e6edf7);
+            border-radius: 16px;
+            padding: 22px 24px;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.035);
+            margin-bottom: 1.5rem;
+        }
+
+        .st-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .st-card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary, #0b1f51);
+            margin: 0 0 2px;
+        }
+
+        .st-card-subtitle {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted, #64748b);
+            margin: 0;
+        }
+
+        .st-count-chip {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted, #64748b);
+            background-color: #f1f5f9;
+            padding: 5px 12px;
+            border-radius: 999px;
+        }
+
+        .st-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .st-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .st-table thead th {
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: var(--text-muted, #64748b);
+            padding: 10px 12px 12px;
+            border-bottom: 1px solid var(--border-subtle, #eef2f7);
+            white-space: nowrap;
+            text-align: left;
+        }
+
+        .st-table thead th.text-right {
+            text-align: right;
+        }
+
+        .st-table tbody tr {
+            border-bottom: 1px solid var(--border-subtle, #f1f5f9);
+            transition: background-color 0.16s ease;
+        }
+
+        .st-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .st-table tbody tr:hover {
+            background-color: #f8fbff;
+        }
+
+        .st-table tbody td {
+            padding: 13px 12px;
+            vertical-align: middle;
+            font-size: 0.88rem;
+            color: var(--text-body, #334155);
+        }
+
+        .st-acc-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 130px;
+        }
+
+        .st-acc-val {
+            font-weight: 700;
+            font-size: 0.86rem;
+            min-width: 36px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .st-acc-track {
+            flex: 1;
+            height: 8px;
+            border-radius: 999px;
+            background-color: #edf2f7;
+            overflow: hidden;
+        }
+
+        .st-acc-fill {
+            height: 100%;
+            border-radius: 999px;
+        }
+
+        .fill-strong {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+        }
+
+        .fill-developing {
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+        }
+
+        .fill-focus {
+            background: linear-gradient(90deg, #fb923c, #ef4444);
+        }
+
+        .st-btn-outline {
+            padding: 6px 14px;
+            border-radius: 9px;
+            background-color: var(--subj-soft-bg, #ebf3ff);
+            color: var(--subj-soft-text, #1757C1) !important;
+            border: 1px solid var(--subj-soft-border, #bfdbfe);
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none !important;
+            white-space: nowrap;
+            transition: all 0.16s ease;
+        }
+
+        .st-btn-outline:hover {
+            background-color: #2477F9;
+            color: #ffffff !important;
+            border-color: #2477F9;
+        }
+
+        /* Mobile Attempt Cards */
+        .st-mobile-attempt-card {
+            background-color: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-subtle, #e6edf7);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        /* Pagination */
+        .st-pagination-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.25rem;
+        }
+
+        .st-pagination-wrap .pagination {
+            margin-bottom: 0;
+            gap: 4px;
+        }
+
+        .st-pagination-wrap .page-link {
+            border-radius: 8px !important;
+            border: 1px solid var(--border-color, #dfe7f2);
+            color: var(--text-primary, #1e293b);
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 6px 12px;
+        }
+
+        .st-pagination-wrap .page-item.active .page-link {
+            background-color: #2477F9;
+            border-color: #2477F9;
+            color: #ffffff;
+        }
+
+        /* Empty States */
+        .st-empty-box {
+            text-align: center;
+            padding: 2.75rem 1.25rem;
+        }
+
+        .st-empty-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background-color: #eff6ff;
+            color: #2477F9;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        /* Guidance Banner */
+        .st-tip-banner {
+            background: linear-gradient(135deg, #eef4ff 0%, #e5efff 100%);
+            border: 1px solid #d5e5ff;
+            border-radius: 16px;
+            padding: 16px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .st-tip-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .st-tip-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background-color: #ffffff;
+            color: #2477F9;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(36, 119, 249, 0.12);
+        }
+
+        .st-tip-title {
+            font-size: 0.96rem;
+            font-weight: 700;
+            color: var(--text-primary, #0b1f51);
+            margin: 0 0 2px;
+        }
+
+        .st-tip-desc {
+            font-size: 0.85rem;
+            color: #475569;
+            margin: 0;
+        }
+
+        .st-tip-link {
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: #2477F9 !important;
+            text-decoration: none !important;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1199.98px) {
+            .st-kpi-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .st-search-box {
+                width: 100%;
+            }
+            .st-card {
+                padding: 18px 16px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .st-kpi-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dark Mode Support */
+        body.dark-layout .st-kpi-card,
+        body.dark-layout .st-card,
+        body.dark-layout .st-mobile-attempt-card,
+        body.dark-layout .st-header-pill-btn,
+        body.dark-layout .st-select,
+        body.dark-layout .st-search-input,
+        body.dark-layout .st-action-btn-light {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-layout .st-page-title,
+        body.dark-layout .st-kpi-count,
+        body.dark-layout .st-paper-title,
+        body.dark-layout .st-qtime-primary,
+        body.dark-layout .st-card-title,
+        body.dark-layout .st-tip-title,
+        body.dark-layout .st-header-pill-btn,
+        body.dark-layout .st-select,
+        body.dark-layout .st-search-input,
+        body.dark-layout .st-action-btn-light {
+            color: #f8fafc !important;
+        }
+
+        body.dark-layout .st-page-subtitle,
+        body.dark-layout .st-kpi-sub,
+        body.dark-layout .st-paper-submeta,
+        body.dark-layout .st-qtime-sub,
+        body.dark-layout .st-status-sub,
+        body.dark-layout .st-card-subtitle,
+        body.dark-layout .st-filter-label,
+        body.dark-layout .st-table thead th,
+        body.dark-layout .st-tip-desc {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-layout .st-kpi-label,
+        body.dark-layout .st-table tbody td {
+            color: #cbd5e1 !important;
+        }
+
+        body.dark-layout .st-table thead th,
+        body.dark-layout .st-table tbody tr {
+            border-color: #334155 !important;
+        }
+
+        body.dark-layout .st-table tbody tr:hover {
+            background-color: rgba(36, 119, 249, 0.08);
+        }
+
+        body.dark-layout .st-acc-track,
+        body.dark-layout .st-count-chip {
+            background-color: #0f172a;
+            color: #94a3b8;
+        }
+
+        body.dark-layout .st-filter-pill {
+            background-color: #1e293b;
+            color: #cbd5e1;
+            border-color: #334155;
+        }
+
+        body.dark-layout .st-filter-pill:hover {
+            background-color: #334155;
+            color: #ffffff;
+        }
+
+        body.dark-layout .st-filter-pill.active {
+            border-color: transparent;
+        }
+
+        body.dark-layout .st-tabs-nav .nav-link {
+            background-color: #1e293b;
+            color: #cbd5e1 !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-layout .st-tabs-nav .nav-link:hover {
+            background-color: #334155;
+            color: #ffffff !important;
+        }
+
+        body.dark-layout .st-tabs-nav .nav-link.active {
+            border-color: transparent !important;
+        }
+
+        body.dark-layout .st-kpi-icon.kpi-soft-blue {
+            background-color: rgba(37, 99, 235, 0.22);
+            color: #93c5fd;
+        }
+
+        body.dark-layout .st-pill-easy,
+        body.dark-layout .st-pill-done {
+            background-color: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+        }
+
+        body.dark-layout .st-pill-medium {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #fde68a;
+        }
+
+        body.dark-layout .st-pill-hard {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+
+        body.dark-layout .st-pill-paused {
+            background-color: rgba(249, 115, 22, 0.2);
+            border-color: rgba(249, 115, 22, 0.35);
+            color: #fdba74;
+        }
+
+        body.dark-layout .st-pill-progress {
+            background-color: rgba(36, 119, 249, 0.2);
+            border-color: rgba(59, 130, 246, 0.35);
+            color: #93c5fd;
+        }
+
+        body.dark-layout .st-pill-neutral {
+            background-color: rgba(148, 163, 184, 0.16);
+            color: #cbd5e1;
+        }
+
+        body.dark-layout .st-tip-banner {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.16) 0%, rgba(30, 41, 59, 0.95) 100%);
+            border-color: #334155;
+        }
+
+        body.dark-layout .st-tip-icon {
+            background-color: #0f172a;
+            color: #60a5fa;
+        }
+
+        body.dark-layout .st-pagination-wrap .page-link {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-layout .st-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        }
+    </style>
+@endpush
 
 @section('content')
     @php
-        // Calculate statistics for header progress
-        $totalSubtopicsCount = $subtopics->count();
-        $totalPapersCount = 0;
-        $completedPapersCount = 0;
+        $theme = $subjectTheme ?? [
+            'color'       => '#2477F9',
+            'gradient'    => 'linear-gradient(135deg, #2477F9 0%, #1757C1 100%)',
+            'soft_bg'     => '#EBF3FF',
+            'soft_text'   => '#1757C1',
+            'soft_border' => '#BFDBFE',
+            'icon'        => 'layers',
+        ];
 
-        foreach ($subtopics as $sub) {
-            $totalPapersCount += $sub->papers->count();
-            foreach ($sub->papers as $p) {
-                if ($p->completed_attempts_count > 0) {
-                    $completedPapersCount++;
-                }
-            }
-        }
-        $completionRate = $totalPapersCount > 0 ? round(($completedPapersCount / $totalPapersCount) * 100) : 0;
+        $subtopicsTotal = $totalSubtopicsCount ?? $subtopics->count();
+        $papersTotal = $totalPapersCount ?? $subtopics->sum(fn($s) => $s->papers->count());
+        $papersCompleted = $completedPapersCount ?? 0;
+        $topicPct = $completionRate ?? ($papersTotal > 0 ? (int) round(($papersCompleted / $papersTotal) * 100) : 0);
+        $avgAcc = $averageAccuracy ?? null;
+
+        $activeTab = (request()->filled('attempt_paper_name') || request()->filled('attempt_subtopic_id') || request()->filled('attempt_status') || request()->has('attempts_page'))
+            ? 'attempts'
+            : 'papers';
+
+        $backUrl = $subject
+            ? route('student.assessments.topics', $subject->id)
+            : route('student.assessments');
     @endphp
 
-    <div class="app-content content">
+    <div class="app-content content"
+         style="--subj-color: {{ $theme['color'] }};
+                --subj-gradient: {{ $theme['gradient'] }};
+                --subj-soft-bg: {{ $theme['soft_bg'] }};
+                --subj-soft-text: {{ $theme['soft_text'] }};
+                --subj-soft-border: {{ $theme['soft_border'] }};">
         <div class="content-overlay"></div>
         <div class="header-navbar-shadow"></div>
         <div class="content-wrapper">
-
-            <!-- Breadcrumbs -->
-            <div class="content-header row">
-                <div class="content-header-left col-md-9 col-12 mb-3">
-                    <div class="row breadcrumbs-top">
-                        <div class="col-12">
-                            <div class="breadcrumb-wrapper col-12">
-                                <ol class="breadcrumb-modern">
-                                    <li class="breadcrumb-modern-item"><a
-                                            href="{{ route('student.dashboard') }}">Dashboard</a></li>
-                                    <li class="breadcrumb-modern-item"><a
-                                            href="{{ route('student.assessments') }}">Assessments</a></li>
-                                    <li class="breadcrumb-modern-item"><a
-                                            href="{{ route('student.assessments.topics', $subject->id) }}">Topics</a></li>
-                                    <li class="breadcrumb-modern-item active">Subtopics</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="content-body">
 
-                <!-- Topic Hero & Statistics Card -->
-                <div class="topic-hero-card card border-0 shadow-sm overflow-hidden mb-4">
-                    <div class="card-body p-4 position-relative">
-                        <div class="hero-bg-shapes">
-                            <div class="shape shape-1"></div>
-                            <div class="shape shape-2"></div>
+                <!-- Breadcrumb Trail -->
+                <nav class="st-breadcrumb" aria-label="Breadcrumb">
+                    <a href="{{ route('student.dashboard') }}">Dashboard</a>
+                    <span class="st-breadcrumb-sep">/</span>
+                    <a href="{{ route('student.assessments') }}">Assessments</a>
+                    @if($subject)
+                        <span class="st-breadcrumb-sep">/</span>
+                        <a href="{{ route('student.assessments.topics', $subject->id) }}">{{ $subject->title }} Topics</a>
+                    @endif
+                    <span class="st-breadcrumb-sep">/</span>
+                    <span>{{ $topic->name }}</span>
+                </nav>
+
+                <!-- Page Header -->
+                <div class="st-page-header">
+                    <div class="st-header-left">
+                        <div class="st-subject-avatar">
+                            @if($subject && !empty($subject->image))
+                                <img src="{{ asset('storage/' . $subject->image) }}"
+                                     alt="{{ $subject->title }}"
+                                     onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none');">
+                                <span class="d-none">
+                                    @if($theme['icon'] === 'book-open')
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M11.2 5.2C9.5 4.2 7.1 3.7 4 4a1 1 0 0 0-.9 1v13.2a1 1 0 0 0 1.1 1c2.8-.3 5.2.3 6.9 1.3V5.2zm1.6 0v15.3c1.7-1 4.1-1.6 6.9-1.3a1 1 0 0 0 1.1-1V5a1 1 0 0 0-.9-1c-3.1-.3-5.5.2-7.1 1.2z"/>
+                                        </svg>
+                                    @elseif($theme['icon'] === 'calculator')
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm1.5 3.5v3h9v-3h-9zm1 5.5a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zm3.5 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zm3.5 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zm-7 4a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zm3.5 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zm3.5 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4z"/>
+                                        </svg>
+                                    @elseif($theme['icon'] === 'brain')
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04z"/>
+                                            <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z"/>
+                                        </svg>
+                                    @else
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                                            <polyline points="2 17 12 22 22 17"/>
+                                            <polyline points="2 12 12 17 22 12"/>
+                                        </svg>
+                                    @endif
+                                </span>
+                            @else
+                                @if($theme['icon'] === 'book-open')
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M11.2 5.2C9.5 4.2 7.1 3.7 4 4a1 1 0 0 0-.9 1v13.2a1 1 0 0 0 1.1 1c2.8-.3 5.2.3 6.9 1.3V5.2zm1.6 0v15.3c1.7-1 4.1-1.6 6.9-1.3a1 1 0 0 0 1.1-1V5a1 1 0 0 0-.9-1c-3.1-.3-5.5.2-7.1 1.2z"/>
+                                    </svg>
+                                @elseif($theme['icon'] === 'calculator')
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm1.5 3.5v3h9v-3h-9zm1 5.5a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zm3.5 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zm3.5 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zm-7 4a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zm3.5 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zm3.5 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4z"/>
+                                    </svg>
+                                @elseif($theme['icon'] === 'brain')
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04z"/>
+                                        <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z"/>
+                                    </svg>
+                                @else
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                                        <polyline points="2 17 12 22 22 17"/>
+                                        <polyline points="2 12 12 17 22 12"/>
+                                    </svg>
+                                @endif
+                            @endif
                         </div>
-                        <div class="row align-items-center position-relative">
-                            <div class="col-lg-8 col-md-12 mb-3 mb-lg-0">
-                                <div class="d-flex align-items-center flex-wrap mb-2">
-                                    <span class="badge badge-hero-category text-uppercase mr-2">{{ $subject->title }}</span>
-                                    <span class="badge badge-hero-tag text-uppercase"><i
-                                            class="feather icon-award mr-1"></i>Practicing</span>
-                                </div>
-                                <h1 class="text-white font-weight-extrabold hero-title mb-2">{{ $topic->name }}</h1>
-                                <p class="text-white opacity-75 font-medium-1 mb-0">Master each subtopic by taking practice
-                                    papers. Track your attempts and view immediate detailed feedback.</p>
+
+                        <div>
+                            <div class="st-title-meta-row">
+                                <h1 class="st-page-title">{{ $topic->name }}</h1>
+                                @if($subject)
+                                    <span class="st-subj-tag">{{ $subject->title }}</span>
+                                @endif
                             </div>
-                            <div class="col-lg-4 col-md-12">
-                                <div class="hero-stats-card p-3 rounded shadow-xs">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="text-white font-weight-bold">Topic Progress</span>
-                                        <span
-                                            class="text-white font-weight-bold font-medium-2">{{ $completionRate }}%</span>
-                                    </div>
-                                    <div class="progress progress-hero mb-3">
-                                        <div class="progress-bar bg-white-progress" role="progressbar"
-                                            style="width: {{ $completionRate }}%" aria-valuenow="{{ $completionRate }}"
-                                            aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                    <div class="row text-center text-white pt-2 border-top border-white-opacity">
-                                        <div class="col-4 border-right border-white-opacity">
-                                            <div class="font-weight-bold font-medium-3">{{ $totalSubtopicsCount }}</div>
-                                            <div class="font-small-2 text-light-opacity">Subtopics</div>
-                                        </div>
-                                        <div class="col-4 border-right border-white-opacity">
-                                            <div class="font-weight-bold font-medium-3">{{ $totalPapersCount }}</div>
-                                            <div class="font-small-2 text-light-opacity">Papers</div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="font-weight-bold font-medium-3 text-success-light">
-                                                {{ $completedPapersCount }}
-                                            </div>
-                                            <div class="font-small-2 text-light-opacity">Done</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <p class="st-page-subtitle">
+                                Practice subtopic papers, resume paused tests, and review your attempt history.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="st-header-actions">
+                        <a href="{{ $backUrl }}" class="st-header-pill-btn">
+                            <i class="feather icon-arrow-left"></i>
+                            <span>Back to Topics</span>
+                        </a>
+                        <a href="{{ route('student.focusareas') }}" class="st-header-pill-btn">
+                            <i class="feather icon-crosshair text-danger"></i>
+                            <span>Focus Areas</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Top Row: 4 KPI Summary Cards -->
+                <div class="st-kpi-grid">
+                    <div class="st-kpi-card">
+                        <div class="st-kpi-icon kpi-blue">
+                            <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                                <polyline points="2 17 12 22 22 17"/>
+                                <polyline points="2 12 12 17 22 12"/>
+                            </svg>
+                        </div>
+                        <div class="st-kpi-meta">
+                            <span class="st-kpi-label">Subtopics</span>
+                            <span class="st-kpi-count">{{ $subtopicsTotal }}</span>
+                            <span class="st-kpi-sub">Under {{ $topic->name }}</span>
+                        </div>
+                    </div>
+
+                    <div class="st-kpi-card">
+                        <div class="st-kpi-icon kpi-soft-blue">
+                            <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="9" y1="13" x2="15" y2="13"/>
+                                <line x1="9" y1="17" x2="13" y2="17"/>
+                            </svg>
+                        </div>
+                        <div class="st-kpi-meta">
+                            <span class="st-kpi-label">Practice Papers</span>
+                            <span class="st-kpi-count">{{ $papersTotal }}</span>
+                            <span class="st-kpi-sub">Available to practice</span>
+                        </div>
+                    </div>
+
+                    <div class="st-kpi-card">
+                        <div class="st-kpi-icon kpi-green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        </div>
+                        <div class="st-kpi-meta">
+                            <span class="st-kpi-label">Completed</span>
+                            <span class="st-kpi-count">{{ $papersCompleted }}</span>
+                            <span class="st-kpi-sub">{{ $topicPct }}% topic progress</span>
+                        </div>
+                    </div>
+
+                    <div class="st-kpi-card">
+                        <div class="st-kpi-icon kpi-amber">
+                            <svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2.5l2.85 5.78 6.38.93-4.61 4.5 1.09 6.35L12 17.06l-5.71 3 1.09-6.35-4.61-4.5 6.38-.93L12 2.5z"/>
+                            </svg>
+                        </div>
+                        <div class="st-kpi-meta">
+                            <span class="st-kpi-label">Average Accuracy</span>
+                            <span class="st-kpi-count">{{ $avgAcc !== null ? $avgAcc . '%' : '—' }}</span>
+                            <span class="st-kpi-sub">
+                                @if($avgAcc === null)
+                                    Take a test to score
+                                @elseif($avgAcc >= 80)
+                                    Strong mastery
+                                @elseif($avgAcc >= 61)
+                                    Getting better
+                                @else
+                                    Keep practicing
+                                @endif
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                @php
-                    $activeTab = (request()->filled('attempt_paper_name') || request()->filled('attempt_subtopic_id') || request()->filled('attempt_status') || request()->has('attempts_page'))
-                        ? 'attempts'
-                        : 'papers';
-                @endphp
-
                 <!-- Navigation Tabs -->
-                <ul class="nav nav-tabs modern-tabs mb-4" id="assessmentTabs" role="tablist">
+                <ul class="nav st-tabs-nav" id="assessmentTabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link {{ $activeTab === 'papers' ? 'active' : '' }}" id="papers-tab" data-toggle="tab"
-                            href="#papers-content" role="tab" aria-controls="papers-content"
-                            aria-selected="{{ $activeTab === 'papers' ? 'true' : 'false' }}">
-                            <i class="feather icon-book-open mr-2"></i> Practice Papers
+                        <a class="nav-link {{ $activeTab === 'papers' ? 'active' : '' }}"
+                           id="papers-tab"
+                           data-toggle="tab"
+                           href="#papers-content"
+                           role="tab"
+                           aria-controls="papers-content"
+                           aria-selected="{{ $activeTab === 'papers' ? 'true' : 'false' }}">
+                            <i class="feather icon-book-open"></i>
+                            <span>Practice Papers</span>
+                            <span class="st-tab-badge">{{ $papersTotal }}</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ $activeTab === 'attempts' ? 'active' : '' }}" id="attempts-tab"
-                            data-toggle="tab" href="#attempts-content" role="tab" aria-controls="attempts-content"
-                            aria-selected="{{ $activeTab === 'attempts' ? 'true' : 'false' }}">
-                            <i class="feather icon-clock mr-2"></i> Attempt History & Results
+                        <a class="nav-link {{ $activeTab === 'attempts' ? 'active' : '' }}"
+                           id="attempts-tab"
+                           data-toggle="tab"
+                           href="#attempts-content"
+                           role="tab"
+                           aria-controls="attempts-content"
+                           aria-selected="{{ $activeTab === 'attempts' ? 'true' : 'false' }}">
+                            <i class="feather icon-clock"></i>
+                            <span>Attempt History &amp; Results</span>
                             @if($attempts->total() > 0)
-                                <span class="badge badge-pill badge-primary ml-2">{{ $attempts->total() }}</span>
+                                <span class="st-tab-badge">{{ $attempts->total() }}</span>
                             @endif
                         </a>
                     </li>
                 </ul>
 
                 <!-- Tab Contents -->
-                <div class="tab-content modern-tab-content" id="assessmentTabsContent">
-                    <!-- Practice Papers Tab Pane -->
-                    <div class="tab-pane fade {{ $activeTab === 'papers' ? 'show active' : '' }}" id="papers-content"
-                        role="tabpanel" aria-labelledby="papers-tab">
+                <div class="tab-content mt-2" id="assessmentTabsContent">
 
-                        <!-- Search & Filters -->
-                        <div class="card search-filter-card mb-4 shadow-sm border-0">
-                            <div class="card-body p-3">
-                                <form method="GET" action="{{ route('student.topics.subtopics', $topic->id) }}"
-                                    class="row align-items-end">
-                                    @foreach(request()->except(['subtopic_name', 'paper_name', 'page']) as $key => $value)
-                                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                                    @endforeach
-                                    <div class="col-md-5 col-sm-12 mb-3 mb-md-0">
-                                        <label for="subtopic_name" class="filter-label"><i
-                                                class="feather icon-layers mr-1"></i>Filter by Subtopic</label>
-                                        <div class="custom-select-wrapper">
-                                            <select name="subtopic_name" id="subtopic_name"
-                                                class="form-control select-modern">
-                                                <option value="">-- All Subtopics --</option>
-                                                @foreach($allSubtopics as $sub)
-                                                    <option value="{{ $sub->name }}" {{ request('subtopic_name') == $sub->name ? 'selected' : '' }}>
-                                                        {{ $sub->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            <i class="feather icon-chevron-down select-chevron"></i>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-5 col-sm-12 mb-3 mb-md-0">
-                                        <label for="paper_name" class="filter-label"><i
-                                                class="feather icon-file-text mr-1"></i>Search Paper Name</label>
-                                        <div class="position-relative has-icon-left">
-                                            <input type="text" name="paper_name" id="paper_name"
-                                                class="form-control input-modern" placeholder="Search papers..."
-                                                value="{{ request('paper_name') }}">
-                                            <div class="form-control-position">
-                                                <i class="feather icon-search"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 col-sm-12 d-flex">
-                                        <button type="submit" class="btn btn-primary btn-modern mr-2 flex-grow-1">
-                                            <i class="feather icon-filter mr-1"></i> Filter
-                                        </button>
-                                        @if(request()->filled('subtopic_name') || request()->filled('paper_name'))
-                                            @php
-                                                $clearMainParams = request()->except(['subtopic_name', 'paper_name', 'page']);
-                                            @endphp
-                                            <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearMainParams) }}"
-                                                class="btn btn-outline-danger btn-modern-danger" title="Clear Filters">
-                                                <i class="feather icon-x"></i>
-                                            </a>
-                                        @endif
-                                    </div>
-                                </form>
+                    <!-- Tab 1: Practice Papers -->
+                    <div class="tab-pane fade {{ $activeTab === 'papers' ? 'show active' : '' }}"
+                         id="papers-content"
+                         role="tabpanel"
+                         aria-labelledby="papers-tab">
+
+                        @php
+                            $currentPaperStatus = $paperStatusFilter ?? 'all';
+                            $currentPaperDifficulty = $paperDifficultyFilter ?? '';
+                            $currentPaperSort = $paperSortBy ?? 'subtopic_asc';
+                            $hasActivePaperFilter = request()->filled('subtopic_name')
+                                || request()->filled('paper_name')
+                                || $currentPaperStatus !== 'all'
+                                || $currentPaperDifficulty !== ''
+                                || $currentPaperSort !== 'subtopic_asc';
+
+                            $paperBaseParams = [];
+                            foreach (request()->except(['paper_status', 'papers_page']) as $k => $v) {
+                                if (!is_array($v)) {
+                                    $paperBaseParams[$k] = $v;
+                                }
+                            }
+                            $clearMainParams = [];
+                            foreach (request()->except(['subtopic_name', 'paper_name', 'paper_status', 'paper_difficulty', 'paper_sort', 'papers_page']) as $k => $v) {
+                                if (!is_array($v)) {
+                                    $clearMainParams[$k] = $v;
+                                }
+                            }
+                        @endphp
+
+                        <!-- Toolbar Row 1: Status Filter Pills & Clear -->
+                        <div class="st-toolbar mb-1">
+                            <div class="st-filter-pills" role="tablist" aria-label="Filter papers by status">
+                                <a href="{{ route('student.topics.subtopics', [$topic->id] + $paperBaseParams) }}"
+                                   class="st-filter-pill {{ $currentPaperStatus === 'all' ? 'active' : '' }}">
+                                    All ({{ $paperStatusCounts['all'] ?? 0 }})
+                                </a>
+                                <a href="{{ route('student.topics.subtopics', [$topic->id] + $paperBaseParams + ['paper_status' => 'in-progress']) }}"
+                                   class="st-filter-pill {{ $currentPaperStatus === 'in-progress' ? 'active' : '' }}">
+                                    In Progress ({{ $paperStatusCounts['in-progress'] ?? 0 }})
+                                </a>
+                                <a href="{{ route('student.topics.subtopics', [$topic->id] + $paperBaseParams + ['paper_status' => 'completed']) }}"
+                                   class="st-filter-pill {{ $currentPaperStatus === 'completed' ? 'active' : '' }}">
+                                    Completed ({{ $paperStatusCounts['completed'] ?? 0 }})
+                                </a>
+                                <a href="{{ route('student.topics.subtopics', [$topic->id] + $paperBaseParams + ['paper_status' => 'not-started']) }}"
+                                   class="st-filter-pill {{ $currentPaperStatus === 'not-started' ? 'active' : '' }}">
+                                    Not Started ({{ $paperStatusCounts['not-started'] ?? 0 }})
+                                </a>
                             </div>
+
+                            @if($hasActivePaperFilter)
+                                <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearMainParams) }}"
+                                   class="st-action-btn-light text-danger">
+                                    <i class="feather icon-x"></i>
+                                    <span>Clear Filters</span>
+                                </a>
+                            @endif
                         </div>
 
-                        <!-- Subtopics List -->
-                        <div class="subtopics-list">
-                            @forelse($subtopics as $subtopic)
-                                @php
-                                    $subtopicPapersCount = $subtopic->papers->count();
-                                    $subtopicCompletedCount = $subtopic->papers->where('completed_attempts_count', '>', 0)->count();
-                                    $subtopicProgress = $subtopicPapersCount > 0 ? round(($subtopicCompletedCount / $subtopicPapersCount) * 100) : 0;
-                                @endphp
-                                <div class="subtopic-card card shadow-sm border-0 mb-3 overflow-hidden">
-                                    <!-- Accordion Header -->
-                                    <div class="subtopic-header d-flex justify-content-between align-items-center py-3 px-4 clickable"
-                                        data-toggle="collapse" data-target="#collapseSubtopic{{ $subtopic->id }}"
-                                        aria-expanded="true" aria-controls="collapseSubtopic{{ $subtopic->id }}">
-                                        <div class="d-flex align-items-center">
-                                            <div class="subtopic-bullet mr-3"></div>
-                                            <div>
-                                                <h5 class="mb-1 text-dark font-weight-bold subtopic-title">{{ $subtopic->name }}
-                                                </h5>
-                                                <div class="d-flex align-items-center font-small-3 flex-wrap">
-                                                    <span class="mr-2">Completed {{ $subtopicCompletedCount }} of
-                                                        {{ $subtopicPapersCount }} papers</span>
-                                                    <div class="subtopic-mini-progress d-none d-sm-block">
-                                                        <div class="subtopic-mini-bar" style="width: {{ $subtopicProgress }}%">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <span class="badge badge-square badge-info badge-papers-count mr-3">
-                                                {{ $subtopicPapersCount }}
-                                                {{ \Illuminate\Support\Str::plural('Paper', $subtopicPapersCount) }}
-                                            </span>
-                                            <div class="chevron-box">
-                                                <i class="feather icon-chevron-down collapse-icon"></i>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <!-- Toolbar Row 2: Subtopic, Difficulty, Sort & Search -->
+                        <form method="GET" action="{{ route('student.topics.subtopics', $topic->id) }}" class="st-toolbar">
+                            @foreach(request()->except(['subtopic_name', 'paper_name', 'paper_difficulty', 'paper_sort', 'papers_page']) as $key => $value)
+                                @if(!is_array($value))
+                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @endif
+                            @endforeach
 
-                                    <!-- Accordion Content -->
-                                    <div id="collapseSubtopic{{ $subtopic->id }}" class="collapse show">
-                                        <div class="card-body p-0 border-top-light">
-                                            @forelse($subtopic->papers as $paper)
-                                                <div
-                                                    class="paper-row border-bottom p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-
-                                                    <!-- Paper Info -->
-                                                    <div class="mb-3 mb-md-0 max-width-70">
-                                                        <div class="d-flex align-items-center flex-wrap mb-2">
-                                                            <h6 class="mb-0 font-weight-bold text-dark paper-title mr-3">
-                                                                {{ $paper->title }}
-                                                            </h6>
-
-                                                            @php
-                                                                $difficultyColors = [
-                                                                    'easy' => 'badge-soft-success',
-                                                                    'medium' => 'badge-soft-warning',
-                                                                    'hard' => 'badge-soft-danger'
-                                                                ];
-                                                                $diffColor = $difficultyColors[$paper->difficulty] ?? 'badge-soft-secondary';
-                                                            @endphp
-                                                            <span class="badge badge-pill {{ $diffColor }} text-capitalize mr-2">
-                                                                <span class="badge-dot mr-1"></span>{{ $paper->difficulty }}
-                                                            </span>
-
-                                                            @if($paper->active_attempt)
-                                                                @if($paper->active_attempt->status == 'paused')
-                                                                    <span class="badge badge-pill badge-soft-paused pulse-warning mr-2">
-                                                                        <span class="badge-dot mr-1"></span>Paused
-                                                                    </span>
-                                                                @else
-                                                                    <span class="badge badge-pill badge-soft-progress pulse-info mr-2">
-                                                                        <span class="badge-dot mr-1"></span>In Progress
-                                                                    </span>
-                                                                @endif
-                                                            @endif
-                                                        </div>
-
-                                                        <div
-                                                            class="d-flex align-items-center font-small-3 flex-wrap paper-meta">
-                                                            <span class="mr-4"><i
-                                                                    class="feather icon-help-circle text-primary mr-1"></i><strong>{{ $paper->questions_count ?? $paper->questions()->count() }}</strong>
-                                                                Questions</span>
-                                                            <span class="mr-4"><i
-                                                                    class="feather icon-clock text-success mr-1"></i><strong>{{ $paper->total_time ? $paper->total_time . ' mins' : 'Unlimited' }}</strong>
-                                                                Duration</span>
-                                                            <span><i
-                                                                    class="feather icon-check-square text-info mr-1"></i><strong>{{ $paper->completed_attempts_count }}</strong>
-                                                                Completed</span>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Paper Action Buttons -->
-                                                    <div class="d-flex align-items-center paper-actions">
-                                                        <!-- Action form -->
-                                                        <form action="{{ route('student.papers.start', $paper->id) }}" method="POST"
-                                                            class="mb-0 mr-2">
-                                                            @csrf
-                                                            @if($paper->active_attempt)
-                                                                @if($paper->active_attempt->status == 'paused')
-                                                                    <button type="submit"
-                                                                        class="btn btn-warning text-white btn-sm px-4 font-weight-bold btn-resume btn-resume-paused">
-                                                                        Resume <i class="feather icon-play ml-1"></i>
-                                                                    </button>
-                                                                @else
-                                                                    <button type="submit"
-                                                                        class="btn btn-info btn-sm px-4 font-weight-bold btn-resume btn-resume-in-progress">
-                                                                        Resume <i class="feather icon-play ml-1"></i>
-                                                                    </button>
-                                                                @endif
-                                                            @else
-                                                                <button type="button"
-                                                                    class="btn btn-primary btn-sm px-4 font-weight-bold btn-start btn-start-trigger"
-                                                                    data-paper-id="{{ $paper->id }}"
-                                                                    data-paper-title="{{ $paper->title }}"
-                                                                    data-paper-questions="{{ $paper->questions_count ?? $paper->questions()->count() }}"
-                                                                    data-paper-time="{{ $paper->total_time ? $paper->total_time . ' mins' : 'Unlimited' }}"
-                                                                    data-paper-difficulty="{{ strtolower($paper->difficulty) }}"
-                                                                    data-paper-instruction="{!! e($paper->instruction ?? 'No specific instructions provided. Answer all questions to the best of your ability.') !!}"
-                                                                    data-action-url="{{ route('student.papers.start', $paper->id) }}">
-                                                                    Start <i class="feather icon-arrow-right ml-1"></i>
-                                                                </button>
-                                                            @endif
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            @empty
-                                                <div class="p-5 text-center empty-state-subtopic">
-                                                    <div class="empty-icon-box mb-3">
-                                                        <i class="feather icon-file font-large-1 text-warning"></i>
-                                                    </div>
-                                                    <h6 class="font-weight-bold text-dark mb-1">No Papers Available</h6>
-                                                    <p class="mb-0 font-small-3">There are no practice papers available for this
-                                                        subtopic
-                                                        currently.</p>
-                                                </div>
-                                            @endforelse
-                                        </div>
-                                    </div>
+                            <div class="st-toolbar-left">
+                                <div class="st-filter-group">
+                                    <label for="subtopic_name" class="st-filter-label">Subtopic:</label>
+                                    <select name="subtopic_name" id="subtopic_name" class="st-select" onchange="this.form.submit()">
+                                        <option value="">All Subtopics</option>
+                                        @foreach($allSubtopics as $sub)
+                                            <option value="{{ $sub->name }}" {{ request('subtopic_name') == $sub->name ? 'selected' : '' }}>
+                                                {{ $sub->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
-                            @empty
-                                <div class="card shadow-sm border-0 p-5 text-center empty-state-main">
-                                    <div class="empty-state-illustrate mb-3">
-                                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                                            class="text-warning animated-svg">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <line x1="12" y1="8" x2="12" y2="12"></line>
-                                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+
+                                <div class="st-filter-group">
+                                    <label for="paper_difficulty" class="st-filter-label">Difficulty:</label>
+                                    <select name="paper_difficulty" id="paper_difficulty" class="st-select" onchange="this.form.submit()">
+                                        <option value="">All Levels</option>
+                                        <option value="easy" {{ $currentPaperDifficulty === 'easy' ? 'selected' : '' }}>Easy</option>
+                                        <option value="medium" {{ $currentPaperDifficulty === 'medium' ? 'selected' : '' }}>Medium</option>
+                                        <option value="hard" {{ $currentPaperDifficulty === 'hard' ? 'selected' : '' }}>Hard</option>
+                                    </select>
+                                </div>
+
+                                <div class="st-filter-group">
+                                    <label for="paper_sort" class="st-filter-label">Sort by:</label>
+                                    <select name="paper_sort" id="paper_sort" class="st-select" onchange="this.form.submit()">
+                                        <option value="subtopic_asc" {{ $currentPaperSort === 'subtopic_asc' ? 'selected' : '' }}>Subtopic (A to Z)</option>
+                                        <option value="paper_asc" {{ $currentPaperSort === 'paper_asc' ? 'selected' : '' }}>Paper Name (A to Z)</option>
+                                        <option value="paper_desc" {{ $currentPaperSort === 'paper_desc' ? 'selected' : '' }}>Paper Name (Z to A)</option>
+                                        <option value="difficulty_asc" {{ $currentPaperSort === 'difficulty_asc' ? 'selected' : '' }}>Difficulty</option>
+                                        <option value="questions_desc" {{ $currentPaperSort === 'questions_desc' ? 'selected' : '' }}>Most Questions</option>
+                                        <option value="status" {{ $currentPaperSort === 'status' ? 'selected' : '' }}>Status</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="st-toolbar-right">
+                                <div class="st-search-box">
+                                    <span class="st-search-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="11" cy="11" r="8"/>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                                         </svg>
-                                    </div>
-                                    <h4 class="font-weight-bold text-dark mb-2">No Subtopics Found</h4>
-                                    <p class="mb-4">No subtopics matched your filter or are configured for this topic.</p>
-                                    @if(request()->filled('subtopic_name') || request()->filled('paper_name'))
-                                        <div>
-                                            <a href="{{ route('student.topics.subtopics', $topic->id) }}"
-                                                class="btn btn-primary btn-modern px-4 py-2">
-                                                <i class="feather icon-rotate-ccw mr-1"></i> Clear Filters
-                                            </a>
-                                        </div>
+                                    </span>
+                                    <input type="text"
+                                           name="paper_name"
+                                           id="paper_name"
+                                           class="st-search-input"
+                                           placeholder="Search papers..."
+                                           value="{{ request('paper_name') }}"
+                                           autocomplete="off"
+                                           aria-label="Search papers">
+                                    @if(request()->filled('paper_name'))
+                                        @php
+                                            $clearPaperParams = [];
+                                            foreach (request()->except(['paper_name', 'papers_page']) as $k => $v) {
+                                                if (!is_array($v)) {
+                                                    $clearPaperParams[$k] = $v;
+                                                }
+                                            }
+                                        @endphp
+                                        <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearPaperParams) }}"
+                                           class="st-search-clear"
+                                           title="Clear paper search"
+                                           aria-label="Clear paper search">
+                                            <i class="feather icon-x"></i>
+                                        </a>
                                     @endif
                                 </div>
-                            @endforelse
-                        </div> <!-- subtopics-list -->
+                            </div>
+                        </form>
 
-                    </div> <!-- Practice Papers Tab Pane -->
+                        <!-- Subtopics & Practice Papers Directory Table Card -->
+                        <div class="st-card">
+                            <div class="st-card-header">
+                                <div>
+                                    <h2 class="st-card-title">Subtopics &amp; Practice Papers</h2>
+                                    <p class="st-card-subtitle">Browse subtopic papers, track completion status, and launch or resume a test.</p>
+                                </div>
+                                @if($paperRows->total() > 0)
+                                    <span class="st-count-chip">
+                                        Showing {{ $paperRows->firstItem() }}–{{ $paperRows->lastItem() }} of {{ $paperRows->total() }}
+                                    </span>
+                                @endif
+                            </div>
 
-                    <!-- Attempt History & Results Tab Pane -->
-                    <div class="tab-pane fade {{ $activeTab === 'attempts' ? 'show active' : '' }}" id="attempts-content"
-                        role="tabpanel" aria-labelledby="attempts-tab">
-                        <div class="card attempt-history-card shadow-sm border-0 overflow-hidden">
-                            <div class="card-body p-4">
-
-                                <!-- Attempt Filters -->
-                                <form method="GET" action="{{ route('student.topics.subtopics', $topic->id) }}"
-                                    class="mb-4">
-                                    @foreach(request()->except(['attempt_paper_name', 'attempt_subtopic_id', 'attempt_status', 'attempts_page']) as $key => $value)
-                                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                                    @endforeach
-                                    <div class="row align-items-end">
-                                        <div class="col-md-4 col-sm-12 mb-3 mb-md-0">
-                                            <label for="attempt_paper_name" class="filter-label"><i
-                                                    class="feather icon-file-text mr-1"></i>Search Paper Name</label>
-                                            <div class="position-relative has-icon-left">
-                                                <input type="text" name="attempt_paper_name" id="attempt_paper_name"
-                                                    class="form-control input-modern" placeholder="Search attempts..."
-                                                    value="{{ request('attempt_paper_name') }}">
-                                                <div class="form-control-position">
-                                                    <i class="feather icon-search"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3 col-sm-12 mb-3 mb-md-0">
-                                            <label for="attempt_subtopic_id" class="filter-label"><i
-                                                    class="feather icon-layers mr-1"></i>Filter by Subtopic</label>
-                                            <div class="custom-select-wrapper">
-                                                <select name="attempt_subtopic_id" id="attempt_subtopic_id"
-                                                    class="form-control select-modern">
-                                                    <option value="">-- All Subtopics --</option>
-                                                    @foreach($allSubtopics as $sub)
-                                                        <option value="{{ $sub->id }}" {{ request('attempt_subtopic_id') == $sub->id ? 'selected' : '' }}>
-                                                            {{ $sub->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                <i class="feather icon-chevron-down select-chevron"></i>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3 col-sm-12 mb-3 mb-md-0">
-                                            <label for="attempt_status" class="filter-label"><i
-                                                    class="feather icon-activity mr-1"></i>Filter by Status</label>
-                                            <div class="custom-select-wrapper">
-                                                <select name="attempt_status" id="attempt_status"
-                                                    class="form-control select-modern">
-                                                    <option value="">-- All Statuses --</option>
-                                                    <option value="completed" {{ request('attempt_status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                                                    <option value="in_progress" {{ request('attempt_status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                                                    <option value="paused" {{ request('attempt_status') == 'paused' ? 'selected' : '' }}>Paused</option>
-                                                </select>
-                                                <i class="feather icon-chevron-down select-chevron"></i>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2 col-sm-12 d-flex">
-                                            <button type="submit" class="btn btn-primary btn-modern mr-2 flex-grow-1">
-                                                <i class="feather icon-filter mr-1"></i> Filter
-                                            </button>
-                                            @if(request()->filled('attempt_paper_name') || request()->filled('attempt_subtopic_id') || request()->filled('attempt_status'))
+                            @if($paperRows->isNotEmpty())
+                                <div class="st-table-wrap">
+                                    <table class="st-table st-papers-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Subtopic</th>
+                                                <th>Practice Paper</th>
+                                                <th>Questions &amp; Time</th>
+                                                <th>Difficulty</th>
+                                                <th>Status &amp; Score</th>
+                                                <th class="text-right">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($paperRows as $row)
                                                 @php
-                                                    $clearParams = request()->except(['attempt_paper_name', 'attempt_subtopic_id', 'attempt_status', 'attempts_page']);
+                                                    $subtopic = $row->subtopic;
+                                                    $paper = $row->paper;
+                                                    $subtopicFilterParams = [];
+                                                    foreach (request()->except(['subtopic_name', 'papers_page']) as $k => $v) {
+                                                        if (!is_array($v)) {
+                                                            $subtopicFilterParams[$k] = $v;
+                                                        }
+                                                    }
                                                 @endphp
-                                                <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearParams) }}"
-                                                    class="btn btn-outline-danger btn-modern-danger"
-                                                    title="Clear Attempt Filters">
-                                                    <i class="feather icon-x"></i>
-                                                </a>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </form>
 
-                                @if($attempts->isNotEmpty())
-                                    <!-- Mobile View cards for Past Attempts -->
-                                    <div class="d-block d-md-none">
-                                        @foreach($attempts as $attempt)
-                                            @php
-                                                $pct = $attempt->max_score > 0 ? round(($attempt->score / $attempt->max_score) * 100) : 0;
-                                                $pctColor = $pct >= 80 ? 'text-success' : ($pct >= 50 ? 'text-warning' : 'text-danger');
-                                            @endphp
-                                            <div
-                                                class="history-mobile-card mb-3 p-3 rounded shadow-xs bg-white border border-light">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <div class="max-width-70">
-                                                        <h6 class="font-weight-bold text-dark mb-1">{{ $attempt->paper->title }}
-                                                        </h6>
-                                                        <span class="badge badge-soft-secondary text-capitalize font-small-2">
-                                                            {{ $attempt->paper->subtopic->name ?? 'N/A' }}
-                                                        </span>
-                                                    </div>
-                                                    <span>
-                                                        @if($attempt->status == 'completed')
-                                                            <span class="badge badge-pill badge-soft-success">Completed</span>
-                                                        @elseif($attempt->status == 'paused')
-                                                            <span class="badge badge-pill badge-soft-warning">Paused</span>
-                                                        @else
-                                                            <span class="badge badge-pill badge-soft-info">In Progress</span>
-                                                        @endif
-                                                    </span>
-                                                </div>
-                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <span class="font-small-3 font-weight-bold">
-                                                        <i
-                                                            class="feather icon-calendar mr-1"></i>{{ $attempt->created_at->format('d M Y, h:i A') }}
-                                                    </span>
-                                                </div>
-                                                <div class="row mb-2">
-                                                    <div class="col-6">
-                                                        <span class="font-small-3">Score:</span>
-                                                        <div class="font-weight-bold text-dark">{{ $attempt->score }} /
-                                                            {{ $attempt->max_score }}</div>
-                                                    </div>
-                                                    <div class="col-6 text-right">
-                                                        <span class="font-small-3">Accuracy:</span>
-                                                        <div class="font-weight-bold {{ $pctColor }}">{{ $pct }}%</div>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                                                    <span class="font-small-3"><i class="feather icon-clock mr-1"></i>
-                                                        @php
-                                                            $h = floor($attempt->time_spent / 3600);
-                                                            $m = floor(($attempt->time_spent / 60) % 60);
-                                                            $s = $attempt->time_spent % 60;
-                                                            $spent = ($h > 0 ? $h . 'h ' : '') . ($m > 0 || $h > 0 ? $m . 'm ' : '') . $s . 's';
-                                                        @endphp
-                                                        {{ $spent }}
-                                                    </span>
-                                                    @if($attempt->status == 'completed')
-                                                        <a href="{{ route('student.attempts.result', $attempt->id) }}"
-                                                            class="btn btn-sm btn-outline-primary py-1 px-3">
-                                                            Result <i class="feather icon-arrow-right ml-1"></i>
-                                                        </a>
-                                                    @else
-                                                        <a href="{{ route('student.attempts.take', $attempt->id) }}"
-                                                            class="btn btn-sm btn-outline-info py-1 px-3">
-                                                            Resume <i class="feather icon-play ml-1"></i>
-                                                        </a>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-
-                                    <!-- Desktop table view -->
-                                    <div
-                                        class="table-responsive d-none d-md-block shadow-xs rounded bg-white overflow-hidden border">
-                                        <table class="table table-sm table-modern mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Paper</th>
-                                                    <th>Subtopic</th>
-                                                    <th>Attempt Date</th>
-                                                    <th>Status</th>
-                                                    <th class="text-center">Score Details</th>
-                                                    <th class="text-center">Accuracy Progress</th>
-                                                    <th class="text-center">Time Spent</th>
-                                                    <th class="text-center">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($attempts as $attempt)
-                                                    @php
-                                                        $pct = $attempt->max_score > 0 ? round(($attempt->score / $attempt->max_score) * 100) : 0;
-                                                        $pctBg = $pct >= 80 ? 'bg-success' : ($pct >= 50 ? 'bg-warning' : 'bg-danger');
-                                                        $pctColor = $pct >= 80 ? 'text-success' : ($pct >= 50 ? 'text-warning' : 'text-danger');
-                                                    @endphp
+                                                @if($row->is_empty_subtopic)
                                                     <tr>
-                                                        <td class="align-middle py-3 px-3 font-weight-bold text-dark">
-                                                            {{ $attempt->paper->title }}
+                                                        <td>
+                                                            <a href="{{ route('student.topics.subtopics', [$topic->id] + $subtopicFilterParams + ['subtopic_name' => $subtopic->name]) }}"
+                                                               class="st-subtopic-chip"
+                                                               title="Filter by {{ $subtopic->name }}">
+                                                                <span>{{ $subtopic->name }}</span>
+                                                            </a>
                                                         </td>
-                                                        <td class="align-middle">
-                                                            {{ $attempt->paper->subtopic->name ?? 'N/A' }}
+                                                        <td>
+                                                            <span class="text-muted font-italic">No practice papers available yet</span>
                                                         </td>
-                                                        <td class="align-middle">
-                                                            <i
-                                                                class="feather icon-calendar mr-1"></i>{{ $attempt->created_at->format('d M Y, h:i A') }}
+                                                        <td><span class="text-muted">&mdash;</span></td>
+                                                        <td><span class="text-muted">&mdash;</span></td>
+                                                        <td>
+                                                            <span class="st-pill st-pill-neutral">No Papers</span>
                                                         </td>
-                                                        <td class="align-middle">
-                                                            @if($attempt->status == 'completed')
-                                                                <span class="badge badge-pill badge-soft-success">Completed</span>
-                                                            @elseif($attempt->status == 'paused')
-                                                                <span class="badge badge-pill badge-soft-warning">Paused</span>
-                                                            @else
-                                                                <span class="badge badge-pill badge-soft-info">In Progress</span>
-                                                            @endif
-                                                        </td>
-                                                        <td class="text-center align-middle text-dark font-weight-bold">
-                                                            {{ $attempt->score }} <span class="font-weight-normal">/
-                                                                {{ $attempt->max_score }}</span>
-                                                        </td>
-                                                        <td class="align-middle">
-                                                            <div class="d-flex align-items-center justify-content-center">
-                                                                <span class="font-weight-bold {{ $pctColor }} mr-3"
-                                                                    style="min-width: 35px;">{{ $pct }}%</span>
-                                                                <div class="progress progress-sm w-50 mb-0 shadow-xs">
-                                                                    <div class="progress-bar {{ $pctBg }}" role="progressbar"
-                                                                        style="width: {{ $pct }}%" aria-valuenow="{{ $pct }}"
-                                                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td class="text-center align-middle text-dark font-weight-medium">
-                                                            <i class="feather icon-clock mr-1"></i>
-                                                            @php
-                                                                $h = floor($attempt->time_spent / 3600);
-                                                                $m = floor(($attempt->time_spent / 60) % 60);
-                                                                $s = $attempt->time_spent % 60;
-                                                                $spent = ($h > 0 ? $h . 'h ' : '') . ($m > 0 || $h > 0 ? $m . 'm ' : '') . $s . 's';
-                                                            @endphp
-                                                            {{ $spent }}
-                                                        </td>
-                                                        <td class="text-center align-middle">
-                                                            @if($attempt->status == 'completed')
-                                                                <a href="{{ route('student.attempts.result', $attempt->id) }}"
-                                                                    class="btn btn-sm btn-outline-primary py-1 px-3 font-weight-bold btn-history-action">
-                                                                    View Result
-                                                                </a>
-                                                            @else
-                                                                <a href="{{ route('student.attempts.take', $attempt->id) }}"
-                                                                    class="btn btn-sm btn-outline-info py-1 px-3 font-weight-bold btn-history-action">
-                                                                    Resume
-                                                                </a>
-                                                            @endif
+                                                        <td class="text-right">
+                                                            <span class="text-muted" style="font-size: 0.82rem;">Coming soon</span>
                                                         </td>
                                                     </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                @else
+                                                    @php
+                                                        $diffKey = strtolower($paper->difficulty ?? '');
+                                                        $diffBadgeClass = match ($diffKey) {
+                                                            'easy'   => 'st-pill-easy',
+                                                            'medium' => 'st-pill-medium',
+                                                            'hard'   => 'st-pill-hard',
+                                                            default  => 'st-pill-neutral',
+                                                        };
+                                                    @endphp
+                                                    <tr>
+                                                        <td>
+                                                            <a href="{{ route('student.topics.subtopics', [$topic->id] + $subtopicFilterParams + ['subtopic_name' => $subtopic->name]) }}"
+                                                               class="st-subtopic-chip"
+                                                               title="Filter by {{ $subtopic->name }}">
+                                                                <span>{{ $subtopic->name }}</span>
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <div class="st-paper-title">{{ $paper->title }}</div>
+                                                            <div class="st-paper-submeta">
+                                                                <span>{{ $paper->display_type ?? ucfirst($paper->type ?? 'Test') }}</span>
+                                                                <span>&bull;</span>
+                                                                <span>{{ $paper->total_marks ?? 0 }} {{ \Illuminate\Support\Str::plural('mark', $paper->total_marks ?? 0) }}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="st-qtime-primary">
+                                                                {{ $paper->questions_count ?? 0 }} {{ \Illuminate\Support\Str::plural('Question', $paper->questions_count ?? 0) }}
+                                                            </div>
+                                                            <div class="st-qtime-sub">
+                                                                <i class="feather icon-clock"></i>
+                                                                <span>{{ $paper->total_time ? $paper->total_time . ' mins' : 'Unlimited' }}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            @if(!empty($paper->difficulty))
+                                                                <span class="st-pill {{ $diffBadgeClass }}">
+                                                                    <span class="st-pill-dot"></span>
+                                                                    {{ $paper->difficulty }}
+                                                                </span>
+                                                            @else
+                                                                <span class="text-muted">&mdash;</span>
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if($paper->active_attempt)
+                                                                @if($paper->active_attempt->status === 'paused')
+                                                                    <span class="st-pill st-pill-paused">
+                                                                        <span class="st-pill-dot"></span>Paused
+                                                                    </span>
+                                                                @else
+                                                                    <span class="st-pill st-pill-progress">
+                                                                        <span class="st-pill-dot"></span>In Progress
+                                                                    </span>
+                                                                @endif
+                                                                @if($paper->completed_attempts_count > 0)
+                                                                    <div class="st-status-sub">
+                                                                        {{ $paper->completed_attempts_count }} prev {{ \Illuminate\Support\Str::plural('attempt', $paper->completed_attempts_count) }}
+                                                                    </div>
+                                                                @endif
+                                                            @elseif($paper->completed_attempts_count > 0)
+                                                                <span class="st-pill st-pill-done">
+                                                                    <i class="feather icon-check"></i> Completed
+                                                                </span>
+                                                                <div class="st-status-sub">
+                                                                    @if($paper->best_accuracy !== null)
+                                                                        Best {{ $paper->best_accuracy }}% &bull;
+                                                                    @endif
+                                                                    {{ $paper->completed_attempts_count }} {{ \Illuminate\Support\Str::plural('attempt', $paper->completed_attempts_count) }}
+                                                                </div>
+                                                            @else
+                                                                <span class="st-pill st-pill-neutral">Not Started</span>
+                                                            @endif
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <div class="st-actions-cell">
+                                                                @if($paper->latest_completed_attempt_id)
+                                                                    <a href="{{ route('student.attempts.result', $paper->latest_completed_attempt_id) }}"
+                                                                       class="st-btn-outline"
+                                                                       title="View latest result">
+                                                                        <i class="feather icon-bar-chart-2"></i>
+                                                                        <span>Result</span>
+                                                                    </a>
+                                                                @endif
 
-                                    <!-- Pagination -->
-                                    <div class="d-flex justify-content-center mt-4">
-                                        {{ $attempts->links() }}
-                                    </div>
-                                @else
-                                    <div class="p-5 text-center empty-state-subtopic">
-                                        <div class="empty-icon-box mb-3">
-                                            <i class="feather icon-file font-large-1 text-warning"></i>
-                                        </div>
-                                        <h6 class="font-weight-bold text-dark mb-1">No Attempt History Available</h6>
-                                        <p class="mb-0 font-small-3">
-                                            @if(request()->filled('attempt_paper_name') || request()->filled('attempt_subtopic_id') || request()->filled('attempt_status'))
-                                                No attempts matched your filters.
-                                            @else
-                                                You have not attempted any papers for this topic yet.
-                                            @endif
-                                        </p>
+                                                                <form action="{{ route('student.papers.start', $paper->id) }}" method="POST" class="mb-0">
+                                                                    @csrf
+                                                                    @if($paper->active_attempt)
+                                                                        <button type="submit"
+                                                                                class="st-btn-resume {{ $paper->active_attempt->status === 'paused' ? 'is-paused' : 'is-active' }}">
+                                                                            <span>Resume</span>
+                                                                            <i class="feather icon-play"></i>
+                                                                        </button>
+                                                                    @else
+                                                                        <button type="button"
+                                                                                class="st-btn-start btn-start-trigger"
+                                                                                data-paper-id="{{ $paper->id }}"
+                                                                                data-paper-title="{{ $paper->title }}"
+                                                                                data-paper-questions="{{ $paper->questions_count ?? 0 }}"
+                                                                                data-paper-time="{{ $paper->total_time ? $paper->total_time . ' mins' : 'Unlimited' }}"
+                                                                                data-paper-timed="{{ $paper->total_time > 0 ? '1' : '0' }}"
+                                                                                data-paper-type="{{ $paper->display_type ?? ucfirst($paper->type ?? 'Test') }}"
+                                                                                data-paper-marks="{{ $paper->total_marks ?? 0 }}"
+                                                                                data-paper-subject="{{ $subject->title ?? ($paper->subject?->title ?? 'General') }}"
+                                                                                data-paper-difficulty="{{ $diffKey }}"
+                                                                                data-paper-instruction="{{ $paper->instruction ?? '' }}"
+                                                                                data-action-url="{{ route('student.papers.start', $paper->id) }}">
+                                                                            <span>{{ $paper->completed_attempts_count > 0 ? 'Retake' : 'Start' }}</span>
+                                                                            <i class="feather icon-arrow-right"></i>
+                                                                        </button>
+                                                                    @endif
+                                                                </form>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endif
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                @if($paperRows->hasPages())
+                                    <div class="st-pagination-wrap">
+                                        {{ $paperRows->links() }}
                                     </div>
                                 @endif
-                            </div> <!-- card-body -->
-                        </div> <!-- card -->
-                    </div> <!-- Attempt History Tab Pane -->
-                </div> <!-- Tab Contents -->
-
-            </div>
-        </div>
-    </div>
-
-    <!-- Instructions Modal -->
-    <div class="modal fade" id="instructionsModal" tabindex="-1" role="dialog" aria-labelledby="instructionsModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content border-0 shadow-lg instructions-modal-content">
-                <!-- Header Banner -->
-                <div class="modal-header text-white px-4 py-3"
-                    style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 0;">
-                    <div class="d-flex align-items-center">
-                        <div class="header-icon-box mr-3"
-                            style="width: 40px; height: 40px; background-color: rgba(255, 255, 255, 0.1); border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;">
-                            <i class="feather icon-file-text text-white font-medium-3"></i>
+                            @else
+                                <div class="st-empty-box">
+                                    <div class="st-empty-icon">
+                                        <i class="feather icon-layers"></i>
+                                    </div>
+                                    <h4 class="font-weight-bold mb-1" style="color: var(--text-primary, #0b1f51);">No Subtopics or Papers Found</h4>
+                                    <p class="text-muted mb-2" style="font-size: 0.9rem;">
+                                        No subtopics or practice papers matched your filter criteria.
+                                    </p>
+                                    @if($hasActivePaperFilter)
+                                        <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearMainParams) }}" class="btn btn-primary btn-sm px-2" style="border-radius: 10px;">
+                                            <i class="feather icon-refresh-cw mr-25"></i> Clear Filters
+                                        </a>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
-                        <div>
-                            <h5 class="modal-title text-white font-weight-bold" id="instructionsModalLabel"
-                                style="font-size: 1.15rem; letter-spacing: 0.3px; line-height: 1.2;">Exam Readiness Review
-                            </h5>
-                            <span class="text-light opacity-75 font-small-2" style="display: block; margin-top: 2px;">Please
-                                read the instructions carefully before starting.</span>
-                        </div>
+
                     </div>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"
-                        style="opacity: 0.8; outline: none; margin-top: -5px;">
-                        <span aria-hidden="true" style="font-size: 1.6rem;">&times;</span>
-                    </button>
+
+                    <!-- Tab 2: Attempt History & Results -->
+                    <div class="tab-pane fade {{ $activeTab === 'attempts' ? 'show active' : '' }}"
+                         id="attempts-content"
+                         role="tabpanel"
+                         aria-labelledby="attempts-tab">
+
+                        <!-- Attempt Filters Toolbar -->
+                        <form method="GET" action="{{ route('student.topics.subtopics', $topic->id) }}" class="st-toolbar">
+                            @foreach(request()->except(['attempt_paper_name', 'attempt_subtopic_id', 'attempt_status', 'attempts_page']) as $key => $value)
+                                @if(!is_array($value))
+                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @endif
+                            @endforeach
+
+                            <div class="st-toolbar-left">
+                                <div class="st-filter-group">
+                                    <label for="attempt_subtopic_id" class="st-filter-label">Subtopic:</label>
+                                    <select name="attempt_subtopic_id" id="attempt_subtopic_id" class="st-select" onchange="this.form.submit()">
+                                        <option value="">All Subtopics</option>
+                                        @foreach($allSubtopics as $sub)
+                                            <option value="{{ $sub->id }}" {{ request('attempt_subtopic_id') == $sub->id ? 'selected' : '' }}>
+                                                {{ $sub->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="st-filter-group">
+                                    <label for="attempt_status" class="st-filter-label">Status:</label>
+                                    <select name="attempt_status" id="attempt_status" class="st-select" onchange="this.form.submit()">
+                                        <option value="">All Statuses</option>
+                                        <option value="completed" {{ request('attempt_status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                                        <option value="in_progress" {{ request('attempt_status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                        <option value="paused" {{ request('attempt_status') == 'paused' ? 'selected' : '' }}>Paused</option>
+                                    </select>
+                                </div>
+
+                                @if(request()->filled('attempt_paper_name') || request()->filled('attempt_subtopic_id') || request()->filled('attempt_status'))
+                                    @php
+                                        $clearParams = request()->except(['attempt_paper_name', 'attempt_subtopic_id', 'attempt_status', 'attempts_page']);
+                                    @endphp
+                                    <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearParams) }}"
+                                       class="st-action-btn-light text-danger">
+                                        <i class="feather icon-x"></i>
+                                        <span>Clear Filters</span>
+                                    </a>
+                                @endif
+                            </div>
+
+                            <div class="st-toolbar-right">
+                                <div class="st-search-box">
+                                    <span class="st-search-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="11" cy="11" r="8"/>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                        </svg>
+                                    </span>
+                                    <input type="text"
+                                           name="attempt_paper_name"
+                                           id="attempt_paper_name"
+                                           class="st-search-input"
+                                           placeholder="Search attempts..."
+                                           value="{{ request('attempt_paper_name') }}"
+                                           autocomplete="off"
+                                           aria-label="Search attempts">
+                                    @if(request()->filled('attempt_paper_name'))
+                                        @php
+                                            $clearAttemptSearch = request()->except(['attempt_paper_name', 'attempts_page']);
+                                        @endphp
+                                        <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearAttemptSearch) }}"
+                                           class="st-search-clear"
+                                           title="Clear search"
+                                           aria-label="Clear search">
+                                            <i class="feather icon-x"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Attempt History Directory Card -->
+                        <div class="st-card">
+                            <div class="st-card-header">
+                                <div>
+                                    <h2 class="st-card-title">Attempt History</h2>
+                                    <p class="st-card-subtitle">Review your completed results and resume unfinished attempts.</p>
+                                </div>
+                                @if($attempts->total() > 0)
+                                    <span class="st-count-chip">
+                                        Showing {{ $attempts->firstItem() }}–{{ $attempts->lastItem() }} of {{ $attempts->total() }}
+                                    </span>
+                                @endif
+                            </div>
+
+                            @if($attempts->isNotEmpty())
+                                <!-- Mobile Cards (< 768px) -->
+                                <div class="d-block d-md-none">
+                                    @foreach($attempts as $attempt)
+                                        @php
+                                            $pct = $attempt->max_score > 0 ? round(($attempt->score / $attempt->max_score) * 100) : 0;
+                                            $pctColor = $pct >= 80 ? 'text-success' : ($pct >= 61 ? 'text-warning' : 'text-danger');
+                                            $h = floor($attempt->time_spent / 3600);
+                                            $m = floor(($attempt->time_spent / 60) % 60);
+                                            $s = $attempt->time_spent % 60;
+                                            $spent = ($h > 0 ? $h . 'h ' : '') . ($m > 0 || $h > 0 ? $m . 'm ' : '') . $s . 's';
+                                        @endphp
+                                        <div class="st-mobile-attempt-card">
+                                            <div class="d-flex justify-content-between align-items-start mb-75">
+                                                <div class="pr-1">
+                                                    <h6 class="font-weight-bold mb-25" style="color: var(--text-primary, #0b1f51);">
+                                                        {{ $attempt->paper->title }}
+                                                    </h6>
+                                                    <span class="st-pill st-pill-neutral">
+                                                        {{ $attempt->paper->subtopic->name ?? 'N/A' }}
+                                                    </span>
+                                                </div>
+                                                @if($attempt->status === 'completed')
+                                                    <span class="st-pill st-pill-done">Completed</span>
+                                                @elseif($attempt->status === 'paused')
+                                                    <span class="st-pill st-pill-paused">Paused</span>
+                                                @else
+                                                    <span class="st-pill st-pill-progress">In Progress</span>
+                                                @endif
+                                            </div>
+
+                                            <div class="d-flex justify-content-between font-small-3 text-muted mb-75">
+                                                <span><i class="feather icon-calendar mr-25"></i>{{ $attempt->created_at->format('d M Y, h:i A') }}</span>
+                                                <span><i class="feather icon-clock mr-25"></i>{{ $spent }}</span>
+                                            </div>
+
+                                            <div class="d-flex justify-content-between align-items-center pt-75 border-top" style="border-color: var(--border-subtle, #eef2f7) !important;">
+                                                <div class="font-small-3">
+                                                    <strong>{{ $attempt->score }} / {{ $attempt->max_score }}</strong>
+                                                    <span class="ml-50 font-weight-bold {{ $pctColor }}">({{ $pct }}%)</span>
+                                                </div>
+                                                @if($attempt->status === 'completed')
+                                                    <a href="{{ route('student.attempts.result', $attempt->id) }}" class="st-btn-outline">
+                                                        <span>Result</span>
+                                                        <i class="feather icon-arrow-right"></i>
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('student.attempts.take', $attempt->id) }}" class="st-btn-outline">
+                                                        <span>Resume</span>
+                                                        <i class="feather icon-play"></i>
+                                                    </a>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                <!-- Desktop Table -->
+                                <div class="st-table-wrap d-none d-md-block">
+                                    <table class="st-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Paper</th>
+                                                <th>Subtopic</th>
+                                                <th>Attempt Date</th>
+                                                <th>Status</th>
+                                                <th>Score</th>
+                                                <th>Accuracy</th>
+                                                <th>Time Spent</th>
+                                                <th class="text-right">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($attempts as $attempt)
+                                                @php
+                                                    $pct = $attempt->max_score > 0 ? round(($attempt->score / $attempt->max_score) * 100) : 0;
+                                                    $fillClass = $pct >= 80 ? 'fill-strong' : ($pct >= 61 ? 'fill-developing' : 'fill-focus');
+                                                    $pctColor = $pct >= 80 ? 'text-success' : ($pct >= 61 ? 'text-warning' : 'text-danger');
+                                                    $h = floor($attempt->time_spent / 3600);
+                                                    $m = floor(($attempt->time_spent / 60) % 60);
+                                                    $s = $attempt->time_spent % 60;
+                                                    $spent = ($h > 0 ? $h . 'h ' : '') . ($m > 0 || $h > 0 ? $m . 'm ' : '') . $s . 's';
+                                                @endphp
+                                                <tr>
+                                                    <td class="font-weight-bold" style="color: var(--text-primary, #0b1f51);">
+                                                        {{ $attempt->paper->title }}
+                                                    </td>
+                                                    <td>{{ $attempt->paper->subtopic->name ?? 'N/A' }}</td>
+                                                    <td class="text-nowrap">
+                                                        <i class="feather icon-calendar mr-25 text-muted"></i>
+                                                        {{ $attempt->created_at->format('d M Y, h:i A') }}
+                                                    </td>
+                                                    <td>
+                                                        @if($attempt->status === 'completed')
+                                                            <span class="st-pill st-pill-done">Completed</span>
+                                                        @elseif($attempt->status === 'paused')
+                                                            <span class="st-pill st-pill-paused">Paused</span>
+                                                        @else
+                                                            <span class="st-pill st-pill-progress">In Progress</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="font-weight-bold text-nowrap">
+                                                        {{ $attempt->score }} <span class="text-muted font-weight-normal">/ {{ $attempt->max_score }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="st-acc-wrap">
+                                                            <span class="st-acc-val {{ $pctColor }}">{{ $pct }}%</span>
+                                                            <div class="st-acc-track">
+                                                                <div class="st-acc-fill {{ $fillClass }}" style="width: {{ $pct }}%;"></div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-nowrap">
+                                                        <i class="feather icon-clock mr-25 text-muted"></i>{{ $spent }}
+                                                    </td>
+                                                    <td class="text-right">
+                                                        @if($attempt->status === 'completed')
+                                                            <a href="{{ route('student.attempts.result', $attempt->id) }}" class="st-btn-outline">
+                                                                <span>View Result</span>
+                                                                <i class="feather icon-arrow-right"></i>
+                                                            </a>
+                                                        @else
+                                                            <a href="{{ route('student.attempts.take', $attempt->id) }}" class="st-btn-outline">
+                                                                <span>Resume</span>
+                                                                <i class="feather icon-play"></i>
+                                                            </a>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                @if($attempts->hasPages())
+                                    <div class="st-pagination-wrap">
+                                        {{ $attempts->links() }}
+                                    </div>
+                                @endif
+                            @else
+                                <div class="st-empty-box">
+                                    <div class="st-empty-icon">
+                                        <i class="feather icon-clock"></i>
+                                    </div>
+                                    <h5 class="font-weight-bold mb-1" style="color: var(--text-primary, #0b1f51);">No Attempt History Available</h5>
+                                    <p class="text-muted mb-0" style="font-size: 0.9rem;">
+                                        @if(request()->filled('attempt_paper_name') || request()->filled('attempt_subtopic_id') || request()->filled('attempt_status'))
+                                            No attempts matched your selected filters.
+                                        @else
+                                            You have not attempted any papers for this topic yet.
+                                        @endif
+                                    </p>
+                                </div>
+                            @endif
+                        </div>
+
+                    </div>
+
                 </div>
-                <form id="modal-start-form" method="POST" action="">
-                    @csrf
-                    <div class="modal-body modal-body-custom p-4">
 
-                        <!-- Paper Card Summary -->
-                        <div class="paper-summary-card p-4 mb-4">
-                            <h3 class="font-weight-extrabold mb-3" id="modal-paper-title"
-                                style="font-size: 1.5rem; line-height: 1.3;">Paper Title</h3>
-
-                            <div class="d-flex align-items-center flex-wrap" style="gap: 12px; margin-top: 15px;">
-                                <div class="stat-pill-modern d-flex align-items-center px-3 py-2" style="gap: 8px;">
-                                    <i class="feather icon-help-circle text-primary"
-                                        style="font-size: 1.15rem; margin-top: 2px;"></i>
-                                    <div>
-                                        <div class="font-small-1 text-uppercase font-weight-bold"
-                                            style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Questions
-                                        </div>
-                                        <span class="font-weight-bold text-dark font-small-3 modal-stat-value"
-                                            id="modal-paper-questions" style="font-size: 0.85rem;">0</span>
-                                    </div>
-                                </div>
-
-                                <div class="stat-pill-modern d-flex align-items-center px-3 py-2" style="gap: 8px;">
-                                    <i class="feather icon-clock text-success"
-                                        style="font-size: 1.15rem; margin-top: 2px;"></i>
-                                    <div>
-                                        <div class="font-small-1 text-uppercase font-weight-bold"
-                                            style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Duration
-                                        </div>
-                                        <span class="font-weight-bold text-dark font-small-3 modal-stat-value"
-                                            id="modal-paper-time" style="font-size: 0.85rem;">0 mins</span>
-                                    </div>
-                                </div>
-
-                                <div class="stat-pill-modern d-flex align-items-center px-3 py-2" style="gap: 8px;">
-                                    <i class="feather icon-award text-warning" id="modal-paper-difficulty-icon"
-                                        style="font-size: 1.15rem; margin-top: 2px;"></i>
-                                    <div>
-                                        <div class="font-small-1 text-uppercase font-weight-bold"
-                                            style="letter-spacing: 0.5px; line-height: 1.1; font-size: 0.65rem;">Difficulty
-                                        </div>
-                                        <span class="font-weight-bold text-dark font-small-3 modal-stat-value"
-                                            id="modal-paper-difficulty" style="font-size: 0.85rem;">Medium</span>
-                                    </div>
-                                </div>
-                            </div>
+                <!-- Bottom Guidance Banner -->
+                <div class="st-tip-banner">
+                    <div class="st-tip-left">
+                        <span class="st-tip-icon">
+                            <i class="feather icon-trending-up font-medium-3"></i>
+                        </span>
+                        <div>
+                            <h4 class="st-tip-title">Track your topic mastery over time</h4>
+                            <p class="st-tip-desc">Check Focus Areas after completing tests to see whether {{ $topic->name }} is Strong, Developing, or Needs Focus.</p>
                         </div>
-
-                        <!-- Instructions Header -->
-                        <div class="d-flex align-items-center mb-3">
-                            <div style="width: 4px; height: 16px; background-color: #2477F9; border-radius: 2px;"
-                                class="mr-2"></div>
-                            <h5 class="font-weight-extrabold mb-0 instructions-heading"
-                                style="font-size: 1.1rem; letter-spacing: -0.2px;">Guidelines & Instructions</h5>
-                        </div>
-
-                        <!-- Instruction Rich Text container -->
-                        <div class="rich-text-container p-4 rounded mb-4" id="modal-paper-instruction">
-                            <!-- Dynamic Content -->
-                        </div>
-
-                        <!-- Crucial Notice Box -->
-                        <div class="alert alert-warning d-flex align-items-start border-0 p-3 mb-0 modal-notice-box"
-                            style="gap: 12px;">
-                            <i class="feather icon-alert-triangle text-warning font-medium-3 mt-1"></i>
-                            <div>
-                                <h6 class="font-weight-bold text-warning mb-1" style="font-size: 0.9rem;">Important Notice
-                                </h6>
-                                <p class="font-small-3 mb-0 modal-notice-text" style="line-height: 1.4;">Starting
-                                    the test initiates a timer that cannot be paused. Ensure you have a stable internet
-                                    connection and are in a quiet environment before proceeding.</p>
-                            </div>
-                        </div>
-
                     </div>
-                    <div class="modal-footer d-flex justify-content-between p-3">
-                        <button type="button" class="btn btn-outline-secondary px-4 py-2 font-weight-bold"
-                            data-dismiss="modal" style="border-radius: 8px; font-size: 0.9rem;">Cancel</button>
-                        <button type="submit" class="btn btn-primary px-4 py-2 font-weight-bold d-flex align-items-center"
-                            style="background: linear-gradient(135deg, #2477F9 0%, #4f46e5 100%) !important; border: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(115, 103, 240, 0.2); font-size: 0.9rem;">
-                            Start Test Now <i class="feather icon-play-circle ml-2 font-medium-1"></i>
-                        </button>
-                    </div>
-                </form>
+                    <a href="{{ route('student.focusareas') }}" class="st-tip-link">
+                        <span>View Focus Areas</span>
+                        <span aria-hidden="true">&rarr;</span>
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>
+
+    @include('student.assessment.partials.start-test-modal')
 @endsection
-
-@push('styles')
-    <style>
-        /* Modern Tabs Styling */
-        .modern-tabs {
-            border-bottom: 2px solid #ebe9f1;
-            padding-bottom: 2px;
-            gap: 10px;
-        }
-
-        .dark-layout .modern-tabs {
-            border-bottom-color: rgba(255, 255, 255, 0.08) !important;
-        }
-
-        .modern-tabs .nav-item {
-            margin-bottom: -2px;
-        }
-
-        .modern-tabs .nav-link {
-            border: none !important;
-            color: #b4b7c5 !important;
-            font-weight: 700;
-            font-size: 1.05rem;
-            padding: 12px 20px;
-            border-radius: 8px 8px 0 0 !important;
-            position: relative;
-            background: transparent !important;
-            transition: all 0.25s ease-in-out;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modern-tabs .nav-link:hover {
-            color: #2477F9 !important;
-            background-color: rgba(115, 103, 240, 0.04) !important;
-        }
-
-        .dark-layout .modern-tabs .nav-link:hover {
-            background-color: rgba(115, 103, 240, 0.08) !important;
-        }
-
-        .modern-tabs .nav-link.active {
-            color: #2477F9 !important;
-            font-weight: 800;
-        }
-
-        .modern-tabs .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, #2477F9 0%, #4f46e5 100%);
-            border-radius: 3px 3px 0 0;
-            transform: scaleX(0);
-            transition: transform 0.25s ease-in-out;
-        }
-
-        .modern-tabs .nav-link.active::after {
-            transform: scaleX(1);
-        }
-
-        .modern-tab-content {
-            padding-top: 10px;
-        }
-
-        /* Custom Styling for Rich Text inside Instructions Modal */
-        .instructions-modal-content {
-            border-radius: 20px !important;
-        }
-
-        .modal-body-custom {
-            background-color: #f8fafc;
-        }
-
-        .paper-summary-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-        }
-
-        #modal-paper-title {
-            color: #1e293b;
-        }
-
-        .stat-pill-modern {
-            background-color: #f1f5f9;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .modal-stat-value {
-            color: #1e293b !important;
-        }
-
-        .instructions-heading {
-            color: #1e293b;
-        }
-
-        .rich-text-container {
-            font-size: 0.95rem;
-            color: #334155;
-            line-height: 1.7;
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            max-height: 300px;
-            overflow-y: auto;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.01);
-        }
-
-        .rich-text-container p {
-            margin-bottom: 1rem;
-        }
-
-        .rich-text-container p:last-child {
-            margin-bottom: 0;
-        }
-
-        .rich-text-container h1,
-        .rich-text-container h2,
-        .rich-text-container h3,
-        .rich-text-container h4,
-        .rich-text-container h5,
-        .rich-text-container h6 {
-            color: #0f172a;
-            font-weight: 700;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            line-height: 1.3;
-        }
-
-        .rich-text-container h1 {
-            font-size: 1.5rem;
-        }
-
-        .rich-text-container h2 {
-            font-size: 1.3rem;
-        }
-
-        .rich-text-container h3 {
-            font-size: 1.15rem;
-        }
-
-        .rich-text-container ul,
-        .rich-text-container ol {
-            padding-left: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .rich-text-container li {
-            margin-bottom: 0.5rem;
-        }
-
-        .rich-text-container blockquote {
-            border-left: 4px solid #2477F9;
-            padding: 0.5rem 1rem;
-            background-color: #f8fafc;
-            color: #475569;
-            margin: 1.5rem 0;
-            border-radius: 0 8px 8px 0;
-            font-style: italic;
-        }
-
-        .rich-text-container strong {
-            color: #0f172a;
-            font-weight: 600;
-        }
-
-        .modal-notice-box {
-            background-color: #fff9e6;
-            border-radius: 12px;
-            border-left: 4px solid #ffc107 !important;
-        }
-
-        .modal-notice-text {
-            color: #64748b;
-        }
-
-        /* Beautiful Scrollbar for Rich Text Container */
-        .rich-text-container::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .rich-text-container::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
-        }
-
-        .rich-text-container::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-
-        .rich-text-container::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
-        /* DARK THEME SUPPORT OVERRIDES */
-        .dark-layout .instructions-modal-content {
-            background-color: #1e2440 !important;
-        }
-
-        .dark-layout .modal-body-custom {
-            background-color: #10163a;
-        }
-
-        .dark-layout .paper-summary-card {
-            background-color: #1e2440;
-            border-color: #2c3558;
-            box-shadow: none;
-        }
-
-        .dark-layout #modal-paper-title {
-            color: #f1f5f9;
-        }
-
-        .dark-layout .stat-pill-modern {
-            background-color: #10163a;
-            border-color: #2c3558;
-        }
-
-        .dark-layout .modal-stat-value {
-            color: #f1f5f9 !important;
-        }
-
-        .dark-layout .instructions-heading {
-            color: #f1f5f9;
-        }
-
-        .dark-layout .rich-text-container {
-            background-color: #181d36;
-            border-color: #2c3558;
-            color: #cbd5e1;
-            box-shadow: none;
-        }
-
-        .dark-layout .rich-text-container h1,
-        .dark-layout .rich-text-container h2,
-        .dark-layout .rich-text-container h3,
-        .dark-layout .rich-text-container h4,
-        .dark-layout .rich-text-container h5,
-        .dark-layout .rich-text-container h6,
-        .dark-layout .rich-text-container strong {
-            color: #f1f5f9;
-        }
-
-        .dark-layout .rich-text-container blockquote {
-            background-color: #10163a;
-            color: #94a3b8;
-        }
-
-        .dark-layout .modal-notice-box {
-            background-color: rgba(255, 193, 7, 0.08);
-            border-left-color: #ffc107 !important;
-        }
-
-        .dark-layout .modal-notice-text {
-            color: #94a3b8;
-        }
-
-        .dark-layout .modal-footer {
-            background-color: #1e2440 !important;
-            border-top-color: #2c3558 !important;
-        }
-
-        /* Breadcrumbs Modern styling */
-        .breadcrumb-modern {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 0.8rem 1.2rem;
-            margin-bottom: 0;
-            list-style: none;
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 8px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-        }
-
-        .dark-layout .breadcrumb-modern {
-            background-color: rgba(26, 32, 75, 0.7);
-            border-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .breadcrumb-modern-item {
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .breadcrumb-modern-item+.breadcrumb-modern-item {
-            padding-left: 0.6rem;
-        }
-
-        .breadcrumb-modern-item+.breadcrumb-modern-item::before {
-            display: inline-block;
-            padding-right: 0.6rem;
-            color: #b4b7c5;
-            content: "/";
-            font-weight: 400;
-        }
-
-        .breadcrumb-modern-item a {
-            color: #2477F9;
-            transition: color 0.15s ease-in-out;
-        }
-
-        .breadcrumb-modern-item a:hover {
-            color: #4f46e5;
-            text-decoration: none;
-        }
-
-        .breadcrumb-modern-item.active {
-            color: #b4b7c5;
-        }
-
-        /* Hero Topic Card Style */
-        .topic-hero-card {
-            border-radius: 16px;
-            background: linear-gradient(135deg, #2477F9 0%, #4f46e5 100%);
-            position: relative;
-            box-shadow: 0 8px 30px rgba(115, 103, 240, 0.25) !important;
-            margin-top: 10px;
-        }
-
-        .hero-bg-shapes {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .hero-bg-shapes .shape {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.075);
-            backdrop-filter: blur(15px);
-        }
-
-        .hero-bg-shapes .shape-1 {
-            width: 300px;
-            height: 300px;
-            top: -100px;
-            right: -50px;
-        }
-
-        .hero-bg-shapes .shape-2 {
-            width: 150px;
-            height: 150px;
-            bottom: -50px;
-            left: 10%;
-        }
-
-        .hero-title {
-            font-size: 2.1rem;
-            line-height: 1.25;
-            z-index: 2;
-            letter-spacing: -0.5px;
-        }
-
-        .badge-hero-category {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            padding: 5px 12px;
-            border-radius: 6px;
-            backdrop-filter: blur(5px);
-        }
-
-        .badge-hero-tag {
-            background-color: rgba(40, 199, 111, 0.25);
-            color: #5effa2;
-            font-weight: 700;
-            font-size: 0.75rem;
-            letter-spacing: 0.5px;
-            padding: 5px 12px;
-            border-radius: 6px;
-            border: 1px solid rgba(40, 199, 111, 0.3);
-        }
-
-        .hero-stats-card {
-            background-color: rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(8px);
-            z-index: 2;
-            position: relative;
-        }
-
-        .progress-hero {
-            background-color: rgba(255, 255, 255, 0.2) !important;
-            height: 8px !important;
-            border-radius: 4px;
-            overflow: hidden;
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-
-        .bg-white-progress {
-            background: linear-gradient(90deg, #ffffff 0%, #bcfad8 100%) !important;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-        }
-
-        .border-white-opacity {
-            border-color: rgba(255, 255, 255, 0.1) !important;
-        }
-
-        .text-light-opacity {
-            color: rgba(255, 255, 255, 0.75);
-        }
-
-        .text-success-light {
-            color: #5effa2 !important;
-        }
-
-        /* Search & Filters Section */
-        .search-filter-card {
-            border-radius: 12px;
-            background-color: #ffffff;
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
-        }
-
-        .dark-layout .search-filter-card {
-            background-color: #1e244b;
-            border-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .filter-label {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #4b4b4b;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-        }
-
-        .dark-layout .filter-label {
-            color: #c2c6dc;
-        }
-
-        .filter-label i {
-            color: #2477F9;
-            font-size: 0.95rem;
-        }
-
-        .custom-select-wrapper {
-            position: relative;
-            width: 100%;
-        }
-
-        .select-modern {
-            height: 42px !important;
-            border-radius: 8px !important;
-            border: 1px solid #d8d6de !important;
-            background-color: #fff !important;
-            color: #5e5873 !important;
-            font-weight: 500;
-            padding-right: 35px !important;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .dark-layout .select-modern {
-            border-color: #414561 !important;
-            background-color: #10163a !important;
-            color: #c2c6dc !important;
-        }
-
-        .select-modern:focus {
-            border-color: #2477F9 !important;
-            box-shadow: 0 3px 8px rgba(115, 103, 240, 0.15) !important;
-        }
-
-        .select-chevron {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-            color: #b4b7c5;
-            font-size: 0.9rem;
-        }
-
-        .input-modern {
-            height: 42px !important;
-            border-radius: 8px !important;
-            border: 1px solid #d8d6de !important;
-            font-weight: 500;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .dark-layout .input-modern {
-            border-color: #414561 !important;
-            background-color: #10163a !important;
-            color: #c2c6dc !important;
-        }
-
-        .input-modern:focus {
-            border-color: #2477F9 !important;
-            box-shadow: 0 3px 8px rgba(115, 103, 240, 0.15) !important;
-        }
-
-        .btn-modern {
-            height: 42px;
-            border-radius: 8px !important;
-            font-weight: 600;
-            background: linear-gradient(135deg, #2477F9 0%, #4f46e5 100%) !important;
-            border: none !important;
-            transition: all 0.2s ease-in-out !important;
-            box-shadow: 0 4px 12px rgba(115, 103, 240, 0.2) !important;
-        }
-
-        .btn-modern:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(115, 103, 240, 0.3) !important;
-        }
-
-        .btn-modern-danger {
-            height: 42px;
-            width: 42px;
-            border-radius: 8px !important;
-            border: 1px solid #ea5455 !important;
-            color: #ea5455 !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent !important;
-            transition: all 0.2s ease-in-out !important;
-        }
-
-        .btn-modern-danger:hover {
-            background-color: rgba(234, 84, 85, 0.08) !important;
-            transform: translateY(-1px);
-        }
-
-        /* Subtopics Collapsible layout */
-        .subtopic-card {
-            border-radius: 12px;
-            background-color: #ffffff;
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
-        }
-
-        .dark-layout .subtopic-card {
-            background-color: #1e244b;
-            border-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .subtopic-card:hover {
-            box-shadow: 0 8px 24px rgba(115, 103, 240, 0.08) !important;
-            transform: translateY(-2px);
-        }
-
-        .subtopic-header {
-            background-color: transparent;
-            transition: background-color 0.15s ease-in-out;
-        }
-
-        .clickable {
-            cursor: pointer;
-        }
-
-        .clickable:hover {
-            background-color: #fafbfc;
-        }
-
-        .dark-layout .clickable:hover {
-            background-color: rgba(255, 255, 255, 0.02);
-        }
-
-        .subtopic-title {
-            letter-spacing: -0.3px;
-        }
-
-        .dark-layout .text-dark {
-            color: #fff !important;
-        }
-
-        .subtopic-bullet {
-            width: 5px;
-            height: 24px;
-            background: linear-gradient(180deg, #2477F9 0%, #4f46e5 100%);
-            border-radius: 3px;
-        }
-
-        .badge-papers-count {
-            font-weight: 700;
-            padding: 6px 14px;
-            font-size: 0.8rem;
-        }
-
-        .dark-layout .badge-papers-count {
-            background-color: rgba(115, 103, 240, 0.18);
-        }
-
-        .chevron-box {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background-color: #f8f9fa;
-            transition: all 0.2s ease;
-        }
-
-        .dark-layout .chevron-box {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .collapse-icon {
-            transition: transform 0.25s ease-in-out;
-            color: #2477F9;
-            font-weight: bold;
-        }
-
-        [aria-expanded="false"] .collapse-icon {
-            transform: rotate(-180deg);
-        }
-
-        [aria-expanded="false"] .chevron-box {
-            background-color: rgba(115, 103, 240, 0.1);
-        }
-
-        .subtopic-mini-progress {
-            display: inline-block;
-            width: 60px;
-            height: 4px;
-            background-color: #e9ecef;
-            border-radius: 2px;
-            margin-left: 8px;
-            vertical-align: middle;
-            overflow: hidden;
-        }
-
-        .dark-layout .subtopic-mini-progress {
-            background-color: #272c54;
-        }
-
-        .subtopic-mini-bar {
-            height: 100%;
-            background-color: #28c76f;
-            border-radius: 2px;
-        }
-
-        .border-top-light {
-            border-top: 1px solid #f1f2f4;
-        }
-
-        .dark-layout .border-top-light {
-            border-top-color: rgba(255, 255, 255, 0.05);
-        }
-
-        /* Paper Row Layout styling */
-        .paper-row {
-            background-color: #ffffff;
-            transition: background-color 0.2s ease;
-        }
-
-        .dark-layout .paper-row {
-            background-color: #1e244b;
-        }
-
-        .paper-row:hover {
-            background-color: rgba(115, 103, 240, 0.015);
-        }
-
-        .dark-layout .paper-row:hover {
-            background-color: rgba(115, 103, 240, 0.03);
-        }
-
-        .paper-title {
-            font-size: 1rem;
-            letter-spacing: -0.2px;
-        }
-
-        .paper-meta .meta-item {
-            display: flex;
-            align-items: center;
-        }
-
-        .paper-meta i {
-            font-size: 0.95rem;
-        }
-
-        /* Pastel Soft Badges */
-        .badge-soft-success {
-            background-color: #e6f4ea !important;
-            color: #137333 !important;
-            border: 1px solid rgba(19, 115, 51, 0.1);
-            font-weight: 600;
-        }
-
-        .dark-layout .badge-soft-success {
-            background-color: rgba(40, 199, 111, 0.15) !important;
-            color: #28c76f !important;
-            border-color: rgba(40, 199, 111, 0.2);
-        }
-
-        .badge-soft-warning {
-            background-color: #fef7e0 !important;
-            color: #b06000 !important;
-            border: 1px solid rgba(176, 96, 0, 0.1);
-            font-weight: 600;
-        }
-
-        .dark-layout .badge-soft-warning {
-            background-color: rgba(255, 159, 67, 0.15) !important;
-            color: #ff9f43 !important;
-            border-color: rgba(255, 159, 67, 0.2);
-        }
-
-        .badge-soft-danger {
-            background-color: #fce8e6 !important;
-            color: #c5221f !important;
-            border: 1px solid rgba(197, 34, 31, 0.1);
-            font-weight: 600;
-        }
-
-        .dark-layout .badge-soft-danger {
-            background-color: rgba(234, 84, 85, 0.15) !important;
-            color: #ea5455 !important;
-            border-color: rgba(234, 84, 85, 0.2);
-        }
-
-        .badge-soft-secondary {
-            background-color: #f1f3f4 !important;
-            color: #5f6368 !important;
-            border: 1px solid rgba(95, 99, 104, 0.1);
-            font-weight: 600;
-        }
-
-        .dark-layout .badge-soft-secondary {
-            background-color: rgba(180, 183, 197, 0.12) !important;
-            color: #b4b7c5 !important;
-            border-color: rgba(180, 183, 197, 0.15);
-        }
-
-        .badge-soft-paused {
-            background-color: rgba(255, 159, 67, 0.1) !important;
-            color: #ff9f43 !important;
-            border: 1px solid rgba(255, 159, 67, 0.15);
-            font-weight: 600;
-        }
-
-        .badge-soft-progress {
-            background-color: rgba(0, 207, 221, 0.1) !important;
-            color: #00cfdd !important;
-            border: 1px solid rgba(0, 207, 221, 0.15);
-            font-weight: 600;
-        }
-
-        .badge-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            display: inline-block;
-            vertical-align: middle;
-        }
-
-        .badge-soft-success .badge-dot {
-            background-color: #137333;
-        }
-
-        .dark-layout .badge-soft-success .badge-dot {
-            background-color: #28c76f;
-        }
-
-        .badge-soft-warning .badge-dot {
-            background-color: #b06000;
-        }
-
-        .dark-layout .badge-soft-warning .badge-dot {
-            background-color: #ff9f43;
-        }
-
-        .badge-soft-danger .badge-dot {
-            background-color: #c5221f;
-        }
-
-        .dark-layout .badge-soft-danger .badge-dot {
-            background-color: #ea5455;
-        }
-
-        .badge-soft-secondary .badge-dot {
-            background-color: #5f6368;
-        }
-
-        .dark-layout .badge-soft-secondary .badge-dot {
-            background-color: #b4b7c5;
-        }
-
-        .badge-soft-paused .badge-dot {
-            background-color: #ff9f43;
-        }
-
-        .badge-soft-progress .badge-dot {
-            background-color: #00cfdd;
-        }
-
-        /* Pulsing Indicators */
-        .pulse-warning {
-            animation: pulse-warn-border 2s infinite;
-        }
-
-        .pulse-info {
-            animation: pulse-inf-border 2s infinite;
-        }
-
-        @keyframes pulse-warn-border {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255, 159, 67, 0.4);
-            }
-
-            70% {
-                box-shadow: 0 0 0 5px rgba(255, 159, 67, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 159, 67, 0);
-            }
-        }
-
-        @keyframes pulse-inf-border {
-            0% {
-                box-shadow: 0 0 0 0 rgba(0, 207, 221, 0.4);
-            }
-
-            70% {
-                box-shadow: 0 0 0 5px rgba(0, 207, 221, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(0, 207, 221, 0);
-            }
-        }
-
-        /* Action Buttons styling */
-        .btn-resume {
-            border-radius: 30px !important;
-            padding: 8px 24px !important;
-            font-size: 0.85rem !important;
-            border: none !important;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            color: #ffffff !important;
-        }
-
-        .btn-resume-paused {
-            background: linear-gradient(135deg, #ff9f43 0%, #ff8300 100%) !important;
-            box-shadow: 0 4px 14px rgba(255, 159, 67, 0.25) !important;
-        }
-
-        .btn-resume-paused:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 159, 67, 0.4) !important;
-        }
-
-        .btn-resume-in-progress {
-            background: linear-gradient(135deg, #00cfdd 0%, #00b4c0 100%) !important;
-            box-shadow: 0 4px 14px rgba(0, 207, 221, 0.25) !important;
-        }
-
-        .btn-resume-in-progress:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 207, 221, 0.4) !important;
-        }
-
-        .btn-resume:active {
-            transform: translateY(0) scale(0.96) !important;
-        }
-
-        .btn-resume i {
-            transition: transform 0.2s ease;
-        }
-
-        .btn-resume:hover i {
-            transform: scale(1.15) translateX(1px);
-        }
-
-        .btn-start {
-            border-radius: 30px !important;
-            padding: 8px 24px !important;
-            font-size: 0.85rem !important;
-            background: linear-gradient(135deg, #2477F9 0%, #4f46e5 100%) !important;
-            border: none !important;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffffff !important;
-            box-shadow: 0 4px 14px rgba(115, 103, 240, 0.25) !important;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        }
-
-        .btn-start:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(115, 103, 240, 0.45) !important;
-        }
-
-        .btn-start:active {
-            transform: translateY(0) scale(0.96) !important;
-        }
-
-        .btn-start i {
-            transition: transform 0.2s ease;
-        }
-
-        .btn-start:hover i {
-            transform: translateX(4px);
-        }
-
-        .btn-history {
-            width: 38px;
-            height: 38px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50% !important;
-            border: 1px solid rgba(115, 103, 240, 0.15) !important;
-            color: #2477F9 !important;
-            background-color: rgba(115, 103, 240, 0.04) !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        }
-
-        .dark-layout .btn-history {
-            background-color: rgba(115, 103, 240, 0.08) !important;
-            border-color: rgba(115, 103, 240, 0.25) !important;
-            color: #8c83f3 !important;
-        }
-
-        .btn-history i {
-            font-size: 0.95rem;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .btn-history:hover {
-            transform: translateY(-2px);
-            border-color: #2477F9 !important;
-            background-color: #2477F9 !important;
-            color: #ffffff !important;
-            box-shadow: 0 4px 12px rgba(115, 103, 240, 0.25) !important;
-        }
-
-        .btn-history:hover i {
-            transform: rotate(-30deg);
-        }
-
-        .btn-history:active {
-            transform: translateY(0) scale(0.92) !important;
-        }
-
-        .btn-history[aria-expanded="true"] {
-            background-color: #4f46e5 !important;
-            border-color: #4f46e5 !important;
-            color: #ffffff !important;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
-        }
-
-        .btn-history[aria-expanded="true"] i {
-            transform: rotate(-360deg);
-        }
-
-        /* Attempts History Timeline & Tables styling */
-        .history-collapse-wrapper {
-            background-color: #fafbfc;
-        }
-
-        .dark-layout .history-collapse-wrapper {
-            background-color: #161a3f;
-        }
-
-        .bg-light-history {
-            background-color: #fafbfc !important;
-        }
-
-        .dark-layout .bg-light-history {
-            background-color: #161a3f !important;
-        }
-
-        .history-bullet {
-            width: 4px;
-            height: 16px;
-            background-color: #b4b7c5;
-            border-radius: 2px;
-        }
-
-        .table-modern {
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .table-modern thead th {
-            background-color: #f3f2f7 !important;
-            color: #5e5873 !important;
-            border-bottom: 1px solid #ebe9f1 !important;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 700;
-            padding: 10px 15px;
-        }
-
-        .dark-layout .table-modern thead th {
-            background-color: #272c54 !important;
-            color: #c2c6dc !important;
-            border-bottom-color: rgba(255, 255, 255, 0.08) !important;
-        }
-
-        .table-modern tbody td {
-            border-bottom: 1px solid #ebe9f1;
-            padding: 12px 15px;
-            font-size: 0.85rem;
-        }
-
-        .dark-layout .table-modern tbody td {
-            border-bottom-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .table-modern tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .progress-sm {
-            height: 6px !important;
-            border-radius: 3px;
-            background-color: #f1f2f4;
-            overflow: hidden;
-        }
-
-        .dark-layout .progress-sm {
-            background-color: #272c54;
-        }
-
-        .btn-history-action {
-            border-radius: 6px;
-            font-size: 0.78rem;
-            padding: 4px 12px;
-            transition: all 0.15s ease-in-out;
-        }
-
-        /* Mobile cards attempts style */
-        .history-mobile-card {
-            border-color: #ebe9f1 !important;
-            transition: transform 0.15s ease;
-        }
-
-        .dark-layout .history-mobile-card {
-            background-color: #1e244b !important;
-            border-color: rgba(255, 255, 255, 0.05) !important;
-        }
-
-        .history-mobile-card:hover {
-            transform: scale(1.01);
-        }
-
-        /* Empty states styling */
-        .empty-state-main {
-            border-radius: 16px;
-            padding: 60px 20px !important;
-            background-color: #ffffff;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
-        }
-
-        .dark-layout .empty-state-main {
-            background-color: #1e244b;
-        }
-
-        .empty-state-subtopic {
-            padding: 40px 20px !important;
-        }
-
-        .empty-icon-box {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background-color: rgba(255, 159, 67, 0.1);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .animated-svg {
-            animation: floating 3s ease-in-out infinite;
-        }
-
-        @keyframes floating {
-            0% {
-                transform: translateY(0px);
-            }
-
-            50% {
-                transform: translateY(-8px);
-            }
-
-            100% {
-                transform: translateY(0px);
-            }
-        }
-
-        /* Responsive Layout Overrides */
-        @media (max-width: 991.98px) {
-            .hero-title {
-                font-size: 1.8rem;
-            }
-
-            .paper-row {
-                flex-direction: column;
-                align-items: flex-start !important;
-            }
-
-            .paper-actions {
-                width: 100%;
-                justify-content: space-between;
-                margin-top: 15px;
-            }
-
-            .paper-actions form {
-                flex-grow: 1;
-            }
-
-            .paper-actions form button {
-                width: 100%;
-                text-align: center;
-            }
-
-            .max-width-70 {
-                max-width: 100% !important;
-            }
-        }
-    </style>
-@endpush
-
-@push('scripts')
-    <script>
-        $(document).ready(function () {
-            $(document).on('click', '.btn-start-trigger', function () {
-                var button = $(this);
-                var paperTitle = button.data('paper-title');
-                var questionsCount = button.data('paper-questions');
-                var totalTime = button.data('paper-time');
-                var difficulty = button.data('paper-difficulty') || 'medium';
-                var instruction = button.attr('data-paper-instruction');
-                var actionUrl = button.data('action-url');
-
-                // Update Modal Form Action
-                $('#modal-start-form').attr('action', actionUrl);
-
-                // Update Modal Title
-                $('#modal-paper-title').text(paperTitle);
-
-                // Update Stats
-                $('#modal-paper-questions').text(questionsCount);
-                $('#modal-paper-time').text(totalTime);
-
-                // Update Difficulty Text & Icon color dynamically
-                var difficultyColor = '#b06000'; // medium
-                if (difficulty === 'easy') {
-                    difficultyColor = '#137333'; // green
-                } else if (difficulty === 'hard') {
-                    difficultyColor = '#c5221f'; // red
-                }
-                $('#modal-paper-difficulty').css('color', difficultyColor).text(difficulty.charAt(0).toUpperCase() + difficulty.slice(1));
-                $('#modal-paper-difficulty-icon').css('color', difficultyColor);
-
-                // Update Instruction Content
-                $('#modal-paper-instruction').html(instruction);
-
-                // Show the modal
-                $('#instructionsModal').modal('show');
-            });
-        });
-    </script>
-@endpush

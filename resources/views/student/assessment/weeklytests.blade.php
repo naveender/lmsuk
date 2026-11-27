@@ -1,45 +1,1175 @@
 @extends('layouts.app')
 
-@section('title', 'Weekly Tests')
+@section('title', 'Weekly Tests & Resources')
+
+@push('styles')
+    <style>
+        /* ==========================================================================
+           STUDENT WEEKLY TESTS & LEARNING PORTAL - MODERN UI/UX (LIGHT & DARK MODE)
+           ========================================================================== */
+        .wt-breadcrumb {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: var(--text-muted, #64748b);
+            margin-bottom: 0.85rem;
+        }
+
+        .wt-breadcrumb a {
+            color: #2477F9;
+            text-decoration: none;
+        }
+
+        .wt-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .wt-breadcrumb-sep {
+            opacity: 0.55;
+        }
+
+        /* Header Area matching reference layout */
+        .wt-page-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 1.35rem;
+        }
+
+        .wt-header-left {
+            min-width: 0;
+            flex: 1 1 360px;
+        }
+
+        .wt-title-badges {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .wt-context-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 11px;
+            border-radius: 999px;
+            background-color: #ebf3ff;
+            color: #1757c1;
+            border: 1px solid #bfdbfe;
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .wt-page-title {
+            color: var(--text-primary, #0b1f51);
+            font-size: 1.9rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            margin: 0 0 6px;
+        }
+
+        .wt-page-subtitle {
+            color: var(--text-muted, #64748b);
+            font-size: 0.94rem;
+            font-weight: 500;
+            margin: 0 0 10px;
+        }
+
+        /* Prominent Final Deadline Pill */
+        .wt-deadline-pill {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 7px 14px;
+            border-radius: 12px;
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            font-size: 0.84rem;
+            font-weight: 600;
+        }
+
+        .wt-deadline-pill.is-unset {
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
+            color: #64748b;
+        }
+
+        .wt-deadline-pill strong {
+            font-weight: 800;
+            color: #dc2626;
+        }
+
+        .wt-deadline-pill.is-unset strong {
+            color: #334155;
+        }
+
+        .wt-deadline-tag {
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* Right Header Controls: Subject + Week Switcher near each other */
+        .wt-controls-form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .wt-primary-controls {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .wt-pill-group {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #dfe7f2);
+            border-radius: 12px;
+            height: 44px;
+            padding: 0 6px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .wt-pill-group:focus-within {
+            border-color: #2477F9;
+            box-shadow: 0 0 0 3px rgba(36, 119, 249, 0.12);
+        }
+
+        .wt-pill-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 8px;
+            color: #2477F9;
+            flex-shrink: 0;
+        }
+
+        .wt-pill-select {
+            border: none;
+            background: transparent;
+            color: var(--text-primary, #0b1f51);
+            font-size: 0.88rem;
+            font-weight: 700;
+            padding: 6px 28px 6px 4px;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 14px 14px;
+            min-width: 145px;
+        }
+
+        .wt-week-divider {
+            width: 1px;
+            height: 22px;
+            background-color: #e2e8f0;
+            margin: 0 2px;
+        }
+
+        .wt-week-nav-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #475569;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.16s ease, color 0.16s ease;
+        }
+
+        .wt-week-nav-btn:hover:not(:disabled) {
+            background-color: #eff6ff;
+            color: #2477F9;
+        }
+
+        .wt-week-nav-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .wt-secondary-controls {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .wt-mini-filter {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .wt-mini-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted, #64748b);
+            margin: 0;
+        }
+
+        .wt-mini-select {
+            height: 36px;
+            padding: 4px 28px 4px 12px;
+            border-radius: 10px;
+            background-color: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #dfe7f2);
+            color: var(--text-primary, #1e293b);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 13px 13px;
+        }
+
+        .wt-mini-select:focus {
+            border-color: #2477F9;
+        }
+
+        .wt-clear-btn {
+            height: 36px;
+            padding: 0 12px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            border: 1px solid #fecaca;
+            color: #dc2626 !important;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none !important;
+            transition: background-color 0.16s ease;
+        }
+
+        .wt-clear-btn:hover {
+            background-color: #fef2f2;
+        }
+
+        /* 5-Card KPI Bar matching reference image */
+        .wt-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 1.5rem;
+        }
+
+        .wt-kpi-card {
+            background-color: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-subtle, #e6edf7);
+            border-radius: 16px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 3px 14px rgba(15, 23, 42, 0.035);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            min-width: 0;
+        }
+
+        .wt-kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+        }
+
+        .wt-kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .wt-kpi-icon.kpi-blue-sq {
+            border-radius: 14px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2477F9 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(36, 119, 249, 0.25);
+        }
+
+        .wt-kpi-icon.kpi-amber {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.24);
+        }
+
+        .wt-kpi-icon.kpi-purple {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.24);
+        }
+
+        .wt-kpi-icon.kpi-red {
+            background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
+
+        .wt-score-ring-wrap {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            flex-shrink: 0;
+        }
+
+        .wt-score-ring-wrap svg {
+            width: 50px;
+            height: 50px;
+            transform: rotate(-90deg);
+        }
+
+        .wt-ring-track {
+            fill: none;
+            stroke: #e2e8f0;
+            stroke-width: 5;
+        }
+
+        .wt-ring-fill {
+            fill: none;
+            stroke: #22c55e;
+            stroke-width: 5;
+            stroke-linecap: round;
+        }
+
+        .wt-kpi-meta {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .wt-kpi-value {
+            font-size: 1.42rem;
+            font-weight: 800;
+            color: var(--text-primary, #0b1f51);
+            line-height: 1.15;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .wt-kpi-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted, #64748b);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Main 40% / 60% Split Grid */
+        .wt-main-grid {
+            display: grid;
+            grid-template-columns: minmax(320px, 5fr) minmax(0, 7fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .wt-left-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            min-width: 0;
+        }
+
+        .wt-right-col {
+            min-width: 0;
+        }
+
+        .wt-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .wt-section-title {
+            font-size: 1.08rem;
+            font-weight: 800;
+            color: var(--text-primary, #0b1f51);
+            margin: 0;
+            letter-spacing: -0.2px;
+        }
+
+        .wt-count-chip {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted, #64748b);
+            background-color: #f1f5f9;
+            padding: 4px 11px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .wt-card {
+            background-color: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-subtle, #e6edf7);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.035);
+            overflow: hidden;
+        }
+
+        /* Section 1: Core Video Player */
+        .wt-video-frame {
+            background: #0f172a;
+            border-radius: 12px;
+            overflow: hidden;
+            min-height: 230px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wt-video-frame iframe,
+        .wt-video-frame video {
+            width: 100%;
+            height: 235px;
+            border: none;
+            display: block;
+        }
+
+        .wt-video-info-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background-color: #f8fafc;
+            border: 1px solid #eef2f7;
+        }
+
+        .wt-video-play-sq {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background-color: #0b2240;
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .wt-video-title {
+            font-size: 0.94rem;
+            font-weight: 700;
+            color: var(--text-primary, #0b1f51);
+            margin: 0 0 2px;
+        }
+
+        .wt-video-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #16a34a;
+        }
+
+        .wt-playlist-box {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #eef2f7;
+        }
+
+        .wt-playlist-heading {
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: var(--text-primary, #0b1f51);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .playlist-scroll-area {
+            max-height: 220px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background-color: #ffffff;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .playlist-item:hover {
+            background-color: #f8fbff !important;
+            border-color: #2477F9 !important;
+        }
+
+        .playlist-item.active-playlist-item {
+            border-color: #2477F9 !important;
+            background-color: #f0f6ff !important;
+        }
+
+        .playlist-completed {
+            background-color: #f0fdf4 !important;
+            border-color: #86efac !important;
+        }
+
+        .playlist-completed:hover {
+            background-color: #dcfce7 !important;
+        }
+
+        /* Section 3: Homework & Resource Cards inside Left Stack */
+        .wt-hw-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .wt-hw-item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 14px;
+            background-color: #f8fafc;
+            border: 1px solid #e6edf7;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .wt-hw-item:hover {
+            border-color: #bfdbfe;
+            box-shadow: 0 4px 12px rgba(36, 119, 249, 0.08);
+        }
+
+        .wt-hw-left {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .wt-hw-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background-color: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .wt-hw-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-primary, #0b1f51);
+            margin: 0 0 3px;
+            line-height: 1.3;
+        }
+
+        .wt-hw-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted, #64748b);
+            margin: 0 0 6px;
+            line-height: 1.4;
+        }
+
+        .wt-hw-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .wt-hw-chip {
+            padding: 2px 8px;
+            border-radius: 6px;
+            background-color: #e8eef7;
+            color: #334155;
+        }
+
+        .wt-hw-download-btn {
+            padding: 7px 14px;
+            border-radius: 9px;
+            background-color: #ffffff;
+            color: #2477F9 !important;
+            border: 1.5px solid #bfdbfe;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none !important;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: all 0.16s ease;
+        }
+
+        .wt-hw-download-btn:hover {
+            background-color: #2477F9;
+            border-color: #2477F9;
+            color: #ffffff !important;
+        }
+
+        /* Section 2: Right Column Online Assignment Evaluation Table */
+        .wt-table-card {
+            background-color: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-subtle, #e6edf7);
+            border-radius: 16px;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.035);
+            overflow: hidden;
+        }
+
+        .wt-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .wt-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+
+        .wt-table thead th {
+            background-color: #0b1f51;
+            color: #ffffff;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            padding: 13px 14px;
+            white-space: nowrap;
+            border: none;
+            text-align: left;
+        }
+
+        .wt-table thead th.text-center {
+            text-align: center;
+        }
+
+        .wt-table thead th.text-right {
+            text-align: right;
+        }
+
+        .wt-table tbody tr {
+            border-bottom: 1px solid var(--border-subtle, #f1f5f9);
+            transition: background-color 0.16s ease;
+        }
+
+        .wt-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .wt-table tbody tr:hover {
+            background-color: #f8fbff;
+        }
+
+        .wt-table tbody tr.wt-row-pending {
+            background-color: #fffbeb;
+        }
+
+        .wt-table tbody tr.wt-row-pending:hover {
+            background-color: #fef3c7;
+        }
+
+        .wt-table tbody td {
+            padding: 13px 14px;
+            vertical-align: middle;
+            font-size: 0.86rem;
+            color: var(--text-body, #334155);
+        }
+
+        .wt-type-sq {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.82rem;
+            font-weight: 800;
+        }
+
+        .wt-type-quiz {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .wt-type-hw {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        .wt-type-exam {
+            background-color: #ede9fe;
+            color: #6d28d9;
+        }
+
+        .wt-type-test {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .wt-module-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-primary, #0b1f51);
+            line-height: 1.3;
+        }
+
+        .wt-row-pending .wt-module-title {
+            color: #b45309;
+        }
+
+        .wt-module-sub {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 3px;
+            font-size: 0.76rem;
+            color: var(--text-muted, #64748b);
+        }
+
+        .wt-diff-chip {
+            padding: 1px 7px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+
+        .wt-diff-easy {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        .wt-diff-medium {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+
+        .wt-diff-hard {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* Table Action Buttons matching reference image */
+        .wt-btn-review {
+            padding: 6px 16px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            color: #2477F9 !important;
+            border: 1.5px solid #bfdbfe;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 82px;
+            text-decoration: none !important;
+            transition: all 0.16s ease;
+        }
+
+        .wt-btn-review:hover {
+            background-color: #2477F9;
+            border-color: #2477F9;
+            color: #ffffff !important;
+        }
+
+        .wt-btn-start {
+            padding: 6px 16px;
+            border-radius: 8px;
+            background-color: #dc2626;
+            color: #ffffff !important;
+            border: 1.5px solid #dc2626;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 82px;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(220, 38, 38, 0.24);
+            transition: all 0.16s ease;
+        }
+
+        .wt-btn-start:hover {
+            background-color: #b91c1c;
+            border-color: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        .wt-btn-resume {
+            padding: 6px 16px;
+            border-radius: 8px;
+            background-color: #f59e0b;
+            color: #ffffff !important;
+            border: 1.5px solid #f59e0b;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 82px;
+            text-decoration: none !important;
+            box-shadow: 0 3px 10px rgba(245, 158, 11, 0.24);
+            transition: all 0.16s ease;
+        }
+
+        .wt-btn-resume:hover {
+            background-color: #d97706;
+            border-color: #d97706;
+            transform: translateY(-1px);
+        }
+
+        /* Empty States */
+        .wt-empty-box {
+            text-align: center;
+            padding: 2.25rem 1rem;
+        }
+
+        .wt-empty-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background-color: #eff6ff;
+            color: #2477F9;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            margin-bottom: 10px;
+        }
+
+        /* Pagination */
+        .wt-pagination-wrap {
+            display: flex;
+            justify-content: center;
+            padding: 14px;
+            border-top: 1px solid var(--border-subtle, #eef2f7);
+        }
+
+        .wt-pagination-wrap .pagination {
+            margin-bottom: 0;
+            gap: 4px;
+        }
+
+        .wt-pagination-wrap .page-link {
+            border-radius: 8px !important;
+            border: 1px solid var(--border-color, #dfe7f2);
+            color: var(--text-primary, #1e293b);
+            font-weight: 600;
+            font-size: 0.84rem;
+            padding: 6px 11px;
+        }
+
+        .wt-pagination-wrap .page-item.active .page-link {
+            background-color: #2477F9;
+            border-color: #2477F9;
+            color: #ffffff;
+        }
+
+        /* Responsive */
+        @media (max-width: 1279.98px) {
+            .wt-kpi-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .wt-controls-form {
+                align-items: flex-start;
+                width: 100%;
+            }
+            .wt-main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .wt-kpi-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .wt-page-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .wt-kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            .wt-pill-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .wt-pill-select {
+                flex: 1;
+            }
+        }
+
+        /* Dark Mode Support */
+        body.dark-layout .wt-kpi-card,
+        body.dark-layout .wt-card,
+        body.dark-layout .wt-table-card,
+        body.dark-layout .wt-pill-group,
+        body.dark-layout .wt-mini-select,
+        body.dark-layout .playlist-item,
+        body.dark-layout .wt-hw-item,
+        body.dark-layout .wt-video-info-row {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-layout .wt-page-title,
+        body.dark-layout .wt-kpi-value,
+        body.dark-layout .wt-section-title,
+        body.dark-layout .wt-video-title,
+        body.dark-layout .wt-playlist-heading,
+        body.dark-layout .wt-hw-title,
+        body.dark-layout .wt-module-title,
+        body.dark-layout .wt-pill-select,
+        body.dark-layout .wt-mini-select {
+            color: #f8fafc !important;
+        }
+
+        body.dark-layout .wt-page-subtitle,
+        body.dark-layout .wt-kpi-label,
+        body.dark-layout .wt-mini-label,
+        body.dark-layout .wt-hw-desc,
+        body.dark-layout .wt-hw-meta,
+        body.dark-layout .wt-module-sub {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-layout .wt-table tbody td {
+            color: #cbd5e1 !important;
+        }
+
+        body.dark-layout .wt-table tbody tr {
+            border-color: #334155 !important;
+        }
+
+        body.dark-layout .wt-table tbody tr:hover {
+            background-color: rgba(36, 119, 249, 0.08);
+        }
+
+        body.dark-layout .wt-table tbody tr.wt-row-pending {
+            background-color: rgba(245, 158, 11, 0.1);
+        }
+
+        body.dark-layout .wt-row-pending .wt-module-title {
+            color: #fde68a !important;
+        }
+
+        body.dark-layout .wt-ring-track {
+            stroke: #334155;
+        }
+
+        body.dark-layout .wt-week-divider {
+            background-color: #334155;
+        }
+
+        body.dark-layout .wt-week-nav-btn {
+            color: #cbd5e1;
+        }
+
+        body.dark-layout .wt-week-nav-btn:hover:not(:disabled) {
+            background-color: rgba(36, 119, 249, 0.2);
+            color: #93c5fd;
+        }
+
+        body.dark-layout .wt-count-chip,
+        body.dark-layout .wt-hw-chip {
+            background-color: #0f172a;
+            color: #cbd5e1;
+        }
+
+        body.dark-layout .wt-deadline-pill {
+            background-color: rgba(239, 68, 68, 0.14);
+            border-color: rgba(239, 68, 68, 0.35);
+            color: #fca5a5;
+        }
+
+        body.dark-layout .wt-deadline-pill strong {
+            color: #fecaca;
+        }
+
+        body.dark-layout .wt-deadline-tag {
+            background-color: rgba(239, 68, 68, 0.24);
+            color: #fecaca;
+        }
+
+        body.dark-layout .wt-deadline-pill.is-unset {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #94a3b8;
+        }
+
+        body.dark-layout .wt-deadline-pill.is-unset strong {
+            color: #e2e8f0;
+        }
+
+        body.dark-layout .wt-btn-review,
+        body.dark-layout .wt-hw-download-btn {
+            background-color: #0f172a;
+            border-color: #334155;
+            color: #60a5fa !important;
+        }
+
+        body.dark-layout .wt-btn-review:hover,
+        body.dark-layout .wt-hw-download-btn:hover {
+            background-color: #2477F9;
+            border-color: #2477F9;
+            color: #ffffff !important;
+        }
+
+        body.dark-layout .wt-clear-btn {
+            background-color: #1e293b;
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #fca5a5 !important;
+        }
+
+        body.dark-layout .wt-pill-select,
+        body.dark-layout .wt-mini-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        }
+
+        body.dark-layout .wt-pill-select option,
+        body.dark-layout .wt-mini-select option {
+            background-color: #1e293b;
+            color: #f8fafc;
+        }
+
+        body.dark-layout .wt-pagination-wrap {
+            border-color: #334155;
+        }
+
+        body.dark-layout .wt-pagination-wrap .page-link {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+    </style>
+@endpush
 
 @section('content')
-    <!-- BEGIN: Content-->
+    @php
+        $scoreCircumference = 2 * pi() * 20;
+        $scoreDashOffset = $metrics['has_score']
+            ? $scoreCircumference * (1 - min(100, max(0, $metrics['score_pct'])) / 100)
+            : $scoreCircumference;
+    @endphp
+
     <div class="app-content content">
         <div class="content-overlay"></div>
         <div class="header-navbar-shadow"></div>
         <div class="content-wrapper">
+            <div class="content-body">
 
-            <!-- Breadcrumbs -->
-            <div class="content-header row mb-1">
-                <div class="content-header-left col-md-9 col-12 mb-2">
-                    <div class="row breadcrumbs-top">
-                        <div class="col-12">
-                            <h2 class="content-header-title float-left mb-0">Weekly Tests</h2>
-                            <div class="breadcrumb-wrapper col-12">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{ route('student.dashboard') }}">Dashboard</a>
-                                    </li>
-                                    <li class="breadcrumb-item"><a href="{{ route('student.assessments') }}">Assessments</a>
-                                    </li>
-                                    <li class="breadcrumb-item active">Weekly Tests</li>
-                                </ol>
+                <!-- Breadcrumb Trail -->
+                <nav class="wt-breadcrumb" aria-label="Breadcrumb">
+                    <a href="{{ route('student.dashboard') }}">Dashboard</a>
+                    <span class="wt-breadcrumb-sep">/</span>
+                    <a href="{{ route('student.assessments') }}">Assessments</a>
+                    <span class="wt-breadcrumb-sep">/</span>
+                    <span>Weekly Tests</span>
+                </nav>
+
+                <!-- Portal Header + Subject & Week Selection + Final Deadline -->
+                <div class="wt-page-header">
+                    <div class="wt-header-left">
+                        @if(!empty($yearGroupLabel) || $selectedSubject)
+                            <div class="wt-title-badges">
+                                @if(!empty($yearGroupLabel))
+                                    <span class="wt-context-chip">{{ $yearGroupLabel }}</span>
+                                @endif
+                                @if($selectedSubject)
+                                    <span class="wt-context-chip">{{ $selectedSubject->title }}</span>
+                                @endif
                             </div>
+                        @endif
+
+                        <h1 class="wt-page-title">{{ $courseTitle }} — {{ $selectedWeekName }}</h1>
+                        <p class="wt-page-subtitle">
+                            Here is your learning plan, tasks and resources{{ $selectedWeekName !== 'All Weeks' ? ' for ' . $selectedWeekName : '' }}.
+                        </p>
+
+                        <!-- Final Deadline Display -->
+                        <div class="wt-deadline-pill {{ empty($selectedWeekDueDate) ? 'is-unset' : '' }}">
+                            <i class="feather icon-clock"></i>
+                            <span>Final Deadline:</span>
+                            <strong>{{ $metrics['deadline'] }}</strong>
+                            @if(!empty($metrics['deadline_subtext']))
+                                <span class="wt-deadline-tag">{{ $metrics['deadline_subtext'] }}</span>
+                            @endif
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="content-body">
-                <!-- Filters Section -->
-                <div class="card mb-3 shadow-sm border-0 filter-card">
-                    <div class="card-body py-1">
-                        <form method="GET" action="{{ route('student.weeklytests') }}" class="row align-items-end">
-                            <!-- Subject Filter -->
-                            <div class="col-lg-3 col-md-6 col-sm-12 mb-1">
-                                <label for="subject_filter"
-                                    class="form-label font-weight-bold text-secondary font-small-2 mb-0">Subject</label>
-                                <select name="subject_id" id="subject_filter"
-                                    class="form-control form-control-sm filter-select">
+                    <!-- Right Header Controls: Subject Selection near Week Selection -->
+                    <form method="GET" action="{{ route('student.weeklytests') }}" id="weeklyFilterForm" class="wt-controls-form">
+                        <div class="wt-primary-controls">
+                            <!-- Subject Selection Pill (near Week selection) -->
+                            <div class="wt-pill-group">
+                                <span class="wt-pill-icon" title="Subject">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                                    </svg>
+                                </span>
+                                <select name="subject_id"
+                                        id="subject_filter"
+                                        class="wt-pill-select"
+                                        onchange="this.form.submit()"
+                                        aria-label="Select subject">
                                     <option value="">All Subjects</option>
                                     @foreach($subjects as $subject)
                                         <option value="{{ $subject->id }}" {{ request('subject_id') == $subject->id ? 'selected' : '' }}>
@@ -49,12 +1179,44 @@
                                 </select>
                             </div>
 
-                            <!-- Course Filter -->
-                            <div class="col-lg-3 col-md-6 col-sm-12 mb-1">
-                                <label for="course_filter"
-                                    class="form-label font-weight-bold text-secondary font-small-2 mb-0">Course</label>
-                                <select name="course_id" id="course_filter"
-                                    class="form-control form-control-sm filter-select select2">
+                            <!-- Week Switcher Pill (< Week >) -->
+                            <div class="wt-pill-group">
+                                <span class="wt-pill-icon" title="Week">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                        <line x1="16" y1="2" x2="16" y2="6"/>
+                                        <line x1="8" y1="2" x2="8" y2="6"/>
+                                        <line x1="3" y1="10" x2="21" y2="10"/>
+                                    </svg>
+                                </span>
+                                <button type="button" id="weekPrevBtn" class="wt-week-nav-btn" aria-label="Previous week" title="Previous week">
+                                    <i class="feather icon-chevron-left"></i>
+                                </button>
+                                <span class="wt-week-divider"></span>
+                                <select name="week"
+                                        id="week_filter"
+                                        class="wt-pill-select"
+                                        onchange="this.form.submit()"
+                                        aria-label="Select week">
+                                    <option value="">All Weeks</option>
+                                    @foreach($allWeeks as $wk)
+                                        <option value="{{ $wk->id }}" data-course-id="{{ $wk->course_id }}" {{ request('week') == $wk->id ? 'selected' : '' }}>
+                                            {{ $wk->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <span class="wt-week-divider"></span>
+                                <button type="button" id="weekNextBtn" class="wt-week-nav-btn" aria-label="Next week" title="Next week">
+                                    <i class="feather icon-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Compact Course & Status Filters -->
+                        <div class="wt-secondary-controls">
+                            <div class="wt-mini-filter">
+                                <label for="course_filter" class="wt-mini-label">Course:</label>
+                                <select name="course_id" id="course_filter" class="wt-mini-select">
                                     <option value="">All Courses</option>
                                     @foreach($courses as $course)
                                         <option value="{{ $course->id }}" {{ request('course_id') == $course->id ? 'selected' : '' }}>
@@ -64,160 +1226,182 @@
                                 </select>
                             </div>
 
-                            <!-- Week Filter -->
-                            <div class="col-lg-2 col-md-6 col-sm-12 mb-1">
-                                <label for="week_filter"
-                                    class="form-label font-weight-bold text-secondary font-small-2 mb-0">Week</label>
-                                <select name="week" id="week_filter"
-                                    class="form-control form-control-sm filter-select select2">
-                                    <option value="">All Weeks</option>
-                                    @foreach($allWeeks as $wk)
-                                        <option value="{{ $wk->id }}" data-course-id="{{ $wk->course_id }}" {{ request('week') == $wk->id ? 'selected' : '' }}>
-                                            {{ $wk->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <!-- Status Filter -->
-                            <div class="col-lg-2 col-md-6 col-sm-12 mb-1">
-                                <label for="status_filter"
-                                    class="form-label font-weight-bold text-secondary font-small-2 mb-0">Status</label>
-                                <select name="status" id="status_filter" class="form-control form-control-sm filter-select">
+                            <div class="wt-mini-filter">
+                                <label for="status_filter" class="wt-mini-label">Status:</label>
+                                <select name="status" id="status_filter" class="wt-mini-select" onchange="this.form.submit()">
                                     <option value="">All Statuses</option>
-                                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>
-                                        Completed</option>
-                                    <option value="paused" {{ request('status') === 'paused' ? 'selected' : '' }}>Paused
-                                    </option>
+                                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
+                                    <option value="paused" {{ request('status') === 'paused' ? 'selected' : '' }}>Paused</option>
                                     <option value="Not completed" {{ request('status') === 'Not completed' ? 'selected' : '' }}>Not Completed</option>
                                 </select>
                             </div>
 
-                            <!-- Buttons -->
-                            <div class="col-lg-2 col-md-12 col-sm-12 d-flex justify-content-between mb-1">
-                                <button type="submit" class="btn btn-primary btn-sm flex-grow-1 mr-1 search-btn shadow-sm">
-                                    <i class="feather icon-search"></i> Filter
-                                </button>
-                                @if(request()->anyFilled(['subject_id', 'course_id', 'week', 'status']))
-                                    <a href="{{ route('student.weeklytests') }}"
-                                        class="btn btn-outline-danger btn-sm flex-grow-1 text-center d-flex align-items-center justify-content-center">
-                                        Clear
-                                    </a>
-                                @endif
-                            </div>
-                        </form>
+                            @if(request()->anyFilled(['subject_id', 'course_id', 'week', 'status']))
+                                <a href="{{ route('student.weeklytests') }}" class="wt-clear-btn">
+                                    <i class="feather icon-x"></i>
+                                    <span>Clear</span>
+                                </a>
+                            @endif
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Top Row: 5 KPI Summary Cards matching reference image -->
+                <div class="wt-kpi-grid">
+                    <!-- 1. Assignment Score Ring -->
+                    <div class="wt-kpi-card">
+                        <div class="wt-score-ring-wrap">
+                            <svg viewBox="0 0 48 48">
+                                <circle class="wt-ring-track" cx="24" cy="24" r="20"/>
+                                <circle class="wt-ring-fill"
+                                        cx="24"
+                                        cy="24"
+                                        r="20"
+                                        stroke-dasharray="{{ number_format($scoreCircumference, 2, '.', '') }}"
+                                        stroke-dashoffset="{{ number_format($scoreDashOffset, 2, '.', '') }}"/>
+                            </svg>
+                        </div>
+                        <div class="wt-kpi-meta">
+                            <span class="wt-kpi-value">{{ $metrics['score'] }}</span>
+                            <span class="wt-kpi-label">Assignment Score</span>
+                        </div>
                     </div>
-                </div>
 
-                <!-- STUDENT PORTAL Header -->
-                <div class="portal-header-wrapper mt-3 mb-2">
-                    <span class="portal-badge font-weight-extrabold text-uppercase">Student Portal</span>
-                    <h2 class="portal-title font-weight-bold text-dark">{{ $courseTitle }} | YR 5 — {{ $selectedWeekName }}
-                    </h2>
-                </div>
+                    <!-- 2. Tasks Completed -->
+                    <div class="wt-kpi-card">
+                        <div class="wt-kpi-icon kpi-blue-sq">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="3"/>
+                                <path d="M9 12l2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <div class="wt-kpi-meta">
+                            <span class="wt-kpi-value">{{ $metrics['completion'] }}</span>
+                            <span class="wt-kpi-label">Tasks Completed</span>
+                        </div>
+                    </div>
 
-                <!-- OVERVIEW METRICS BAR -->
-                <div class="overview-metrics-card card shadow-sm border-0 mb-4">
-                    <div class="card-body p-0">
-                        <div class="metrics-grid">
-                            <div class="metric-item border-right">
-                                <span class="metric-label">Assignment Score</span>
-                                <span class="metric-value text-dark">{{ $metrics['score'] }}</span>
-                            </div>
-                            <div class="metric-item border-right">
-                                <span class="metric-label">Task Completion</span>
-                                <span class="metric-value text-dark">{{ $metrics['completion'] }}</span>
-                            </div>
-                            <div class="metric-item border-right">
-                                <span class="metric-label">Tracked Runtime</span>
-                                <span
-                                    class="metric-value font-small-3 font-weight-normal mt-1">{{ $metrics['runtime'] }}</span>
-                            </div>
-                            <div class="metric-item border-right">
-                                <span class="metric-label">Exam System Metrics</span>
-                                <span
-                                    class="metric-value font-small-3 font-weight-normal mt-1">{{ $metrics['overdue_late'] }}</span>
-                            </div>
-                            <div class="metric-item">
-                                <span class="metric-label text-danger">Final Deadline</span>
-                                <span
-                                    class="metric-value text-danger font-medium-1 font-weight-bold mt-1">{{ $metrics['deadline'] }}</span>
-                            </div>
+                    <!-- 3. Estimated Runtime -->
+                    <div class="wt-kpi-card">
+                        <div class="wt-kpi-icon kpi-amber">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="9"/>
+                                <polyline points="12 7 12 12 15 15"/>
+                            </svg>
+                        </div>
+                        <div class="wt-kpi-meta">
+                            <span class="wt-kpi-value">{{ $metrics['estimated_text'] }}</span>
+                            <span class="wt-kpi-label">Estimated Runtime</span>
+                        </div>
+                    </div>
+
+                    <!-- 4. Time Taken -->
+                    <div class="wt-kpi-card">
+                        <div class="wt-kpi-icon kpi-purple">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="13" r="8"/>
+                                <path d="M12 9v4l2 2"/>
+                                <path d="M9 2h6"/>
+                            </svg>
+                        </div>
+                        <div class="wt-kpi-meta">
+                            <span class="wt-kpi-value">{{ $metrics['taken_text'] }}</span>
+                            <span class="wt-kpi-label">Time Taken</span>
+                        </div>
+                    </div>
+
+                    <!-- 5. Pending / Overdue Tasks -->
+                    <div class="wt-kpi-card">
+                        <div class="wt-kpi-icon kpi-red">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="9"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                        </div>
+                        <div class="wt-kpi-meta">
+                            <span class="wt-kpi-value">{{ $metrics['pending_count'] }}</span>
+                            <span class="wt-kpi-label">
+                                {{ $metrics['is_deadline_passed'] ? 'Overdue' : 'Pending' }} {{ \Illuminate\Support\Str::plural('Task', $metrics['pending_count']) }}
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <!-- MAIN Split Layout (40% / 60%) -->
-                <div class="row layout-split">
+                <!-- MAIN Split Layout: Left Stack (Videos + Homework) / Right (Evaluation Table) -->
+                <div class="wt-main-grid">
 
-                    <!-- Left Column (40% Hold - Videos & Mark Schemes) -->
-                    <div class="col-xl-5 col-lg-5 col-md-12 col-sm-12 layout-left">
+                    <!-- Left Column -->
+                    <div class="wt-left-stack">
 
                         <!-- 1. CORE VIDEO LECTURE STREAMS -->
-                        <div class="video-section-wrapper mb-4">
-                            <h5 class="section-heading mb-2 font-weight-extrabold text-dark">1. CORE VIDEO LECTURE STREAMS
-                            </h5>
+                        <div>
+                            <div class="wt-section-header">
+                                <h2 class="wt-section-title">1. Core Video Lecture Streams</h2>
+                                @if($mediaFiles->isNotEmpty())
+                                    <span class="wt-count-chip">
+                                        {{ $mediaFiles->count() }} {{ \Illuminate\Support\Str::plural('Lecture', $mediaFiles->count()) }}
+                                    </span>
+                                @endif
+                            </div>
 
                             @if($mediaFiles->isNotEmpty())
                                 @php $firstVideo = $mediaFiles->first(); @endphp
-                                <div class="card shadow-sm border-0 overflow-hidden video-card">
-                                    <!-- Interactive Playable Video Box -->
-                                    <div class="video-container" id="videoContainer" data-active-id="{{ $firstVideo->id }}">
+                                <div class="wt-card">
+                                    <div class="wt-video-frame" id="videoContainer" data-active-id="{{ $firstVideo->id }}">
                                         @if($firstVideo->type === 'iframe')
                                             {!! $firstVideo->embed_url !!}
                                         @elseif(in_array($firstVideo->type, ['video_file', 'video_url', 's3', 'wasabi']))
-                                            <video id="trackedHtml5Player" controls class="embed-responsive-item"
-                                                src="{{ $firstVideo->embed_url }}"
-                                                style="width: 100%; height: 240px; border: none;"></video>
+                                            <video id="trackedHtml5Player" controls src="{{ $firstVideo->embed_url }}"></video>
                                         @else
-                                            <iframe id="videoIframe" class="embed-responsive-item" width="100%" height="240"
-                                                src="{{ $firstVideo->embed_url }}" frameborder="0" allowfullscreen allow="autoplay"
-                                                style="border: none;"></iframe>
+                                            <iframe id="videoIframe"
+                                                    src="{{ $firstVideo->embed_url }}"
+                                                    frameborder="0"
+                                                    allowfullscreen
+                                                    allow="autoplay"></iframe>
                                         @endif
                                     </div>
-                                    <div class="card-body p-2 border-bottom">
-                                        <div class="d-flex align-items-center">
-                                            <div class="video-icon-box mr-2">
-                                                @php $firstProgress = $videoProgressMap[$firstVideo->id] ?? null; @endphp
+
+                                    @php $firstProgress = $videoProgressMap[$firstVideo->id] ?? null; @endphp
+                                    <div class="wt-video-info-row">
+                                        <div class="d-flex align-items-center min-width-0" style="gap: 12px;">
+                                            <span class="wt-video-play-sq">
                                                 @if($firstProgress && $firstProgress->is_completed)
-                                                    <i class="feather icon-check-circle text-success font-large-1"></i>
+                                                    <i class="feather icon-check"></i>
                                                 @else
-                                                    <i class="feather icon-play-circle text-primary font-large-1"></i>
+                                                    <i class="feather icon-play"></i>
                                                 @endif
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <h6 class="video-title font-weight-bold text-dark mb-0" id="activeVideoTitle">
-                                                    {{ $firstVideo->title }}</h6>
-                                                <span class="video-status text-success font-weight-bold font-small-2"
-                                                    id="activeVideoDuration">
+                                            </span>
+                                            <div class="min-width-0">
+                                                <h6 class="wt-video-title text-truncate" id="activeVideoTitle">{{ $firstVideo->title }}</h6>
+                                                <span class="wt-video-status" id="activeVideoDuration">
                                                     @if($firstVideo->duration)
-                                                        <i class="feather icon-play mr-1"></i>Runtime: {{ $firstVideo->duration }}
+                                                        <i class="feather icon-check-circle mr-25"></i>Runtime: {{ $firstVideo->duration }}
                                                     @else
-                                                        <i class="feather icon-play mr-1"></i>Video Lecture Stream
+                                                        <i class="feather icon-play-circle mr-25"></i>Video Lecture Stream
                                                     @endif
                                                 </span>
                                             </div>
-                                            <div id="activeVideoProgressBadge">
-                                                @if($firstProgress && $firstProgress->is_completed)
-                                                    <span class="badge badge-success px-1 py-50"><i
-                                                            class="feather icon-check mr-25"></i>Completed</span>
-                                                @elseif($firstProgress && $firstProgress->watch_time > 0)
-                                                    <span class="badge badge-light-warning px-1 py-50"><i
-                                                            class="feather icon-clock mr-25"></i>{{ gmdate('H:i:s', $firstProgress->watch_time) }}
-                                                        watched</span>
-                                                @else
-                                                    <span class="badge badge-light-secondary px-1 py-50">Not started</span>
-                                                @endif
-                                            </div>
+                                        </div>
+
+                                        <div id="activeVideoProgressBadge" class="flex-shrink-0">
+                                            @if($firstProgress && $firstProgress->is_completed)
+                                                <span class="badge badge-success px-1 py-50"><i class="feather icon-check mr-25"></i>Completed</span>
+                                            @elseif($firstProgress && $firstProgress->watch_time > 0)
+                                                <span class="badge badge-light-warning px-1 py-50"><i class="feather icon-clock mr-25"></i>{{ gmdate('H:i:s', $firstProgress->watch_time) }} watched</span>
+                                            @else
+                                                <span class="badge badge-light-secondary px-1 py-50">Not started</span>
+                                            @endif
                                         </div>
                                     </div>
 
                                     @if($mediaFiles->count() > 1)
-                                        <div class="playlist-container p-2 bg-light">
-                                            <h6 class="font-weight-bold text-dark mb-1"><i class="feather icon-list"></i> Weekly
-                                                Video Playlist ({{ $mediaFiles->count() }} lectures)</h6>
-                                            <div class="playlist-scroll-area"
-                                                style="max-height: 220px; overflow-y: auto; gap: 8px; display: flex; flex-direction: column;">
+                                        <div class="wt-playlist-box">
+                                            <div class="wt-playlist-heading">
+                                                <i class="feather icon-list text-primary"></i>
+                                                <span>Weekly Video Playlist ({{ $mediaFiles->count() }} lectures)</span>
+                                            </div>
+                                            <div class="playlist-scroll-area">
                                                 @foreach($mediaFiles as $video)
                                                     @php
                                                         $vProgress = $videoProgressMap[$video->id] ?? null;
@@ -231,12 +1415,14 @@
                                                         }
                                                         $isVCompleted = $vProgress && $vProgress->is_completed;
                                                     @endphp
-                                                    <div class="playlist-item d-flex align-items-center p-1 border rounded bg-white cursor-pointer {{ $loop->first ? 'active-playlist-item border-primary' : '' }} {{ $isVCompleted ? 'playlist-completed' : '' }}"
-                                                        style="transition: all 0.2s; position: relative; overflow: hidden;"
-                                                        data-id="{{ $video->id }}" data-embed="{{ $video->embed_url }}"
-                                                        data-title="{{ $video->title }}" data-duration="{{ $video->duration }}"
-                                                        data-type="{{ $video->type }}" data-completed="{{ $isVCompleted ? '1' : '0' }}"
-                                                        data-watchtime="{{ $vProgress ? $vProgress->watch_time : 0 }}">
+                                                    <div class="playlist-item {{ $loop->first ? 'active-playlist-item' : '' }} {{ $isVCompleted ? 'playlist-completed' : '' }}"
+                                                         data-id="{{ $video->id }}"
+                                                         data-embed="{{ $video->embed_url }}"
+                                                         data-title="{{ $video->title }}"
+                                                         data-duration="{{ $video->duration }}"
+                                                         data-type="{{ $video->type }}"
+                                                         data-completed="{{ $isVCompleted ? '1' : '0' }}"
+                                                         data-watchtime="{{ $vProgress ? $vProgress->watch_time : 0 }}">
                                                         <div class="mr-1">
                                                             @if($isVCompleted)
                                                                 <i class="feather icon-check-circle text-success font-medium-3"></i>
@@ -245,35 +1431,33 @@
                                                             @endif
                                                         </div>
                                                         <div class="flex-grow-1 min-width-0">
-                                                            <h6 class="text-truncate font-small-3 font-weight-bold mb-0 text-dark">
-                                                                {{ $video->title }}</h6>
-                                                            <small class="font-small-1">
+                                                            <h6 class="text-truncate font-small-3 font-weight-bold mb-0 wt-video-title">
+                                                                {{ $video->title }}
+                                                            </h6>
+                                                            <small class="font-small-1 text-muted">
                                                                 @if($video->duration)
                                                                     <i class="feather icon-clock mr-25"></i>{{ $video->duration }}
                                                                 @else
                                                                     Video Lecture
                                                                 @endif
                                                                 @if($vProgress && $vProgress->watch_time > 0 && !$isVCompleted)
-                                                                    <span class="text-warning ml-50">•
-                                                                        {{ gmdate('i:s', $vProgress->watch_time) }} watched</span>
+                                                                    <span class="text-warning ml-50">• {{ gmdate('i:s', $vProgress->watch_time) }} watched</span>
                                                                 @endif
                                                             </small>
                                                         </div>
                                                         @if($isVCompleted)
-                                                            <span class="badge badge-success font-small-1 ml-50"
-                                                                style="white-space: nowrap;">✓ Done</span>
+                                                            <span class="badge badge-success font-small-1 ml-50" style="white-space: nowrap;">✓ Done</span>
                                                         @elseif($watchPct > 0)
-                                                            <span class="badge badge-light-warning font-small-1 ml-50"
-                                                                style="white-space: nowrap;">{{ $watchPct }}%</span>
+                                                            <span class="badge badge-light-warning font-small-1 ml-50" style="white-space: nowrap;">{{ $watchPct }}%</span>
                                                         @endif
-                                                        {{-- Progress bar underlay --}}
+
                                                         @if($watchPct > 0 && !$isVCompleted)
                                                             <div class="playlist-progress-bar"
-                                                                style="position: absolute; bottom: 0; left: 0; height: 3px; width: {{ $watchPct }}%; background: #ff9f43; border-radius: 0 0 0 4px; transition: width 0.3s;">
+                                                                 style="position: absolute; bottom: 0; left: 0; height: 3px; width: {{ $watchPct }}%; background: #f59e0b; transition: width 0.3s;">
                                                             </div>
                                                         @elseif($isVCompleted)
                                                             <div class="playlist-progress-bar"
-                                                                style="position: absolute; bottom: 0; left: 0; height: 3px; width: 100%; background: #28c76f; border-radius: 0 0 4px 4px;">
+                                                                 style="position: absolute; bottom: 0; left: 0; height: 3px; width: 100%; background: #22c55e;">
                                                             </div>
                                                         @endif
                                                     </div>
@@ -283,158 +1467,84 @@
                                     @endif
                                 </div>
                             @else
-                                <div class="alert alert-info py-2" role="alert">
-                                    <div class="alert-body d-flex align-items-center">
-                                        <i class="feather icon-info mr-1" style="font-size: 1.5rem;"></i>
-                                        <div>
-                                            <h6 class="alert-heading font-weight-bold mb-25">No Video Lectures Scheduled</h6>
-                                            <span class="font-small-3">There are no core video lecture streams
-                                                assigned to this course/week schedule.</span>
+                                <div class="wt-card">
+                                    <div class="wt-empty-box">
+                                        <div class="wt-empty-icon">
+                                            <i class="feather icon-video"></i>
                                         </div>
+                                        <h6 class="font-weight-bold mb-25 wt-section-title" style="font-size: 0.96rem;">No Video Lectures Scheduled</h6>
+                                        <p class="mb-0 text-muted font-small-3">
+                                            There are no core video lecture streams assigned to this schedule yet.
+                                        </p>
                                     </div>
                                 </div>
                             @endif
                         </div>
 
+                        <!-- 3. HOMEWORK TASKS (Compact cards stacked under videos matching reference image) -->
+                        <div>
+                            <div class="wt-section-header">
+                                <h2 class="wt-section-title">3. HOMEWORK TASKS</h2>
+                                @if(isset($homeworks) && $homeworks->isNotEmpty())
+                                    <span class="wt-count-chip">
+                                        {{ $homeworks->count() }} {{ \Illuminate\Support\Str::plural('Assignment', $homeworks->count()) }}
+                                    </span>
+                                @endif
+                            </div>
 
-
-                    </div>
-
-                    <!-- Right Column (60% Hold - Online Assessment Tests) -->
-                    <div class="col-xl-7 col-lg-7 col-md-12 col-sm-12 layout-right">
-
-                        <!-- 3. ONLINE ASSIGNMENT TASKS EVALUATION -->
-                        <div class="assessment-section-wrapper mb-4">
-                            <h5 class="section-heading mb-2 font-weight-extrabold text-dark">2. ONLINE ASSIGNMENT TASKS
-                                EVALUATION</h5>
-
-                            <div class="card shadow-sm border-0 overflow-hidden">
-                                <div class="table-responsive">
-                                    <table class="table table-hover evaluation-table mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th style="width: 10%;">Difficulty</th>
-                                                <th style="width: 10%;">Type</th>
-                                                <th style="width: 40%;">Assignment Challenge Module Title</th>
-                                                <th style="width: 15%;" class="text-center">Target</th>
-                                                <th style="width: 15%;" class="text-center">Completed</th>
-                                                <th style="width: 10%;" class="text-center">Score</th>
-                                                <th style="width: 10%; text-align: right;">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($papers as $paper)
-                                                @php
-                                                    // Dynamic type tag based on difficulty or subject
-                                                    // Q (Quiz - Blue), H (Homework - Red), S (Subject test - Light Red)
-
-                                                    if ($paper->difficulty === 'easy') {
-                                                        $typeChar = 'E';
-                                                        $typeClass = 'bg-light-success text-success';
-                                                    } elseif ($paper->difficulty === 'medium') {
-                                                        $typeChar = 'M';
-                                                        $typeClass = 'bg-light-primary text-primary';
-                                                    } elseif ($paper->difficulty === 'hard') {
-                                                        $typeChar = 'H';
-                                                        $typeClass = 'bg-light-rose text-rose';
-                                                    } else {
-                                                        $typeChar = 'T';
-                                                        $typeClass = 'bg-light-secondary text-secondary';
-                                                    } 
-                                                @endphp
-                                                <tr>
-                                                    <td>
-                                                        <div
-                                                            class="type-badge {{ $typeClass }} font-weight-extrabold text-center">
-                                                            {{ $typeChar }}
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="badge {{ $paper->type }} font-weight-extrabold text-center">
-                                                            {{ ucfirst($paper->type) }}
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="font-weight-bold text-dark module-title">{{ $paper->title }}
-                                                        </div>
-                                                        <div class="font-small-1 mt-0">Subject: <span
-                                                                class="text-secondary font-weight-bold">{{ $paper->subject->title ?? 'N/A' }}</span>
-                                                        </div>
-                                                    </td>
-                                                    <td class="text-center font-weight-bold font-small-2">
-                                                        @if($paper->total_time > 0)
-                                                            {{ $paper->total_time }}m 00s
-                                                        @else
-                                                            No Limit
+                            <div class="wt-card">
+                                @if(isset($homeworks) && $homeworks->isNotEmpty())
+                                    <div class="wt-hw-list">
+                                        @foreach($homeworks as $homework)
+                                            <div class="wt-hw-item">
+                                                <div class="wt-hw-left">
+                                                    <span class="wt-hw-icon" title="{{ strtoupper($homework->file_type ?? 'HW') }}">
+                                                        <i class="feather icon-file-text"></i>
+                                                    </span>
+                                                    <div class="min-width-0">
+                                                        <h4 class="wt-hw-title">{{ $homework->title }}</h4>
+                                                        @if($homework->description)
+                                                            <p class="wt-hw-desc">
+                                                                {{ \Illuminate\Support\Str::limit(strip_tags($homework->description), 130) }}
+                                                            </p>
                                                         @endif
-                                                    </td>
-                                                    <td class="text-center font-small-2">
-                                                        @if($paper->attempt_status === 'completed')
-                                                            {{ $paper->completed_at }}
-                                                        @else
-                                                            —
-                                                        @endif
-                                                    </td>
-                                                    <td class="text-center font-weight-extrabold font-small-3">
-                                                        @if($paper->attempt_status === 'completed')
-                                                            @php
-                                                                $percentage = $paper->score_percentage ?? 0;
-                                                                $colorClass = 'text-success';
-                                                                if ($percentage < 50) {
-                                                                    $colorClass = 'text-danger';
-                                                                } elseif ($percentage < 80) {
-                                                                    $colorClass = 'text-warning';
-                                                                }
-                                                            @endphp
-                                                            <span class="{{ $colorClass }}">{{ $percentage }}%</span>
-                                                        @elseif($paper->attempt_status === 'paused')
-                                                            <span class="text-warning">Paused</span>
-                                                        @else
-                                                            <span>Pending</span>
-                                                        @endif
-                                                    </td>
-                                                    <td style="text-align: right;">
-                                                        @if($paper->attempt_status === 'completed')
-                                                            <a href="{{ route('student.attempts.result', $paper->completed_attempt_id) }}"
-                                                                class="review-btn-custom">
-                                                                Review
-                                                            </a>
-                                                        @elseif($paper->attempt_status === 'paused')
-                                                            <a href="{{ route('student.attempts.take', $paper->active_attempt->id) }}"
-                                                                class="resume-btn-custom">
-                                                                Resume
-                                                            </a>
-                                                        @else
-                                                            <form action="{{ route('student.papers.start', $paper->id) }}"
-                                                                method="POST" class="d-inline">
-                                                                @csrf
-                                                                <button type="submit" class="start-btn-custom">
-                                                                    Start
-                                                                </button>
-                                                            </form>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center py-5">
-                                                        <div class="my-3">
-                                                            <i
-                                                                class="feather icon-award font-large-3 text-warning mb-2 animate-bounce"></i>
-                                                            <h5 class="text-dark font-weight-bold">No Weekly Tests Found</h5>
-                                                            <p class="mb-0 text-secondary">We couldn't find any weekly tests
-                                                                assigned matching your filters.</p>
+                                                        <div class="wt-hw-meta">
+                                                            <span class="wt-hw-chip">{{ $homework->subject->title ?? 'General' }}</span>
+                                                            @if($homework->topic)
+                                                                <span>{{ $homework->topic->name }}</span>
+                                                            @endif
+                                                            @if($selectedWeekDueDate)
+                                                                <span>• Due {{ \Carbon\Carbon::parse($selectedWeekDueDate)->format('d M Y') }}</span>
+                                                            @endif
+                                                            @if($homework->formatted_file_size)
+                                                                <span>• {{ strtoupper($homework->file_type ?? 'FILE') }} ({{ $homework->formatted_file_size }})</span>
+                                                            @endif
                                                         </div>
-                                                    </td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <!-- Pagination -->
-                                @if($papers->hasPages())
-                                    <div class="d-flex justify-content-center py-2 border-top">
-                                        {{ $papers->links() }}
+                                                    </div>
+                                                </div>
+
+                                                @if($homework->file_path)
+                                                    <a href="{{ route('student.homeworks.download', $homework->id) }}"
+                                                       class="wt-hw-download-btn"
+                                                       title="Download {{ $homework->file_name ?: 'Attached File' }}">
+                                                        <i class="feather icon-download"></i>
+                                                        <span>Download</span>
+                                                    </a>
+                                                @else
+                                                    <span class="wt-count-chip">No file</span>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="wt-empty-box">
+                                        <div class="wt-empty-icon">
+                                            <i class="feather icon-book-open"></i>
+                                        </div>
+                                        <h6 class="font-weight-bold mb-25 wt-section-title" style="font-size: 0.96rem;">No Homework Tasks Scheduled</h6>
+                                        <p class="mb-0 text-muted font-small-3">
+                                            There are no homework tasks assigned for this course and week schedule.
+                                        </p>
                                     </div>
                                 @endif
                             </div>
@@ -442,659 +1552,175 @@
 
                     </div>
 
-                </div>
+                    <!-- Right Column: 2. ONLINE ASSIGNMENT TASKS EVALUATION -->
+                    <div class="wt-right-col">
+                        <div class="wt-section-header">
+                            <h2 class="wt-section-title">2. Online Assignment Tasks Evaluation</h2>
+                            @if($papers->total() > 0)
+                                <span class="wt-count-chip">
+                                    Showing {{ $papers->firstItem() }}–{{ $papers->lastItem() }} of {{ $papers->total() }}
+                                </span>
+                            @endif
+                        </div>
 
-                <!-- 3. HOMEWORK TASKS -->
-                <div class="row mt-3">
-                    <div class="col-12">
-                        <div class="homework-section-wrapper mb-4">
-                            <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap"
-                                style="gap: 10px;">
-                                <h5 class="section-heading mb-0 font-weight-extrabold text-dark d-flex align-items-center">
-                                    <i class="feather icon-book-open mr-1 text-primary"></i> 3. HOMEWORK TASKS
-                                </h5>
-                                @if(isset($homeworks) && $homeworks->isNotEmpty())
-                                    <span class="badge badge-light-primary font-small-2 font-weight-bold px-1 py-50">
-                                        <i class="feather icon-file-text mr-25"></i> {{ $homeworks->count() }}
-                                        {{ \Illuminate\Support\Str::plural('Assignment', $homeworks->count()) }} Scheduled
-                                    </span>
-                                @endif
-                            </div>
+                        <div class="wt-table-card">
+                            <div class="wt-table-wrap">
+                                <table class="wt-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Assignment / Challenge Module Title</th>
+                                            <th class="text-center">Target</th>
+                                            <th class="text-center">Completed</th>
+                                            <th class="text-center">Score</th>
+                                            <th class="text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($papers as $paper)
+                                            @php
+                                                $typeKey = strtolower($paper->type ?? 'test');
+                                                [$typeChar, $typeSqClass] = match ($typeKey) {
+                                                    'quiz'     => ['Q', 'wt-type-quiz'],
+                                                    'homework' => ['H', 'wt-type-hw'],
+                                                    'exam'     => ['E', 'wt-type-exam'],
+                                                    default    => ['T', 'wt-type-test'],
+                                                };
 
-                            <div class="card shadow-sm border-0 overflow-hidden">
-                                <div class="table-responsive">
-                                    <table class="table table-hover evaluation-table mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th style="width: 8%;">Type</th>
-                                                <th style="width: 32%;">Homework Task Title & Instructions</th>
-                                                <th style="width: 25%;">Curriculum Topic & Class</th>
-                                                <th style="width: 15%;" class="text-center">Due Date</th>
-                                                <th style="width: 20%; text-align: right;">Attachment File</th>
+                                                $diffKey = strtolower($paper->difficulty ?? '');
+                                                $diffClass = match ($diffKey) {
+                                                    'easy'   => 'wt-diff-easy',
+                                                    'medium' => 'wt-diff-medium',
+                                                    'hard'   => 'wt-diff-hard',
+                                                    default  => '',
+                                                };
+                                                $isPendingRow = $paper->attempt_status === 'Not completed';
+                                            @endphp
+                                            <tr class="{{ $isPendingRow ? 'wt-row-pending' : '' }}">
+                                                <td>
+                                                    <span class="wt-type-sq {{ $typeSqClass }}" title="{{ ucfirst($paper->type ?? 'Test') }}">
+                                                        {{ $typeChar }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="wt-module-title">{{ $paper->title }}</div>
+                                                    <div class="wt-module-sub">
+                                                        <span>{{ $paper->subject->title ?? 'General' }}</span>
+                                                        <span>&bull;</span>
+                                                        <span>{{ ucfirst($paper->type ?? 'Test') }}</span>
+                                                        @if($diffClass)
+                                                            <span class="wt-diff-chip {{ $diffClass }}">{{ $paper->difficulty }}</span>
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                                <td class="text-center text-nowrap font-weight-600">
+                                                    @if($paper->total_time > 0)
+                                                        {{ $paper->total_time }}m 00s
+                                                    @else
+                                                        No Limit
+                                                    @endif
+                                                </td>
+                                                <td class="text-center text-nowrap">
+                                                    @if($paper->attempt_status === 'completed' && $paper->completed_at)
+                                                        {{ $paper->completed_at }}
+                                                    @else
+                                                        &mdash;
+                                                    @endif
+                                                </td>
+                                                <td class="text-center font-weight-bold text-nowrap">
+                                                    @if($paper->attempt_status === 'completed')
+                                                        @php
+                                                            $percentage = $paper->score_percentage ?? 0;
+                                                            $colorClass = $percentage >= 80
+                                                                ? 'text-success'
+                                                                : ($percentage >= 50 ? 'text-warning' : 'text-danger');
+                                                        @endphp
+                                                        <span class="{{ $colorClass }}">{{ $percentage }}%</span>
+                                                    @elseif($paper->attempt_status === 'paused')
+                                                        <span class="text-warning">Paused</span>
+                                                    @else
+                                                        <span class="text-warning">Pending</span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-right text-nowrap">
+                                                    @if($paper->attempt_status === 'completed')
+                                                        @if(!$paper->hide_result && $paper->completed_attempt_id)
+                                                            <a href="{{ route('student.attempts.result', $paper->completed_attempt_id) }}"
+                                                               class="wt-btn-review">
+                                                                Review
+                                                            </a>
+                                                        @else
+                                                            <span class="wt-count-chip">Submitted</span>
+                                                        @endif
+                                                    @elseif($paper->attempt_status === 'paused' && $paper->active_attempt)
+                                                        <a href="{{ route('student.attempts.take', $paper->active_attempt->id) }}"
+                                                           class="wt-btn-resume">
+                                                            Resume
+                                                        </a>
+                                                    @else
+                                                        <form action="{{ route('student.papers.start', $paper->id) }}"
+                                                              method="POST"
+                                                              class="d-inline mb-0">
+                                                            @csrf
+                                                            <button type="submit" class="wt-btn-start">
+                                                                Start
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($homeworks as $homework)
-                                                <tr>
-                                                    <td>
-                                                        <div class="type-badge bg-light-warning text-warning font-weight-extrabold text-center"
-                                                            title="Homework Assignment"
-                                                            style="width: 32px; height: 32px; line-height: 32px; border-radius: 6px; font-size: 0.85rem; background-color: rgba(255, 159, 67, 0.12); color: #ff9f43; border: 1px solid rgba(255, 159, 67, 0.3);">
-                                                            HW
+                                        @empty
+                                            <tr>
+                                                <td colspan="6">
+                                                    <div class="wt-empty-box">
+                                                        <div class="wt-empty-icon">
+                                                            <i class="feather icon-award"></i>
                                                         </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="font-weight-bold text-dark module-title mb-25">
-                                                            {{ $homework->title }}</div>
-                                                        @if($homework->description)
-                                                            <div class="font-small-2"
-                                                                style="max-width: 500px; line-height: 1.4;">
-                                                                {{ \Illuminate\Support\Str::limit(strip_tags($homework->description), 130) }}
-                                                            </div>
-                                                        @else
-                                                            <span class="font-small-1 font-italic">No additional
-                                                                instructions</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        <div class="d-flex flex-wrap align-items-center mb-50"
-                                                            style="gap: 5px;">
-                                                            <span
-                                                                class="badge badge-light-secondary font-small-1 font-weight-semibold">
-                                                                <i
-                                                                    class="feather icon-bookmark mr-25"></i>{{ $homework->subject->title ?? 'General' }}
-                                                            </span>
-                                                            @if($homework->topic)
-                                                                <span
-                                                                    class="badge badge-light-primary font-small-1 font-weight-semibold">
-                                                                    {{ $homework->topic->name }}
-                                                                </span>
-                                                            @endif
-                                                            @if($homework->subtopic)
-                                                                <span
-                                                                    class="badge badge-light-info font-small-1 font-weight-semibold">
-                                                                    {{ $homework->subtopic->name }}
-                                                                </span>
-                                                            @endif
-                                                        </div>
-                                                        @if($homework->class || $homework->yearGroup || $homework->academic_year)
-                                                            <div class="font-small-1 d-flex flex-wrap align-items-center"
-                                                                style="gap: 10px;">
-                                                                @if($homework->class)
-                                                                    <span><i
-                                                                            class="feather icon-users mr-25 text-secondary"></i>{{ $homework->class->name }}</span>
-                                                                @endif
-                                                                @if($homework->yearGroup)
-                                                                    <span><i
-                                                                            class="feather icon-calendar mr-25 text-secondary"></i>{{ $homework->yearGroup->title ?? $homework->yearGroup->value }}</span>
-                                                                @endif
-                                                                @if($homework->academic_year)
-                                                                    <span><i
-                                                                            class="feather icon-clock mr-25 text-secondary"></i>{{ $homework->academic_year }}</span>
-                                                                @endif
-                                                            </div>
-                                                        @endif
-                                                    </td>
-                                                    <td class="text-center">
-                                                        @if($selectedWeekDueDate)
-                                                            <div class="font-weight-bold font-small-2 text-dark">
-                                                                {{ \Carbon\Carbon::parse($selectedWeekDueDate)->format('d M Y') }}
-                                                            </div>
-                                                            <small class="font-small-1 font-weight-semibold">
-                                                                {{ \Carbon\Carbon::parse($selectedWeekDueDate)->format('h:i A') }}
-                                                            </small>
-                                                        @else
-                                                            <span
-                                                                class="font-small-2 font-weight-semibold">{{ $selectedWeekName ?? 'Week Schedule' }}</span>
-                                                        @endif
-                                                    </td>
-                                                    <td style="text-align: right;">
-                                                        @if($homework->file_path)
-                                                            <div class="d-inline-flex flex-column align-items-end">
-                                                                <a href="{{ route('student.homeworks.download', $homework->id) }}"
-                                                                    class="download-btn-custom shadow-sm"
-                                                                    title="Download {{ $homework->file_name ?: 'Attached File' }}">
-                                                                    <i class="feather icon-download mr-50"></i> Download
-                                                                </a>
-                                                                <div
-                                                                    class="font-small-1 mt-25 d-inline-flex align-items-center">
-                                                                    <span
-                                                                        class="badge badge-light-secondary font-small-1 mr-50 text-uppercase font-weight-bold">
-                                                                        {{ $homework->file_type ?? 'FILE' }}
-                                                                    </span>
-                                                                    @if($homework->formatted_file_size)
-                                                                        <span>{{ $homework->formatted_file_size }}</span>
-                                                                    @endif
-                                                                </div>
-                                                            </div>
-                                                        @else
-                                                            <span class="badge badge-light-secondary px-1 py-50 font-small-2">
-                                                                <i class="feather icon-slash mr-25"></i> No attachment
-                                                            </span>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="5" class="text-center py-5">
-                                                        <div class="my-2">
-                                                            <i class="feather icon-book-open font-large-3 text-secondary mb-1 d-block"
-                                                                style="opacity: 0.35;"></i>
-                                                            <h5 class="text-dark font-weight-bold mb-50">No Homework Tasks
-                                                                Scheduled</h5>
-                                                            <p class="mb-0 text-secondary font-small-3">There are no homework
-                                                                tasks assigned for this course and week schedule.</p>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                        <h5 class="font-weight-bold mb-25 wt-section-title">No Weekly Tests Found</h5>
+                                                        <p class="mb-0 text-muted font-small-3">
+                                                            We couldn't find any weekly tests matching your selected filters.
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
                             </div>
+
+                            @if($papers->hasPages())
+                                <div class="wt-pagination-wrap">
+                                    {{ $papers->links() }}
+                                </div>
+                            @endif
                         </div>
                     </div>
+
                 </div>
 
             </div>
         </div>
     </div>
-    <!-- END: Content-->
 @endsection
 
-@push('styles')
-    <link rel="stylesheet" type="text/css" href="{{ asset('theme/app-assets/vendors/css/forms/select/select2.min.css') }}">
-    <style>
-        /* Premium Select2 Styling to match theme and filter card */
-        .select2-container--default .select2-selection--single {
-            border: 1px solid #dcdcdc !important;
-            border-radius: 6px !important;
-            height: 38px !important;
-            display: flex;
-            align-items: center;
-            background-color: #ffffff !important;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        }
-
-        .select2-container--default .select2-selection--single:focus,
-        .select2-container--default.select2-container--focus .select2-selection--single {
-            border-color: #2477F9 !important;
-            box-shadow: 0 3px 8px rgba(115, 103, 240, 0.15) !important;
-            outline: 0;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            color: #4e5154 !important;
-            padding-left: 12px !important;
-            font-size: 0.85rem !important;
-            font-weight: 500;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__placeholder {
-            color: #b4b4b4 !important;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 36px !important;
-            right: 8px !important;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__arrow b {
-            border-color: #8c8c8c transparent transparent transparent !important;
-        }
-
-        .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
-            border-color: transparent transparent #8c8c8c transparent !important;
-        }
-
-        .select2-container--default .select2-dropdown {
-            border: 1px solid #e3e6eb !important;
-            border-radius: 6px !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
-        }
-
-        .select2-container--default .select2-search--dropdown .select2-search__field {
-            border: 1px solid #dcdcdc !important;
-            border-radius: 4px !important;
-            padding: 6px 10px !important;
-            font-size: 0.85rem !important;
-        }
-
-        .select2-container--default .select2-results__option {
-            padding: 8px 12px !important;
-            font-size: 0.85rem !important;
-        }
-
-        .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #2477F9 !important;
-            color: #ffffff !important;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__clear {
-            margin-right: 20px !important;
-            color: #ea5455 !important;
-            font-size: 1.1rem !important;
-        }
-
-        .select2-container {
-            width: 100% !important;
-        }
-
-        /* Premium CSS matching the reference image layout */
-
-        /* Filters design */
-        .filter-card {
-            border-left: 4px solid #2477F9 !important;
-            background: #ffffff;
-        }
-
-        .filter-select {
-            border-radius: 6px;
-            border: 1px solid #dcdcdc;
-            font-size: 0.85rem;
-        }
-
-        .search-btn {
-            border-radius: 6px;
-            font-weight: bold;
-        }
-
-        /* YS Title style */
-        .portal-badge {
-            color: #8c8c8c;
-            font-size: 0.75rem;
-            letter-spacing: 1.5px;
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        .portal-title {
-            font-size: 1.6rem;
-            color: #0b2240 !important;
-            letter-spacing: -0.5px;
-        }
-
-        /* Overview Metrics Bar Grid */
-        .overview-metrics-card {
-            background-color: #ffffff;
-            border: 1px solid #e3e6eb;
-            border-radius: 8px;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            text-align: left;
-        }
-
-        .metric-item {
-            padding: 16px 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .border-right {
-            border-right: 1px solid #e9ecf0;
-        }
-
-        .metric-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            color: #7b8895;
-            font-weight: 700;
-            letter-spacing: 0.8px;
-            margin-bottom: 6px;
-        }
-
-        .metric-value {
-            font-size: 1.45rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        /* Video Container design */
-        .video-card {
-            border-radius: 8px;
-            border: 1px solid #e3e6eb;
-            background: #ffffff;
-        }
-
-        .video-container {
-            background: #111e2f;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            min-height: 240px;
-        }
-
-        .video-icon-box {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Document/Mark schemes design */
-        .document-card {
-            border-radius: 8px;
-            border: 1px solid #e3e6eb;
-            background: #ffffff;
-            transition: all 0.2s ease;
-        }
-
-        .document-card:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .doc-icon-box {
-            width: 42px;
-            height: 42px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .bg-light-danger {
-            background-color: rgba(234, 84, 85, 0.1);
-        }
-
-        .text-danger {
-            color: #ea5455 !important;
-        }
-
-        .bg-light-primary {
-            background-color: rgba(115, 103, 240, 0.1);
-        }
-
-        .text-primary {
-            color: #2477F9 !important;
-        }
-
-        .bg-light-rose {
-            background-color: rgba(236, 72, 153, 0.1);
-        }
-
-        .text-rose {
-            color: #ec4899 !important;
-        }
-
-        .document-btn {
-            border-radius: 6px;
-            font-size: 0.8rem;
-            min-width: 75px;
-            text-align: center;
-        }
-
-        /* Section Heading styles */
-        .section-heading {
-            font-size: 0.95rem;
-            letter-spacing: 0.5px;
-            color: #0b2240;
-            border-bottom: 2px solid transparent;
-            padding-bottom: 2px;
-        }
-
-        /* Right column: Assignments table styling */
-        .evaluation-table th {
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #ffffff;
-            background-color: #0b2240 !important;
-            border-bottom: none;
-            padding: 12px 14px;
-            font-weight: 700;
-        }
-
-        .evaluation-table td {
-            vertical-align: middle;
-            padding: 14px 14px;
-            border-bottom: 1px solid #e9ecf0;
-        }
-
-        .type-badge {
-            width: 28px;
-            height: 28px;
-            line-height: 28px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-
-        .module-title {
-            font-size: 0.95rem;
-            letter-spacing: -0.1px;
-        }
-
-        .review-btn-custom {
-            border: 1.5px solid #4a5568 !important;
-            color: #4a5568 !important;
-            background-color: #ffffff !important;
-            border-radius: 6px !important;
-            font-size: 0.8rem !important;
-            padding: 6px 12px !important;
-            display: inline-block !important;
-            text-align: center !important;
-            font-weight: 700 !important;
-            transition: all 0.2s ease-in-out !important;
-            cursor: pointer !important;
-            text-decoration: none !important;
-            min-width: 95px !important;
-            line-height: 1.5 !important;
-            box-sizing: border-box !important;
-        }
-
-        .review-btn-custom:hover {
-            background-color: #4a5568 !important;
-            color: #ffffff !important;
-            border-color: #4a5568 !important;
-            transform: translateY(-1px) !important;
-            text-decoration: none !important;
-        }
-
-        .start-btn-custom {
-            background-color: #a91217 !important;
-            border: 1px solid #a91217 !important;
-            color: #ffffff !important;
-            border-radius: 6px !important;
-            font-size: 0.8rem !important;
-            padding: 6px 12px !important;
-            display: inline-block !important;
-            text-align: center !important;
-            font-weight: 700 !important;
-            transition: all 0.2s ease-in-out !important;
-            box-shadow: 0 2px 4px rgba(169, 18, 23, 0.2) !important;
-            cursor: pointer !important;
-            text-decoration: none !important;
-            min-width: 95px !important;
-            line-height: 1.5 !important;
-            box-sizing: border-box !important;
-        }
-
-        .start-btn-custom:hover {
-            background-color: #cd1a21 !important;
-            border-color: #cd1a21 !important;
-            color: #ffffff !important;
-            transform: translateY(-1px) !important;
-            box-shadow: 0 4px 8px rgba(169, 18, 23, 0.3) !important;
-            text-decoration: none !important;
-        }
-
-        .resume-btn-custom {
-            background-color: #ff9f43 !important;
-            border: 1px solid #ff9f43 !important;
-            color: #ffffff !important;
-            border-radius: 6px !important;
-            font-size: 0.8rem !important;
-            padding: 6px 12px !important;
-            display: inline-block !important;
-            text-align: center !important;
-            font-weight: 700 !important;
-            transition: all 0.2s ease-in-out !important;
-            box-shadow: 0 2px 4px rgba(255, 159, 67, 0.2) !important;
-            cursor: pointer !important;
-            text-decoration: none !important;
-            min-width: 95px !important;
-            line-height: 1.5 !important;
-            box-sizing: border-box !important;
-        }
-
-        .resume-btn-custom:hover {
-            background-color: #ffb063 !important;
-            border-color: #ffb063 !important;
-            color: #ffffff !important;
-            transform: translateY(-1px) !important;
-            box-shadow: 0 4px 8px rgba(255, 159, 67, 0.3) !important;
-            text-decoration: none !important;
-        }
-
-        .document-btn-custom {
-            border: 1.5px solid #4a5568 !important;
-            color: #4a5568 !important;
-            background-color: #ffffff !important;
-            border-radius: 6px !important;
-            font-size: 0.8rem !important;
-            padding: 6px 12px !important;
-            display: inline-block !important;
-            text-align: center !important;
-            font-weight: 700 !important;
-            transition: all 0.2s ease-in-out !important;
-            cursor: pointer !important;
-            text-decoration: none !important;
-            min-width: 80px !important;
-            line-height: 1.5 !important;
-            box-sizing: border-box !important;
-        }
-
-        .document-btn-custom:hover {
-            background-color: #4a5568 !important;
-            color: #ffffff !important;
-            border-color: #4a5568 !important;
-            transform: translateY(-1px) !important;
-            text-decoration: none !important;
-        }
-
-        .download-btn-custom {
-            background-color: #2477F9 !important;
-            color: #ffffff !important;
-            border: 1px solid #2477F9 !important;
-            border-radius: 6px !important;
-            font-size: 0.8rem !important;
-            padding: 6px 14px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-weight: 700 !important;
-            transition: all 0.2s ease-in-out !important;
-            cursor: pointer !important;
-            text-decoration: none !important;
-            min-width: 100px !important;
-            line-height: 1.5 !important;
-            box-sizing: border-box !important;
-            box-shadow: 0 2px 4px rgba(115, 103, 240, 0.2) !important;
-        }
-
-        .download-btn-custom:hover {
-            background-color: #5e50ee !important;
-            border-color: #5e50ee !important;
-            color: #ffffff !important;
-            transform: translateY(-1px) !important;
-            box-shadow: 0 4px 8px rgba(115, 103, 240, 0.3) !important;
-            text-decoration: none !important;
-        }
-
-        .document-btn-custom.red-btn-custom {
-            background-color: #a91217 !important;
-            border: 1px solid #a91217 !important;
-            color: #ffffff !important;
-            box-shadow: 0 2px 4px rgba(169, 18, 23, 0.2) !important;
-        }
-
-        .document-btn-custom.red-btn-custom:hover {
-            background-color: #cd1a21 !important;
-            border-color: #cd1a21 !important;
-            color: #ffffff !important;
-            transform: translateY(-1px) !important;
-            box-shadow: 0 4px 8px rgba(169, 18, 23, 0.3) !important;
-            text-decoration: none !important;
-        }
-
-        /* Exact 40/60 split sizing on large devices */
-        @media (min-width: 992px) {
-            .layout-left {
-                flex: 0 0 40% !important;
-                max-width: 40% !important;
-            }
-
-            .layout-right {
-                flex: 0 0 60% !important;
-                max-width: 60% !important;
-            }
-        }
-
-        /* Responsiveness for metrics bar */
-        @media (max-width: 1200px) {
-            .metrics-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .border-right:nth-child(3) {
-                border-right: none;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .metric-item {
-                border-right: none;
-                border-bottom: 1px solid #e9ecf0;
-                padding: 12px 16px;
-            }
-
-            .metric-item:last-child {
-                border-bottom: none;
-            }
-
-            .portal-title {
-                font-size: 1.3rem;
-            }
-        }
-
-        /* Watch Progress Styles */
-        .playlist-completed {
-            background-color: #f0fdf4 !important;
-            border-color: #86efac !important;
-        }
-
-        .playlist-completed:hover {
-            background-color: #dcfce7 !important;
-        }
-
-        .playlist-item:hover {
-            background-color: #f8f8ff !important;
-            border-color: #2477F9 !important;
-        }
-
-        #activeVideoProgressBadge .badge {
-            font-size: 0.72rem;
-        }
-    </style>
-@endpush
-
 @push('scripts')
-    <script src="{{ asset('theme/app-assets/vendors/js/forms/select/select2.full.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const filterForm = document.getElementById('weeklyFilterForm');
             const courseFilter = document.getElementById('course_filter');
             const weekFilter = document.getElementById('week_filter');
+            const weekPrevBtn = document.getElementById('weekPrevBtn');
+            const weekNextBtn = document.getElementById('weekNextBtn');
+
+            function syncWeekNavButtons() {
+                if (!weekFilter || !weekPrevBtn || !weekNextBtn) return;
+                const totalOptions = weekFilter.options.length;
+                const idx = weekFilter.selectedIndex;
+                weekPrevBtn.disabled = totalOptions <= 1 || idx <= 0;
+                weekNextBtn.disabled = totalOptions <= 1 || idx >= totalOptions - 1;
+            }
 
             if (courseFilter && weekFilter) {
-                // Store all original week options from the dropdown
                 const originalWeeks = Array.from(weekFilter.options).map(opt => ({
                     value: opt.value,
                     text: opt.text,
@@ -1102,33 +1728,14 @@
                     selected: opt.selected
                 }));
 
-                // Initialize Select2 on Course and Week filters
-                $(courseFilter).select2({
-                    placeholder: "All Courses",
-                    allowClear: true,
-                    width: '100%'
-                });
-
-                $(weekFilter).select2({
-                    placeholder: "All Weeks",
-                    allowClear: true,
-                    width: '100%'
-                });
-
                 function updateWeeks(isInitialLoad = false) {
                     const selectedCourseId = courseFilter.value;
                     const currentSelectedWeek = weekFilter.value;
 
-                    // Clear existing options
                     weekFilter.innerHTML = '';
-
                     let hasSelected = false;
 
-                    // Rebuild options matching the selected course
                     originalWeeks.forEach(opt => {
-                        // Always include "All Weeks" (empty value)
-                        // If no course is selected (selectedCourseId is empty), include all weeks
-                        // Otherwise, match the courseId of the week option with selectedCourseId
                         if (opt.value === '' || !selectedCourseId || opt.courseId === selectedCourseId) {
                             const newOpt = document.createElement('option');
                             newOpt.value = opt.value;
@@ -1137,7 +1744,6 @@
                                 newOpt.setAttribute('data-course-id', opt.courseId);
                             }
 
-                            // Restore selection if it matches
                             if (opt.value === currentSelectedWeek) {
                                 newOpt.selected = true;
                                 hasSelected = true;
@@ -1147,22 +1753,41 @@
                         }
                     });
 
-                    // If the previously selected week is not valid for the new course, default to "All Weeks"
                     if (!hasSelected && !isInitialLoad) {
                         weekFilter.value = '';
                     }
 
-                    // Synchronize Select2 with updated underlying native options
-                    $(weekFilter).trigger('change.select2');
+                    syncWeekNavButtons();
                 }
 
-                // Listen to changes on the Course filter dropdown (using JQuery to capture Select2 select/clear events)
-                $(courseFilter).on('change', function () {
+                courseFilter.addEventListener('change', function () {
                     updateWeeks(false);
+                    if (filterForm) {
+                        filterForm.submit();
+                    }
                 });
 
-                // Initial load filtering
                 updateWeeks(true);
+            } else {
+                syncWeekNavButtons();
+            }
+
+            if (weekPrevBtn && weekFilter && filterForm) {
+                weekPrevBtn.addEventListener('click', function () {
+                    if (weekFilter.selectedIndex > 0) {
+                        weekFilter.selectedIndex = weekFilter.selectedIndex - 1;
+                        filterForm.submit();
+                    }
+                });
+            }
+
+            if (weekNextBtn && weekFilter && filterForm) {
+                weekNextBtn.addEventListener('click', function () {
+                    if (weekFilter.selectedIndex < weekFilter.options.length - 1) {
+                        weekFilter.selectedIndex = weekFilter.selectedIndex + 1;
+                        filterForm.submit();
+                    }
+                });
             }
 
             // --- VIDEO TRACKING MODULE ---
@@ -1214,7 +1839,6 @@
                             return;
                         }
                         const diff = videoEl.currentTime - lastTime;
-                        // Seek prevention: only count positive increments under 2.5 seconds
                         if (diff > 0 && diff < 2.5) {
                             accumulatedWatchTime += diff;
                         }
@@ -1276,55 +1900,44 @@
                     badgeEl.innerHTML = `<span class="badge badge-light-warning px-1 py-50"><i class="feather icon-clock mr-25"></i>${timeStr} watched</span>`;
                 }
 
-                // Also update the playlist item
                 const playlistItem = document.querySelector(`.playlist-item[data-id="${activeVideoId}"]`);
-                if (playlistItem) {
-                    if (data.is_completed) {
-                        playlistItem.classList.add('playlist-completed');
-                        playlistItem.setAttribute('data-completed', '1');
-                        // Update icon
-                        const iconEl = playlistItem.querySelector('.mr-1 i');
-                        if (iconEl) {
-                            iconEl.className = 'feather icon-check-circle text-success font-medium-3';
-                        }
-                        // Update/add badge
-                        let badge = playlistItem.querySelector('.badge');
-                        if (badge) {
-                            badge.className = 'badge badge-success font-small-1 ml-50';
-                            badge.textContent = '✓ Done';
-                            badge.style.whiteSpace = 'nowrap';
-                        }
-                        // Update progress bar
-                        let progBar = playlistItem.querySelector('.playlist-progress-bar');
-                        if (progBar) {
-                            progBar.style.width = '100%';
-                            progBar.style.background = '#28c76f';
-                        } else {
-                            const bar = document.createElement('div');
-                            bar.className = 'playlist-progress-bar';
-                            bar.style.cssText = 'position:absolute;bottom:0;left:0;height:3px;width:100%;background:#28c76f;border-radius:0 0 4px 4px;';
-                            playlistItem.appendChild(bar);
-                        }
+                if (playlistItem && data.is_completed) {
+                    playlistItem.classList.add('playlist-completed');
+                    playlistItem.setAttribute('data-completed', '1');
+                    const iconEl = playlistItem.querySelector('.mr-1 i');
+                    if (iconEl) {
+                        iconEl.className = 'feather icon-check-circle text-success font-medium-3';
+                    }
+                    const badge = playlistItem.querySelector('.badge');
+                    if (badge) {
+                        badge.className = 'badge badge-success font-small-1 ml-50';
+                        badge.textContent = '✓ Done';
+                        badge.style.whiteSpace = 'nowrap';
+                    }
+                    const progBar = playlistItem.querySelector('.playlist-progress-bar');
+                    if (progBar) {
+                        progBar.style.width = '100%';
+                        progBar.style.background = '#22c55e';
+                    } else {
+                        const bar = document.createElement('div');
+                        bar.className = 'playlist-progress-bar';
+                        bar.style.cssText = 'position:absolute;bottom:0;left:0;height:3px;width:100%;background:#22c55e;';
+                        playlistItem.appendChild(bar);
                     }
                 }
             }
 
-            // Playlist item click swapping
             document.querySelectorAll('.playlist-item').forEach(item => {
                 item.addEventListener('click', function () {
-                    // Send progress of previous video before switching
                     const currentVideoEl = document.getElementById('trackedHtml5Player');
                     if (currentVideoEl) {
                         sendWatchProgress(currentVideoEl.currentTime);
                     }
 
-                    // Remove active class from all items
                     document.querySelectorAll('.playlist-item').forEach(i => {
-                        i.classList.remove('active-playlist-item', 'border-primary');
+                        i.classList.remove('active-playlist-item');
                     });
-
-                    // Add active class to clicked item
-                    this.classList.add('active-playlist-item', 'border-primary');
+                    this.classList.add('active-playlist-item');
 
                     const videoId = this.getAttribute('data-id');
                     const embedUrl = this.getAttribute('data-embed');
@@ -1342,22 +1955,23 @@
 
                     if (titleEl) titleEl.textContent = title;
                     if (durEl) {
-                        durEl.innerHTML = duration ? `<i class="feather icon-play mr-1"></i>Runtime: ${duration}` : '<i class="feather icon-play mr-1"></i>Video Lecture Stream';
+                        durEl.innerHTML = duration
+                            ? `<i class="feather icon-check-circle mr-25"></i>Runtime: ${duration}`
+                            : '<i class="feather icon-play-circle mr-25"></i>Video Lecture Stream';
                     }
 
                     if (container) {
                         let playerHtml = '';
                         if (type === 'iframe') {
-                            playerHtml = embedUrl; // Contains raw iframe code
+                            playerHtml = embedUrl;
                         } else if (type === 'video_file' || type === 'video_url' || type === 's3' || type === 'wasabi') {
-                            playerHtml = `<video id="trackedHtml5Player" controls class="embed-responsive-item" src="${embedUrl}" autoplay style="width:100%; height:240px; border:none;"></video>`;
+                            playerHtml = `<video id="trackedHtml5Player" controls src="${embedUrl}" autoplay></video>`;
                         } else {
-                            playerHtml = `<iframe class="embed-responsive-item" width="100%" height="240" src="${embedUrl}" frameborder="0" allowfullscreen allow="autoplay" style="border:none;"></iframe>`;
+                            playerHtml = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen allow="autoplay"></iframe>`;
                         }
                         container.innerHTML = playerHtml;
                     }
 
-                    // Setup tracking for the new player instance
                     setupVideoTracking();
                 });
             });

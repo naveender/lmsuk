@@ -142,3 +142,115 @@ test('student can view subtopics and paginated attempt history with working filt
     expect($filterStatusAttempts->total())->toEqual(1);
     expect($filterStatusAttempts->first()->status)->toEqual('paused');
 });
+
+test('student subtopics page renders papers in table format with status, difficulty, sort and subtopic filters', function () {
+    $student = User::factory()->create([
+        'role' => 'student',
+        'username' => 'student_subtopic_table_' . uniqid(),
+    ]);
+
+    $subject = Subject::create([
+        'title' => 'Maths',
+        'is_active' => true,
+    ]);
+
+    $topic = Topic::create([
+        'name' => 'Algebra',
+        'slug' => 'algebra',
+        'subject_id' => $subject->id,
+    ]);
+
+    $subEquations = Topic::create([
+        'name' => 'Linear Equations',
+        'slug' => 'linear-equations',
+        'parent' => $topic->id,
+        'subject_id' => $subject->id,
+    ]);
+
+    $subSequences = Topic::create([
+        'name' => 'Number Sequences',
+        'slug' => 'number-sequences',
+        'parent' => $topic->id,
+        'subject_id' => $subject->id,
+    ]);
+
+    $subEmpty = Topic::create([
+        'name' => 'Inequalities',
+        'slug' => 'inequalities',
+        'parent' => $topic->id,
+        'subject_id' => $subject->id,
+    ]);
+
+    $paperEq = Paper::create([
+        'title' => 'Equations Practice Set A',
+        'type' => 'test',
+        'subject_id' => $subject->id,
+        'topic_id' => $topic->id,
+        'subtopic_id' => $subEquations->id,
+        'difficulty' => 'easy',
+        'total_time' => 25,
+    ]);
+
+    $paperSeq = Paper::create([
+        'title' => 'Sequences Challenge Set B',
+        'type' => 'test',
+        'subject_id' => $subject->id,
+        'topic_id' => $topic->id,
+        'subtopic_id' => $subSequences->id,
+        'difficulty' => 'hard',
+        'total_time' => 40,
+    ]);
+
+    $paperEq->assignments()->create(['assign_type' => 'students', 'assign_mode' => 'all']);
+    $paperSeq->assignments()->create(['assign_type' => 'students', 'assign_mode' => 'all']);
+
+    PaperAttempt::create([
+        'user_id' => $student->id,
+        'paper_id' => $paperEq->id,
+        'status' => 'completed',
+        'score' => 9,
+        'max_score' => 10,
+        'time_spent' => 420,
+        'completed_at' => now()->subDay(),
+    ]);
+
+    $response = $this->actingAs($student)
+        ->get(route('student.topics.subtopics', $topic->id));
+
+    $response->assertStatus(200)
+        ->assertSee('Subtopics & Practice Papers')
+        ->assertSee('st-papers-table', false)
+        ->assertSee('Questions & Time')
+        ->assertSee('Status & Score')
+        ->assertSee('Linear Equations')
+        ->assertSee('Equations Practice Set A')
+        ->assertSee('Number Sequences')
+        ->assertSee('Sequences Challenge Set B')
+        ->assertSee('Inequalities')
+        ->assertSee('No practice papers available yet')
+        ->assertSee('Best 90%');
+
+    // Filter by completed status should only return completed paper row
+    $completedOnly = $this->actingAs($student)
+        ->get(route('student.topics.subtopics', [
+            'topic' => $topic->id,
+            'paper_status' => 'completed',
+        ]));
+
+    $completedOnly->assertStatus(200);
+    $rows = $completedOnly->viewData('paperRows');
+    expect($rows->total())->toEqual(1);
+    expect($rows->first()->paper_title)->toEqual('Equations Practice Set A');
+
+    // Filter by difficulty=hard should only return hard paper row
+    $hardOnly = $this->actingAs($student)
+        ->get(route('student.topics.subtopics', [
+            'topic' => $topic->id,
+            'paper_difficulty' => 'hard',
+        ]));
+
+    $hardOnly->assertStatus(200);
+    $hardRows = $hardOnly->viewData('paperRows');
+    expect($hardRows->total())->toEqual(1);
+    expect($hardRows->first()->paper_title)->toEqual('Sequences Challenge Set B');
+});

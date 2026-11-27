@@ -1,6 +1,7 @@
 <!-- BEGIN: Header-->
 @php
     $isAdmin = auth()->check() && auth()->user()->isAdmin();
+    $isStudent = auth()->check() && auth()->user()->role === 'student';
     $theme = session('theme', request()->cookie('theme', 'light'));
     if (!in_array($theme, ['light', 'dark'])) {
         $theme = 'light';
@@ -257,6 +258,169 @@
                         if (overlay) overlay.classList.add('visible');
                         document.body.classList.add('sidebar-open-no-scroll');
                     }
+                });
+            }
+        });
+    </script>
+
+@elseif ($isStudent)
+    <!-- =========================================================================
+         STUDENT MODERN TOP NAVBAR (Exact match to reference image)
+         ========================================================================= -->
+    <nav class="header-navbar navbar-expand-lg navbar navbar-with-menu student-modern-navbar navbar-light">
+        <div class="navbar-wrapper w-100">
+            <div class="navbar-container content d-flex align-items-center justify-content-between w-100">
+
+                <!-- Left Section: Mobile Toggle & Reference Search Bar -->
+                <div class="navbar-left-area d-flex align-items-center flex-grow-1 mr-2">
+                    <button type="button" class="student-nav-icon-btn mobile-menu-btn d-xl-none mr-1" id="studentMobileMenuToggle" aria-label="Toggle Navigation">
+                        <i class="feather icon-menu"></i>
+                    </button>
+                    
+                    <!-- Search Input Bar (Matches Reference Image) -->
+                    <div class="student-search-container">
+                        <i class="feather icon-search student-search-icon"></i>
+                        <input type="text" class="student-search-input" id="studentHeaderSearch" 
+                               placeholder="Search for lessons, topics, or practice questions..."
+                               autocomplete="off" aria-label="Search">
+                    </div>
+                </div>
+
+                <!-- Right Section: Notification Bell & User Profile -->
+                <div class="navbar-right-area d-flex align-items-center" style="gap: 16px;">
+
+                    <!-- Notification Bell with Red Badge "3" (Matches Reference Image) -->
+                    <div class="dropdown">
+                        <button class="header-icon-badge-btn student-bell-btn" type="button" id="studentNotificationsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Notifications">
+                            <i class="feather icon-bell"></i>
+                            <span class="badge-count badge-red-count">3</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right animated-dropdown shadow-lg border-0 notifications-dropdown-menu" aria-labelledby="studentNotificationsDropdown" style="width: 320px; border-radius: 12px; margin-top: 8px;">
+                            <div class="d-flex align-items-center justify-content-between px-2 py-1 border-bottom">
+                                <h6 class="font-weight-bold mb-0 text-dark">Announcements</h6>
+                                <span class="badge badge-pill badge-light-danger font-small-1 font-weight-bold">3 New</span>
+                            </div>
+                            <div class="notifications-list scrollable-container" style="max-height: 280px; overflow-y: auto;">
+                                <a href="{{ route('student.announcements') }}" class="dropdown-item d-flex align-items-start py-1 px-2 border-bottom">
+                                    <div class="notif-icon-circle bg-light-danger text-danger mr-1 mt-25">
+                                        <i class="feather icon-alert-circle"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <p class="font-weight-bold text-dark mb-25 font-small-2">Weekly Assessment Schedule</p>
+                                        <small class="d-block font-small-1">New tests published for this week</small>
+                                        <small class="text-danger font-small-1 font-weight-bold mt-25 d-inline-block">Action Required</small>
+                                    </div>
+                                </a>
+                                <a href="{{ route('student.videolessonscategories') }}" class="dropdown-item d-flex align-items-start py-1 px-2 border-bottom">
+                                    <div class="notif-icon-circle bg-light-primary text-primary mr-1 mt-25">
+                                        <i class="feather icon-video"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <p class="font-weight-bold text-dark mb-25 font-small-2">New Video Lessons</p>
+                                        <small class="d-block font-small-1">Maths & Verbal Reasoning updated</small>
+                                        <small class="text-primary font-small-1 mt-25 d-inline-block">2 hours ago</small>
+                                    </div>
+                                </a>
+                                <a href="{{ route('student.weeklytests') }}" class="dropdown-item d-flex align-items-start py-1 px-2">
+                                    <div class="notif-icon-circle bg-light-warning text-warning mr-1 mt-25">
+                                        <i class="feather icon-file-text"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <p class="font-weight-bold text-dark mb-25 font-small-2">Homework Released</p>
+                                        <small class="d-block font-small-1">Download this week's worksheet</small>
+                                        <small class="font-small-1 mt-25 d-inline-block">Today</small>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="p-1 text-center border-top">
+                                <a href="{{ route('student.announcements') }}" class="font-small-2 font-weight-bold text-primary">View All Announcements &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Profile Pill Dropdown (Matches Reference Image) -->
+                    <div class="dropdown dropdown-user">
+                        <button class="student-header-profile-btn dropdown-toggle" type="button" id="studentHeaderProfileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Student Profile">
+                            <img class="student-header-avatar" src="{{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="Student Avatar">
+                            <div class="student-header-user-info d-none d-sm-flex flex-column text-left">
+                                <span class="student-header-name">{{ $user->name ?? 'Student User' }}</span>
+                                <span class="student-header-role">Student</span>
+                            </div>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right shadow-lg border-0 header-user-dropdown-menu animated-dropdown" aria-labelledby="studentHeaderProfileDropdown">
+                            <div class="user-dropdown-header">
+                                <div class="d-flex align-items-center">
+                                    <img class="dropdown-user-avatar mr-75" src="{{ asset('/theme/app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="Avatar">
+                                    <div class="dropdown-user-meta overflow-hidden">
+                                        <h6 class="dropdown-user-title text-truncate mb-0">{{ $user->name ?? 'Student User' }}</h6>
+                                        <span class="dropdown-user-email text-truncate d-block">{{ $user->email ?? 'student@aspire.com' }}</span>
+                                        <span class="badge badge-pill badge-light-primary font-small-1 font-weight-bold mt-25">
+                                            Student Portal
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="user-dropdown-items py-25">
+                                <a class="dropdown-item user-menu-link" href="{{ route('account.index') }}">
+                                    <div class="menu-icon-box icon-box-primary">
+                                        <i class="feather icon-user"></i>
+                                    </div>
+                                    <div class="menu-text-wrap flex-grow-1">
+                                        <span class="menu-item-label">My Account</span>
+                                        <span class="menu-item-desc">Profile & security settings</span>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item user-menu-link" href="{{ route('settings.index') }}">
+                                    <div class="menu-icon-box icon-box-info">
+                                        <i class="feather icon-settings"></i>
+                                    </div>
+                                    <div class="menu-text-wrap flex-grow-1">
+                                        <span class="menu-item-label">Settings</span>
+                                        <span class="menu-item-desc">Account preferences</span>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item user-menu-link theme-toggle-menu-item" href="{{ route('change.theme') }}" id="studentThemeDropdownToggle">
+                                    <div class="menu-icon-box icon-box-primary" style="background: rgba(36, 119, 249, 0.12); color: var(--theme-primary-bright);">
+                                        <i class="feather icon-{{ $theme === 'dark' ? 'sun' : 'moon' }}" id="studentThemeDropdownIcon"></i>
+                                    </div>
+                                    <div class="menu-text-wrap flex-grow-1">
+                                        <span class="menu-item-label" id="studentThemeDropdownLabel">{{ $theme === 'dark' ? 'Light Mode' : 'Dark Mode' }}</span>
+                                        <span class="menu-item-desc">Switch interface appearance</span>
+                                    </div>
+                                    <span class="badge badge-pill badge-light-primary font-small-1 font-weight-bold">{{ ucfirst($theme) }}</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-divider my-50"></div>
+                            <div class="user-dropdown-footer px-50 pb-25">
+                                <form method="POST" action="{{ route('logout') }}" class="m-0">
+                                    @csrf
+                                    <button type="submit" class="btn btn-user-logout btn-block d-flex align-items-center justify-content-center">
+                                        <i class="feather icon-power mr-50 font-medium-1"></i>
+                                        <span>Log Out</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </nav>
+
+    <!-- Student Mobile Menu Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var mobileToggle = document.getElementById('studentMobileMenuToggle');
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var sidebar = document.getElementById('studentSidebar');
+                    var overlay = document.getElementById('studentSidebarOverlay');
+                    if (sidebar) sidebar.classList.add('mobile-open');
+                    if (overlay) overlay.classList.add('visible');
+                    document.body.classList.add('sidebar-open-no-scroll');
                 });
             }
         });
