@@ -111,7 +111,6 @@
 
                 <!-- STUDENT PORTAL Header -->
                 <div class="portal-header-wrapper mt-3 mb-2">
-                    <span class="portal-badge font-weight-extrabold text-uppercase">Student Portal</span>
                     <h2 class="portal-title font-weight-bold text-dark">{{ $courseTitle }} | YR 5 — {{ $selectedWeekName }}
                     </h2>
                 </div>

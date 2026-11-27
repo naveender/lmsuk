@@ -698,6 +698,8 @@ class AssessmentController extends Controller
         $allStudentAttempts = $topicPaperIds->isNotEmpty()
             ? PaperAttempt::where('user_id', $student->id)
                 ->whereIn('paper_id', $topicPaperIds)
+                ->orderByDesc('completed_at')
+                ->orderByDesc('id')
                 ->get()
             : collect();
         $attemptsByPaper = $allStudentAttempts->groupBy('paper_id');
@@ -741,13 +743,35 @@ class AssessmentController extends Controller
         $choiceTypes = ['single_choice_radio', 'single_choice_dropdown', 'multiple_choice', 'picture_choice'];
         $directTypes = ['fill_in_the_blanks', 'free_text', 'matching_text'];
 
+        $paperStatusFilter = request('paper_status', 'all');
+        $paperDifficultyFilter = strtolower(trim((string) request('paper_difficulty', '')));
+        $paperSortBy = request('paper_sort', 'subtopic_asc');
+
+        $paperEntries = collect();
+
         foreach ($subtopics as $subtopic) {
             $subtopicPapers = $papersBySubtopic->get($subtopic->id, collect());
 
-            $subtopic->papers = $subtopicPapers->map(function ($paper) use ($attemptsByPaper, $choiceTypes, $directTypes) {
+            $subtopic->papers = $subtopicPapers->map(function ($paper) use ($attemptsByPaper, $choiceTypes, $directTypes, $subtopic) {
                 $paperAttempts = $attemptsByPaper->get($paper->id, collect());
+                $completedAttempts = $paperAttempts->where('status', 'completed');
+
                 $paper->active_attempt = $paperAttempts->whereIn('status', ['in_progress', 'paused'])->first();
-                $paper->completed_attempts_count = $paperAttempts->where('status', 'completed')->count();
+                $paper->completed_attempts_count = $completedAttempts->count();
+
+                $latestCompletedAttempt = $completedAttempts->first();
+                $paper->latest_completed_attempt_id = ($latestCompletedAttempt && !$paper->hide_result)
+                    ? $latestCompletedAttempt->id
+                    : null;
+
+                $scoredPaperAttempts = $completedAttempts->filter(fn($a) => $a->max_score > 0);
+                $paper->best_accuracy = $scoredPaperAttempts->isNotEmpty()
+                    ? (int) round($scoredPaperAttempts->max(fn($a) => ($a->score / $a->max_score) * 100))
+                    : null;
+
+                $paper->status_key = $paper->active_attempt
+                    ? 'in-progress'
+                    : ($paper->completed_attempts_count > 0 ? 'completed' : 'not-started');
 
                 $questionsCount = $paper->questions->count();
                 $paper->questions_count = $questionsCount;
@@ -776,9 +800,113 @@ class AssessmentController extends Controller
                     $paper->display_type = 'Mixed Format';
                 }
 
+                $paper->subtopic_name = $subtopic->name;
+
                 return $paper;
             });
+
+            foreach ($subtopic->papers as $paper) {
+                $paperEntries->push((object) [
+                    'is_empty_subtopic' => false,
+                    'subtopic'          => $subtopic,
+                    'subtopic_name'     => $subtopic->name,
+                    'paper'             => $paper,
+                    'paper_title'       => $paper->title ?? '',
+                    'difficulty_key'    => strtolower($paper->difficulty ?? ''),
+                    'status_key'        => $paper->status_key,
+                    'questions_count'   => $paper->questions_count ?? 0,
+                ]);
+            }
         }
+
+        // Difficulty filter (applies before status pills count so status counts stay accurate)
+        $difficultyFiltered = $paperDifficultyFilter !== ''
+            ? $paperEntries->filter(fn($row) => $row->difficulty_key === $paperDifficultyFilter)
+            : $paperEntries;
+
+        $paperStatusCounts = [
+            'all'         => $difficultyFiltered->count(),
+            'in-progress' => $difficultyFiltered->where('status_key', 'in-progress')->count(),
+            'completed'   => $difficultyFiltered->where('status_key', 'completed')->count(),
+            'not-started' => $difficultyFiltered->where('status_key', 'not-started')->count(),
+        ];
+
+        $filteredPaperRows = $paperStatusFilter !== 'all'
+            ? $difficultyFiltered->filter(fn($row) => $row->status_key === $paperStatusFilter)
+            : $difficultyFiltered;
+
+        // Include empty subtopics in the table only when no paper-specific filter is active
+        $hasPaperFilter = request()->filled('paper_name')
+            || $paperDifficultyFilter !== ''
+            || $paperStatusFilter !== 'all';
+
+        if (!$hasPaperFilter) {
+            foreach ($subtopics as $subtopic) {
+                if ($subtopic->papers->isEmpty()) {
+                    $filteredPaperRows->push((object) [
+                        'is_empty_subtopic' => true,
+                        'subtopic'          => $subtopic,
+                        'subtopic_name'     => $subtopic->name,
+                        'paper'             => null,
+                        'paper_title'       => '',
+                        'difficulty_key'    => '',
+                        'status_key'        => 'empty',
+                        'questions_count'   => -1,
+                    ]);
+                }
+            }
+        }
+
+        $difficultyOrder = ['easy' => 1, 'medium' => 2, 'hard' => 3];
+        $statusOrder = ['in-progress' => 1, 'not-started' => 2, 'completed' => 3, 'empty' => 4];
+
+        $sortedPaperRows = match ($paperSortBy) {
+            'paper_asc'       => $filteredPaperRows->sortBy(fn($r) => [
+                $r->is_empty_subtopic ? 1 : 0,
+                strtolower($r->paper_title),
+                strtolower($r->subtopic_name),
+            ]),
+            'paper_desc'      => $filteredPaperRows->sortByDesc(fn($r) => [
+                $r->is_empty_subtopic ? 0 : 1,
+                strtolower($r->paper_title),
+            ]),
+            'difficulty_asc'  => $filteredPaperRows->sortBy(fn($r) => [
+                $r->is_empty_subtopic ? 1 : 0,
+                $difficultyOrder[$r->difficulty_key] ?? 9,
+                strtolower($r->subtopic_name),
+                strtolower($r->paper_title),
+            ]),
+            'questions_desc'  => $filteredPaperRows->sortBy(fn($r) => [
+                $r->is_empty_subtopic ? 1 : 0,
+                -$r->questions_count,
+                strtolower($r->paper_title),
+            ]),
+            'status'          => $filteredPaperRows->sortBy(fn($r) => [
+                $statusOrder[$r->status_key] ?? 9,
+                strtolower($r->subtopic_name),
+                strtolower($r->paper_title),
+            ]),
+            default           => $filteredPaperRows->sortBy(fn($r) => [
+                strtolower($r->subtopic_name),
+                $r->is_empty_subtopic ? 1 : 0,
+                strtolower($r->paper_title),
+            ]),
+        };
+
+        $sortedPaperRows = $sortedPaperRows->values();
+
+        $papersCurrentPage = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage('papers_page');
+        $papersPerPage = 15;
+        $paperRows = (new \Illuminate\Pagination\LengthAwarePaginator(
+            $sortedPaperRows->slice(($papersCurrentPage - 1) * $papersPerPage, $papersPerPage)->values(),
+            $sortedPaperRows->count(),
+            $papersPerPage,
+            $papersCurrentPage,
+            [
+                'path' => \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPath(),
+                'pageName' => 'papers_page',
+            ]
+        ))->withQueryString();
 
         // Fetch and paginate attempts for papers in these subtopics
         $attemptsQuery = PaperAttempt::where('user_id', $student->id)
@@ -810,6 +938,11 @@ class AssessmentController extends Controller
             'subjectTheme',
             'subtopics',
             'allSubtopics',
+            'paperRows',
+            'paperStatusCounts',
+            'paperStatusFilter',
+            'paperDifficultyFilter',
+            'paperSortBy',
             'attempts',
             'totalSubtopicsCount',
             'totalPapersCount',

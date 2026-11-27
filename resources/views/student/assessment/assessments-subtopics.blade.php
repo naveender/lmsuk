@@ -414,159 +414,103 @@
             color: #2477F9 !important;
         }
 
-        /* Subtopic Accordion Cards */
-        .st-subtopics-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-bottom: 1.5rem;
-        }
-
-        .st-subtopic-card {
-            background-color: var(--card-bg, #ffffff);
-            border: 1px solid var(--border-subtle, #e6edf7);
-            border-radius: 16px;
-            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.035);
-            overflow: hidden;
-        }
-
-        .st-subtopic-header {
-            padding: 18px 22px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-            cursor: pointer;
-            user-select: none;
-            transition: background-color 0.16s ease;
-        }
-
-        .st-subtopic-header:hover {
-            background-color: #f8fbff;
-        }
-
-        .st-subtopic-title-wrap {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 0;
-        }
-
-        .st-subtopic-accent {
-            width: 5px;
-            height: 28px;
-            border-radius: 999px;
-            background: var(--subj-gradient, linear-gradient(180deg, #2477F9, #1757C1));
-            flex-shrink: 0;
-        }
-
-        .st-subtopic-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--text-primary, #0b1f51);
-            margin: 0 0 3px;
-            line-height: 1.25;
-        }
-
-        .st-subtopic-meta {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--text-muted, #64748b);
-        }
-
-        .st-mini-track {
-            width: 80px;
-            height: 7px;
-            border-radius: 999px;
-            background-color: #edf2f7;
-            overflow: hidden;
-            display: inline-block;
-        }
-
-        .st-mini-fill {
-            height: 100%;
-            border-radius: 999px;
-            background: linear-gradient(90deg, #22c55e, #16a34a);
-        }
-
-        .st-subtopic-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-
-        .st-papers-pill {
-            padding: 5px 12px;
-            border-radius: 999px;
-            background-color: var(--subj-soft-bg, #ebf3ff);
-            color: var(--subj-soft-text, #1757C1);
-            font-size: 0.78rem;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .st-chevron-circle {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: #f1f5f9;
-            color: #475569;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.22s ease, background-color 0.2s ease;
-        }
-
-        .st-subtopic-header[aria-expanded="false"] .st-chevron-circle {
-            transform: rotate(-90deg);
-        }
-
-        .st-subtopic-body {
-            border-top: 1px solid var(--border-subtle, #eef2f7);
-        }
-
-        /* Paper Rows */
-        .st-paper-row {
-            padding: 16px 22px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            border-bottom: 1px solid var(--border-subtle, #f1f5f9);
-            transition: background-color 0.16s ease;
-        }
-
-        .st-paper-row:last-child {
-            border-bottom: none;
-        }
-
-        .st-paper-row:hover {
-            background-color: #f8fbff;
-        }
-
-        .st-paper-info {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .st-paper-title-line {
+        /* Filter Pills Row */
+        .st-filter-pills {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
             gap: 8px;
-            margin-bottom: 6px;
+        }
+
+        .st-filter-pill {
+            padding: 7px 14px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background-color: #e8eef7;
+            color: #334155;
+            text-decoration: none !important;
+            border: 1px solid transparent;
+            transition: all 0.18s ease;
+        }
+
+        .st-filter-pill:hover {
+            background-color: #dce5f3;
+            color: #0b1f51;
+        }
+
+        .st-filter-pill.active {
+            background-color: #2477F9;
+            color: #ffffff;
+            box-shadow: 0 3px 10px rgba(36, 119, 249, 0.25);
+        }
+
+        /* Table Paper & Subtopic Cells */
+        .st-subtopic-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background-color: var(--subj-soft-bg, #ebf3ff);
+            color: var(--subj-soft-text, #1757C1) !important;
+            border: 1px solid var(--subj-soft-border, #bfdbfe);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-decoration: none !important;
+            white-space: nowrap;
+            transition: all 0.16s ease;
+        }
+
+        .st-subtopic-chip:hover {
+            background-color: var(--subj-color, #2477F9);
+            color: #ffffff !important;
+            border-color: transparent;
         }
 
         .st-paper-title {
-            font-size: 0.98rem;
+            font-size: 0.96rem;
             font-weight: 700;
             color: var(--text-primary, #0b1f51);
-            margin: 0;
+            margin: 0 0 3px;
+            line-height: 1.3;
+        }
+
+        .st-paper-submeta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-muted, #64748b);
+        }
+
+        .st-qtime-primary {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-primary, #0b1f51);
+            line-height: 1.3;
+            white-space: nowrap;
+        }
+
+        .st-qtime-sub {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-muted, #64748b);
+            margin-top: 2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .st-status-sub {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--text-muted, #64748b);
+            margin-top: 4px;
+            white-space: nowrap;
         }
 
         .st-pill {
@@ -578,6 +522,7 @@
             font-size: 0.74rem;
             font-weight: 700;
             text-transform: capitalize;
+            white-space: nowrap;
         }
 
         .st-pill-easy {
@@ -625,41 +570,28 @@
             display: inline-block;
         }
 
-        .st-paper-meta {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 18px;
-            font-size: 0.82rem;
-            color: var(--text-muted, #64748b);
-        }
-
-        .st-paper-meta span {
+        .st-actions-cell {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-        }
-
-        .st-paper-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
+            justify-content: flex-end;
+            gap: 8px;
+            white-space: nowrap;
         }
 
         /* Start / Resume Buttons */
         .st-btn-start {
-            padding: 8px 20px;
+            padding: 7px 16px;
             border-radius: 10px;
             background: linear-gradient(135deg, #2477F9 0%, #1757C1 100%);
             color: #ffffff !important;
             border: none;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 700;
             display: inline-flex;
             align-items: center;
             gap: 6px;
             cursor: pointer;
+            white-space: nowrap;
             box-shadow: 0 4px 12px rgba(36, 119, 249, 0.25);
             transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
@@ -670,16 +602,17 @@
         }
 
         .st-btn-resume {
-            padding: 8px 20px;
+            padding: 7px 16px;
             border-radius: 10px;
             border: none;
             color: #ffffff !important;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 700;
             display: inline-flex;
             align-items: center;
             gap: 6px;
             cursor: pointer;
+            white-space: nowrap;
             transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
 
@@ -964,19 +897,6 @@
         }
 
         @media (max-width: 767.98px) {
-            .st-paper-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .st-paper-actions {
-                width: 100%;
-            }
-            .st-paper-actions form,
-            .st-btn-start,
-            .st-btn-resume {
-                width: 100%;
-                justify-content: center;
-            }
             .st-search-box {
                 width: 100%;
             }
@@ -993,7 +913,6 @@
 
         /* Dark Mode Support */
         body.dark-layout .st-kpi-card,
-        body.dark-layout .st-subtopic-card,
         body.dark-layout .st-card,
         body.dark-layout .st-mobile-attempt-card,
         body.dark-layout .st-header-pill-btn,
@@ -1006,8 +925,8 @@
 
         body.dark-layout .st-page-title,
         body.dark-layout .st-kpi-count,
-        body.dark-layout .st-subtopic-title,
         body.dark-layout .st-paper-title,
+        body.dark-layout .st-qtime-primary,
         body.dark-layout .st-card-title,
         body.dark-layout .st-tip-title,
         body.dark-layout .st-header-pill-btn,
@@ -1019,8 +938,9 @@
 
         body.dark-layout .st-page-subtitle,
         body.dark-layout .st-kpi-sub,
-        body.dark-layout .st-subtopic-meta,
-        body.dark-layout .st-paper-meta,
+        body.dark-layout .st-paper-submeta,
+        body.dark-layout .st-qtime-sub,
+        body.dark-layout .st-status-sub,
         body.dark-layout .st-card-subtitle,
         body.dark-layout .st-filter-label,
         body.dark-layout .st-table thead th,
@@ -1033,25 +953,34 @@
             color: #cbd5e1 !important;
         }
 
-        body.dark-layout .st-subtopic-body,
-        body.dark-layout .st-paper-row,
         body.dark-layout .st-table thead th,
         body.dark-layout .st-table tbody tr {
             border-color: #334155 !important;
         }
 
-        body.dark-layout .st-subtopic-header:hover,
-        body.dark-layout .st-paper-row:hover,
         body.dark-layout .st-table tbody tr:hover {
             background-color: rgba(36, 119, 249, 0.08);
         }
 
-        body.dark-layout .st-mini-track,
         body.dark-layout .st-acc-track,
-        body.dark-layout .st-chevron-circle,
         body.dark-layout .st-count-chip {
             background-color: #0f172a;
             color: #94a3b8;
+        }
+
+        body.dark-layout .st-filter-pill {
+            background-color: #1e293b;
+            color: #cbd5e1;
+            border-color: #334155;
+        }
+
+        body.dark-layout .st-filter-pill:hover {
+            background-color: #334155;
+            color: #ffffff;
+        }
+
+        body.dark-layout .st-filter-pill.active {
+            border-color: transparent;
         }
 
         body.dark-layout .st-tabs-nav .nav-link {
@@ -1370,10 +1299,66 @@
                          role="tabpanel"
                          aria-labelledby="papers-tab">
 
-                        <!-- Toolbar: Subtopic Filter, Paper Search & Collapse Toggle -->
+                        @php
+                            $currentPaperStatus = $paperStatusFilter ?? 'all';
+                            $currentPaperDifficulty = $paperDifficultyFilter ?? '';
+                            $currentPaperSort = $paperSortBy ?? 'subtopic_asc';
+                            $hasActivePaperFilter = request()->filled('subtopic_name')
+                                || request()->filled('paper_name')
+                                || $currentPaperStatus !== 'all'
+                                || $currentPaperDifficulty !== ''
+                                || $currentPaperSort !== 'subtopic_asc';
+
+                            $paperBaseParams = [];
+                            foreach (request()->except(['paper_status', 'papers_page']) as $k => $v) {
+                                if (!is_array($v)) {
+                                    $paperBaseParams[$k] = $v;
+                                }
+                            }
+                            $clearMainParams = [];
+                            foreach (request()->except(['subtopic_name', 'paper_name', 'paper_status', 'paper_difficulty', 'paper_sort', 'papers_page']) as $k => $v) {
+                                if (!is_array($v)) {
+                                    $clearMainParams[$k] = $v;
+                                }
+                            }
+                        @endphp
+
+                        <!-- Toolbar Row 1: Status Filter Pills & Clear -->
+                        <div class="st-toolbar mb-1">
+                            <div class="st-filter-pills" role="tablist" aria-label="Filter papers by status">
+                                <a href="{{ route('student.topics.subtopics', [$topic->id] + $paperBaseParams) }}"
+                                   class="st-filter-pill {{ $currentPaperStatus === 'all' ? 'active' : '' }}">
+                                    All ({{ $paperStatusCounts['all'] ?? 0 }})
+                                </a>
+                                <a href="{{ route('student.topics.subtopics', [$topic->id] + $paperBaseParams + ['paper_status' => 'in-progress']) }}"
+                                   class="st-filter-pill {{ $currentPaperStatus === 'in-progress' ? 'active' : '' }}">
+                                    In Progress ({{ $paperStatusCounts['in-progress'] ?? 0 }})
+                                </a>
+                                <a href="{{ route('student.topics.subtopics', [$topic->id] + $paperBaseParams + ['paper_status' => 'completed']) }}"
+                                   class="st-filter-pill {{ $currentPaperStatus === 'completed' ? 'active' : '' }}">
+                                    Completed ({{ $paperStatusCounts['completed'] ?? 0 }})
+                                </a>
+                                <a href="{{ route('student.topics.subtopics', [$topic->id] + $paperBaseParams + ['paper_status' => 'not-started']) }}"
+                                   class="st-filter-pill {{ $currentPaperStatus === 'not-started' ? 'active' : '' }}">
+                                    Not Started ({{ $paperStatusCounts['not-started'] ?? 0 }})
+                                </a>
+                            </div>
+
+                            @if($hasActivePaperFilter)
+                                <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearMainParams) }}"
+                                   class="st-action-btn-light text-danger">
+                                    <i class="feather icon-x"></i>
+                                    <span>Clear Filters</span>
+                                </a>
+                            @endif
+                        </div>
+
+                        <!-- Toolbar Row 2: Subtopic, Difficulty, Sort & Search -->
                         <form method="GET" action="{{ route('student.topics.subtopics', $topic->id) }}" class="st-toolbar">
-                            @foreach(request()->except(['subtopic_name', 'paper_name', 'page']) as $key => $value)
-                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                            @foreach(request()->except(['subtopic_name', 'paper_name', 'paper_difficulty', 'paper_sort', 'papers_page']) as $key => $value)
+                                @if(!is_array($value))
+                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @endif
                             @endforeach
 
                             <div class="st-toolbar-left">
@@ -1389,16 +1374,27 @@
                                     </select>
                                 </div>
 
-                                @if(request()->filled('subtopic_name') || request()->filled('paper_name'))
-                                    @php
-                                        $clearMainParams = request()->except(['subtopic_name', 'paper_name', 'page']);
-                                    @endphp
-                                    <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearMainParams) }}"
-                                       class="st-action-btn-light text-danger">
-                                        <i class="feather icon-x"></i>
-                                        <span>Clear Filters</span>
-                                    </a>
-                                @endif
+                                <div class="st-filter-group">
+                                    <label for="paper_difficulty" class="st-filter-label">Difficulty:</label>
+                                    <select name="paper_difficulty" id="paper_difficulty" class="st-select" onchange="this.form.submit()">
+                                        <option value="">All Levels</option>
+                                        <option value="easy" {{ $currentPaperDifficulty === 'easy' ? 'selected' : '' }}>Easy</option>
+                                        <option value="medium" {{ $currentPaperDifficulty === 'medium' ? 'selected' : '' }}>Medium</option>
+                                        <option value="hard" {{ $currentPaperDifficulty === 'hard' ? 'selected' : '' }}>Hard</option>
+                                    </select>
+                                </div>
+
+                                <div class="st-filter-group">
+                                    <label for="paper_sort" class="st-filter-label">Sort by:</label>
+                                    <select name="paper_sort" id="paper_sort" class="st-select" onchange="this.form.submit()">
+                                        <option value="subtopic_asc" {{ $currentPaperSort === 'subtopic_asc' ? 'selected' : '' }}>Subtopic (A to Z)</option>
+                                        <option value="paper_asc" {{ $currentPaperSort === 'paper_asc' ? 'selected' : '' }}>Paper Name (A to Z)</option>
+                                        <option value="paper_desc" {{ $currentPaperSort === 'paper_desc' ? 'selected' : '' }}>Paper Name (Z to A)</option>
+                                        <option value="difficulty_asc" {{ $currentPaperSort === 'difficulty_asc' ? 'selected' : '' }}>Difficulty</option>
+                                        <option value="questions_desc" {{ $currentPaperSort === 'questions_desc' ? 'selected' : '' }}>Most Questions</option>
+                                        <option value="status" {{ $currentPaperSort === 'status' ? 'selected' : '' }}>Status</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="st-toolbar-right">
@@ -1419,7 +1415,12 @@
                                            aria-label="Search papers">
                                     @if(request()->filled('paper_name'))
                                         @php
-                                            $clearPaperParams = request()->except(['paper_name', 'page']);
+                                            $clearPaperParams = [];
+                                            foreach (request()->except(['paper_name', 'papers_page']) as $k => $v) {
+                                                if (!is_array($v)) {
+                                                    $clearPaperParams[$k] = $v;
+                                                }
+                                            }
                                         @endphp
                                         <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearPaperParams) }}"
                                            class="st-search-clear"
@@ -1429,170 +1430,213 @@
                                         </a>
                                     @endif
                                 </div>
-
-                                @if($subtopics->isNotEmpty())
-                                    <button type="button" class="st-action-btn-light" id="toggleAllSubtopicsBtn">
-                                        <i class="feather icon-minimize-2"></i>
-                                        <span>Collapse All</span>
-                                    </button>
-                                @endif
                             </div>
                         </form>
 
-                        <!-- Subtopics List -->
-                        <div class="st-subtopics-stack">
-                            @forelse($subtopics as $subtopic)
-                                @php
-                                    $subtopicPapersCount = $subtopic->papers->count();
-                                    $subtopicCompletedCount = $subtopic->papers->where('completed_attempts_count', '>', 0)->count();
-                                    $subtopicProgress = $subtopicPapersCount > 0 ? round(($subtopicCompletedCount / $subtopicPapersCount) * 100) : 0;
-                                @endphp
-                                <div class="st-subtopic-card">
-                                    <div class="st-subtopic-header"
-                                         data-toggle="collapse"
-                                         data-target="#collapseSubtopic{{ $subtopic->id }}"
-                                         aria-expanded="true"
-                                         aria-controls="collapseSubtopic{{ $subtopic->id }}">
-                                        <div class="st-subtopic-title-wrap">
-                                            <span class="st-subtopic-accent"></span>
-                                            <div class="min-width-0">
-                                                <h3 class="st-subtopic-title">{{ $subtopic->name }}</h3>
-                                                <div class="st-subtopic-meta">
-                                                    <span>Completed {{ $subtopicCompletedCount }} of {{ $subtopicPapersCount }} papers</span>
-                                                    <span class="st-mini-track d-none d-sm-inline-block">
-                                                        <span class="st-mini-fill d-block" style="width: {{ $subtopicProgress }}%;"></span>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
+                        <!-- Subtopics & Practice Papers Directory Table Card -->
+                        <div class="st-card">
+                            <div class="st-card-header">
+                                <div>
+                                    <h2 class="st-card-title">Subtopics &amp; Practice Papers</h2>
+                                    <p class="st-card-subtitle">Browse subtopic papers, track completion status, and launch or resume a test.</p>
+                                </div>
+                                @if($paperRows->total() > 0)
+                                    <span class="st-count-chip">
+                                        Showing {{ $paperRows->firstItem() }}–{{ $paperRows->lastItem() }} of {{ $paperRows->total() }}
+                                    </span>
+                                @endif
+                            </div>
 
-                                        <div class="st-subtopic-right">
-                                            <span class="st-papers-pill">
-                                                {{ $subtopicPapersCount }} {{ \Illuminate\Support\Str::plural('Paper', $subtopicPapersCount) }}
-                                            </span>
-                                            <span class="st-chevron-circle">
-                                                <i class="feather icon-chevron-down"></i>
-                                            </span>
-                                        </div>
-                                    </div>
+                            @if($paperRows->isNotEmpty())
+                                <div class="st-table-wrap">
+                                    <table class="st-table st-papers-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Subtopic</th>
+                                                <th>Practice Paper</th>
+                                                <th>Questions &amp; Time</th>
+                                                <th>Difficulty</th>
+                                                <th>Status &amp; Score</th>
+                                                <th class="text-right">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($paperRows as $row)
+                                                @php
+                                                    $subtopic = $row->subtopic;
+                                                    $paper = $row->paper;
+                                                    $subtopicFilterParams = [];
+                                                    foreach (request()->except(['subtopic_name', 'papers_page']) as $k => $v) {
+                                                        if (!is_array($v)) {
+                                                            $subtopicFilterParams[$k] = $v;
+                                                        }
+                                                    }
+                                                @endphp
 
-                                    <div id="collapseSubtopic{{ $subtopic->id }}" class="collapse show st-subtopic-body">
-                                        @forelse($subtopic->papers as $paper)
-                                            @php
-                                                $diffKey = strtolower($paper->difficulty ?? '');
-                                                $diffBadgeClass = match ($diffKey) {
-                                                    'easy'   => 'st-pill-easy',
-                                                    'medium' => 'st-pill-medium',
-                                                    'hard'   => 'st-pill-hard',
-                                                    default  => 'st-pill-neutral',
-                                                };
-                                            @endphp
-                                            <div class="st-paper-row">
-                                                <div class="st-paper-info">
-                                                    <div class="st-paper-title-line">
-                                                        <h4 class="st-paper-title">{{ $paper->title }}</h4>
-
-                                                        @if(!empty($paper->difficulty))
-                                                            <span class="st-pill {{ $diffBadgeClass }}">
-                                                                <span class="st-pill-dot"></span>
-                                                                {{ $paper->difficulty }}
-                                                            </span>
-                                                        @endif
-
-                                                        @if($paper->active_attempt)
-                                                            @if($paper->active_attempt->status === 'paused')
-                                                                <span class="st-pill st-pill-paused">
-                                                                    <span class="st-pill-dot"></span>Paused
+                                                @if($row->is_empty_subtopic)
+                                                    <tr>
+                                                        <td>
+                                                            <a href="{{ route('student.topics.subtopics', [$topic->id] + $subtopicFilterParams + ['subtopic_name' => $subtopic->name]) }}"
+                                                               class="st-subtopic-chip"
+                                                               title="Filter by {{ $subtopic->name }}">
+                                                                <span>{{ $subtopic->name }}</span>
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <span class="text-muted font-italic">No practice papers available yet</span>
+                                                        </td>
+                                                        <td><span class="text-muted">&mdash;</span></td>
+                                                        <td><span class="text-muted">&mdash;</span></td>
+                                                        <td>
+                                                            <span class="st-pill st-pill-neutral">No Papers</span>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <span class="text-muted" style="font-size: 0.82rem;">Coming soon</span>
+                                                        </td>
+                                                    </tr>
+                                                @else
+                                                    @php
+                                                        $diffKey = strtolower($paper->difficulty ?? '');
+                                                        $diffBadgeClass = match ($diffKey) {
+                                                            'easy'   => 'st-pill-easy',
+                                                            'medium' => 'st-pill-medium',
+                                                            'hard'   => 'st-pill-hard',
+                                                            default  => 'st-pill-neutral',
+                                                        };
+                                                    @endphp
+                                                    <tr>
+                                                        <td>
+                                                            <a href="{{ route('student.topics.subtopics', [$topic->id] + $subtopicFilterParams + ['subtopic_name' => $subtopic->name]) }}"
+                                                               class="st-subtopic-chip"
+                                                               title="Filter by {{ $subtopic->name }}">
+                                                                <span>{{ $subtopic->name }}</span>
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <div class="st-paper-title">{{ $paper->title }}</div>
+                                                            <div class="st-paper-submeta">
+                                                                <span>{{ $paper->display_type ?? ucfirst($paper->type ?? 'Test') }}</span>
+                                                                <span>&bull;</span>
+                                                                <span>{{ $paper->total_marks ?? 0 }} {{ \Illuminate\Support\Str::plural('mark', $paper->total_marks ?? 0) }}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="st-qtime-primary">
+                                                                {{ $paper->questions_count ?? 0 }} {{ \Illuminate\Support\Str::plural('Question', $paper->questions_count ?? 0) }}
+                                                            </div>
+                                                            <div class="st-qtime-sub">
+                                                                <i class="feather icon-clock"></i>
+                                                                <span>{{ $paper->total_time ? $paper->total_time . ' mins' : 'Unlimited' }}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            @if(!empty($paper->difficulty))
+                                                                <span class="st-pill {{ $diffBadgeClass }}">
+                                                                    <span class="st-pill-dot"></span>
+                                                                    {{ $paper->difficulty }}
                                                                 </span>
                                                             @else
-                                                                <span class="st-pill st-pill-progress">
-                                                                    <span class="st-pill-dot"></span>In Progress
-                                                                </span>
+                                                                <span class="text-muted">&mdash;</span>
                                                             @endif
-                                                        @elseif($paper->completed_attempts_count > 0)
-                                                            <span class="st-pill st-pill-done">
-                                                                <i class="feather icon-check"></i> Completed
-                                                            </span>
-                                                        @endif
-                                                    </div>
+                                                        </td>
+                                                        <td>
+                                                            @if($paper->active_attempt)
+                                                                @if($paper->active_attempt->status === 'paused')
+                                                                    <span class="st-pill st-pill-paused">
+                                                                        <span class="st-pill-dot"></span>Paused
+                                                                    </span>
+                                                                @else
+                                                                    <span class="st-pill st-pill-progress">
+                                                                        <span class="st-pill-dot"></span>In Progress
+                                                                    </span>
+                                                                @endif
+                                                                @if($paper->completed_attempts_count > 0)
+                                                                    <div class="st-status-sub">
+                                                                        {{ $paper->completed_attempts_count }} prev {{ \Illuminate\Support\Str::plural('attempt', $paper->completed_attempts_count) }}
+                                                                    </div>
+                                                                @endif
+                                                            @elseif($paper->completed_attempts_count > 0)
+                                                                <span class="st-pill st-pill-done">
+                                                                    <i class="feather icon-check"></i> Completed
+                                                                </span>
+                                                                <div class="st-status-sub">
+                                                                    @if($paper->best_accuracy !== null)
+                                                                        Best {{ $paper->best_accuracy }}% &bull;
+                                                                    @endif
+                                                                    {{ $paper->completed_attempts_count }} {{ \Illuminate\Support\Str::plural('attempt', $paper->completed_attempts_count) }}
+                                                                </div>
+                                                            @else
+                                                                <span class="st-pill st-pill-neutral">Not Started</span>
+                                                            @endif
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <div class="st-actions-cell">
+                                                                @if($paper->latest_completed_attempt_id)
+                                                                    <a href="{{ route('student.attempts.result', $paper->latest_completed_attempt_id) }}"
+                                                                       class="st-btn-outline"
+                                                                       title="View latest result">
+                                                                        <i class="feather icon-bar-chart-2"></i>
+                                                                        <span>Result</span>
+                                                                    </a>
+                                                                @endif
 
-                                                    <div class="st-paper-meta">
-                                                        <span>
-                                                            <i class="feather icon-help-circle text-primary"></i>
-                                                            <strong>{{ $paper->questions_count ?? 0 }}</strong> Questions
-                                                        </span>
-                                                        <span>
-                                                            <i class="feather icon-clock text-success"></i>
-                                                            <strong>{{ $paper->total_time ? $paper->total_time . ' mins' : 'Unlimited' }}</strong>
-                                                        </span>
-                                                        <span>
-                                                            <i class="feather icon-check-square text-info"></i>
-                                                            <strong>{{ $paper->completed_attempts_count }}</strong> Completed
-                                                        </span>
-                                                    </div>
-                                                </div>
+                                                                <form action="{{ route('student.papers.start', $paper->id) }}" method="POST" class="mb-0">
+                                                                    @csrf
+                                                                    @if($paper->active_attempt)
+                                                                        <button type="submit"
+                                                                                class="st-btn-resume {{ $paper->active_attempt->status === 'paused' ? 'is-paused' : 'is-active' }}">
+                                                                            <span>Resume</span>
+                                                                            <i class="feather icon-play"></i>
+                                                                        </button>
+                                                                    @else
+                                                                        <button type="button"
+                                                                                class="st-btn-start btn-start-trigger"
+                                                                                data-paper-id="{{ $paper->id }}"
+                                                                                data-paper-title="{{ $paper->title }}"
+                                                                                data-paper-questions="{{ $paper->questions_count ?? 0 }}"
+                                                                                data-paper-time="{{ $paper->total_time ? $paper->total_time . ' mins' : 'Unlimited' }}"
+                                                                                data-paper-timed="{{ $paper->total_time > 0 ? '1' : '0' }}"
+                                                                                data-paper-type="{{ $paper->display_type ?? ucfirst($paper->type ?? 'Test') }}"
+                                                                                data-paper-marks="{{ $paper->total_marks ?? 0 }}"
+                                                                                data-paper-subject="{{ $subject->title ?? ($paper->subject?->title ?? 'General') }}"
+                                                                                data-paper-difficulty="{{ $diffKey }}"
+                                                                                data-paper-instruction="{{ $paper->instruction ?? '' }}"
+                                                                                data-action-url="{{ route('student.papers.start', $paper->id) }}">
+                                                                            <span>{{ $paper->completed_attempts_count > 0 ? 'Retake' : 'Start' }}</span>
+                                                                            <i class="feather icon-arrow-right"></i>
+                                                                        </button>
+                                                                    @endif
+                                                                </form>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endif
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
 
-                                                <div class="st-paper-actions">
-                                                    <form action="{{ route('student.papers.start', $paper->id) }}" method="POST" class="mb-0">
-                                                        @csrf
-                                                        @if($paper->active_attempt)
-                                                            <button type="submit"
-                                                                    class="st-btn-resume {{ $paper->active_attempt->status === 'paused' ? 'is-paused' : 'is-active' }}">
-                                                                <span>Resume</span>
-                                                                <i class="feather icon-play"></i>
-                                                            </button>
-                                                        @else
-                                                            <button type="button"
-                                                                    class="st-btn-start btn-start-trigger"
-                                                                    data-paper-id="{{ $paper->id }}"
-                                                                    data-paper-title="{{ $paper->title }}"
-                                                                    data-paper-questions="{{ $paper->questions_count ?? 0 }}"
-                                                                    data-paper-time="{{ $paper->total_time ? $paper->total_time . ' mins' : 'Unlimited' }}"
-                                                                    data-paper-timed="{{ $paper->total_time > 0 ? '1' : '0' }}"
-                                                                    data-paper-type="{{ $paper->display_type ?? ucfirst($paper->type ?? 'Test') }}"
-                                                                    data-paper-marks="{{ $paper->total_marks ?? 0 }}"
-                                                                    data-paper-subject="{{ $subject->title ?? ($paper->subject?->title ?? 'General') }}"
-                                                                    data-paper-difficulty="{{ $diffKey }}"
-                                                                    data-paper-instruction="{{ $paper->instruction ?? '' }}"
-                                                                    data-action-url="{{ route('student.papers.start', $paper->id) }}">
-                                                                <span>Start</span>
-                                                                <i class="feather icon-arrow-right"></i>
-                                                            </button>
-                                                        @endif
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        @empty
-                                            <div class="st-empty-box">
-                                                <div class="st-empty-icon">
-                                                    <i class="feather icon-file-text"></i>
-                                                </div>
-                                                <h5 class="font-weight-bold mb-50" style="color: var(--text-primary, #0b1f51);">No Papers Available</h5>
-                                                <p class="text-muted mb-0" style="font-size: 0.88rem;">
-                                                    There are no practice papers available for this subtopic right now.
-                                                </p>
-                                            </div>
-                                        @endforelse
+                                @if($paperRows->hasPages())
+                                    <div class="st-pagination-wrap">
+                                        {{ $paperRows->links() }}
                                     </div>
-                                </div>
-                            @empty
-                                <div class="st-card">
-                                    <div class="st-empty-box">
-                                        <div class="st-empty-icon">
-                                            <i class="feather icon-layers"></i>
-                                        </div>
-                                        <h4 class="font-weight-bold mb-1" style="color: var(--text-primary, #0b1f51);">No Subtopics Found</h4>
-                                        <p class="text-muted mb-2" style="font-size: 0.9rem;">
-                                            No subtopics matched your filter or are configured for this topic yet.
-                                        </p>
-                                        @if(request()->filled('subtopic_name') || request()->filled('paper_name'))
-                                            <a href="{{ route('student.topics.subtopics', $topic->id) }}" class="btn btn-primary btn-sm px-2" style="border-radius: 10px;">
-                                                <i class="feather icon-refresh-cw mr-25"></i> Clear Filters
-                                            </a>
-                                        @endif
+                                @endif
+                            @else
+                                <div class="st-empty-box">
+                                    <div class="st-empty-icon">
+                                        <i class="feather icon-layers"></i>
                                     </div>
+                                    <h4 class="font-weight-bold mb-1" style="color: var(--text-primary, #0b1f51);">No Subtopics or Papers Found</h4>
+                                    <p class="text-muted mb-2" style="font-size: 0.9rem;">
+                                        No subtopics or practice papers matched your filter criteria.
+                                    </p>
+                                    @if($hasActivePaperFilter)
+                                        <a href="{{ route('student.topics.subtopics', [$topic->id] + $clearMainParams) }}" class="btn btn-primary btn-sm px-2" style="border-radius: 10px;">
+                                            <i class="feather icon-refresh-cw mr-25"></i> Clear Filters
+                                        </a>
+                                    @endif
                                 </div>
-                            @endforelse
+                            @endif
                         </div>
 
                     </div>
@@ -1606,7 +1650,9 @@
                         <!-- Attempt Filters Toolbar -->
                         <form method="GET" action="{{ route('student.topics.subtopics', $topic->id) }}" class="st-toolbar">
                             @foreach(request()->except(['attempt_paper_name', 'attempt_subtopic_id', 'attempt_status', 'attempts_page']) as $key => $value)
-                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @if(!is_array($value))
+                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @endif
                             @endforeach
 
                             <div class="st-toolbar-left">
@@ -1872,26 +1918,3 @@
 
     @include('student.assessment.partials.start-test-modal')
 @endsection
-
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var toggleAllBtn = document.getElementById('toggleAllSubtopicsBtn');
-            var allExpanded = true;
-
-            if (toggleAllBtn) {
-                toggleAllBtn.addEventListener('click', function () {
-                    allExpanded = !allExpanded;
-                    var panels = $('.st-subtopic-card .collapse');
-                    if (allExpanded) {
-                        panels.collapse('show');
-                        toggleAllBtn.innerHTML = '<i class="feather icon-minimize-2"></i><span>Collapse All</span>';
-                    } else {
-                        panels.collapse('hide');
-                        toggleAllBtn.innerHTML = '<i class="feather icon-maximize-2"></i><span>Expand All</span>';
-                    }
-                });
-            }
-        });
-    </script>
-@endpush
