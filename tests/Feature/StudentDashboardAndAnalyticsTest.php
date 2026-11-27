@@ -227,3 +227,57 @@ test('student analytics calculates real kpis, trend, subject scores, and isolate
     $response->assertSee('Fractions Real');
     $response->assertSee('Math Real Paper 1');
 });
+
+test('student analytics provides per-subject analytics snapshots, extended badge tiers, and focus recommendations', function () {
+    $student = User::factory()->create([
+        'role'     => 'student',
+        'username' => 'student_an_enh_' . uniqid(),
+    ]);
+
+    $maths = Subject::create(['title' => 'Maths', 'is_active' => true]);
+    $nvr = Subject::create(['title' => 'Non-Verbal Reasoning', 'is_active' => true]);
+
+    $geoTopic = Topic::create(['name' => 'Geometry Basics', 'slug' => 'geo-basics', 'subject_id' => $maths->id]);
+    $rotTopic = Topic::create(['name' => '3D Rotations', 'slug' => 'rotations-3d', 'subject_id' => $nvr->id]);
+
+    $mathPaper = Paper::create(['title' => 'Geo Practice', 'type' => 'test', 'subject_id' => $maths->id, 'topic_id' => $geoTopic->id]);
+    $nvrPaper = Paper::create(['title' => 'NVR Spatial Test', 'type' => 'test', 'subject_id' => $nvr->id, 'topic_id' => $rotTopic->id]);
+
+    PaperAttempt::create([
+        'user_id'      => $student->id,
+        'paper_id'     => $mathPaper->id,
+        'status'       => 'completed',
+        'score'        => 9,
+        'max_score'    => 10,
+        'completed_at' => now()->subDays(2),
+    ]);
+
+    PaperAttempt::create([
+        'user_id'      => $student->id,
+        'paper_id'     => $nvrPaper->id,
+        'status'       => 'completed',
+        'score'        => 5,
+        'max_score'    => 10,
+        'completed_at' => now()->subDay(),
+    ]);
+
+    $response = $this->actingAs($student)->get(route('student.analytics', ['subject' => 'nvr']));
+
+    $response->assertStatus(200);
+    $response->assertViewHas('bestScore', 90);
+    $response->assertViewHas('latestScore', 50);
+    $response->assertViewHas('activeSubjectFilter', 'nvr');
+
+    $subjectMap = $response->viewData('subjectAnalyticsMap');
+    expect($subjectMap['maths']['summary']['average_score'])->toEqual(90);
+    expect($subjectMap['nvr']['summary']['average_score'])->toEqual(50);
+    expect($subjectMap['nvr']['trend']['series'])->toEqual([50]);
+
+    $lowestTopic = $response->viewData('lowestTopic');
+    expect($lowestTopic['name'])->toEqual('3D Rotations');
+
+    $response->assertSee('Recommended Focus: 3D Rotations');
+    $response->assertSee('subj-nvr');
+    $response->assertSee('NVR Spatial Test');
+    $response->assertSee('All Subjects');
+});
