@@ -1050,32 +1050,144 @@ class AssessmentController extends Controller
      */
     public function result($attemptId)
     {
-        $attempt = PaperAttempt::with(['paper.questions.options', 'answers.question'])->findOrFail($attemptId);
+        $attempt = PaperAttempt::with([
+            'paper.subject',
+            'paper.topic',
+            'paper.questions.options',
+            'paper.questions.topic',
+            'answers.question',
+        ])->findOrFail($attemptId);
 
         if ($attempt->user_id !== auth()->id()) {
             abort(403);
         }
 
-        if ($attempt->paper->hide_result) {
-            $redirectUrl = $attempt->paper->topic_id
-                ? route('student.topics.subtopics', $attempt->paper->topic_id)
-                : route('student.weeklytests');
-            return redirect($redirectUrl)
+        $paper = $attempt->paper;
+        $backUrl = $paper->topic_id
+            ? route('student.topics.subtopics', $paper->topic_id)
+            : ($paper->subject_id
+                ? route('student.assessments.topics', $paper->subject_id)
+                : route('student.weeklytests'));
+
+        if ($paper->hide_result) {
+            return redirect($backUrl)
                 ->with('error', 'Results for this paper are hidden.');
         }
 
-        $answers = StudentAnswer::where('paper_attempt_id', $attempt->id)
+        $answers = StudentAnswer::with('selectedOption')
+            ->where('paper_attempt_id', $attempt->id)
             ->get()
             ->keyBy('question_id');
 
-        $questions = $attempt->paper->questions;
-        if ($attempt->paper->shuffle_questions) {
-            $questions = $questions->sortBy(function($q) use ($attempt) {
+        $questions = $paper->questions;
+        if ($paper->shuffle_questions) {
+            $questions = $questions->sortBy(function ($q) use ($attempt) {
                 return md5($q->id . '_' . $attempt->id);
             })->values();
         }
 
-        return view('student.assessment.result', compact('attempt', 'questions', 'answers'));
+        $totalQuestions = $questions->count() > 0 ? $questions->count() : max(0, (int) $attempt->total_questions);
+
+        $questionMarksMap = [];
+        $correctCount = 0;
+        $incorrectCount = 0;
+        $unansweredCount = 0;
+        $topicBuckets = [];
+
+        foreach ($questions as $q) {
+            $qMarks = (float) ($q->pivot->marks ?? $q->marks ?? $paper->default_marks ?? 1);
+            $questionMarksMap[$q->id] = $qMarks;
+
+            $ans = $answers->get($q->id);
+            $isCorrect = $ans && $ans->is_correct;
+            if ($ans) {
+                if ($isCorrect) {
+                    $correctCount++;
+                } else {
+                    $incorrectCount++;
+                }
+            } else {
+                $unansweredCount++;
+            }
+
+            if ($q->topic) {
+                $tid = $q->topic->id;
+                if (!isset($topicBuckets[$tid])) {
+                    $topicBuckets[$tid] = [
+                        'id'      => $tid,
+                        'name'    => $q->topic->name,
+                        'total'   => 0,
+                        'correct' => 0,
+                    ];
+                }
+                $topicBuckets[$tid]['total']++;
+                if ($isCorrect) {
+                    $topicBuckets[$tid]['correct']++;
+                }
+            }
+        }
+
+        if ($questions->isEmpty()) {
+            $correctCount = (int) $attempt->correct_answers;
+            $incorrectCount = max(0, $totalQuestions - $correctCount);
+            $unansweredCount = 0;
+        }
+
+        $maxScore = $attempt->max_score > 0
+            ? (int) $attempt->max_score
+            : (int) array_sum($questionMarksMap);
+
+        $percentage = $maxScore > 0 ? (int) round(($attempt->score / $maxScore) * 100) : 0;
+        $percentage = max(0, min(100, $percentage));
+
+        $timeSpentSec = max(0, (int) $attempt->time_spent);
+        $hours = (int) floor($timeSpentSec / 3600);
+        $mins = (int) floor(($timeSpentSec % 3600) / 60);
+        $secs = $timeSpentSec % 60;
+        $formattedTimeSpent = $hours > 0
+            ? sprintf('%dh %02dm %02ds', $hours, $mins, $secs)
+            : ($mins > 0 ? sprintf('%dm %02ds', $mins, $secs) : sprintf('%ds', $secs));
+
+        $avgSecondsPerQ = $totalQuestions > 0 ? (int) round($timeSpentSec / $totalQuestions) : 0;
+
+        $topicBreakdown = collect($topicBuckets)->map(function (array $bucket) {
+            $acc = $bucket['total'] > 0 ? (int) round(($bucket['correct'] / $bucket['total']) * 100) : 0;
+            return [
+                'id'       => $bucket['id'],
+                'name'     => $bucket['name'],
+                'total'    => $bucket['total'],
+                'correct'  => $bucket['correct'],
+                'accuracy' => $acc,
+                'url'      => route('student.topics.subtopics', $bucket['id']),
+            ];
+        })->values();
+
+        $subjectTheme = $this->resolveSubjectTheme($paper->subject?->title ?? '');
+
+        $activeAttemptForPaper = PaperAttempt::where('user_id', auth()->id())
+            ->where('paper_id', $paper->id)
+            ->whereIn('status', ['in_progress', 'paused'])
+            ->first();
+
+        return view('student.assessment.result', compact(
+            'attempt',
+            'paper',
+            'questions',
+            'answers',
+            'questionMarksMap',
+            'totalQuestions',
+            'maxScore',
+            'percentage',
+            'correctCount',
+            'incorrectCount',
+            'unansweredCount',
+            'formattedTimeSpent',
+            'avgSecondsPerQ',
+            'topicBreakdown',
+            'subjectTheme',
+            'backUrl',
+            'activeAttemptForPaper'
+        ));
     }
 
     /**

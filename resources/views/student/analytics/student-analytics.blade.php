@@ -72,10 +72,24 @@
                             </div>
                             <div class="flex-grow-1">
                                 <span class="analytics-card-label d-block text-muted font-small-3 font-weight-bold mb-25">Average Score</span>
-                                <h2 class="analytics-card-val font-weight-bolder mb-0">{{ $averageScore }}%</h2>
-                                <span class="analytics-card-subtext font-small-2 font-weight-bold text-success d-inline-flex align-items-center">
-                                    <i class="feather icon-arrow-up mr-25 font-small-1"></i> +{{ $scoreGrowth }}%
-                                </span>
+                                <h2 class="analytics-card-val font-weight-bolder mb-0">{{ $totalAssessments > 0 ? $averageScore . '%' : '—' }}</h2>
+                                @if($scoreGrowth === null)
+                                    <span class="analytics-card-subtext font-small-2 text-muted">
+                                        {{ $totalAssessments > 0 ? 'Need 2+ tests for trend' : 'No completed tests' }}
+                                    </span>
+                                @elseif($scoreGrowth > 0)
+                                    <span class="analytics-card-subtext font-small-2 font-weight-bold text-success d-inline-flex align-items-center">
+                                        <i class="feather icon-arrow-up mr-25 font-small-1"></i> +{{ $scoreGrowth }}%
+                                    </span>
+                                @elseif($scoreGrowth < 0)
+                                    <span class="analytics-card-subtext font-small-2 font-weight-bold text-danger d-inline-flex align-items-center">
+                                        <i class="feather icon-arrow-down mr-25 font-small-1"></i> {{ $scoreGrowth }}%
+                                    </span>
+                                @else
+                                    <span class="analytics-card-subtext font-small-2 font-weight-bold text-muted d-inline-flex align-items-center">
+                                        0% change
+                                    </span>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -90,8 +104,15 @@
                             </div>
                             <div class="flex-grow-1">
                                 <span class="analytics-card-label d-block text-muted font-small-3 font-weight-bold mb-25">Overall Progress</span>
-                                <h2 class="analytics-card-val font-weight-bolder mb-0">{{ ($overallProgress >= 0 ? '+' : '') . $overallProgress }}%</h2>
-                                <span class="analytics-card-subtext font-small-2 text-muted">Since last month</span>
+                                @if($overallProgress !== null)
+                                    <h2 class="analytics-card-val font-weight-bolder mb-0 {{ $overallProgress < 0 ? 'text-danger' : '' }}">
+                                        {{ ($overallProgress >= 0 ? '+' : '') . $overallProgress }}%
+                                    </h2>
+                                    <span class="analytics-card-subtext font-small-2 text-muted">Vs. previous period</span>
+                                @else
+                                    <h2 class="analytics-card-val font-weight-bolder mb-0">—</h2>
+                                    <span class="analytics-card-subtext font-small-2 text-muted">No prior period data</span>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -123,8 +144,16 @@
                             <h4 class="card-title font-weight-bold mb-25">Performance Trend</h4>
                             <p class="text-muted font-small-3 mb-0">Your average score over time.</p>
                         </div>
-                        <div class="card-body pt-1 pb-2">
-                            <div id="performanceTrendChart" class="apex-charts-trend" style="min-height: 280px;"></div>
+                        <div class="card-body pt-1 pb-2 d-flex flex-column justify-content-center">
+                            @if(!empty($trendData['series']))
+                                <div id="performanceTrendChart" class="apex-charts-trend" style="min-height: 280px;"></div>
+                            @else
+                                <div class="text-center py-4 text-muted">
+                                    <i class="feather icon-trending-up font-large-2 d-block mb-1 opacity-75"></i>
+                                    <p class="mb-1">No completed assessments found in {{ strtolower($selectedPeriodLabel) }}.</p>
+                                    <a href="{{ route('student.assessments') }}" class="btn btn-sm btn-outline-primary">Start a Practice Test</a>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -137,32 +166,41 @@
                             <p class="text-muted font-small-3 mb-0">Your average score by subject.</p>
                         </div>
                         <div class="card-body pt-1 pb-2 d-flex flex-column justify-content-between">
-                            <div id="subjectPerformanceChart" class="apex-charts-subject" style="min-height: 220px;"></div>
+                            @if(!empty($hasSubjectData) && !empty($subjectPerformance))
+                                <div id="subjectPerformanceChart" class="apex-charts-subject" style="min-height: 220px;"></div>
 
-                            <!-- Subject Icons Legend Below Chart (matching reference) -->
-                            <div class="subject-icons-row d-flex justify-content-around text-center pt-1 mt-1 border-top">
-                                <!-- English -->
-                                <div class="subject-icon-item text-center">
-                                    <div class="subject-icon-box text-danger mx-auto mb-50" title="English">
-                                        <i data-lucide="book-open" style="width: 28px; height: 28px;"></i>
-                                    </div>
-                                    <span class="subject-icon-caption font-small-2 font-weight-bold text-muted">English</span>
+                                <div class="subject-icons-row d-flex justify-content-around text-center pt-1 mt-1 border-top">
+                                    @foreach($subjectPerformance as $subj)
+                                        @php
+                                            $iconColorClass = match ($subj['key']) {
+                                                'english' => 'text-danger',
+                                                'maths'   => 'text-primary',
+                                                'vr'      => 'text-warning',
+                                                'science' => 'text-success',
+                                                default   => 'text-info',
+                                            };
+                                            $lucideName = match ($subj['icon']) {
+                                                'book-open'  => 'book-open',
+                                                'calculator' => 'calculator',
+                                                'brain'      => 'brain',
+                                                'zap'        => 'zap',
+                                                default      => 'layers',
+                                            };
+                                        @endphp
+                                        <div class="subject-icon-item text-center">
+                                            <div class="subject-icon-box {{ $iconColorClass }} mx-auto mb-50" title="{{ $subj['title'] }}">
+                                                <i data-lucide="{{ $lucideName }}" style="width: 26px; height: 26px;"></i>
+                                            </div>
+                                            <span class="subject-icon-caption font-small-2 font-weight-bold text-muted">{{ $subj['title'] }}</span>
+                                        </div>
+                                    @endforeach
                                 </div>
-                                <!-- Maths -->
-                                <div class="subject-icon-item text-center">
-                                    <div class="subject-icon-box text-primary mx-auto mb-50" title="Maths">
-                                        <i data-lucide="calculator" style="width: 28px; height: 28px;"></i>
-                                    </div>
-                                    <span class="subject-icon-caption font-small-2 font-weight-bold text-muted">Maths</span>
+                            @else
+                                <div class="text-center py-4 my-auto text-muted">
+                                    <i class="feather icon-bar-chart-2 font-large-2 d-block mb-1 opacity-75"></i>
+                                    <p class="mb-0">Complete an assessment to view your subject breakdown.</p>
                                 </div>
-                                <!-- Verbal Reasoning -->
-                                <div class="subject-icon-item text-center">
-                                    <div class="subject-icon-box text-warning mx-auto mb-50" title="Verbal Reasoning">
-                                        <i data-lucide="brain" style="width: 28px; height: 28px;"></i>
-                                    </div>
-                                    <span class="subject-icon-caption font-small-2 font-weight-bold text-muted">Verbal Reasoning</span>
-                                </div>
-                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -196,28 +234,30 @@
                                         @forelse($recentAssessments as $recent)
                                             <tr>
                                                 <td class="font-small-3 text-muted pl-2 text-nowrap align-middle">
-                                                    {{ $recent->completed_at ? $recent->completed_at->format('d M Y') : $recent->created_at->format('d M Y') }}
+                                                    {{ $recent->display_date ? $recent->display_date->format('d M Y') : '' }}
                                                 </td>
                                                 <td class="font-small-3 font-weight-bold text-dark align-middle">
-                                                    <span class="text-truncate d-inline-block" style="max-width: 220px;" title="{{ $recent->paper?->title ?? 'Assessment' }}">
+                                                    <a href="{{ route('student.attempts.result', $recent->id) }}" class="text-truncate d-inline-block text-reset" style="max-width: 220px;" title="{{ $recent->paper?->title ?? 'Assessment' }}">
                                                         {{ $recent->paper?->title ?? 'Assessment' }}
-                                                    </span>
+                                                    </a>
                                                 </td>
                                                 <td class="text-center align-middle">
                                                     @if($recent->subject_badge_type === 'english')
-                                                        <span class="badge-subject badge-subject-english">English</span>
+                                                        <span class="badge-subject badge-subject-english">{{ $recent->subject_badge_name }}</span>
                                                     @elseif($recent->subject_badge_type === 'maths')
-                                                        <span class="badge-subject badge-subject-maths">Maths</span>
+                                                        <span class="badge-subject badge-subject-maths">{{ $recent->subject_badge_name }}</span>
+                                                    @elseif($recent->subject_badge_type === 'vr')
+                                                        <span class="badge-subject badge-subject-vr">{{ $recent->subject_badge_name }}</span>
                                                     @else
-                                                        <span class="badge-subject badge-subject-vr">VR</span>
+                                                        <span class="badge-subject badge-subject-maths">{{ $recent->subject_badge_name }}</span>
                                                     @endif
                                                 </td>
                                                 <td class="text-right pr-2 align-middle">
                                                     @php
                                                         $scoreColorClass = 'text-success';
-                                                        if ($recent->score_pct < 50) {
+                                                        if ($recent->score_pct < 61) {
                                                             $scoreColorClass = 'text-danger';
-                                                        } elseif ($recent->score_pct < 70) {
+                                                        } elseif ($recent->score_pct < 80) {
                                                             $scoreColorClass = 'text-warning';
                                                         }
                                                     @endphp
@@ -230,7 +270,7 @@
                                             <tr>
                                                 <td colspan="4" class="text-center py-4 text-muted">
                                                     <i class="feather icon-inbox font-large-1 d-block mb-1 text-muted"></i>
-                                                    No completed assessments found yet. Take a test to populate your analytics!
+                                                    No completed assessments found in this period yet.
                                                 </td>
                                             </tr>
                                         @endforelse
@@ -558,95 +598,97 @@ document.addEventListener("DOMContentLoaded", function () {
     // -------------------------------------------------------------------------
     // 1. Performance Trend Area Spline Chart
     // -------------------------------------------------------------------------
-    const trendCategories = {!! json_encode($trendData['categories']) !!};
-    const trendSeriesData = {!! json_encode($trendData['series']) !!};
-
-    const trendChartOptions = {
-        chart: {
-            type: 'area',
-            height: 280,
-            toolbar: { show: false },
-            parentHeightOffset: 0,
-            zoom: { enabled: false },
-            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-        },
-        series: [{
-            name: 'Average Score',
-            data: trendSeriesData
-        }],
-        colors: ['#2563eb'],
-        stroke: {
-            curve: 'smooth',
-            width: 3
-        },
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shadeIntensity: 1,
-                opacityFrom: 0.25,
-                opacityTo: 0.02,
-                stops: [0, 90, 100],
-                colorStops: [
-                    { offset: 0, color: '#2563eb', opacity: 0.28 },
-                    { offset: 100, color: '#2563eb', opacity: 0.02 }
-                ]
-            }
-        },
-        markers: {
-            size: 4,
-            colors: ['#2563eb'],
-            strokeColors: '#ffffff',
-            strokeWidth: 2,
-            hover: {
-                size: 6,
-                sizeOffset: 2
-            }
-        },
-        dataLabels: { enabled: false },
-        xaxis: {
-            categories: trendCategories,
-            labels: {
-                style: {
-                    colors: labelColor,
-                    fontSize: '11px',
-                    fontWeight: 500
-                }
-            },
-            axisBorder: { show: false },
-            axisTicks: { show: false }
-        },
-        yaxis: {
-            min: 0,
-            max: 100,
-            tickAmount: 4,
-            labels: {
-                formatter: function (val) {
-                    return Math.round(val) + '%';
-                },
-                style: {
-                    colors: labelColor,
-                    fontSize: '11px'
-                }
-            }
-        },
-        grid: {
-            borderColor: gridColor,
-            strokeDashArray: 4,
-            yaxis: { lines: { show: true } },
-            xaxis: { lines: { show: false } }
-        },
-        tooltip: {
-            theme: isDark ? 'dark' : 'light',
-            y: {
-                formatter: function (val) {
-                    return val + '%';
-                }
-            }
-        }
-    };
+    const trendCategories = @json($trendData['categories'] ?? []);
+    const trendSeriesData = @json($trendData['series'] ?? []);
+    const trendPointLabels = @json($trendData['labels'] ?? []);
 
     const trendChartEl = document.querySelector("#performanceTrendChart");
-    if (trendChartEl && typeof ApexCharts !== 'undefined') {
+    if (trendChartEl && trendSeriesData.length > 0 && typeof ApexCharts !== 'undefined') {
+        const trendChartOptions = {
+            chart: {
+                type: 'area',
+                height: 280,
+                toolbar: { show: false },
+                parentHeightOffset: 0,
+                zoom: { enabled: false },
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+            },
+            series: [{
+                name: 'Score',
+                data: trendSeriesData
+            }],
+            colors: ['#2563eb'],
+            stroke: {
+                curve: 'smooth',
+                width: 3
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.25,
+                    opacityTo: 0.02,
+                    stops: [0, 90, 100],
+                    colorStops: [
+                        { offset: 0, color: '#2563eb', opacity: 0.28 },
+                        { offset: 100, color: '#2563eb', opacity: 0.02 }
+                    ]
+                }
+            },
+            markers: {
+                size: 4,
+                colors: ['#2563eb'],
+                strokeColors: '#ffffff',
+                strokeWidth: 2,
+                hover: {
+                    size: 6,
+                    sizeOffset: 2
+                }
+            },
+            dataLabels: { enabled: false },
+            xaxis: {
+                categories: trendCategories,
+                labels: {
+                    style: {
+                        colors: labelColor,
+                        fontSize: '11px',
+                        fontWeight: 500
+                    }
+                },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                min: 0,
+                max: 100,
+                tickAmount: 4,
+                labels: {
+                    formatter: function (val) {
+                        return Math.round(val) + '%';
+                    },
+                    style: {
+                        colors: labelColor,
+                        fontSize: '11px'
+                    }
+                }
+            },
+            grid: {
+                borderColor: gridColor,
+                strokeDashArray: 4,
+                yaxis: { lines: { show: true } },
+                xaxis: { lines: { show: false } }
+            },
+            tooltip: {
+                theme: isDark ? 'dark' : 'light',
+                y: {
+                    formatter: function (val, opts) {
+                        const ctxLabel = trendPointLabels[opts.dataPointIndex] || '';
+                        return ctxLabel ? (val + '% (' + ctxLabel + ')') : (val + '%');
+                    }
+                }
+            }
+        };
+
         const trendChart = new ApexCharts(trendChartEl, trendChartOptions);
         trendChart.render();
     }
@@ -654,94 +696,89 @@ document.addEventListener("DOMContentLoaded", function () {
     // -------------------------------------------------------------------------
     // 2. Subject Performance Distributed Bar Chart
     // -------------------------------------------------------------------------
-    const subjectData = [
-        {{ $subjectPerformance['english']['score'] ?? 0 }},
-        {{ $subjectPerformance['maths']['score'] ?? 0 }},
-        {{ $subjectPerformance['vr']['score'] ?? 0 }}
-    ];
-
-    const subjectColors = ['#ef4444', '#2563eb', '#f59e0b'];
-
-    const subjectChartOptions = {
-        chart: {
-            type: 'bar',
-            height: 220,
-            toolbar: { show: false },
-            parentHeightOffset: 0,
-            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-        },
-        series: [{
-            name: 'Score',
-            data: subjectData
-        }],
-        colors: subjectColors,
-        plotOptions: {
-            bar: {
-                distributed: true,
-                borderRadius: 8,
-                columnWidth: '42%',
-                dataLabels: {
-                    position: 'top'
-                }
-            }
-        },
-        dataLabels: {
-            enabled: true,
-            formatter: function (val) {
-                return val + '%';
-            },
-            offsetY: -22,
-            style: {
-                fontSize: '13px',
-                fontWeight: '700',
-                colors: [textColor]
-            }
-        },
-        legend: { show: false },
-        xaxis: {
-            categories: ['English', 'Maths', 'Verbal Reasoning'],
-            labels: {
-                style: {
-                    colors: labelColor,
-                    fontSize: '12px',
-                    fontWeight: 600
-                }
-            },
-            axisBorder: { show: false },
-            axisTicks: { show: false }
-        },
-        yaxis: {
-            min: 0,
-            max: 100,
-            tickAmount: 4,
-            labels: {
-                formatter: function (val) {
-                    return Math.round(val) + '%';
-                },
-                style: {
-                    colors: labelColor,
-                    fontSize: '11px'
-                }
-            }
-        },
-        grid: {
-            borderColor: gridColor,
-            strokeDashArray: 4,
-            yaxis: { lines: { show: true } },
-            xaxis: { lines: { show: false } }
-        },
-        tooltip: {
-            theme: isDark ? 'dark' : 'light',
-            y: {
-                formatter: function (val) {
-                    return val + '% Average Score';
-                }
-            }
-        }
-    };
-
+    const subjectItems = @json($subjectPerformance ?? []);
     const subjectChartEl = document.querySelector("#subjectPerformanceChart");
-    if (subjectChartEl && typeof ApexCharts !== 'undefined') {
+
+    if (subjectChartEl && subjectItems.length > 0 && typeof ApexCharts !== 'undefined') {
+        const subjectChartOptions = {
+            chart: {
+                type: 'bar',
+                height: 220,
+                toolbar: { show: false },
+                parentHeightOffset: 0,
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+            },
+            series: [{
+                name: 'Score',
+                data: subjectItems.map(s => s.score)
+            }],
+            colors: subjectItems.map(s => s.color),
+            plotOptions: {
+                bar: {
+                    distributed: true,
+                    borderRadius: 8,
+                    columnWidth: subjectItems.length <= 3 ? '42%' : '55%',
+                    dataLabels: {
+                        position: 'top'
+                    }
+                }
+            },
+            dataLabels: {
+                enabled: true,
+                formatter: function (val) {
+                    return val + '%';
+                },
+                offsetY: -22,
+                style: {
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    colors: [textColor]
+                }
+            },
+            legend: { show: false },
+            xaxis: {
+                categories: subjectItems.map(s => s.title),
+                labels: {
+                    style: {
+                        colors: labelColor,
+                        fontSize: '12px',
+                        fontWeight: 600
+                    }
+                },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                min: 0,
+                max: 100,
+                tickAmount: 4,
+                labels: {
+                    formatter: function (val) {
+                        return Math.round(val) + '%';
+                    },
+                    style: {
+                        colors: labelColor,
+                        fontSize: '11px'
+                    }
+                }
+            },
+            grid: {
+                borderColor: gridColor,
+                strokeDashArray: 4,
+                yaxis: { lines: { show: true } },
+                xaxis: { lines: { show: false } }
+            },
+            tooltip: {
+                theme: isDark ? 'dark' : 'light',
+                y: {
+                    formatter: function (val, opts) {
+                        const tests = subjectItems[opts.dataPointIndex]?.tests ?? 0;
+                        return val + '% Average (' + tests + ' ' + (tests === 1 ? 'test' : 'tests') + ')';
+                    }
+                }
+            }
+        };
+
         const subjectChart = new ApexCharts(subjectChartEl, subjectChartOptions);
         subjectChart.render();
     }

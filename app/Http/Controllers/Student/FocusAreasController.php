@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\PaperAttempt;
 use App\Models\StudentAnswer;
 use App\Models\Subject;
-use App\Models\Topic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -16,7 +15,7 @@ class FocusAreasController extends Controller
     private const DEVELOPING_THRESHOLD = 61;
 
     /**
-     * Display the Student Focus Areas dashboard.
+     * Display the Student Focus Areas dashboard using real student attempt data.
      */
     public function index(Request $request)
     {
@@ -36,7 +35,6 @@ class FocusAreasController extends Controller
             '12_weeks' => 'Last 12 Weeks',
             'all'      => 'All Time',
         ];
-        $selectedPeriodLabel = $periodLabels[$period];
 
         $startDate = match ($period) {
             '4_weeks'  => now()->subWeeks(4)->startOfDay(),
@@ -59,23 +57,22 @@ class FocusAreasController extends Controller
             })->values()
             : $allAttempts;
 
-        // On initial default load without explicit period param, fall back to all attempts if recent window is empty
-        $activeAttempts = ($periodAttempts->isEmpty() && !$request->has('period') && $allAttempts->isNotEmpty())
-            ? $allAttempts
-            : $periodAttempts;
-
-        $isSamplePreview = $allAttempts->isEmpty();
-
-        if ($isSamplePreview) {
-            $topicItems = $this->buildSampleTopicItems();
-            $subjectOverview = $this->buildSampleSubjectOverview($topicItems);
+        // If default 12-week window has no attempts yet but older attempts exist, show All Time truthfully
+        if (!$request->has('period') && $periodAttempts->isEmpty() && $allAttempts->isNotEmpty()) {
+            $period = 'all';
+            $activeAttempts = $allAttempts;
         } else {
-            $topicItems = $this->buildTopicItemsFromAttempts($activeAttempts);
-            $subjectOverview = $this->buildSubjectOverview($activeAttempts, $topicItems);
+            $activeAttempts = $periodAttempts;
         }
 
-        // Default ordering: Accuracy (High to Low)
-        $topicItems = $topicItems->sortByDesc('accuracy')->values();
+        $selectedPeriodLabel = $periodLabels[$period];
+        $hasAttemptData = $activeAttempts->isNotEmpty();
+
+        $topicItems = $this->buildTopicItemsFromAttempts($activeAttempts)
+            ->sortByDesc('accuracy')
+            ->values();
+
+        $subjectOverview = $this->buildSubjectOverview($activeAttempts, $topicItems);
 
         // KPI counts directly consistent with evaluated topics
         $strongCount = $topicItems->where('status', 'strong')->count();
@@ -90,14 +87,13 @@ class FocusAreasController extends Controller
             ->values()
             ->take(3);
 
-        // Subject options for the filter dropdown
         $subjectOptions = $this->buildSubjectFilterOptions($topicItems, $subjectOverview);
 
         return view('student.focusareas.index', compact(
             'period',
             'periodLabels',
             'selectedPeriodLabel',
-            'isSamplePreview',
+            'hasAttemptData',
             'topicItems',
             'subjectOverview',
             'subjectOptions',
@@ -110,7 +106,7 @@ class FocusAreasController extends Controller
     }
 
     /**
-     * Build topic accuracy items from real completed attempts and question answers.
+     * Build topic accuracy items strictly from the student's completed attempts and answers.
      */
     protected function buildTopicItemsFromAttempts(Collection $attempts): Collection
     {
@@ -169,7 +165,7 @@ class FocusAreasController extends Controller
 
                 $key = 'topic_' . $resolvedTopic->id;
                 if (isset($topicBuckets[$key])) {
-                    continue; // Avoid mixing paper-level and question-level counts for the same topic
+                    continue;
                 }
 
                 $subject = $question->subject ?: $resolvedTopic->subject;
@@ -230,10 +226,14 @@ class FocusAreasController extends Controller
     }
 
     /**
-     * Build subject overview chart series and icons from real attempts/topics.
+     * Build subject overview chart series and icons from real attempts and active subjects.
      */
     protected function buildSubjectOverview(Collection $attempts, Collection $topicItems): array
     {
+        if ($attempts->isEmpty() && $topicItems->isEmpty()) {
+            return [];
+        }
+
         $subjects = Subject::where('is_active', true)->orderBy('id')->get();
         $overview = [];
 
@@ -252,13 +252,13 @@ class FocusAreasController extends Controller
             }
 
             $overview[] = [
-                'id'    => $subject->id,
-                'key'   => $meta['key'],
-                'title' => $meta['label'],
-                'score' => max(0, min(100, $score)),
-                'color' => $meta['color'],
+                'id'          => $subject->id,
+                'key'         => $meta['key'],
+                'title'       => $meta['label'],
+                'score'       => max(0, min(100, $score)),
+                'color'       => $meta['color'],
                 'color_light' => $meta['color_light'],
-                'icon'  => $meta['icon'],
+                'icon'        => $meta['icon'],
             ];
         }
 
@@ -269,13 +269,13 @@ class FocusAreasController extends Controller
                 $first = $items->first();
                 $meta = $this->resolveSubjectMeta($first['subject_name']);
                 $overview[] = [
-                    'id'    => $first['subject_id'],
-                    'key'   => $key,
-                    'title' => $first['subject_name'],
-                    'score' => (int) round($items->avg('accuracy')),
-                    'color' => $meta['color'],
+                    'id'          => $first['subject_id'],
+                    'key'         => $key,
+                    'title'       => $first['subject_name'],
+                    'score'       => (int) round($items->avg('accuracy')),
+                    'color'       => $meta['color'],
                     'color_light' => $meta['color_light'],
-                    'icon'  => $meta['icon'],
+                    'icon'        => $meta['icon'],
                 ];
             }
         }
@@ -284,94 +284,7 @@ class FocusAreasController extends Controller
     }
 
     /**
-     * Provide sample preview topic rows when a student has no completed attempts yet.
-     */
-    protected function buildSampleTopicItems(): Collection
-    {
-        $subjectsByKey = Subject::where('is_active', true)
-            ->get()
-            ->keyBy(fn($s) => $this->resolveSubjectMeta($s->title)['key']);
-
-        $topicsByName = Topic::where(function ($q) {
-            $q->whereNull('parent')->orWhere('parent', 0);
-        })->get()->keyBy(fn($t) => strtolower(trim($t->name)));
-
-        $curriculum = [
-            ['name' => 'Comprehension',        'subject' => 'English',          'accuracy' => 88],
-            ['name' => 'Number & Calculation', 'subject' => 'Maths',            'accuracy' => 84],
-            ['name' => 'Word Relationships',   'subject' => 'Verbal Reasoning', 'accuracy' => 82],
-            ['name' => 'Grammar',              'subject' => 'English',          'accuracy' => 80],
-            ['name' => 'Data Handling',        'subject' => 'Maths',            'accuracy' => 80],
-            ['name' => 'Problem Solving',      'subject' => 'Maths',            'accuracy' => 76],
-            ['name' => 'Vocabulary',           'subject' => 'English',          'accuracy' => 68],
-            ['name' => 'Sequences',            'subject' => 'Verbal Reasoning', 'accuracy' => 68],
-            ['name' => 'Creative Writing',     'subject' => 'English',          'accuracy' => 64],
-            ['name' => 'Shapes & Geometry',    'subject' => 'Maths',            'accuracy' => 58],
-            ['name' => 'Logical Reasoning',    'subject' => 'Verbal Reasoning', 'accuracy' => 56],
-            ['name' => 'Codes & Patterns',     'subject' => 'Verbal Reasoning', 'accuracy' => 52],
-        ];
-
-        return collect($curriculum)->map(function (array $item) use ($subjectsByKey, $topicsByName) {
-            $meta = $this->resolveSubjectMeta($item['subject']);
-            $status = $this->classifyAccuracy($item['accuracy']);
-            $matchedTopic = $topicsByName->get(strtolower($item['name']));
-            $matchedSubject = $subjectsByKey->get($meta['key']);
-
-            $url = $matchedTopic
-                ? route('student.topics.subtopics', $matchedTopic->id)
-                : ($matchedSubject
-                    ? route('student.assessments.topics', $matchedSubject->id)
-                    : route('student.assessments'));
-
-            return [
-                'id'            => $matchedTopic?->id,
-                'name'          => $item['name'],
-                'subject_id'    => $matchedSubject?->id,
-                'subject_key'   => $meta['key'],
-                'subject_name'  => $meta['label'],
-                'subject_badge' => $meta['badge'],
-                'accuracy'      => $item['accuracy'],
-                'attempts'      => 0,
-                'status'        => $status['key'],
-                'status_label'  => $status['label'],
-                'url'           => $url,
-            ];
-        })->values();
-    }
-
-    /**
-     * Build sample preview subject overview bars matching the sample topics.
-     */
-    protected function buildSampleSubjectOverview(Collection $topicItems): array
-    {
-        $definitions = [
-            'english' => 'English',
-            'maths'   => 'Maths',
-            'vr'      => 'Verbal Reasoning',
-        ];
-
-        $overview = [];
-        foreach ($definitions as $key => $title) {
-            $meta = $this->resolveSubjectMeta($title);
-            $matching = $topicItems->where('subject_key', $key);
-            $score = $matching->isNotEmpty() ? (int) round($matching->avg('accuracy')) : 0;
-
-            $overview[] = [
-                'id'          => null,
-                'key'         => $meta['key'],
-                'title'       => $meta['label'],
-                'score'       => $score,
-                'color'       => $meta['color'],
-                'color_light' => $meta['color_light'],
-                'icon'        => $meta['icon'],
-            ];
-        }
-
-        return $overview;
-    }
-
-    /**
-     * Collect unique subject dropdown options.
+     * Collect unique subject dropdown options from active subjects and evaluated topics.
      */
     protected function buildSubjectFilterOptions(Collection $topicItems, array $subjectOverview): array
     {

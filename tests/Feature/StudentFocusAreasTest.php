@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-test('student with no attempts sees focus areas layout with sample preview', function () {
+test('student with no attempts sees empty focus areas state without sample or mock data', function () {
     $student = User::factory()->create([
         'role'     => 'student',
         'username' => 'student_fa_empty_' . uniqid(),
@@ -27,18 +27,28 @@ test('student with no attempts sees focus areas layout with sample preview', fun
     $response->assertSee('Developing Areas');
     $response->assertSee('Areas to Improve');
     $response->assertSee('Total Topics');
-    $response->assertSee('Topic Performance');
-    $response->assertSee('Subject Overview');
-    $response->assertSee('Keep Going!');
-    $response->assertSee('Sample Preview');
-    $response->assertViewHas('isSamplePreview', true);
-    $response->assertViewHas('totalTopicsCount', 12);
+    $response->assertSee('No topic attempts');
+    $response->assertSee('Browse Assessments');
+
+    $response->assertDontSee('Sample Preview');
+    $response->assertDontSee('Codes &amp; Patterns', false);
+    $response->assertDontSee('88%');
+
+    $response->assertViewHas('hasAttemptData', false);
+    $response->assertViewHas('strongCount', 0);
+    $response->assertViewHas('developingCount', 0);
+    $response->assertViewHas('focusCount', 0);
+    $response->assertViewHas('totalTopicsCount', 0);
 });
 
 test('student with completed attempts sees real topic tiers, subject averages, and period filtering', function () {
     $student = User::factory()->create([
         'role'     => 'student',
         'username' => 'student_fa_real_' . uniqid(),
+    ]);
+    $otherStudent = User::factory()->create([
+        'role'     => 'student',
+        'username' => 'student_fa_other_' . uniqid(),
     ]);
 
     $english = Subject::create(['title' => 'English', 'is_active' => true]);
@@ -48,6 +58,7 @@ test('student with completed attempts sees real topic tiers, subject averages, a
     $compTopic = Topic::create(['name' => 'Comprehension', 'slug' => 'comprehension', 'subject_id' => $english->id]);
     $algebraTopic = Topic::create(['name' => 'Algebra', 'slug' => 'algebra', 'subject_id' => $maths->id]);
     $codesTopic = Topic::create(['name' => 'Codes & Patterns', 'slug' => 'codes-patterns', 'subject_id' => $vr->id]);
+    $otherTopic = Topic::create(['name' => 'Other Student Topic', 'slug' => 'other-topic', 'subject_id' => $english->id]);
 
     $engPaper = Paper::create([
         'title'      => 'Comprehension Paper 1',
@@ -66,6 +77,12 @@ test('student with completed attempts sees real topic tiers, subject averages, a
         'type'       => 'test',
         'subject_id' => $vr->id,
         'topic_id'   => $codesTopic->id,
+    ]);
+    $otherPaper = Paper::create([
+        'title'      => 'Other Paper',
+        'type'       => 'test',
+        'subject_id' => $english->id,
+        'topic_id'   => $otherTopic->id,
     ]);
 
     // Recent Strong attempt (90%)
@@ -98,10 +115,19 @@ test('student with completed attempts sees real topic tiers, subject averages, a
         'completed_at' => now()->subWeeks(6),
     ]);
 
-    // Default 12 weeks view includes all 3 attempts
+    // Other student's attempt — must NEVER appear for logged-in student
+    PaperAttempt::create([
+        'user_id'      => $otherStudent->id,
+        'paper_id'     => $otherPaper->id,
+        'status'       => 'completed',
+        'score'        => 2,
+        'max_score'    => 10,
+        'completed_at' => now()->subDays(2),
+    ]);
+
     $response = $this->actingAs($student)->get(route('student.focusareas'));
     $response->assertStatus(200);
-    $response->assertViewHas('isSamplePreview', false);
+    $response->assertViewHas('hasAttemptData', true);
     $response->assertViewHas('strongCount', 1);
     $response->assertViewHas('developingCount', 1);
     $response->assertViewHas('focusCount', 1);
@@ -113,6 +139,7 @@ test('student with completed attempts sees real topic tiers, subject averages, a
     $response->assertSee('70%');
     $response->assertSee('Codes &amp; Patterns', false);
     $response->assertSee('50%');
+    $response->assertDontSee('Other Student Topic');
 
     // Explicit 4_weeks filter excludes the 6-week-old VR attempt
     $fourWeeksResp = $this->actingAs($student)->get(route('student.focusareas', ['period' => '4_weeks']));
@@ -180,7 +207,7 @@ test('focus areas aggregates question-level topics when paper has no topic_id', 
 
     $response = $this->actingAs($student)->get(route('student.focusareas'));
     $response->assertStatus(200);
-    $response->assertViewHas('isSamplePreview', false);
+    $response->assertViewHas('hasAttemptData', true);
     $response->assertViewHas('focusCount', 1);
     $response->assertSee('Shapes &amp; Geometry', false);
     $response->assertSee('50%');

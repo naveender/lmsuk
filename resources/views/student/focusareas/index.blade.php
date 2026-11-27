@@ -907,12 +907,6 @@
                     <div class="fa-page-title-wrap">
                         <div class="fa-title-row">
                             <h1 class="fa-page-title">Focus Areas</h1>
-                            @if($isSamplePreview)
-                                <span class="fa-preview-badge">
-                                    <i class="feather icon-eye"></i>
-                                    <span>Sample Preview &middot; Complete tests to see your live scores</span>
-                                </span>
-                            @endif
                         </div>
                         <p class="fa-page-subtitle">Identify your strengths and areas to improve.</p>
                     </div>
@@ -1169,9 +1163,9 @@
                                 <p class="fa-card-subtitle">Average accuracy by subject.</p>
                             </div>
 
-                            <div id="subjectOverviewChart" class="fa-chart-box"></div>
+                            @if(!empty($hasAttemptData) && !empty($subjectOverview))
+                                <div id="subjectOverviewChart" class="fa-chart-box"></div>
 
-                            @if(!empty($subjectOverview))
                                 <div class="fa-subject-legend-grid" id="subjectLegendGrid" style="--subj-cols: {{ count($subjectOverview) }};">
                                     @foreach($subjectOverview as $subj)
                                         <div class="fa-subj-legend-item">
@@ -1200,6 +1194,15 @@
                                             </span>
                                         </div>
                                     @endforeach
+                                </div>
+                            @else
+                                <div class="fa-empty-box" style="padding: 1.75rem 1rem;">
+                                    <div class="fa-empty-icon">
+                                        <i class="feather icon-bar-chart-2" style="font-size: 1.35rem;"></i>
+                                    </div>
+                                    <p class="text-muted mb-0" style="font-size: 0.86rem;">
+                                        Complete an assessment to view your subject averages.
+                                    </p>
                                 </div>
                             @endif
                         </div>
@@ -1230,6 +1233,10 @@
                                             <span class="fa-improve-score">{{ $item['accuracy'] }}%</span>
                                         </a>
                                     @endforeach
+                                </div>
+                            @elseif($topicItems->isEmpty())
+                                <div class="text-muted" style="font-size: 0.86rem; padding-top: 4px;">
+                                    Complete a practice test to see topics that need extra focus.
                                 </div>
                             @else
                                 <div class="fa-improve-empty">
